@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Globalization;
 using System.Windows;
 using JebaitedPlayer.Infrastructure;
 using JebaitedPlayer.Mpv;
@@ -21,15 +20,13 @@ namespace JebaitedPlayer.ViewModels;
 /// </summary>
 public sealed class AutoSyncController : ObservableObject
 {
-    private static readonly CultureInfo Hr = CultureInfo.GetCultureInfo("hr-HR");
-
     private readonly AppSettings _settings;
     private readonly PlayerViewModel _vm;
     private readonly SpeechAnalysisService _speech;
     private CancellationTokenSource? _cts;
     private string? _audioTrack;
     private bool _isBusy;
-    private string _status = "Automatska sinkronizacija još nije pokrenuta za ove titlove.";
+    private Func<string> _status = () => Loc.T("autosync.notStarted");
     private double _progress;
 
     public AutoSyncController(AppSettings settings, PlayerViewModel vm, SpeechAnalysisService speech)
@@ -50,7 +47,7 @@ public sealed class AutoSyncController : ObservableObject
             ProgressValue = p;
             if (IsBusy)
             {
-                Status = $"Analiziram zvuk… {p.ToString("P0", Hr)}";
+                SetStatus(() => Loc.T("autosync.analyzingProgress", p));
             }
         });
     }
@@ -65,10 +62,20 @@ public sealed class AutoSyncController : ObservableObject
         private set => SetField(ref _isBusy, value);
     }
 
-    public string Status
+    /// <summary>Opis stanja na trenutnom jeziku (slaže se pri čitanju, pa prati promjenu jezika).</summary>
+    public string Status => _status();
+
+    /// <summary>Promjena jezika: status se ponovno složi.</summary>
+    public void RefreshTexts() => OnPropertyChanged(nameof(Status));
+
+    /// <summary>Opis rezultata analize na jeziku sučelja.</summary>
+    public static string DetailText(SyncResult r) =>
+        r.DetailKey.Length == 0 ? r.Detail : Loc.T("syncDetail." + r.DetailKey, r.DetailArgs);
+
+    private void SetStatus(Func<string> status)
     {
-        get => _status;
-        private set => SetField(ref _status, value);
+        _status = status;
+        OnPropertyChanged(nameof(Status));
     }
 
     public double ProgressValue
@@ -110,7 +117,7 @@ public sealed class AutoSyncController : ObservableObject
             LastTrackKey = null;
             IsBusy = false;
             ProgressValue = 0;
-            Status = "Automatska sinkronizacija još nije pokrenuta za ove titlove.";
+            SetStatus(() => Loc.T("autosync.notStarted"));
         };
     }
 
@@ -120,7 +127,7 @@ public sealed class AutoSyncController : ObservableObject
         SubtitleTrackInfo? track = _vm.Subtitles.SelectedTrack;
         if (track?.Prepared is not { IsBitmap: false })
         {
-            Message?.Invoke("Automatska sinkronizacija radi za vanjske tekstualne titlove (npr. .srt). Ugrađeni titlovi su već usklađeni s videom.");
+            Message?.Invoke(Loc.T("autosync.onlyExternal"));
             return;
         }
 
@@ -137,7 +144,7 @@ public sealed class AutoSyncController : ObservableObject
 
         if (cues.Count < 15)
         {
-            return new SyncResult { Verdict = SyncVerdict.NotEnoughData, Detail = $"premalo replika ({cues.Count})" };
+            return new SyncResult { Verdict = SyncVerdict.NotEnoughData, Detail = $"premalo replika ({cues.Count})", DetailKey = "fewCues", DetailArgs = [cues.Count] };
         }
 
         SpeechTrack speech = await _speech.GetAsync(video, AudioTrackForAnalysis, ct);
@@ -158,7 +165,7 @@ public sealed class AutoSyncController : ObservableObject
         {
             if (manual)
             {
-                Message?.Invoke("Ovaj video nema zvuk za provjeru titlova.");
+                Message?.Invoke(Loc.T("autosync.noAudio"));
             }
 
             return;
@@ -167,7 +174,8 @@ public sealed class AutoSyncController : ObservableObject
         IReadOnlyList<Cue> cues = prepared.Timings;
         if (cues.Count < 15)
         {
-            Status = $"Premalo replika za provjeru prema govoru ({cues.Count}).";
+            int count = cues.Count;
+            SetStatus(() => Loc.T("autosync.tooFewCues", count));
             if (manual)
             {
                 Message?.Invoke(Status);
@@ -182,16 +190,16 @@ public sealed class AutoSyncController : ObservableObject
         SubtitleTiming before = subs.Timing;
         SubtitleTimeMap? beforeMap = subs.TimeMap;
         IsBusy = true;
-        Status = "Analiziram zvuk…";
+        SetStatus(() => Loc.T("autosync.analyzing"));
         if (manual)
         {
-            Message?.Invoke("Sinkroniziram titlove prema govoru…");
+            Message?.Invoke(Loc.T("autosync.syncing"));
         }
 
         try
         {
             SpeechTrack speech = await _speech.GetAsync(video, AudioTrackForAnalysis, cts.Token);
-            Status = "Poravnavam titlove…";
+            SetStatus(() => Loc.T("autosync.aligning"));
             var sw = Stopwatch.StartNew();
             SyncResult r = await Task.Run(() => SubtitleAligner.Align(speech, cues), cts.Token);
             LastAlignMs = sw.ElapsedMilliseconds;
@@ -212,7 +220,8 @@ public sealed class AutoSyncController : ObservableObject
         }
         catch (Exception ex) when (ex is InvalidDataException or IOException or MpvException or DllNotFoundException or InvalidOperationException)
         {
-            Status = $"Analiza zvuka nije uspjela: {ex.Message}";
+            string error = ex.Message;
+            SetStatus(() => Loc.T("autosync.analysisFailed", error));
             Log.Warn(Status);
             if (manual)
             {
@@ -232,7 +241,7 @@ public sealed class AutoSyncController : ObservableObject
     private void Apply(SyncResult r, SubtitleTrackInfo track, SubtitleTiming before, SubtitleTimeMap? beforeMap, bool manual)
     {
         SubtitleController subs = _vm.Subtitles;
-        string parts = $"poklapa se {r.AgreeingWindows} od {r.Windows} dijelova filma";
+        string Parts() => Loc.T("autosync.agree", r.AgreeingWindows, r.Windows);
         switch (r.Verdict)
         {
             case SyncVerdict.InSync:
@@ -241,47 +250,47 @@ public sealed class AutoSyncController : ObservableObject
             {
                 if (!manual && (subs.Timing != before || !ReferenceEquals(subs.TimeMap, beforeMap)))
                 {
-                    Status = "Rezultat nije primijenjen jer si u međuvremenu ručno promijenio sinkronizaciju.";
-                    Message?.Invoke("Automatska sinkronizacija nije primijenjena: ručna sinkronizacija ima prednost.");
+                    SetStatus(() => Loc.T("autosync.manualWins"));
+                    Message?.Invoke(Loc.T("autosync.manualWinsMessage"));
                     return;
                 }
 
-                string what;
+                Func<string> what;
                 if (r.Verdict == SyncVerdict.CorrectedInParts)
                 {
                     // Titlovi za drugo izdanje: svaki dio dobije svoj pomak (ispravljena kopija), mpv bez dodatnog pomaka.
                     var map = new SubtitleTimeMap(r.Segments.Select(s => new SubtitleTimeMap.Segment(s.From * 1000, s.Speed, s.Offset * 1000)));
                     subs.ApplyAutoSync(track, SubtitleTiming.Identity, map);
-                    what = $"su za drugo izdanje videa pa su ispravljeni po dijelovima ({r.Segments.Count} dijelova, pomak od " +
-                           $"{FormatSeconds(map.MinOffsetMs / 1000)} do {FormatSeconds(map.MaxOffsetMs / 1000)})";
+                    int count = r.Segments.Count;
+                    double min = map.MinOffsetMs / 1000, max = map.MaxOffsetMs / 1000;
+                    what = () => Loc.T("autosync.whatParts", count, FormatSeconds(min), FormatSeconds(max));
                 }
                 else
                 {
                     SubtitleTiming target = r.Verdict == SyncVerdict.InSync ? SubtitleTiming.Identity : new SubtitleTiming(r.Speed, r.Offset * 1000);
                     subs.ApplyAutoSync(track, target);
                     what = r.Verdict == SyncVerdict.InSync
-                        ? "su već usklađeni s govorom"
-                        : $"sinkronizirani prema govoru: {Describe(target)}";
+                        ? () => Loc.T("autosync.whatInSync")
+                        : () => Loc.T("autosync.whatSynced", Describe(target));
                 }
 
-                Status = $"Titlovi {what} ({parts}).";
-                Message?.Invoke($"Titlovi {what}");
+                SetStatus(() => Loc.T("autosync.statusResult", what(), Parts()));
+                Message?.Invoke(Loc.T("autosync.messageResult", what()));
                 break;
             }
 
             case SyncVerdict.Uncertain:
-                Status = $"Sinkronizaciju nije moguće pouzdano provjeriti: {r.Detail}. Titlovi su ostavljeni kako jesu.";
-                Message?.Invoke($"Titlovi nisu automatski sinkronizirani: {r.Detail}. Uskladi ih ručno: Titlovi → Sinkronizacija titlova.");
+                SetStatus(() => Loc.T("autosync.uncertainStatus", DetailText(r)));
+                Message?.Invoke(Loc.T("autosync.uncertainMessage", DetailText(r)));
                 break;
 
             case SyncVerdict.Mismatch:
-                Status = "Titlovi se ne poklapaju s govorom ni uz korekciju po dijelovima: najvjerojatnije su za drugu epizodu ili drugi film.";
-                Message?.Invoke("Upozorenje: titlovi se ne poklapaju s govorom u ovom videu (najvjerojatnije su za drugu epizodu ili film). " +
-                                "Potraži druge titlove (Ctrl+F).");
+                SetStatus(() => Loc.T("autosync.mismatchStatus"));
+                Message?.Invoke(Loc.T("autosync.mismatchMessage"));
                 break;
 
             default:
-                Status = $"Premalo govora ili replika za provjeru ({r.Detail}).";
+                SetStatus(() => Loc.T("autosync.notEnoughStatus", DetailText(r)));
                 if (manual)
                 {
                     Message?.Invoke(Status);
@@ -294,7 +303,7 @@ public sealed class AutoSyncController : ObservableObject
     private static string FormatSeconds(double seconds)
     {
         string sign = seconds > 0.005 ? "+" : seconds < -0.005 ? "−" : string.Empty;
-        return $"{sign}{Math.Abs(seconds).ToString("0.0", Hr)} s";
+        return $"{sign}{Math.Abs(seconds).ToString("0.0", Loc.Culture)} s";
     }
 
     private static string DescribeSegments(SyncResult r) => string.Join(" | ", r.Segments.Select(s =>
@@ -303,13 +312,13 @@ public sealed class AutoSyncController : ObservableObject
     public static string Describe(SubtitleTiming t)
     {
         string sign = t.DelayMs > 0.5 ? "+" : t.DelayMs < -0.5 ? "−" : string.Empty;
-        string text = $"pomak {sign}{(Math.Abs(t.DelayMs) / 1000).ToString("0.00", Hr)} s";
+        string text = Loc.T("timing.offset", sign + (Math.Abs(t.DelayMs) / 1000).ToString("0.00", Loc.Culture));
         if (Math.Abs(t.Speed - 1) > 1e-6)
         {
-            string? preset = SubtitleTiming.FrameRatePresets.FirstOrDefault(p => Math.Abs(p.Speed - t.Speed) < 0.0004).Name;
-            text += preset != null
-                ? $", brzina {t.Speed.ToString("0.0000", Hr)}× ({preset.Replace("Titlovi ", "titlovi za ")})"
-                : $", brzina {t.Speed.ToString("0.0000", Hr)}×";
+            string speed = t.Speed.ToString("0.0000", Loc.Culture);
+            text += FrameRatePreset.Find(t.Speed, 0.0004) is { } preset
+                ? Loc.T("timing.speedPreset", speed, preset.Description)
+                : Loc.T("timing.speed", speed);
         }
 
         return text;

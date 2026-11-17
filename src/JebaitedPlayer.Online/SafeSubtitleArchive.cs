@@ -20,14 +20,14 @@ public static class SafeSubtitleArchive
     {
         if (IsRar(data))
         {
-            throw new ProviderException("Titlovi su u RAR arhivi, koju player još ne podržava.");
+            throw new ProviderException(Loc.T("online.archive.rar"));
         }
 
         if (!IsZip(data))
         {
             if (data.Length > MaxSubtitleBytes)
             {
-                throw new ProviderException("Datoteka titlova je prevelika.");
+                throw new ProviderException(Loc.T("online.archive.fileTooLarge"));
             }
 
             return new DownloadedSubtitle(SafeName(fallbackName), data);
@@ -36,7 +36,7 @@ public static class SafeSubtitleArchive
         using var zip = new ZipArchive(new MemoryStream(data, writable: false), ZipArchiveMode.Read);
         if (zip.Entries.Count > MaxEntries)
         {
-            throw new ProviderException("Arhiva ima previše datoteka.");
+            throw new ProviderException(Loc.T("online.archive.tooManyFiles"));
         }
 
         long total = 0;
@@ -53,18 +53,18 @@ public static class SafeSubtitleArchive
 
             if (entry.Length > MaxSubtitleBytes)
             {
-                throw new ProviderException("Titl u arhivi je prevelik.");
+                throw new ProviderException(Loc.T("online.archive.entryTooLarge"));
             }
 
             if (entry.CompressedLength > 0 && entry.Length / entry.CompressedLength > MaxCompressionRatio)
             {
-                throw new ProviderException("Arhiva izgleda sumnjivo (prevelik omjer sažimanja).");
+                throw new ProviderException(Loc.T("online.archive.suspicious"));
             }
 
             total += entry.Length;
             if (total > MaxTotalBytes)
             {
-                throw new ProviderException("Arhiva je prevelika.");
+                throw new ProviderException(Loc.T("online.archive.tooLarge"));
             }
 
             subtitles.Add((entry, name));
@@ -72,7 +72,7 @@ public static class SafeSubtitleArchive
 
         if (subtitles.Count == 0)
         {
-            throw new ProviderException("U arhivi nema datoteka titlova.");
+            throw new ProviderException(Loc.T("online.archive.noSubtitles"));
         }
 
         var chosen = subtitles
@@ -89,7 +89,7 @@ public static class SafeSubtitleArchive
         {
             if (buffer.Length + read > MaxSubtitleBytes)
             {
-                throw new ProviderException("Titl u arhivi je prevelik.");
+                throw new ProviderException(Loc.T("online.archive.entryTooLarge"));
             }
 
             buffer.Write(chunk, 0, read);

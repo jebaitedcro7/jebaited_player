@@ -18,49 +18,49 @@ public partial class MainWindow
     private void ShowContextMenu()
     {
         var menu = new ContextMenu { PlacementTarget = this, Placement = PlacementMode.MousePoint };
-        menu.Items.Add(Item("Otvori datoteku…", "Ctrl+O", ShowOpenDialog));
-        menu.Items.Add(Item("Otvori mapu…", "Ctrl+Shift+O", ShowOpenFolderDialog));
-        menu.Items.Add(Item("Reproduciraj / pauziraj", "Razmaknica", _vm.TogglePause, _vm.HasMedia));
-        menu.Items.Add(Item("Cijeli zaslon", "F", () => SetFullscreen(!_vm.IsFullscreen)));
+        menu.Items.Add(Item(Loc.T("menu.openFile"), "Ctrl+O", ShowOpenDialog));
+        menu.Items.Add(Item(Loc.T("menu.openFolder"), "Ctrl+Shift+O", ShowOpenFolderDialog));
+        menu.Items.Add(Item(Loc.T("menu.playPause"), Loc.T("key.space"), _vm.TogglePause, _vm.HasMedia));
+        menu.Items.Add(Item(Loc.T("menu.fullscreen"), "F", () => SetFullscreen(!_vm.IsFullscreen)));
         menu.Items.Add(new Separator());
         if (_vm.HasMedia && _vm.Library.HasPlaylist)
         {
-            menu.Items.Add(Item("Popis epizoda", "L", () => SetPlaylistPanel(PlaylistPanel.Visibility != Visibility.Visible)));
-            menu.Items.Add(Item("Sljedeća epizoda", "N", _vm.Library.PlayNext));
+            menu.Items.Add(Item(Loc.T("menu.playlist"), "L", () => SetPlaylistPanel(PlaylistPanel.Visibility != Visibility.Visible)));
+            menu.Items.Add(Item(Loc.T("menu.nextEpisode"), "N", _vm.Library.PlayNext));
         }
 
-        menu.Items.Add(Item(_vm.Library.IsCurrentFavorite ? "Ukloni iz omiljenih" : "Dodaj u omiljene", "Ctrl+D",
+        menu.Items.Add(Item(_vm.Library.IsCurrentFavorite ? Loc.T("home.removeFavorite") : Loc.T("menu.addFavorite"), "Ctrl+D",
             _vm.Library.ToggleFavorite, _vm.HasMedia));
         menu.Items.Add(new Separator());
 
-        var audio = new HoverIntentMenuItem { Header = "Audio", IsEnabled = _vm.HasMedia && _vm.Extras.AudioTracks.Count > 0 };
+        var audio = new HoverIntentMenuItem { Header = Loc.T("menu.audio"), IsEnabled = _vm.HasMedia && _vm.Extras.AudioTracks.Count > 0 };
         AddAudioItems(audio.Items);
         menu.Items.Add(audio);
 
-        var subtitles = new HoverIntentMenuItem { Header = "Titlovi", IsEnabled = _vm.HasMedia };
+        var subtitles = new HoverIntentMenuItem { Header = Loc.T("controls.subtitles"), IsEnabled = _vm.HasMedia };
         AddSubtitleItems(subtitles.Items);
         menu.Items.Add(subtitles);
 
-        var speed = new HoverIntentMenuItem { Header = $"Brzina ({_vm.Extras.SpeedText})", IsEnabled = _vm.HasMedia };
+        var speed = new HoverIntentMenuItem { Header = Loc.T("menu.speed", _vm.Extras.SpeedText), IsEnabled = _vm.HasMedia };
         AddSpeedItems(speed.Items);
         menu.Items.Add(speed);
 
-        var aspect = new HoverIntentMenuItem { Header = $"Omjer slike ({_vm.Extras.AspectName})", IsEnabled = _vm.HasMedia && !_vm.IsAudioOnly };
+        var aspect = new HoverIntentMenuItem { Header = Loc.T("menu.aspect", _vm.Extras.AspectName), IsEnabled = _vm.HasMedia && !_vm.IsAudioOnly };
         AddAspectItems(aspect.Items);
         menu.Items.Add(aspect);
 
         bool canShoot = _vm.HasMedia && !_vm.IsAudioOnly;
-        var shot = new HoverIntentMenuItem { Header = "Snimka zaslona" };
-        shot.Items.Add(Item("S titlovima", "S", () => _ = _vm.Extras.TakeScreenshotAsync(withSubtitles: true), canShoot));
-        shot.Items.Add(Item("Samo slika", "Shift+S", () => _ = _vm.Extras.TakeScreenshotAsync(withSubtitles: false), canShoot));
+        var shot = new HoverIntentMenuItem { Header = Loc.T("menu.screenshot") };
+        shot.Items.Add(Item(Loc.T("menu.screenshotWithSubs"), "S", () => _ = _vm.Extras.TakeScreenshotAsync(withSubtitles: true), canShoot));
+        shot.Items.Add(Item(Loc.T("menu.screenshotPictureOnly"), "Shift+S", () => _ = _vm.Extras.TakeScreenshotAsync(withSubtitles: false), canShoot));
         shot.Items.Add(new Separator());
-        shot.Items.Add(Item("Otvori mapu snimki", null, _vm.Extras.OpenScreenshotFolder));
+        shot.Items.Add(Item(Loc.T("menu.openScreenshotFolder"), null, _vm.Extras.OpenScreenshotFolder));
         menu.Items.Add(shot);
 
         menu.Items.Add(new Separator());
-        menu.Items.Add(Item("Postavke…", null, ShowPlayerSettings));
-        menu.Items.Add(Item("Tipkovnički prečaci", "F1", ShowShortcuts, _vm.HasMedia));
-        menu.Items.Add(Item("Izlaz", "Alt+F4", Close));
+        menu.Items.Add(Item(Loc.T("menu.settings"), null, ShowPlayerSettings));
+        menu.Items.Add(Item(Loc.T("menu.shortcuts"), "F1", ShowShortcuts, _vm.HasMedia));
+        menu.Items.Add(Item(Loc.T("menu.exit"), "Alt+F4", Close));
         OpenMenu(menu);
     }
 
@@ -83,7 +83,7 @@ public partial class MainWindow
         if (extras.AudioTracks.Count > 1)
         {
             items.Add(new Separator());
-            items.Add(Item("Sljedeća audio traka", "B", extras.CycleAudio));
+            items.Add(Item(Loc.T("menu.nextAudio"), "B", extras.CycleAudio));
         }
     }
 
@@ -93,27 +93,27 @@ public partial class MainWindow
         foreach (double s in PlaybackExtrasController.SpeedSteps)
         {
             double speed = s;
-            string name = Math.Abs(speed - 1) < 1e-9 ? "Normalna (1×)" : $"{speed.ToString("0.##", System.Globalization.CultureInfo.GetCultureInfo("hr-HR"))}×";
+            string name = Math.Abs(speed - 1) < 1e-9 ? Loc.T("menu.speedNormal") : $"{speed.ToString("0.##", Loc.Culture)}×";
             items.Add(Item(name, Math.Abs(speed - 1) < 1e-9 ? "Backspace" : null, () => extras.SetSpeed(speed),
                 isChecked: Math.Abs(extras.Speed - speed) < 1e-6));
         }
 
         items.Add(new Separator());
-        items.Add(Item("Brže", "+", () => extras.StepSpeed(+1), extras.Speed < 2 - 1e-6));
-        items.Add(Item("Sporije", "−", () => extras.StepSpeed(-1), extras.Speed > 0.5 + 1e-6));
+        items.Add(Item(Loc.T("menu.faster"), "+", () => extras.StepSpeed(+1), extras.Speed < 2 - 1e-6));
+        items.Add(Item(Loc.T("menu.slower"), "−", () => extras.StepSpeed(-1), extras.Speed > 0.5 + 1e-6));
     }
 
     private void AddAspectItems(ItemCollection items)
     {
         PlaybackExtrasController extras = _vm.Extras;
-        foreach (var (value, name) in PlaybackExtrasController.AspectModes)
+        foreach (var (value, nameKey) in PlaybackExtrasController.AspectModes)
         {
             string v = value;
-            items.Add(Item(name, null, () => extras.SetAspect(v), isChecked: extras.AspectMode == v));
+            items.Add(Item(Loc.T(nameKey), null, () => extras.SetAspect(v), isChecked: extras.AspectMode == v));
         }
 
         items.Add(new Separator());
-        items.Add(Item("Sljedeći omjer", "O", extras.CycleAspect));
+        items.Add(Item(Loc.T("menu.nextAspect"), "O", extras.CycleAspect));
     }
 
     private PlayerSettingsWindow? _playerSettingsWindow;
@@ -147,7 +147,7 @@ public partial class MainWindow
         SubtitleController subs = _vm.Subtitles;
         SubtitleTrackInfo? selected = subs.SelectedTrack;
 
-        items.Add(Item("Bez titlova", null, () => subs.SelectTrack(null), isChecked: selected is null));
+        items.Add(Item(Loc.T("menu.noSubtitles"), null, () => subs.SelectTrack(null), isChecked: selected is null));
         foreach (SubtitleTrackInfo track in subs.Tracks)
         {
             SubtitleTrackInfo t = track;
@@ -155,13 +155,13 @@ public partial class MainWindow
         }
 
         items.Add(new Separator());
-        items.Add(Item("Traži titlove na internetu…", "Ctrl+F", ShowSearchWindow));
-        items.Add(Item("Učitaj titlove iz datoteke…", "Ctrl+T", ShowLoadSubtitlesDialog));
+        items.Add(Item(Loc.T("menu.searchOnline"), "Ctrl+F", ShowSearchWindow));
+        items.Add(Item(Loc.T("menu.loadFromFile"), "Ctrl+T", ShowLoadSubtitlesDialog));
 
         if (selected?.Prepared is { IsBitmap: false } prepared)
         {
-            var encoding = new HoverIntentMenuItem { Header = $"Encoding: {prepared.EncodingName}" };
-            encoding.Items.Add(Item("Automatski", null, () => subs.ChangeEncoding(selected, null)));
+            var encoding = new HoverIntentMenuItem { Header = Loc.T("menu.encoding", prepared.EncodingName) };
+            encoding.Items.Add(Item(Loc.T("menu.encodingAuto"), null, () => subs.ChangeEncoding(selected, null)));
             foreach (var (codePage, name) in SubtitleEncoding.ManualChoices)
             {
                 int cp = codePage;
@@ -171,15 +171,15 @@ public partial class MainWindow
             items.Add(encoding);
         }
 
-        items.Add(Item(_autoSync.IsBusy ? "Sinkroniziram prema govoru…" : "Sinkroniziraj prema govoru", "A", _autoSync.SyncSelected,
+        items.Add(Item(_autoSync.IsBusy ? Loc.T("menu.syncBusy") : Loc.T("menu.sync"), "A", _autoSync.SyncSelected,
             selected?.Prepared is { IsBitmap: false } && !_autoSync.IsBusy));
-        items.Add(Item("Sinkronizacija titlova…", null, ShowSyncWindow, selected != null));
-        items.Add(Item("Vrati originalnu sinkronizaciju", "Ctrl+Backspace", subs.ResetSync, subs.HasCorrection));
-        items.Add(Item(subs.IsVisible ? "Sakrij titlove" : "Prikaži titlove", "V", subs.ToggleVisibility));
+        items.Add(Item(Loc.T("menu.syncWindow"), null, ShowSyncWindow, selected != null));
+        items.Add(Item(Loc.T("menu.resetSync"), "Ctrl+Backspace", subs.ResetSync, subs.HasCorrection));
+        items.Add(Item(subs.IsVisible ? Loc.T("menu.hideSubtitles") : Loc.T("menu.showSubtitles"), "V", subs.ToggleVisibility));
         items.Add(new Separator());
-        items.Add(Item("Postavke titlova…", null, ShowSubtitleSettings));
-        items.Add(Item("Postavi titlove s interneta…", null, () => ShowOnlineSetup()));
-        items.Add(Item("Izvori titlova (ključevi)…", null, ShowSourcesWindow));
+        items.Add(Item(Loc.T("settings.subtitleSettings"), null, ShowSubtitleSettings));
+        items.Add(Item(Loc.T("menu.onlineSetup"), null, () => ShowOnlineSetup()));
+        items.Add(Item(Loc.T("settings.sources"), null, ShowSourcesWindow));
     }
 
     private OnlineSetupWindow? _onlineSetupWindow;
@@ -235,7 +235,7 @@ public partial class MainWindow
     {
         if (!_vm.HasMedia)
         {
-            Notify("Prvo otvori video, a zatim traži titlove.");
+            Notify(Loc.T("notice.openVideoBeforeSearch"));
             return;
         }
 
@@ -350,13 +350,13 @@ public partial class MainWindow
     {
         if (!_vm.HasMedia)
         {
-            Notify("Prvo otvori video, a zatim dodaj titlove.");
+            Notify(Loc.T("notice.openVideoBeforeLoad"));
             return;
         }
 
         var dialog = new Microsoft.Win32.OpenFileDialog
         {
-            Title = "Učitaj titlove",
+            Title = Loc.T("dialog.loadSubtitles"),
             Multiselect = true,
             Filter = MediaFormats.SubtitleDialogFilter,
             InitialDirectory = _vm.Subtitles.VideoPath is { } video ? Path.GetDirectoryName(video) : null,

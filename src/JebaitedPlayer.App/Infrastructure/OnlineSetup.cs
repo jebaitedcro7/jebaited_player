@@ -57,18 +57,18 @@ internal static class OnlineSetup
         var lines = new List<string>
         {
             !string.IsNullOrWhiteSpace(o.OpenSubtitlesUsername) && OpenSubtitlesKey(o) != null
-                ? $"✓ OpenSubtitles: prijavljen kao {o.OpenSubtitlesUsername}"
+                ? Loc.T("wizard.summary.osLoggedIn", o.OpenSubtitlesUsername)
                 : OpenSubtitlesKey(o) != null
-                    ? "– OpenSubtitles: bez računa (najviše 5 preuzimanja dnevno)"
-                    : "– OpenSubtitles: nije postavljen",
-            Secret.Unprotect(o.SubDlApiKey) is { Length: > 0 } ? "✓ SubDL: ključ spremljen" : "– SubDL: nije postavljen",
+                    ? Loc.T("wizard.summary.osNoAccount")
+                    : Loc.T("wizard.summary.osNotSet"),
+            Secret.Unprotect(o.SubDlApiKey) is { Length: > 0 } ? Loc.T("wizard.summary.subdlSaved") : Loc.T("wizard.summary.subdlNotSet"),
             o.TitloviEnabled && !string.IsNullOrWhiteSpace(o.TitloviUsername)
-                ? $"✓ Titlovi.com: prijavljen kao {o.TitloviUsername}"
-                : "– Titlovi.com: nije postavljen",
+                ? Loc.T("wizard.summary.titloviLoggedIn", o.TitloviUsername)
+                : Loc.T("wizard.summary.titloviNotSet"),
         };
         string tail = HasPersonalSetup(o)
-            ? "Kad uz video nema hrvatskih titlova, player će ih sam potražiti."
-            : "Nijedan račun nije postavljen. Vodič možeš otvoriti kad god želiš.";
+            ? Loc.T("wizard.summary.ready")
+            : Loc.T("wizard.summary.none");
         return string.Join(Environment.NewLine, lines) + Environment.NewLine + Environment.NewLine + tail;
     }
 }

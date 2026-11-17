@@ -7,4 +7,13 @@
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\JebaitedPlayer.Localization\JebaitedPlayer.Localization.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Tekstovi sučelja (Languages/*.json). -->
+    <Using Include="JebaitedPlayer.Localization" />
+  </ItemGroup>
+
 </Project>

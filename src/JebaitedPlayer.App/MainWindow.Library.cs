@@ -45,7 +45,7 @@ public partial class MainWindow
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
             Log.Error("Otvaranje", ex);
-            Notify($"Otvaranje nije uspjelo: {ex.Message}");
+            Notify(Loc.T("error.openFailed", ex.Message));
         }
     }
 
@@ -61,6 +61,9 @@ public partial class MainWindow
                 break;
             case nameof(LibraryController.HasPlaylist) when !_vm.Library.HasPlaylist:
                 SetPlaylistPanel(false);
+                break;
+            case nameof(LibraryController.HasLibraryContent):
+                UpdateLogoSize();
                 break;
         }
     }
@@ -128,7 +131,7 @@ public partial class MainWindow
     {
         var dialog = new Microsoft.Win32.OpenFolderDialog
         {
-            Title = "Otvori mapu s filmovima ili serijom",
+            Title = Loc.T("dialog.openFolder"),
             Multiselect = false,
         };
 

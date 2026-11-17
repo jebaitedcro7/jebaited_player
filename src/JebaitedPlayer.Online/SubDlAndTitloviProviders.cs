@@ -18,7 +18,7 @@ public sealed class SubDlProvider(HttpClient http, Func<string?> apiKey) : ISubt
 
     public async Task<IReadOnlyList<SubtitleCandidate>> SearchAsync(SubtitleQuery query, CancellationToken ct)
     {
-        string key = apiKey() ?? throw new ProviderException("Nije upisan SubDL API ključ.");
+        string key = apiKey() ?? throw new ProviderException(Loc.T("online.subdl.noKey"));
         var p = new Dictionary<string, string>
         {
             ["api_key"] = key,
@@ -48,12 +48,12 @@ public sealed class SubDlProvider(HttpClient http, Func<string?> apiKey) : ISubt
         string json = await OnlineHttp.ReadTextAsync(response, ct);
         if (response.StatusCode is HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden)
         {
-            throw new ProviderException("SubDL je odbio API ključ.");
+            throw new ProviderException(Loc.T("online.subdl.keyRejected"));
         }
 
         if (response.StatusCode == HttpStatusCode.TooManyRequests)
         {
-            throw new ProviderException("SubDL: previše zahtjeva, pokušaj malo kasnije.");
+            throw new ProviderException(Loc.T("online.subdl.tooMany"));
         }
 
         return ParseSearch(json);
@@ -79,7 +79,7 @@ public sealed class SubDlProvider(HttpClient http, Func<string?> apiKey) : ISubt
             OnlineHttp.EnsureAllowed(response.RequestMessage?.RequestUri ?? uri, AllowedHosts);
             if (!response.IsSuccessStatusCode)
             {
-                throw new ProviderException($"SubDL preuzimanje nije uspjelo ({(int)response.StatusCode}).");
+                throw new ProviderException(Loc.T("online.subdl.downloadFailed", (int)response.StatusCode));
             }
 
             byte[] bytes = await OnlineHttp.ReadLimitedAsync(response, ct);
@@ -109,7 +109,7 @@ public sealed class SubDlProvider(HttpClient http, Func<string?> apiKey) : ISubt
         var info = MediaNameParser.Parse("Inception.2010.mkv");
         var q = new SubtitleQuery("test", info, null, 0, null, ["en"]);
         IReadOnlyList<SubtitleCandidate> results = await SearchAsync(q, ct);
-        return $"API ključ radi (probna pretraga: {results.Count} rezultata).";
+        return Loc.T("online.subdl.keyOk", results.Count);
     }
 
     internal static IReadOnlyList<SubtitleCandidate> ParseSearch(string json)
@@ -119,7 +119,7 @@ public sealed class SubDlProvider(HttpClient http, Func<string?> apiKey) : ISubt
         var list = new List<SubtitleCandidate>();
         if (root.TryGetProperty("status", out JsonElement status) && status.ValueKind == JsonValueKind.False)
         {
-            string message = Json.Str(root, "error") ?? Json.Str(root, "message") ?? "nepoznata greška";
+            string message = Json.Str(root, "error") ?? Json.Str(root, "message") ?? Loc.T("error.unknown");
             if (message.Contains("can't find", StringComparison.OrdinalIgnoreCase) || message.Contains("not found", StringComparison.OrdinalIgnoreCase))
             {
                 return list;
@@ -228,7 +228,7 @@ public sealed class TitloviProvider(HttpClient http, Func<TitloviCredentials?> c
         if (response.StatusCode is HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden)
         {
             _token = null;
-            throw new ProviderException("Titlovi.com je odbio prijavu.");
+            throw new ProviderException(Loc.T("online.titlovi.rejected"));
         }
 
         response.EnsureSuccessStatusCode();
@@ -254,7 +254,7 @@ public sealed class TitloviProvider(HttpClient http, Func<TitloviCredentials?> c
     {
         _token = null;
         await EnsureTokenAsync(ct);
-        return "Prijava na Titlovi.com uspjela.";
+        return Loc.T("online.titlovi.loginOk");
     }
 
     internal static IReadOnlyList<SubtitleCandidate> ParseSearch(string json)
@@ -301,7 +301,7 @@ public sealed class TitloviProvider(HttpClient http, Func<TitloviCredentials?> c
             return;
         }
 
-        TitloviCredentials c = credentials() ?? throw new ProviderException("Nije upisan Titlovi.com račun.");
+        TitloviCredentials c = credentials() ?? throw new ProviderException(Loc.T("online.titlovi.noAccount"));
         var p = new Dictionary<string, string> { ["username"] = c.Username, ["password"] = c.Password, ["json"] = "true" };
         var uri = new Uri($"{Api}/gettoken?{OnlineHttp.QueryString(p)}");
         OnlineHttp.EnsureAllowed(uri, AllowedHosts);
@@ -310,12 +310,12 @@ public sealed class TitloviProvider(HttpClient http, Func<TitloviCredentials?> c
         if (!response.IsSuccessStatusCode)
         {
             throw new ProviderException(response.StatusCode == HttpStatusCode.Forbidden
-                ? "Prijava na Titlovi.com nije uspjela (korisničko ime ili lozinka)."
-                : $"Titlovi.com prijava nije uspjela ({(int)response.StatusCode}).");
+                ? Loc.T("online.titlovi.loginFailed")
+                : Loc.T("online.titlovi.loginFailedCode", (int)response.StatusCode));
         }
 
         using JsonDocument doc = JsonDocument.Parse(await OnlineHttp.ReadTextAsync(response, ct));
-        _token = Json.Str(doc.RootElement, "Token") ?? throw new ProviderException("Titlovi.com nije vratio token.");
+        _token = Json.Str(doc.RootElement, "Token") ?? throw new ProviderException(Loc.T("online.titlovi.noToken"));
         _userId = Json.Str(doc.RootElement, "UserId") ?? string.Empty;
         _tokenExpires = Json.Str(doc.RootElement, "ExpirationDate") is { } exp &&
                         DateTime.TryParse(exp, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal, out DateTime e)

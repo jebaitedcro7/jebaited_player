@@ -15,7 +15,7 @@ public sealed record AudioTrackInfo(long Id, string? Title, string? Language, st
     {
         get
         {
-            var parts = new List<string> { Language is null ? "Nepoznat jezik" : SubtitleLanguage.DisplayName(Language) };
+            var parts = new List<string> { Language is null ? Loc.T("audio.unknownLanguage") : SubtitleLanguage.DisplayName(Language) };
             string format = string.Join(' ', new[] { CodecName(Codec), ChannelName(Channels) }.Where(s => s.Length > 0));
             if (format.Length > 0)
             {
@@ -51,7 +51,7 @@ public sealed record AudioTrackInfo(long Id, string? Title, string? Language, st
         2 => "stereo",
         6 => "5.1",
         8 => "7.1",
-        int n => $"{n} kan.",
+        int n => Loc.T("audio.channels", n),
     };
 }
 
@@ -63,17 +63,16 @@ public sealed class PlaybackExtrasController(AppSettings settings, PlayerViewMod
 {
     public static readonly double[] SpeedSteps = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0];
 
-    public static readonly IReadOnlyList<(string Value, string Name)> AspectModes =
+    /// <summary>Omjeri slike: vrijednost za mpv i ključ naziva (Languages/*.json).</summary>
+    public static readonly IReadOnlyList<(string Value, string NameKey)> AspectModes =
     [
-        ("auto", "Izvorni"),
-        ("16:9", "16:9"),
-        ("4:3", "4:3"),
-        ("1.85:1", "1,85:1"),
-        ("2.35:1", "2,35:1"),
-        ("fill", "Ispuni zaslon (rubovi se režu)"),
+        ("auto", "aspect.original"),
+        ("16:9", "aspect.16x9"),
+        ("4:3", "aspect.4x3"),
+        ("1.85:1", "aspect.185"),
+        ("2.35:1", "aspect.235"),
+        ("fill", "aspect.fill"),
     ];
-
-    private static readonly CultureInfo Hr = CultureInfo.GetCultureInfo("hr-HR");
 
     private MpvPlayer? _player;
     private IReadOnlyList<AudioTrackInfo> _audioTracks = [];
@@ -111,7 +110,7 @@ public sealed class PlaybackExtrasController(AppSettings settings, PlayerViewMod
         }
     }
 
-    public string SpeedText => $"{Speed.ToString("0.##", Hr)}×";
+    public string SpeedText => $"{Speed.ToString("0.##", Loc.Culture)}×";
 
     public bool IsSpeedChanged => Math.Abs(Speed - 1) > 1e-6;
 
@@ -127,7 +126,7 @@ public sealed class PlaybackExtrasController(AppSettings settings, PlayerViewMod
         }
     }
 
-    public string AspectName => AspectModes.FirstOrDefault(m => m.Value == _aspect).Name ?? _aspect;
+    public string AspectName => AspectModes.FirstOrDefault(m => m.Value == _aspect).NameKey is { } key ? Loc.T(key) : _aspect;
 
     /// <summary>Zadnja spremljena snimka (za dijagnostiku).</summary>
     public string? LastScreenshot { get; private set; }
@@ -180,7 +179,7 @@ public sealed class PlaybackExtrasController(AppSettings settings, PlayerViewMod
         }
 
         _player.SetPropertyAsync("aid", track.Id.ToString(CultureInfo.InvariantCulture));
-        vm.ShowOsd($"Audio: {track.DisplayName}", 2000);
+        vm.ShowOsd(Loc.T("osd.audio", track.DisplayName), 2000);
         if (vm.CurrentPath is { } path)
         {
             Safe(() => store?.SaveAudioState(path, new AudioState(track.Id, track.Language)));
@@ -192,13 +191,13 @@ public sealed class PlaybackExtrasController(AppSettings settings, PlayerViewMod
     {
         if (_audioTracks.Count == 0)
         {
-            vm.ShowOsd("Nema audio traka");
+            vm.ShowOsd(Loc.T("osd.noAudio"));
             return;
         }
 
         if (_audioTracks.Count == 1)
         {
-            vm.ShowOsd($"Samo jedna audio traka: {_audioTracks[0].DisplayName}", 2000);
+            vm.ShowOsd(Loc.T("osd.singleAudio", _audioTracks[0].DisplayName), 2000);
             return;
         }
 
@@ -275,7 +274,7 @@ public sealed class PlaybackExtrasController(AppSettings settings, PlayerViewMod
         speed = Math.Clamp(Math.Round(speed, 2), 0.5, 2.0);
         _player?.SetPropertyAsync("speed", speed);
         Speed = speed;
-        vm.ShowOsd($"Brzina reprodukcije: {SpeedText}");
+        vm.ShowOsd(Loc.T("osd.speed", SpeedText));
     }
 
     /// <summary>Tipke [ i ]: sljedeća manja ili veća brzina iz popisa.</summary>
@@ -299,7 +298,7 @@ public sealed class PlaybackExtrasController(AppSettings settings, PlayerViewMod
         _player.SetPropertyAsync("video-aspect-override", mode is "auto" or "fill" ? "-1" : mode);
         _player.SetPropertyAsync("panscan", mode == "fill" ? 1.0 : 0.0);
         AspectMode = mode;
-        vm.ShowOsd($"Omjer slike: {AspectName}");
+        vm.ShowOsd(Loc.T("osd.aspect", AspectName));
     }
 
     /// <summary>Tipka O: sljedeći omjer slike.</summary>
@@ -316,7 +315,7 @@ public sealed class PlaybackExtrasController(AppSettings settings, PlayerViewMod
     {
         if (_player is null || !vm.HasMedia || vm.IsAudioOnly)
         {
-            Message?.Invoke("Snimka zaslona radi samo dok se reproducira video.");
+            Message?.Invoke(Loc.T("notice.screenshotNeedsVideo"));
             return null;
         }
 
@@ -329,7 +328,7 @@ public sealed class PlaybackExtrasController(AppSettings settings, PlayerViewMod
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
         {
-            Message?.Invoke($"Mapa za snimke nije dostupna: {ex.Message}");
+            Message?.Invoke(Loc.T("notice.screenshotFolderUnavailable", ex.Message));
             return null;
         }
 
@@ -342,13 +341,13 @@ public sealed class PlaybackExtrasController(AppSettings settings, PlayerViewMod
             if (File.Exists(path) && new FileInfo(path).Length > 0)
             {
                 LastScreenshot = path;
-                Message?.Invoke($"Snimka spremljena: {Path.GetFileName(path)}");
+                Message?.Invoke(Loc.T("notice.screenshotSaved", Path.GetFileName(path)));
                 Log.Info($"Snimka zaslona: {path}");
                 return path;
             }
         }
 
-        Message?.Invoke("Snimka zaslona nije spremljena.");
+        Message?.Invoke(Loc.T("notice.screenshotFailed"));
         return null;
     }
 
@@ -362,7 +361,7 @@ public sealed class PlaybackExtrasController(AppSettings settings, PlayerViewMod
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or System.ComponentModel.Win32Exception)
         {
-            Message?.Invoke($"Mapa za snimke nije dostupna: {ex.Message}");
+            Message?.Invoke(Loc.T("notice.screenshotFolderUnavailable", ex.Message));
         }
     }
 

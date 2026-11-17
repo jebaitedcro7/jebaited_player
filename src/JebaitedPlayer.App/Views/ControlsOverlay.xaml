@@ -1,7 +1,8 @@
 <Window x:Class="JebaitedPlayer.Views.ControlsOverlay"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="jebaited_player kontrole"
+        xmlns:loc="clr-namespace:JebaitedPlayer.Infrastructure"
+        Title="{loc:T controls.windowTitle}"
         WindowStyle="None" AllowsTransparency="True" Background="Transparent"
         ShowInTaskbar="False" ShowActivated="False" ResizeMode="NoResize"
         Focusable="False" AllowDrop="True" UseLayoutRounding="True"
@@ -53,12 +54,12 @@
 
                 <StackPanel Orientation="Horizontal">
                     <Button Style="{StaticResource IconButton}" FontSize="20" Content="{Binding PlayPauseGlyph}"
-                            Command="{Binding PlayPauseCommand}" ToolTip="Reproduciraj / pauziraj (Razmaknica)" />
+                            Command="{Binding PlayPauseCommand}" ToolTip="{loc:T controls.playPause}" />
                     <Button Style="{StaticResource IconButton}" Margin="8,0,0,0" Content="{Binding VolumeGlyph}"
-                            Command="{Binding MuteCommand}" ToolTip="Isključi / uključi zvuk (M)" />
+                            Command="{Binding MuteCommand}" ToolTip="{loc:T controls.mute}" />
                     <Slider Style="{StaticResource PlayerSlider}" Width="96" Margin="4,0,0,0" VerticalAlignment="Center"
                             Minimum="0" Maximum="100" SmallChange="5" LargeChange="10"
-                            Value="{Binding Volume, Mode=TwoWay}" ToolTip="Glasnoća (↑ / ↓)" />
+                            Value="{Binding Volume, Mode=TwoWay}" ToolTip="{loc:T controls.volume}" />
                     <TextBlock Text="{Binding VolumeText}" Style="{StaticResource TimeText}" Margin="10,0,0,0" MinWidth="40"
                                Foreground="{DynamicResource TextSecondaryBrush}" />
                 </StackPanel>
@@ -70,23 +71,23 @@
                 <StackPanel Grid.Column="2" Orientation="Horizontal">
                     <Button x:Name="SpeedButton" Style="{StaticResource IconButton}" Content="{Binding Extras.SpeedText}"
                             FontFamily="{DynamicResource UiFont}" FontSize="13" Width="Auto" MinWidth="54" Margin="0,0,4,0"
-                            ToolTip="Brzina reprodukcije (+ / − / Backspace)" Click="OnSpeedClick"
+                            ToolTip="{loc:T controls.speed}" Click="OnSpeedClick"
                             Visibility="{Binding Extras.IsSpeedChanged, Converter={StaticResource BoolToVisibility}}" />
                     <Button Style="{StaticResource IconButton}" Content="{Binding Library.FavoriteGlyph}"
                             ToolTip="{Binding Library.FavoriteToolTip}" Command="{Binding Library.ToggleFavoriteCommand}" Margin="0,0,4,0"
                             Visibility="{Binding HasMedia, Converter={StaticResource BoolToVisibility}}" />
-                    <Button x:Name="AudioButton" Style="{StaticResource IconButton}" Content="&#xE8D6;" ToolTip="Audio traka (B)"
+                    <Button x:Name="AudioButton" Style="{StaticResource IconButton}" Content="&#xE8D6;" ToolTip="{loc:T controls.audioTrack}"
                             Click="OnAudioClick" Margin="0,0,4,0"
                             Visibility="{Binding Extras.HasMultipleAudio, Converter={StaticResource BoolToVisibility}}" />
-                    <Button Style="{StaticResource IconButton}" Content="&#xE8FD;" ToolTip="Popis epizoda (L)"
+                    <Button Style="{StaticResource IconButton}" Content="&#xE8FD;" ToolTip="{loc:T controls.playlist}"
                             Click="OnPlaylistClick" Margin="0,0,4,0"
                             Visibility="{Binding Library.HasPlaylist, Converter={StaticResource BoolToVisibility}}" />
                     <Button x:Name="SubtitlesButton" Style="{StaticResource IconButton}" Content="&#xE7F0;"
-                            ToolTip="Titlovi" Click="OnSubtitlesClick" Margin="0,0,4,0" />
+                            ToolTip="{loc:T controls.subtitles}" Click="OnSubtitlesClick" Margin="0,0,4,0" />
                     <Button Style="{StaticResource IconButton}" Content="&#xE8E5;" Command="{Binding OpenCommand}"
-                            ToolTip="Otvori datoteku (Ctrl+O)" />
+                            ToolTip="{loc:T controls.open}" />
                     <Button Style="{StaticResource IconButton}" Margin="4,0,0,0" Content="{Binding FullscreenGlyph}"
-                            Command="{Binding FullscreenCommand}" ToolTip="Cijeli zaslon (F)" />
+                            Command="{Binding FullscreenCommand}" ToolTip="{loc:T controls.fullscreen}" />
                 </StackPanel>
             </Grid>
         </Grid>

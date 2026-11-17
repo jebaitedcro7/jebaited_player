@@ -72,7 +72,7 @@ public sealed class MpvPlayer : IDisposable
         _handle = LibMpv.mpv_create();
         if (_handle == 0)
         {
-            throw new MpvException(-1, "mpv_create nije uspio.");
+            throw new MpvException(-1, Loc.T("error.mpv.create"));
         }
     }
 
@@ -114,7 +114,7 @@ public sealed class MpvPlayer : IDisposable
         int r = LibMpv.mpv_set_option_string(_handle, name, value);
         if (r < 0)
         {
-            throw new MpvException(r, $"Opcija '{name}' nije prihvaćena: {ErrorString(r)}");
+            throw new MpvException(r, Loc.T("error.mpv.option", name, ErrorString(r)));
         }
     }
 
@@ -143,7 +143,7 @@ public sealed class MpvPlayer : IDisposable
         int r = LibMpv.mpv_observe_property(_handle, ++_nextObserveId, name, format);
         if (r < 0)
         {
-            throw new MpvException(r, $"Praćenje svojstva '{name}': {ErrorString(r)}");
+            throw new MpvException(r, Loc.T("error.mpv.observe", name, ErrorString(r)));
         }
     }
 
@@ -161,7 +161,7 @@ public sealed class MpvPlayer : IDisposable
     {
         if (!RunCommand(args, async: false))
         {
-            throw new MpvException(-1, $"Naredba '{args[0]}' nije uspjela.");
+            throw new MpvException(-1, Loc.T("error.mpv.command", args[0]));
         }
     }
 

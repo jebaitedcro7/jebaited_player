@@ -157,7 +157,7 @@ public static class MpvAudioExtractor
             if (first != connect)
             {
                 MpvEndFileEventArgs? e = await ended.Task.ConfigureAwait(false);
-                throw new InvalidDataException(e?.ErrorText ?? error ?? "Datoteka nema zvuk koji se može analizirati.");
+                throw new InvalidDataException(e?.ErrorText ?? error ?? Loc.T("error.noAnalyzableAudio"));
             }
 
             await connect.ConfigureAwait(false);

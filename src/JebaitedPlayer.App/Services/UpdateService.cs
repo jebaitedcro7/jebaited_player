@@ -74,7 +74,8 @@ public sealed class UpdateService
     public UpdateState State => _state;
 
     /// <summary>Tekst za postavke, npr. "Nova verzija 1.0.1 je preuzeta…".</summary>
-    public string Status => _status;
+    /// <summary>Opis stanja na trenutnom jeziku (čita se svaki put, pa prati promjenu jezika).</summary>
+    public string Status => DescribeState();
 
     /// <summary>
     /// Provjeri i (ako postoji) preuzmi novu verziju. Bez mreže ili kad GitHub ne odgovara samo zapiše u log.
@@ -167,12 +168,12 @@ public sealed class UpdateService
 
     private string DescribeState() => _state switch
     {
-        UpdateState.NotInstalled => "Nadogradnje rade u instaliranoj verziji (ova je pokrenuta izvan instalacije).",
-        UpdateState.Checking => "Provjeravam postoji li nova verzija…",
-        UpdateState.Downloading => "Preuzimam novu verziju…",
-        UpdateState.UpToDate => "Imaš najnoviju verziju.",
-        UpdateState.Ready => $"Nova verzija {ReadyVersion} je preuzeta. Instalirat će se kad zatvoriš player.",
-        UpdateState.Failed => "Provjera nije uspjela (nema veze s internetom ili GitHub ne odgovara). Pokušat ću kasnije.",
+        UpdateState.NotInstalled => Loc.T("update.notInstalled"),
+        UpdateState.Checking => Loc.T("update.checking"),
+        UpdateState.Downloading => Loc.T("update.downloading"),
+        UpdateState.UpToDate => Loc.T("update.upToDate"),
+        UpdateState.Ready => Loc.T("update.downloaded", ReadyVersion),
+        UpdateState.Failed => Loc.T("update.failed"),
         _ => string.Empty,
     };
 

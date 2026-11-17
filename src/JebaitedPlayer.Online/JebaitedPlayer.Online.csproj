@@ -6,8 +6,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\JebaitedPlayer.Localization\JebaitedPlayer.Localization.csproj" />
     <ProjectReference Include="..\JebaitedPlayer.Library\JebaitedPlayer.Library.csproj" />
     <ProjectReference Include="..\JebaitedPlayer.Subtitles\JebaitedPlayer.Subtitles.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Tekstovi sučelja (Languages/*.json). -->
+    <Using Include="JebaitedPlayer.Localization" />
   </ItemGroup>
 
   <ItemGroup>

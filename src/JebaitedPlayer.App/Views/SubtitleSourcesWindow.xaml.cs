@@ -35,7 +35,7 @@ public partial class SubtitleSourcesWindow : Window
         TitloviPassword.Password = Secret.Unprotect(o.TitloviPassword) ?? string.Empty;
         if (AppSecrets.HasOpenSubtitlesAppKey)
         {
-            OsKeyHint.Text = "API ključ nije potreban (player ima svoj); upiši ga samo ako želiš koristiti vlastiti.";
+            OsKeyHint.Bind(TextBlock.TextProperty, "sources.keyOptional");
         }
     }
 
@@ -93,7 +93,7 @@ public partial class SubtitleSourcesWindow : Window
     {
         var button = (Button)sender;
         button.IsEnabled = false;
-        status.Text = "Provjeravam…";
+        status.Text = Loc.T("wizard.checking");
         try
         {
             using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(25));
@@ -101,7 +101,7 @@ public partial class SubtitleSourcesWindow : Window
         }
         catch (Exception ex) when (ex is ProviderException or HttpRequestException or TaskCanceledException or System.Text.Json.JsonException)
         {
-            status.Text = "✗ " + (ex is TaskCanceledException ? "Izvor ne odgovara." : ex.Message);
+            status.Text = "✗ " + (ex is TaskCanceledException ? Loc.T("sources.timeout") : ex.Message);
         }
         finally
         {

@@ -37,7 +37,7 @@ public sealed class SubtitleSearchService(IReadOnlyList<ISubtitleProvider> provi
     public async Task<DownloadedSubtitle> DownloadAsync(SubtitleCandidate candidate, SubtitleQuery query, CancellationToken ct)
     {
         ISubtitleProvider provider = providers.FirstOrDefault(p => p.Name == candidate.Provider)
-                                     ?? throw new ProviderException($"Izvor {candidate.Provider} nije dostupan.");
+                                     ?? throw new ProviderException(Loc.T("online.sourceUnavailable", candidate.Provider));
         string? file = DownloadCacheFile(candidate);
         if (file != null && TryReadDownload(file) is { } cached)
         {
@@ -148,15 +148,15 @@ public sealed class SubtitleSearchService(IReadOnlyList<ISubtitleProvider> provi
         }
         catch (OperationCanceledException) when (!ct.IsCancellationRequested)
         {
-            return (new ProviderResult(provider.Name, false, 0, $"{provider.Name} ne odgovara (isteklo vrijeme).", false), []);
+            return (new ProviderResult(provider.Name, false, 0, Loc.T("online.timeout", provider.Name), false), []);
         }
         catch (HttpRequestException ex)
         {
-            return (new ProviderResult(provider.Name, false, 0, $"{provider.Name} nije dostupan ({ex.StatusCode?.ToString() ?? ex.Message}).", false), []);
+            return (new ProviderResult(provider.Name, false, 0, Loc.T("online.unavailable", provider.Name, ex.StatusCode?.ToString() ?? ex.Message), false), []);
         }
         catch (JsonException)
         {
-            return (new ProviderResult(provider.Name, false, 0, $"{provider.Name} je vratio neočekivan odgovor.", false), []);
+            return (new ProviderResult(provider.Name, false, 0, Loc.T("online.unexpected", provider.Name), false), []);
         }
     }
 

@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>JebaitedPlayer.Localization</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Jezici sučelja: jedna JSON datoteka po jeziku, ugrađena u program (lang.<kod>.json). -->
+    <EmbeddedResource Include="Languages\*.json" LogicalName="lang.%(Filename).json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="JebaitedPlayer.Localization.Tests" />
+  </ItemGroup>
+
+</Project>

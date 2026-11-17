@@ -12,6 +12,7 @@ public sealed class PlaylistItem(string path, MediaInfo info) : ObservableObject
     private bool _watched;
     private bool _isCurrent;
     private string _progressText = string.Empty;
+    private WatchEntry? _entry;
 
     public string Path { get; } = path;
     public MediaInfo Info { get; } = info;
@@ -22,8 +23,8 @@ public sealed class PlaylistItem(string path, MediaInfo info) : ObservableObject
 
     /// <summary>Naslov skupine u popisu ("Serija · Sezona 1").</summary>
     public string Group => Info.IsEpisode
-        ? Info.Season is int s ? $"{Info.Title} · Sezona {s}" : Info.Title
-        : "Filmovi i ostalo";
+        ? Info.Season is int s ? Loc.T("playlist.seasonGroup", Info.Title, s) : Info.Title
+        : Loc.T("playlist.moviesGroup");
 
     public double Progress
     {
@@ -49,11 +50,19 @@ public sealed class PlaylistItem(string path, MediaInfo info) : ObservableObject
         set => SetField(ref _progressText, value);
     }
 
+    /// <summary>Promjena jezika: tekst napretka i naziv skupine na novom jeziku.</summary>
+    public void RefreshTexts()
+    {
+        Apply(_entry);
+        OnPropertyChanged(nameof(Group));
+    }
+
     public void Apply(WatchEntry? entry)
     {
+        _entry = entry;
         Watched = entry?.Watched ?? false;
         Progress = Watched ? 1 : entry?.Progress ?? 0;
-        ProgressText = Watched ? "pogledano"
+        ProgressText = Watched ? Loc.T("playlist.watched")
             : entry is { Position: >= 30, Duration: > 0 } e ? $"{TimeFormat.Format(e.Position, e.Duration >= 3600)} / {TimeFormat.Format(e.Duration, e.Duration >= 3600)}"
             : string.Empty;
     }
@@ -89,6 +98,7 @@ public sealed class LibraryController : ObservableObject
     private long _upNextDeadline;
     private long _lastSave;
     private bool _isCurrentFavorite;
+    private string? _playlistTitleKey;
 
     public LibraryController(PlayerViewModel vm, WatchStore? store)
     {
@@ -158,7 +168,7 @@ public sealed class LibraryController : ObservableObject
 
     public string FavoriteGlyph => IsCurrentFavorite ? "" : "";
 
-    public string FavoriteToolTip => IsCurrentFavorite ? "Ukloni iz omiljenih (Ctrl+D)" : "Dodaj u omiljene (Ctrl+D)";
+    public string FavoriteToolTip => IsCurrentFavorite ? Loc.T("controls.removeFavorite") : Loc.T("controls.addFavorite");
 
     /// <summary>Koliko sekundi traje odbrojavanje do sljedeće epizode.</summary>
     public int UpNextDelaySeconds { get; set; } = 10;
@@ -198,7 +208,7 @@ public sealed class LibraryController : ObservableObject
 
     public bool HasResumeOffer => ResumeOffer.HasValue;
 
-    public string ResumeText => ResumeOffer is double p ? $"Nastavi od {TimeFormat.Format(p, p >= 3600)}" : string.Empty;
+    public string ResumeText => ResumeOffer is double p ? Loc.T("cards.resumeFrom", TimeFormat.Format(p, p >= 3600)) : string.Empty;
 
     public PlaylistItem? UpNext
     {
@@ -228,7 +238,7 @@ public sealed class LibraryController : ObservableObject
         }
     }
 
-    public string UpNextText => UpNext is null ? string.Empty : AutoPlayNext ? $"Sljedeća za {UpNextSeconds} s" : "Sljedeća epizoda";
+    public string UpNextText => UpNext is null ? string.Empty : AutoPlayNext ? Loc.T("cards.nextIn", UpNextSeconds) : Loc.T("menu.nextEpisode");
 
     public bool IsPromptVisible => HasResumeOffer || HasUpNext;
 
@@ -246,7 +256,7 @@ public sealed class LibraryController : ObservableObject
             paths = MediaScanner.Sort(scans.SelectMany(s => s.Files).Concat(files).Distinct(StringComparer.OrdinalIgnoreCase)).ToList();
             if (paths.Count == 0)
             {
-                Message?.Invoke("U mapi nema video datoteka.");
+                Message?.Invoke(Loc.T("notice.noVideosInFolder"));
                 return;
             }
 
@@ -257,20 +267,23 @@ public sealed class LibraryController : ObservableObject
             }
 
             start = PickStart(paths);
-            title = folders.Count == 1 ? Path.GetFileName(folders[0].TrimEnd('\\', '/')) : "Odabrane mape";
+            _playlistTitleKey = folders.Count == 1 ? null : "playlist.selectedFolders";
+            title = _playlistTitleKey is null ? Path.GetFileName(folders[0].TrimEnd('\\', '/')) : Loc.T(_playlistTitleKey);
         }
         else if (files.Count == 1)
         {
             MediaInfo info = MediaNameParser.Parse(files[0]);
             paths = info.IsEpisode ? (await Task.Run(() => EpisodeNeighbours(files[0]))).ToList() : [files[0]];
             start = files[0];
+            _playlistTitleKey = null;
             title = info.IsEpisode ? info.Title : Path.GetFileName(Path.GetDirectoryName(files[0])) ?? string.Empty;
         }
         else
         {
             paths = MediaScanner.Sort(files).ToList();
             start = paths.FirstOrDefault();
-            title = "Odabrane datoteke";
+            _playlistTitleKey = "playlist.selectedFiles";
+            title = Loc.T(_playlistTitleKey);
         }
 
         SetPlaylist(paths, title);
@@ -316,7 +329,7 @@ public sealed class LibraryController : ObservableObject
         }
         else
         {
-            Message?.Invoke("Ovo je zadnja datoteka u popisu");
+            Message?.Invoke(Loc.T("notice.lastInList"));
         }
     }
 
@@ -328,7 +341,7 @@ public sealed class LibraryController : ObservableObject
         }
         else
         {
-            Message?.Invoke("Ovo je prva datoteka u popisu");
+            Message?.Invoke(Loc.T("notice.firstInList"));
         }
     }
 
@@ -427,10 +440,10 @@ public sealed class LibraryController : ObservableObject
         foreach (WatchEntry e in entries.Where(e => File.Exists(e.Path)).Take(anyFavorites ? 5 : 8))
         {
             MediaInfo info = MediaNameParser.Parse(e.Path);
-            string detail = e.Watched ? "Pogledano"
+            string detail = e.Watched ? Loc.T("history.watched")
                 : e.Position >= MinResumeSeconds && e.Duration > 0
-                    ? $"Stao si na {TimeFormat.Format(e.Position, e.Duration >= 3600)} od {TimeFormat.Format(e.Duration, e.Duration >= 3600)}"
-                    : "Započeto";
+                    ? Loc.T("history.stoppedAt", TimeFormat.Format(e.Position, e.Duration >= 3600), TimeFormat.Format(e.Duration, e.Duration >= 3600))
+                    : Loc.T("history.started");
             Recent.Add(new RecentItem(e.Path, info.DisplayTitle, detail, e.Watched ? 1 : e.Progress));
         }
 
@@ -444,13 +457,29 @@ public sealed class LibraryController : ObservableObject
         Favorites.Clear();
         foreach (Favorite f in all.Where(f => f.IsSeries ? Directory.Exists(f.Path) : File.Exists(f.Path)))
         {
-            Favorites.Add(new FavoriteItem(f.Path, f.Title, f.IsSeries ? $"Serija · {f.Path}" : $"Film · {Path.GetFileName(f.Path)}", f.IsSeries));
+            Favorites.Add(new FavoriteItem(f.Path, f.Title, f.IsSeries ? Loc.T("history.seriesDetail", f.Path) : Loc.T("history.movieDetail", Path.GetFileName(f.Path)), f.IsSeries));
         }
 
         OnPropertyChanged(nameof(HasFavorites));
         OnPropertyChanged(nameof(HasLibraryContent));
-        _vm.ShowWelcomeShortcuts = Recent.Count == 0 && Favorites.Count == 0;
         UpdateCurrentFavorite();
+    }
+
+    /// <summary>Promjena jezika: tekstovi koje kontroler slaže sam (popis, povijest, omiljeno, kartice) na novom jeziku.</summary>
+    public void RefreshTexts()
+    {
+        if (_playlistTitleKey != null)
+        {
+            PlaylistTitle = Loc.T(_playlistTitleKey);
+        }
+
+        foreach (PlaylistItem item in Playlist)
+        {
+            item.RefreshTexts();
+        }
+
+        RefreshRecent();
+        OnPropertyChanged(string.Empty);
     }
 
     /// <summary>
@@ -461,7 +490,7 @@ public sealed class LibraryController : ObservableObject
     {
         if (_store is null || FavoriteTarget() is not { } target)
         {
-            Message?.Invoke("Prvo otvori film ili epizodu.");
+            Message?.Invoke(Loc.T("notice.openMediaFirst"));
             return;
         }
 
@@ -476,7 +505,7 @@ public sealed class LibraryController : ObservableObject
         }
 
         RefreshFavorites();
-        Message?.Invoke(remove ? $"Uklonjeno iz omiljenih: {target.Title}" : $"Dodano u omiljene: {target.Title}");
+        Message?.Invoke(remove ? Loc.T("notice.favoriteRemoved", target.Title) : Loc.T("notice.favoriteAdded", target.Title));
     }
 
     /// <summary>Što bi se dodalo u omiljene za trenutni video: (putanja, naslov, "movie" ili "series").</summary>
@@ -517,7 +546,7 @@ public sealed class LibraryController : ObservableObject
         bool watched = !item.Watched;
         Safe(() => _store?.SetWatched(item.Path, watched));
         item.Apply(Safe(() => _store?.Get(item.Path)));
-        Message?.Invoke(watched ? $"Označeno kao pogledano: {item.Label}" : $"Označeno kao nepogledano: {item.Label}");
+        Message?.Invoke(watched ? Loc.T("notice.markedWatched", item.Label) : Loc.T("notice.markedUnwatched", item.Label));
     }
 
     private void SetPlaylist(IReadOnlyList<string> paths, string title)

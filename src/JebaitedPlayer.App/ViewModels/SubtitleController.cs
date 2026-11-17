@@ -21,7 +21,11 @@ public sealed record ExternalSubtitleSelectedEventArgs(SubtitleTrackInfo Track, 
 public sealed record CueRow(double OriginalMs, double DisplaySeconds, string Time, string Text, bool IsCurrent);
 
 /// <summary>Točka ručnog poravnanja u prozoru sinkronizacije.</summary>
-public sealed record AnchorRow(SyncAnchor Anchor, string Description);
+public sealed record AnchorRow(SyncAnchor Anchor, string ShortText, double PositionSeconds)
+{
+    /// <summary>Opis točke na trenutnom jeziku.</summary>
+    public string Description => Loc.T("anchors.row", ShortText, SubtitleController.ClockText(PositionSeconds));
+}
 
 /// <summary>Jedan titl kako ga vidi aplikacija (ugrađeni u video ili vanjski koji smo mi učitali).</summary>
 public sealed record SubtitleTrackInfo
@@ -55,9 +59,9 @@ public sealed record SubtitleTrackInfo
             }
 
             string title = string.IsNullOrWhiteSpace(Title) ? string.Empty : $" · {Title}";
-            string kind = IsExternal ? "vanjski" : "ugrađeni";
+            string kind = IsExternal ? Loc.T("track.external") : Loc.T("track.embedded");
             string codec = Codec is null ? string.Empty : ", " + CodecName(Codec);
-            string flags = (IsForced ? ", prisilni" : string.Empty) + (IsDefault ? ", zadani" : string.Empty);
+            string flags = (IsForced ? ", " + Loc.T("track.forced") : string.Empty) + (IsDefault ? ", " + Loc.T("track.default") : string.Empty);
             return $"{language}{title} ({kind}{codec}{flags})";
         }
     }
@@ -92,7 +96,7 @@ public sealed record SubtitleTrackInfo
         "hdmv_pgs_subtitle" => "PGS",
         "dvd_subtitle" => "VobSub",
         "dvb_subtitle" => "DVB",
-        "mov_text" => "MP4 tekst",
+        "mov_text" => Loc.T("track.mp4Text"),
         _ => codec,
     };
 }
@@ -103,8 +107,6 @@ public sealed record SubtitleTrackInfo
 /// </summary>
 public sealed class SubtitleController(AppSettings settings) : ObservableObject
 {
-    private static readonly CultureInfo Hr = CultureInfo.GetCultureInfo("hr-HR");
-
     private readonly Dictionary<string, PreparedSubtitle> _prepared = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, SubtitleTiming> _timingByTrack = new(StringComparer.OrdinalIgnoreCase);
 
@@ -115,7 +117,7 @@ public sealed class SubtitleController(AppSettings settings) : ObservableObject
 
     // Izvorni dokument po titlu (za popis replika u poravnanju po replici).
     private readonly Dictionary<string, SubtitleDocument> _documents = new(StringComparer.OrdinalIgnoreCase);
-    private string _anchorStatus = "Nema točaka.";
+    private Func<string> _anchorStatus = () => Loc.T("anchors.noneStatus");
 
     // Zadnji odabrani titl (ključ), i dok je nakratko "bez odabira" tijekom zamjene datoteke.
     private string? _activeKey;
@@ -132,7 +134,7 @@ public sealed class SubtitleController(AppSettings settings) : ObservableObject
     private double? _audioMarkMs;
     private double? _subtitleMarkOriginalMs;
     private (double Original, double Target)? _firstPoint;
-    private string _syncStatus = "Nema postavljenih točaka.";
+    private Func<string> _syncStatus = () => Loc.T("zx.none");
     private bool _persistAfterSelection;
     private string? _lastSelectedLanguage;
 
@@ -179,7 +181,7 @@ public sealed class SubtitleController(AppSettings settings) : ObservableObject
 
     public SubtitleTrackInfo? SelectedTrack => _tracks.FirstOrDefault(t => t.IsSelected);
 
-    public string SelectedTrackText => SelectedTrack?.DisplayName ?? "Titlovi nisu odabrani";
+    public string SelectedTrackText => SelectedTrack?.DisplayName ?? Loc.T("subs.noneSelected");
 
     public bool CanSaveSynced => SelectedTrack?.Prepared is { IsBitmap: false };
 
@@ -212,12 +214,12 @@ public sealed class SubtitleController(AppSettings settings) : ObservableObject
     /// <summary>Pomak u sekundama za unos u prozoru sinkronizacije (npr. "−2,5").</summary>
     public string DelaySecondsInput
     {
-        get => (Timing.DelayMs / 1000).ToString("0.00", Hr);
+        get => (Timing.DelayMs / 1000).ToString("0.00", Loc.Culture);
         set
         {
             if (TryParseNumber(value, out double seconds) && Math.Abs(seconds) < 36_000)
             {
-                SetTiming(Timing with { DelayMs = seconds * 1000 }, "Pomak titlova");
+                SetTiming(Timing with { DelayMs = seconds * 1000 }, Loc.T("osd.subDelay"));
             }
             else
             {
@@ -234,12 +236,10 @@ public sealed class SubtitleController(AppSettings settings) : ObservableObject
             double perTen = Timing.DriftSecondsPerTenMinutes;
             if (Math.Abs(perTen) < 0.005)
             {
-                return "Bez postupne korekcije.";
+                return Loc.T("gradual.none");
             }
 
-            string direction = perTen < 0 ? "ranije" : "kasnije";
-            return $"Svakih 10 minuta titlovi dolaze {Math.Abs(perTen).ToString("0.0", Hr)} s {direction} " +
-                   "(računato od mjesta gdje su bili točni).";
+            return Loc.T(perTen < 0 ? "gradual.earlier" : "gradual.later", Math.Abs(perTen).ToString("0.0", Loc.Culture));
         }
     }
 
@@ -249,10 +249,29 @@ public sealed class SubtitleController(AppSettings settings) : ObservableObject
     /// <summary>Točke ručnog poravnanja (replika → trenutak kad se čuje).</summary>
     public ObservableCollection<AnchorRow> Anchors { get; } = [];
 
-    public string AnchorStatus
+    public string AnchorStatus => _anchorStatus();
+
+    /// <summary>Promjena jezika: opisi točaka, statusi i sažeci na novom jeziku.</summary>
+    public void RefreshTexts()
     {
-        get => _anchorStatus;
-        private set => SetField(ref _anchorStatus, value);
+        for (int i = 0; i < Anchors.Count; i++)
+        {
+            Anchors[i] = Anchors[i] with { };
+        }
+
+        OnPropertyChanged(string.Empty);
+    }
+
+    private void SetAnchorStatus(Func<string> status)
+    {
+        _anchorStatus = status;
+        OnPropertyChanged(nameof(AnchorStatus));
+    }
+
+    private void SetSyncStatus(Func<string> status)
+    {
+        _syncStatus = status;
+        OnPropertyChanged(nameof(SyncStatus));
     }
 
     public string DelayText => FormatDelay(Timing.DelayMs);
@@ -267,14 +286,15 @@ public sealed class SubtitleController(AppSettings settings) : ObservableObject
     {
         get
         {
-            string linear = Timing.IsIdentity ? string.Empty : $"Pomak {FormatDelay(Timing.DelayMs)}, brzina {Timing.Speed.ToString("0.0000", Hr)}×";
+            string delay = FormatDelay(Timing.DelayMs);
+            string speed = Timing.Speed.ToString("0.0000", Loc.Culture);
             if (TimeMap is not { } map)
             {
-                return Timing.IsIdentity ? "Originalna sinkronizacija" : linear;
+                return Timing.IsIdentity ? Loc.T("timing.original") : Loc.T("timing.summaryLinear", delay, speed);
             }
 
-            string parts = $"Ispravljeno po dijelovima ({map.Segments.Count}, pomak {FormatDelay(map.MinOffsetMs)} do {FormatDelay(map.MaxOffsetMs)})";
-            return Timing.IsIdentity ? parts : $"{parts} + {linear.ToLowerInvariant()}";
+            string parts = Loc.T("timing.summaryParts", map.Segments.Count, FormatDelay(map.MinOffsetMs), FormatDelay(map.MaxOffsetMs));
+            return Timing.IsIdentity ? parts : $"{parts} + {Loc.T("timing.summaryLinearInline", delay, speed)}";
         }
     }
 
@@ -286,7 +306,7 @@ public sealed class SubtitleController(AppSettings settings) : ObservableObject
         {
             if (TryParseNumber(value, out double ms) && Math.Abs(ms) < 36_000_000)
             {
-                SetTiming(Timing with { DelayMs = ms }, "Pomak titlova");
+                SetTiming(Timing with { DelayMs = ms }, Loc.T("osd.subDelay"));
             }
             else
             {
@@ -298,12 +318,12 @@ public sealed class SubtitleController(AppSettings settings) : ObservableObject
     /// <summary>Faktor brzine za unos (1 = bez korekcije).</summary>
     public string SpeedInput
     {
-        get => Timing.Speed.ToString("0.0000", Hr);
+        get => Timing.Speed.ToString("0.0000", Loc.Culture);
         set
         {
             if (TryParseNumber(value, out double speed) && speed is > 0.5 and < 2)
             {
-                SetTiming(Timing with { Speed = speed }, "Brzina titlova");
+                SetTiming(Timing with { Speed = speed }, Loc.T("osd.subSpeed"));
             }
             else
             {
@@ -328,11 +348,7 @@ public sealed class SubtitleController(AppSettings settings) : ObservableObject
         }
     }
 
-    public string SyncStatus
-    {
-        get => _syncStatus;
-        private set => SetField(ref _syncStatus, value);
-    }
+    public string SyncStatus => _syncStatus();
 
     public void Attach(MpvPlayer player)
     {
@@ -370,23 +386,23 @@ public sealed class SubtitleController(AppSettings settings) : ObservableObject
     {
         if (_tracks.Count == 0)
         {
-            Message?.Invoke("Nema titlova za ovaj video");
+            Message?.Invoke(Loc.T("subs.noneForVideo"));
             return;
         }
 
         int index = _tracks.ToList().FindIndex(t => t.IsSelected);
         SubtitleTrackInfo? next = index + 1 < _tracks.Count ? _tracks[index + 1] : null;
         SelectTrack(next);
-        Message?.Invoke(next is null ? "Titlovi isključeni" : $"Titlovi: {next.DisplayName}");
+        Message?.Invoke(next is null ? Loc.T("subs.off") : Loc.T("subs.selected", next.DisplayName));
     }
 
     public void ToggleVisibility()
     {
         IsVisible = !IsVisible;
-        Message?.Invoke(IsVisible ? "Titlovi prikazani" : "Titlovi sakriveni");
+        Message?.Invoke(IsVisible ? Loc.T("subs.shown") : Loc.T("subs.hidden"));
     }
 
-    public void AdjustDelay(double deltaMs) => SetTiming(Timing with { DelayMs = Timing.DelayMs + deltaMs }, "Pomak titlova");
+    public void AdjustDelay(double deltaMs) => SetTiming(Timing with { DelayMs = Timing.DelayMs + deltaMs }, Loc.T("osd.subDelay"));
 
     /// <summary>Korak postupne korekcije: 0,5 s na svakih 10 minuta filma.</summary>
     public const double GradualStep = 0.5 / 600;
@@ -405,7 +421,7 @@ public sealed class SubtitleController(AppSettings settings) : ObservableObject
         double anchorMs = double.IsNaN(position) ? 0 : position * 1000;
         SetTiming(Timing.WithSpeedAnchored(Math.Clamp(speed, 0.9, 1.1), anchorMs), null);
         PersistState();
-        Message?.Invoke(Math.Abs(Timing.Speed - 1) < 1e-9 ? "Bez postupne korekcije" : $"Postupna korekcija: {GradualText}");
+        Message?.Invoke(Math.Abs(Timing.Speed - 1) < 1e-9 ? Loc.T("gradual.noneShort") : Loc.T("gradual.message", GradualText));
         LogManual($"postupna korekcija: {GradualText} {TimingSummary}");
     }
 
@@ -426,7 +442,7 @@ public sealed class SubtitleController(AppSettings settings) : ObservableObject
         }
         catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException)
         {
-            Message?.Invoke($"Replike nije moguće pročitati: {ex.Message}");
+            Message?.Invoke(Loc.T("anchors.readFailed", ex.Message));
             return;
         }
 
@@ -465,7 +481,7 @@ public sealed class SubtitleController(AppSettings settings) : ObservableObject
         }
 
         string shortText = row.Text.Length > 40 ? row.Text[..40] + "…" : row.Text;
-        Anchors.Add(new AnchorRow(anchor, $"„{shortText}” počinje u {ClockText(position)}"));
+        Anchors.Add(new AnchorRow(anchor, shortText, position));
         ApplyAnchors();
     }
 
@@ -478,7 +494,7 @@ public sealed class SubtitleController(AppSettings settings) : ObservableObject
     public void ClearAnchors()
     {
         Anchors.Clear();
-        AnchorStatus = "Nema točaka.";
+        SetAnchorStatus(() => Loc.T("anchors.noneStatus"));
     }
 
     private void ApplyAnchors()
@@ -491,11 +507,11 @@ public sealed class SubtitleController(AppSettings settings) : ObservableObject
         List<SyncAnchor> anchors = [.. Anchors.Select(a => a.Anchor)];
         if (anchors.Count == 0)
         {
-            AnchorStatus = "Nema točaka. Sinkronizacija je ostala kakva je bila.";
+            SetAnchorStatus(() => Loc.T("anchors.noneKept"));
             return;
         }
 
-        string result;
+        Func<string> result;
         if (anchors.Count == 1)
         {
             // Jedna točka: cijeli titl (i postojeći ispravak po dijelovima) pomakne se da ova replika bude točna.
@@ -503,22 +519,23 @@ public sealed class SubtitleController(AppSettings settings) : ObservableObject
             double mapped = TimeMap?.Apply(a.OriginalMs) ?? a.OriginalMs;
             SetTiming(Timing.AlignPoint(mapped, a.TargetMs), null);
             PersistState();
-            result = $"pomak {DelayText}";
+            double delayMs = Timing.DelayMs;
+            result = () => Loc.T("anchors.offset", FormatDelay(delayMs));
         }
         else
         {
             List<(long, long)> cues = [.. OriginalDocument(prepared).Cues.Select(c => (c.StartMs, c.EndMs))];
             AnchorSolution solution = SyncAnchors.Solve(anchors, cues);
             ApplyAutoSync(track, solution.Timing, solution.Map);
-            result = solution.Description.ToLowerInvariant();
+            // Opis se pri promjeni jezika ponovno složi (rješenje je brzo i ne mijenja se).
+            result = () => SyncAnchors.Solve(anchors, cues).Description;
         }
 
-        string points = anchors.Count == 1 ? "1 točka" : anchors.Count < 5 ? $"{anchors.Count} točke" : $"{anchors.Count} točaka";
-        AnchorStatus = $"{points}: {result}." + (anchors.Count == 1
-            ? " Ako titlovi dalje u filmu opet odstupaju, dodaj točku i tamo."
-            : string.Empty);
-        Message?.Invoke($"Poravnano po replici ({points}): {result}");
-        LogManual($"poravnanje po replici ({points}): {result}; {TimingSummary}");
+        int count = anchors.Count;
+        string Points() => Loc.Plural("anchors.points", count);
+        SetAnchorStatus(() => Loc.T("anchors.status", Points(), result()) + (count == 1 ? Loc.T("anchors.addMoreHint") : string.Empty));
+        Message?.Invoke(Loc.T("anchors.message", Points(), result()));
+        LogManual($"poravnanje po replici ({Points()}): {result()}; {TimingSummary}");
         RefreshNearbyCues();
     }
 
@@ -536,14 +553,17 @@ public sealed class SubtitleController(AppSettings settings) : ObservableObject
         return doc;
     }
 
-    private static string ClockText(double seconds)
+    internal static string ClockText(double seconds)
     {
         var t = TimeSpan.FromSeconds(Math.Max(0, seconds));
         string tenths = ((int)(t.Milliseconds / 100)).ToString(CultureInfo.InvariantCulture);
-        return t.TotalHours >= 1 ? $"{(int)t.TotalHours}:{t.Minutes:00}:{t.Seconds:00},{tenths}" : $"{t.Minutes:00}:{t.Seconds:00},{tenths}";
+        string separator = Loc.Culture.NumberFormat.NumberDecimalSeparator;
+        return t.TotalHours >= 1
+            ? $"{(int)t.TotalHours}:{t.Minutes:00}:{t.Seconds:00}{separator}{tenths}"
+            : $"{t.Minutes:00}:{t.Seconds:00}{separator}{tenths}";
     }
 
-    public void ApplySpeedPreset(double speed) => SetTiming(Timing with { Speed = speed }, "Brzina titlova");
+    public void ApplySpeedPreset(double speed) => SetTiming(Timing with { Speed = speed }, Loc.T("osd.subSpeed"));
 
     public void ResetSync()
     {
@@ -557,7 +577,7 @@ public sealed class SubtitleController(AppSettings settings) : ObservableObject
 
         SetTiming(SubtitleTiming.Identity, null);
         PersistState();
-        Message?.Invoke("Vraćena originalna sinkronizacija titlova");
+        Message?.Invoke(Loc.T("subs.syncReset"));
         LogManual("vraćena originalna sinkronizacija");
     }
 
@@ -610,7 +630,7 @@ public sealed class SubtitleController(AppSettings settings) : ObservableObject
         {
             // Oznaka znači da je promjenu napravio korisnik, pa je pamtimo za ovaj video.
             PersistState();
-            string speed = Math.Abs(timing.Speed - 1) > 1e-9 ? $", brzina {timing.Speed.ToString("0.0000", Hr)}×" : string.Empty;
+            string speed = Math.Abs(timing.Speed - 1) > 1e-9 ? Loc.T("timing.speed", timing.Speed.ToString("0.0000", Loc.Culture)) : string.Empty;
             Message?.Invoke($"{osdLabel}: {FormatDelay(timing.DelayMs)}{speed}");
             LogManual(TimingSummary);
         }
@@ -656,7 +676,7 @@ public sealed class SubtitleController(AppSettings settings) : ObservableObject
         _audioMarkMs = t * 1000;
         if (_subtitleMarkOriginalMs is null)
         {
-            Message?.Invoke("Zapamćeno vrijeme replike. Sad pritisni X kad se pojavi njezin titl.");
+            Message?.Invoke(Loc.T("zx.audioMarked"));
         }
 
         TryCompletePoint();
@@ -667,7 +687,7 @@ public sealed class SubtitleController(AppSettings settings) : ObservableObject
     {
         if (_lastSubStartSeconds is not double start || Environment.TickCount64 - _lastSubStartTicks > 10_000)
         {
-            Message?.Invoke("Nema titla na ekranu. Pritisni X dok je titl prikazan.");
+            Message?.Invoke(Loc.T("zx.noSubtitle"));
             return;
         }
 
@@ -677,7 +697,7 @@ public sealed class SubtitleController(AppSettings settings) : ObservableObject
         _subtitleMarkOriginalMs = start * 1000;
         if (_audioMarkMs is null)
         {
-            Message?.Invoke("Zapamćen titl. Sad pritisni Z kad čuješ tu repliku.");
+            Message?.Invoke(Loc.T("zx.subtitleMarked"));
         }
 
         TryCompletePoint();
@@ -688,7 +708,7 @@ public sealed class SubtitleController(AppSettings settings) : ObservableObject
         _audioMarkMs = null;
         _subtitleMarkOriginalMs = null;
         _firstPoint = null;
-        SyncStatus = "Nema postavljenih točaka.";
+        SetSyncStatus(() => Loc.T("zx.none"));
     }
 
     /// <summary>Dvije točke izravno (dijagnostika i testovi).</summary>
@@ -696,7 +716,8 @@ public sealed class SubtitleController(AppSettings settings) : ObservableObject
     {
         _firstPoint = (original1, target1);
         SetTiming(SubtitleTiming.FromTwoPoints(original1, target1, original2, target2), null);
-        SyncStatus = $"Dvije točke: brzina {Timing.Speed.ToString("0.0000", Hr)}×, pomak {DelayText}";
+        double speed = Timing.Speed, delay = Timing.DelayMs;
+        SetSyncStatus(() => Loc.T("zx.twoPoints", speed.ToString("0.0000", Loc.Culture), FormatDelay(delay)));
     }
 
     public void ChangeEncoding(SubtitleTrackInfo track, int? codePage)
@@ -723,14 +744,14 @@ public sealed class SubtitleController(AppSettings settings) : ObservableObject
 
             if (task.Exception is { } ex)
             {
-                Message?.Invoke($"Encoding nije promijenjen: {ex.InnerException?.Message}");
+                Message?.Invoke(Loc.T("subs.encodingFailed", ex.InnerException?.Message));
                 return;
             }
 
             PreparedSubtitle updated = task.Result;
             _player.CommandAsync("sub-remove", track.Id.ToString(CultureInfo.InvariantCulture));
             AddToPlayer(updated, select: true);
-            Message?.Invoke($"Encoding titlova: {updated.EncodingName}");
+            Message?.Invoke(Loc.T("subs.encodingChanged", updated.EncodingName));
         }, TaskScheduler.FromCurrentSynchronizationContext());
     }
 
@@ -754,7 +775,7 @@ public sealed class SubtitleController(AppSettings settings) : ObservableObject
         }
 
         SubtitleService.SaveSynced(prepared, Timing, targetPath, _videoFps, TimeMap);
-        Message?.Invoke($"Spremljeno: {Path.GetFileName(targetPath)}");
+        Message?.Invoke(Loc.T("subs.saved", Path.GetFileName(targetPath)));
         Log.Info($"Spremljeni sinkronizirani titlovi: {targetPath} ({TimingSummary})");
     }
 
@@ -928,13 +949,13 @@ public sealed class SubtitleController(AppSettings settings) : ObservableObject
         foreach (var failed in results.Where(r => r.Error != null))
         {
             Log.Warn($"Titlovi nisu učitani: {failed.Path}: {failed.Error}");
-            Message?.Invoke($"Titlovi nisu učitani ({Path.GetFileName(failed.Path)}): {failed.Error}");
+            Message?.Invoke(Loc.T("subs.loadFailed", Path.GetFileName(failed.Path), failed.Error));
         }
 
         if (select != null)
         {
             string details = select.IsBitmap ? SubtitleFormats.DisplayName(select.Format) : $"{SubtitleFormats.DisplayName(select.Format)}, {select.EncodingName}";
-            Message?.Invoke($"Titlovi: {SubtitleLanguage.DisplayName(select.Language)} – {Path.GetFileName(select.OriginalPath)} ({details})");
+            Message?.Invoke(Loc.T("subs.loaded", SubtitleLanguage.DisplayName(select.Language), Path.GetFileName(select.OriginalPath), details));
             Log.Info($"Titlovi odabrani: {select.OriginalPath} ({details}, jezik {select.Language ?? "?"}, {select.CueCount} redaka)");
         }
     }
@@ -1193,7 +1214,7 @@ public sealed class SubtitleController(AppSettings settings) : ObservableObject
             if (task.Exception is { } ex)
             {
                 Log.Warn($"Ispravljeni titlovi nisu pripremljeni: {ex.InnerException?.Message}");
-                Message?.Invoke($"Ispravljeni titlovi nisu učitani: {ex.InnerException?.Message}");
+                Message?.Invoke(Loc.T("subs.mappedFailed", ex.InnerException?.Message));
                 return;
             }
 
@@ -1231,15 +1252,16 @@ public sealed class SubtitleController(AppSettings settings) : ObservableObject
             if (two.Speed is < 0.85 or > 1.15)
             {
                 _firstPoint = null;
-                SyncStatus = "Točke daju nemoguću brzinu, pa su poništene. Provjeri jesi li označio istu repliku.";
-                Message?.Invoke("Točke nisu valjane (nemoguća brzina) i poništene su");
+                SetSyncStatus(() => Loc.T("zx.invalidStatus"));
+                Message?.Invoke(Loc.T("zx.invalidMessage"));
                 return;
             }
 
             SetTiming(two, null);
             PersistState();
-            SyncStatus = $"Dvije točke: brzina {two.Speed.ToString("0.0000", Hr)}×, pomak {DelayText}.";
-            Message?.Invoke($"Sinkronizirano po dvije točke: brzina {two.Speed.ToString("0.0000", Hr)}×, pomak {DelayText}");
+            double delay = Timing.DelayMs;
+            SetSyncStatus(() => Loc.T("zx.twoPointsStatus", two.Speed.ToString("0.0000", Loc.Culture), FormatDelay(delay)));
+            Message?.Invoke(Loc.T("zx.twoPointsMessage", two.Speed.ToString("0.0000", Loc.Culture), DelayText));
             LogManual($"dvije točke (replika {original / 1000:0.000} s → {target / 1000:0.000} s): {TimingSummary}");
             return;
         }
@@ -1248,14 +1270,14 @@ public sealed class SubtitleController(AppSettings settings) : ObservableObject
         SetTiming(Timing.AlignPoint(original, target), null);
         PersistState();
         LogManual($"točka po replici (replika {original / 1000:0.000} s → {target / 1000:0.000} s): {TimingSummary}");
-        SyncStatus = "Točka 1 je postavljena. Ako titlovi kasnije opet odstupaju, ponovi Z i X barem minutu kasnije.";
-        Message?.Invoke($"Titlovi poravnati po replici: pomak {DelayText}");
+        SetSyncStatus(() => Loc.T("zx.firstPointStatus"));
+        Message?.Invoke(Loc.T("zx.onePointMessage", DelayText));
     }
 
     private static string FormatDelay(double ms)
     {
         string sign = ms > 0.5 ? "+" : ms < -0.5 ? "−" : string.Empty;
-        return $"{sign}{(Math.Abs(ms) / 1000).ToString("0.000", Hr)} s";
+        return $"{sign}{(Math.Abs(ms) / 1000).ToString("0.000", Loc.Culture)} s";
     }
 
     private static bool TryParseNumber(string? text, out double value)

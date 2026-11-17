@@ -91,7 +91,7 @@ public partial class MainWindow : Window
         if (options.IsDiagnostics)
         {
             // Testovi ne pune tvoju mapu slika.
-            _vm.Extras.FolderOverride = Path.Combine(Path.GetTempPath(), "jebaited_player_diag", "screenshots");
+            _vm.Extras.FolderOverride = options.DiagScreenshotFolder ?? Path.Combine(Path.GetTempPath(), "jebaited_player_diag", "screenshots");
             if (options.DiagAutoNext is bool autoNext)
             {
                 _vm.Library.AutoPlayNext = autoNext;
@@ -140,6 +140,13 @@ public partial class MainWindow : Window
         _vm.OpenRequested += (_, _) => ShowOpenDialog();
         _vm.FullscreenToggleRequested += (_, _) => SetFullscreen(!_vm.IsFullscreen);
         _vm.PropertyChanged += OnViewModelPropertyChanged;
+        Loc.LanguageChanged += OnLanguageChanged;
+
+        // Prekidač teme na početnom ekranu (usklađen s onim u postavkama).
+        HomeThemeSwitch.IsChecked = !WindowTheme.IsDark;
+        HomeThemeSwitch.Checked += (_, _) => SetTheme("light");
+        HomeThemeSwitch.Unchecked += (_, _) => SetTheme("dark");
+        WindowTheme.Changed += () => HomeThemeSwitch.IsChecked = !WindowTheme.IsDark;
 
         Video.VideoMouseMove += (_, _) => RegisterActivity();
         Video.VideoClick += (_, _) =>
@@ -182,42 +189,7 @@ public partial class MainWindow : Window
 
                     shown = true;
                     await Task.Delay(2500);
-                    switch (show)
-                    {
-                        case "sync":
-                            ShowSyncWindow();
-                            break;
-                        case "context":
-                            ShowContextMenu();
-                            break;
-                        case "settings":
-                            ShowSubtitleSettings();
-                            break;
-                        case "menu" when _overlay != null:
-                            ShowSubtitleMenu(_overlay.SubtitlesButton);
-                            break;
-                        case "playlist":
-                            SetPlaylistPanel(true);
-                            break;
-                        case "search":
-                            ShowSearchWindow();
-                            break;
-                        case "sources":
-                            ShowSourcesWindow();
-                            break;
-                        case "player-settings":
-                            ShowPlayerSettings();
-                            break;
-                        case "wizard":
-                            ShowOnlineSetup();
-                            break;
-                        case "wizard-os":
-                            ShowOnlineSetup(1);
-                            break;
-                        case "context-menu":
-                            ShowContextMenu();
-                            break;
-                    }
+                    ShowForDiagnostics(show);
                 };
             }
         }
@@ -236,6 +208,109 @@ public partial class MainWindow : Window
         PreviewKeyDown += OnPreviewKeyDown;
         PreviewMouseWheel += OnPreviewMouseWheel;
         InitializeUpdates();
+    }
+
+    /// <summary>
+    /// Jezik je promijenjen (postavke): tekstovi vezani u XAML-u mijenjaju se sami, a ovdje se ponovno slože tekstovi
+    /// koje slaže kod (povijest, popis epizoda, statusi). Jezik se pamti i opisi u Windowsima se osvježe.
+    /// </summary>
+    private void OnLanguageChanged()
+    {
+        _vm.RefreshTexts();
+        _autoSync.RefreshTexts();
+        _online.RefreshTexts();
+        System.Windows.Data.CollectionViewSource.GetDefaultView(_vm.Library.Playlist).Refresh();
+        if (!_options.IsDiagnostics)
+        {
+            _settings.Language = Loc.Current;
+            _settings.Save();
+            ShellIntegration.RefreshTextsInBackground();
+        }
+
+        Log.Info($"Jezik sučelja promijenjen: {Loc.Current}");
+    }
+
+    /// <summary>Dijagnostika i snimke zaslona: otvori zadani prozor ili izbornik (uz video ili na početnom ekranu).</summary>
+    private void ShowForDiagnostics(string show)
+    {
+        Log.Info($"Dijagnostika: otvaram {show}");
+        switch (show)
+        {
+            case "sync":
+                ShowSyncWindow();
+                break;
+            case "context":
+                ShowContextMenu();
+                break;
+            case "settings":
+                ShowSubtitleSettings();
+                break;
+            case "menu" when _overlay != null:
+                ShowSubtitleMenu(_overlay.SubtitlesButton);
+                break;
+            case "playlist":
+                SetPlaylistPanel(true);
+                break;
+            case "search":
+                ShowSearchWindow();
+                break;
+            case "sources":
+                ShowSourcesWindow();
+                break;
+            case "player-settings":
+                ShowPlayerSettings();
+                break;
+            case "wizard":
+                ShowOnlineSetup();
+                break;
+            case "wizard-os":
+                ShowOnlineSetup(1);
+                break;
+            case "context-menu":
+                ShowContextMenu();
+                break;
+            case "language-picker":
+                new LanguagePickerWindow { Owner = this }.Show();
+                break;
+        }
+    }
+
+    private void OnHomeSettingsClick(object sender, RoutedEventArgs e) => ShowPlayerSettings();
+
+    private void SetTheme(string theme)
+    {
+        if (theme == WindowTheme.Current)
+        {
+            return;
+        }
+
+        WindowTheme.Apply(theme);
+        if (!_options.IsDiagnostics)
+        {
+            _settings.Theme = theme;
+            _settings.Save();
+        }
+
+        Log.Info($"Tema: {theme}");
+    }
+
+    private void OnWelcomeSizeChanged(object sender, SizeChangedEventArgs e) => UpdateLogoSize();
+
+    /// <summary>Logo se prilagođava visini prozora: manji kad je prozor nizak ili kad su prikazani popisi.</summary>
+    private void UpdateLogoSize()
+    {
+        double h = WelcomePanel.ActualHeight;
+        if (h <= 0)
+        {
+            return;
+        }
+
+        double logo = Math.Clamp(h * (_vm.Library.HasLibraryContent ? 0.16 : 0.24), 52, 170);
+        LogoImage.Height = logo;
+        LogoBlock.Height = logo * 1.3;
+        LogoBlock.Width = logo * 2.1;
+        AuthorName.FontSize = Math.Clamp(logo * 0.2, 17, 30);
+        ProductName.Visibility = h < 430 ? Visibility.Collapsed : Visibility.Visible;
     }
 
     protected override void OnSourceInitialized(EventArgs e)
@@ -257,6 +332,11 @@ public partial class MainWindow : Window
         OpenStartupFiles();
         UpdateOnlineSetupButton();
         OfferOnlineSetupOnFirstRun();
+        if (_options.DiagShow is { } show && _options.Files.Count == 0)
+        {
+            // Dijagnostika stalno mjeri iscrtavanje (dretva nikad nije "idle"), pa se prozor otvara nakon kratke pauze.
+            _ = Task.Delay(1500).ContinueWith(_ => ShowForDiagnostics(show), TaskScheduler.FromCurrentSynchronizationContext());
+        }
     }
 
     protected override void OnDragOver(DragEventArgs e)
@@ -443,7 +523,7 @@ public partial class MainWindow : Window
                 }
                 else
                 {
-                    Notify("Prvo otvori video, a zatim dodaj titlove.");
+                    Notify(Loc.T("notice.openVideoBeforeLoad"));
                 }
             }
 
@@ -460,7 +540,7 @@ public partial class MainWindow : Window
         catch (Exception ex)
         {
             Log.Error("Pokretanje mpv-a", ex);
-            MessageBox.Show(this, $"Engine za reprodukciju nije moguće pokrenuti:\n{ex.Message}",
+            MessageBox.Show(this, Loc.T("error.engineStart", ex.Message),
                 "jebaited_player", MessageBoxButton.OK, MessageBoxImage.Error);
             return;
         }
@@ -487,7 +567,7 @@ public partial class MainWindow : Window
     {
         var dialog = new Microsoft.Win32.OpenFileDialog
         {
-            Title = "Otvori datoteku",
+            Title = Loc.T("home.openFile"),
             Multiselect = true,
             Filter = MediaFormats.DialogFilter,
         };

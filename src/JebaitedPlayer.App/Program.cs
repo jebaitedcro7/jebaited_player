@@ -134,6 +134,7 @@ internal static class Program
             if (command == "register")
             {
                 string exe = Environment.ProcessPath ?? throw new InvalidOperationException("Putanja exe-a nije poznata.");
+                Loc.SetLanguage(AppSettings.Load().Language);
                 int types = ShellIntegration.Register(exe, root);
                 Log.Info($"Registracija u Windowsu: {types} vrsta datoteka ({exe})");
             }

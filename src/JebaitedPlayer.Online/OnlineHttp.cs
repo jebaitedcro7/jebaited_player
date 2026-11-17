@@ -36,7 +36,7 @@ public static class OnlineHttp
             uri.Host.EndsWith("." + s, StringComparison.OrdinalIgnoreCase));
         if (uri.Scheme != Uri.UriSchemeHttps || !hostOk)
         {
-            throw new ProviderException($"Odbijena nesigurna ili nepoznata adresa: {uri.Scheme}://{uri.Host}");
+            throw new ProviderException(Loc.T("online.unsafeAddress", $"{uri.Scheme}://{uri.Host}"));
         }
     }
 
@@ -44,7 +44,7 @@ public static class OnlineHttp
     {
         if (response.Content.Headers.ContentLength is long declared && declared > MaxResponseBytes)
         {
-            throw new ProviderException("Odgovor izvora je prevelik.");
+            throw new ProviderException(Loc.T("online.responseTooLarge"));
         }
 
         await using Stream stream = await response.Content.ReadAsStreamAsync(ct);
@@ -55,7 +55,7 @@ public static class OnlineHttp
         {
             if (buffer.Length + read > MaxResponseBytes)
             {
-                throw new ProviderException("Odgovor izvora je prevelik.");
+                throw new ProviderException(Loc.T("online.responseTooLarge"));
             }
 
             buffer.Write(chunk, 0, read);

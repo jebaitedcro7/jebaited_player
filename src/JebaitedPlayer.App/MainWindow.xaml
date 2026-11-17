@@ -1,6 +1,7 @@
 <Window x:Class="JebaitedPlayer.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:JebaitedPlayer.Infrastructure"
         xmlns:controls="clr-namespace:JebaitedPlayer.Controls"
         Title="jebaited_player"
         Width="1280" Height="760" MinWidth="520" MinHeight="320"
@@ -31,24 +32,41 @@
             </Grid>
 
             <!-- Početni ekran. -->
-            <Grid x:Name="WelcomePanel" Background="{DynamicResource PanelBackgroundBrush}">
+            <Grid x:Name="WelcomePanel" Background="{DynamicResource PanelBackgroundBrush}" SizeChanged="OnWelcomeSizeChanged">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- Diskretna svemirska pozadina (crta se jednom, bez animacija). -->
+                <controls:SpaceBackground Grid.RowSpan="2" />
+
                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
-                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="24,32">
-                        <TextBlock Text="jebaited_player" FontSize="34" FontWeight="SemiBold" HorizontalAlignment="Center" />
-                        <TextBlock Text="Povuci film, seriju ili cijelu mapu ovdje, ili ih otvori." FontSize="15" Margin="0,8,0,0"
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="24,20,24,16">
+                        <!-- Alien logo (glavni element) s blagim sjajem i ime ispod njega. -->
+                        <Grid x:Name="LogoBlock" HorizontalAlignment="Center" Width="300" Height="200" IsHitTestVisible="False">
+                            <Ellipse Fill="{DynamicResource LogoGlowBrush}" />
+                            <Image x:Name="LogoImage" Source="/Assets/logo-ufo.png" Height="150" RenderOptions.BitmapScalingMode="HighQuality" />
+                        </Grid>
+                        <TextBlock x:Name="AuthorName" Text="jebaited_cro" FontSize="30" FontFamily="Segoe UI Variable Display Light, Segoe UI Light"
+                                   HorizontalAlignment="Center" Margin="0,2,0,0" />
+                        <TextBlock x:Name="ProductName" Text="jebaited_player" FontSize="13" HorizontalAlignment="Center" Margin="0,2,0,0"
+                                   Foreground="{DynamicResource TextSecondaryBrush}" />
+                        <TextBlock Text="{loc:T home.dropHint}" FontSize="15" Margin="0,18,0,0" MaxWidth="560"
+                                   TextWrapping="Wrap" TextAlignment="Center"
                                    Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center" />
 
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,28,0,0">
                             <Button Style="{StaticResource AccentButton}" Click="OnOpenClick">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="&#xE8E5;" FontFamily="{DynamicResource IconFont}" FontSize="16" VerticalAlignment="Center" />
-                                    <TextBlock Text="Otvori datoteku" Margin="10,0,0,0" FontSize="15" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                    <TextBlock Text="{loc:T home.openFile}" Margin="10,0,0,0" FontSize="15" FontWeight="SemiBold" VerticalAlignment="Center" />
                                 </StackPanel>
                             </Button>
                             <Button Style="{StaticResource SecondaryButton}" Click="OnOpenFolderClick" Margin="10,0,0,0" Padding="18,10">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="&#xE838;" FontFamily="{DynamicResource IconFont}" FontSize="16" VerticalAlignment="Center" />
-                                    <TextBlock Text="Otvori mapu" Margin="10,0,0,0" FontSize="15" VerticalAlignment="Center" />
+                                    <TextBlock Text="{loc:T home.openFolder}" Margin="10,0,0,0" FontSize="15" VerticalAlignment="Center" />
                                 </StackPanel>
                             </Button>
                         </StackPanel>
@@ -56,7 +74,7 @@
                         <!-- Dok nijedan izvor titlova nema korisnikov račun ili ključ. -->
                         <Button x:Name="OnlineSetupButton" Style="{StaticResource LinkButton}" Click="OnOnlineSetupClick"
                                 HorizontalAlignment="Center" Margin="0,16,0,0" Visibility="Collapsed"
-                                Content="Postavi hrvatske titlove s interneta (2 minute)" />
+                                Content="{loc:T home.onlineSetup}" />
 
                         <TextBlock Text="{Binding ErrorMessage}" Foreground="{DynamicResource ErrorBrush}" Margin="0,18,0,0"
                                    HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" MaxWidth="560"
@@ -68,9 +86,11 @@
                         <!-- Nastavi gledati i Omiljeno: jedno uz drugo kad stane, inače jedno ispod drugog. -->
                         <WrapPanel HorizontalAlignment="Center" Margin="0,22,0,0">
                         <!-- Nastavi gledati -->
-                        <StackPanel Width="520" Margin="14,12,14,0" VerticalAlignment="Top"
-                                    Visibility="{Binding Library.HasRecent, Converter={StaticResource BoolToVisibility}}">
-                            <TextBlock Text="Nastavi gledati" FontSize="15" FontWeight="SemiBold" Margin="10,0,0,6" />
+                        <Border Width="520" Margin="14,12,14,0" VerticalAlignment="Top" Background="{DynamicResource HomeCardBrush}"
+                                CornerRadius="10" Padding="6,10,6,6"
+                                Visibility="{Binding Library.HasRecent, Converter={StaticResource BoolToVisibility}}">
+                        <StackPanel>
+                            <TextBlock Text="{loc:T home.continueWatching}" FontSize="15" FontWeight="SemiBold" Margin="10,0,0,6" />
                             <ItemsControl ItemsSource="{Binding Library.Recent}" Focusable="False">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
@@ -89,7 +109,7 @@
                                                 </StackPanel>
                                             </Button>
                                             <Button Grid.Column="1" Style="{StaticResource IconButton}" Content="&#xE711;" FontSize="12"
-                                                    Width="32" Height="32" VerticalAlignment="Center" ToolTip="Ukloni iz povijesti"
+                                                    Width="32" Height="32" VerticalAlignment="Center" ToolTip="{loc:T home.removeRecent}"
                                                     CommandParameter="{Binding}"
                                                     Command="{Binding DataContext.Library.RemoveRecentCommand, RelativeSource={RelativeSource AncestorType=Window}}" />
                                         </Grid>
@@ -97,11 +117,14 @@
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
                         </StackPanel>
+                        </Border>
 
                         <!-- Omiljeno (M6) -->
-                        <StackPanel Width="520" Margin="14,12,14,0" VerticalAlignment="Top"
-                                    Visibility="{Binding Library.HasFavorites, Converter={StaticResource BoolToVisibility}}">
-                            <TextBlock Text="Omiljeno" FontSize="15" FontWeight="SemiBold" Margin="10,0,0,6" />
+                        <Border Width="520" Margin="14,12,14,0" VerticalAlignment="Top" Background="{DynamicResource HomeCardBrush}"
+                                CornerRadius="10" Padding="6,10,6,6"
+                                Visibility="{Binding Library.HasFavorites, Converter={StaticResource BoolToVisibility}}">
+                        <StackPanel>
+                            <TextBlock Text="{loc:T home.favorites}" FontSize="15" FontWeight="SemiBold" Margin="10,0,0,6" />
                             <ItemsControl ItemsSource="{Binding Library.Favorites}" Focusable="False">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
@@ -124,7 +147,7 @@
                                                 </DockPanel>
                                             </Button>
                                             <Button Grid.Column="1" Style="{StaticResource IconButton}" Content="&#xE711;" FontSize="12"
-                                                    Width="32" Height="32" VerticalAlignment="Center" ToolTip="Ukloni iz omiljenih"
+                                                    Width="32" Height="32" VerticalAlignment="Center" ToolTip="{loc:T home.removeFavorite}"
                                                     CommandParameter="{Binding}"
                                                     Command="{Binding DataContext.Library.RemoveFavoriteCommand, RelativeSource={RelativeSource AncestorType=Window}}" />
                                         </Grid>
@@ -132,11 +155,11 @@
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
                         </StackPanel>
+                        </Border>
                         </WrapPanel>
 
-                        <Button Style="{StaticResource LinkButton}" Content="Tipkovnički prečaci (F1)" HorizontalAlignment="Center"
-                                Margin="0,26,0,0" Click="OnToggleShortcutsClick"
-                                Visibility="{Binding Library.HasLibraryContent, Converter={StaticResource BoolToVisibility}}" />
+                        <Button Style="{StaticResource LinkButton}" Content="{loc:T home.shortcuts}" HorizontalAlignment="Center"
+                                Margin="0,22,0,0" Click="OnToggleShortcutsClick" />
 
                         <ItemsControl ItemsSource="{Binding Shortcuts}" Margin="0,22,0,0" HorizontalAlignment="Center"
                                       Grid.IsSharedSizeScope="True" Focusable="False"
@@ -158,9 +181,23 @@
                     </StackPanel>
                 </ScrollViewer>
 
-                <TextBlock Text="{Binding VersionText}" FontSize="11" Margin="0,0,14,10"
-                           HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                           Foreground="{DynamicResource TextSecondaryBrush}" />
+                <!-- Donja traka: postavke i tema lijevo (zaseban red, pa popisi ne prelaze preko nje), verzija desno. -->
+                <DockPanel Grid.Row="1" Margin="8,0,14,8" LastChildFill="False">
+                    <Button DockPanel.Dock="Left" Style="{StaticResource IconButton}" Content="&#xE713;" FontSize="17"
+                            ToolTip="{loc:T home.settingsTooltip}" AutomationProperties.Name="{loc:T home.settingsTooltip}"
+                            Click="OnHomeSettingsClick" />
+                    <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0,0,0"
+                                Background="Transparent" ToolTip="{loc:T home.themeTooltip}">
+                        <TextBlock Text="&#xE708;" FontFamily="{DynamicResource IconFont}" FontSize="13" VerticalAlignment="Center"
+                                   Foreground="{DynamicResource TextSecondaryBrush}" />
+                        <ToggleButton x:Name="HomeThemeSwitch" Style="{StaticResource SwitchToggle}" Margin="8,0" VerticalAlignment="Center"
+                                      AutomationProperties.Name="{loc:T home.themeTooltip}" />
+                        <TextBlock Text="&#xE706;" FontFamily="{DynamicResource IconFont}" FontSize="14" VerticalAlignment="Center"
+                                   Foreground="{DynamicResource TextSecondaryBrush}" />
+                    </StackPanel>
+                    <TextBlock DockPanel.Dock="Right" Text="{Binding VersionText}" FontSize="11" VerticalAlignment="Center"
+                               Foreground="{DynamicResource TextSecondaryBrush}" />
+                </DockPanel>
             </Grid>
         </Grid>
 
@@ -175,11 +212,11 @@
                     </Grid.ColumnDefinitions>
                     <StackPanel VerticalAlignment="Center">
                         <TextBlock Text="{Binding Library.PlaylistTitle}" FontSize="15" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
-                        <TextBlock Text="N / P = sljedeća / prethodna · desni klik = pogledano" FontSize="11"
+                        <TextBlock Text="{loc:T playlist.hint}" FontSize="11"
                                    Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" />
                     </StackPanel>
                     <Button Grid.Column="1" Style="{StaticResource IconButton}" Content="&#xE711;" FontSize="12" Width="32" Height="32"
-                            ToolTip="Zatvori popis (L)" Click="OnClosePlaylistClick" />
+                            ToolTip="{loc:T playlist.close}" Click="OnClosePlaylistClick" />
                 </Grid>
                 <ScrollViewer x:Name="PlaylistScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
                     <ItemsControl x:Name="PlaylistItems" Margin="6,0,6,12" Focusable="False">
@@ -200,7 +237,7 @@
                                         Command="{Binding DataContext.Library.PlayCommand, RelativeSource={RelativeSource AncestorType=Window}}">
                                     <Button.ContextMenu>
                                         <ContextMenu>
-                                            <MenuItem Header="Označi kao pogledano / nepogledano" CommandParameter="{Binding}"
+                                            <MenuItem Header="{loc:T playlist.toggleWatched}" CommandParameter="{Binding}"
                                                       Command="{Binding PlacementTarget.Tag.ToggleWatchedCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
                                         </ContextMenu>
                                     </Button.ContextMenu>

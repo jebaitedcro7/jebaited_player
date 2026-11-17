@@ -1,0 +1,29 @@
+<Window x:Class="JebaitedPlayer.Views.LanguagePickerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:JebaitedPlayer.Infrastructure"
+        xmlns:views="clr-namespace:JebaitedPlayer.Views"
+        Title="{loc:T picker.windowTitle}"
+        Width="480" SizeToContent="Height" ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen" ShowInTaskbar="True"
+        Background="{DynamicResource WindowBackgroundBrush}"
+        Foreground="{DynamicResource TextPrimaryBrush}"
+        FontFamily="{DynamicResource UiFont}" FontSize="13" UseLayoutRounding="True">
+
+    <!-- Prvo pokretanje: odabir jezika. Odabir se odmah vidi u ovom prozoru; zatvaranje bez odabira = English. -->
+    <StackPanel Margin="28,20,28,24">
+        <Grid HorizontalAlignment="Center" Width="180" Height="120">
+            <Ellipse Fill="{DynamicResource LogoGlowBrush}" />
+            <Image Source="/Assets/logo-ufo.png" Height="92" RenderOptions.BitmapScalingMode="HighQuality" />
+        </Grid>
+        <TextBlock Text="jebaited_player" FontSize="13" HorizontalAlignment="Center" Margin="0,2,0,0"
+                   Foreground="{DynamicResource TextSecondaryBrush}" />
+        <TextBlock Text="{loc:T picker.heading}" FontSize="22" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,14,0,0" />
+        <TextBlock Text="{loc:T picker.hint}" Style="{StaticResource HintText}" HorizontalAlignment="Center" TextAlignment="Center"
+                   TextWrapping="Wrap" Margin="0,4,0,0" />
+        <views:LanguageSelector Margin="0,18,0,0" />
+        <Button Style="{StaticResource AccentButton}" HorizontalAlignment="Stretch" Margin="0,20,0,0" Click="OnContinue">
+            <TextBlock Text="{loc:T picker.continue}" FontWeight="SemiBold" FontSize="14" />
+        </Button>
+    </StackPanel>
+</Window>

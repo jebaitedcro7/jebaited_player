@@ -43,10 +43,11 @@ public partial class OnlineSetupWindow : Window
         OsKeyHelp.Visibility = keyVisibility;
         if (needsKey)
         {
-            OsIntroText.Text = "Najviše titlova i jedini izvor koji prepoznaje točno izdanje tvog videa. Trebaju korisničko ime, lozinka i besplatni API ključ.";
+            OsIntroText.Bind(TextBlock.TextProperty, "wizard.osIntroWithKey");
         }
 
         ShowPage(Math.Clamp(startPage, 0, _pages.Length - 1));
+        this.OnLanguageChanged(() => ShowPage(_page));
     }
 
     /// <summary>Što je vodič spremio (za dijagnostiku i izvještaj).</summary>
@@ -63,9 +64,9 @@ public partial class OnlineSetupWindow : Window
         bool last = page == _pages.Length - 1;
         BackButton.Visibility = page is > 0 and < 4 ? Visibility.Visible : Visibility.Collapsed;
         SkipButton.Visibility = page is 1 or 2 or 3 ? Visibility.Visible : Visibility.Collapsed;
-        SkipButton.Content = page == 1 ? "Preskoči" : "Preskoči (neobavezno)";
-        NextText.Text = last ? "Zatvori" : page == 0 ? "Započni" : "Dalje";
-        PageCounter.Text = page is > 0 and < 4 ? $"Korak {page} od 3" : string.Empty;
+        SkipButton.Content = page == 1 ? Loc.T("wizard.skip") : Loc.T("wizard.skipOptional");
+        NextText.Text = last ? Loc.T("common.close") : page == 0 ? Loc.T("wizard.start") : Loc.T("wizard.next");
+        PageCounter.Text = page is > 0 and < 4 ? Loc.T("wizard.step", page, 3) : string.Empty;
         if (last)
         {
             DoneSummary.Text = OnlineSetup.Summary(_settings.Online);
@@ -95,13 +96,13 @@ public partial class OnlineSetupWindow : Window
         string? key = personalKey.Length > 0 ? personalKey : AppSecrets.OpenSubtitlesAppKey;
         if (user.Length == 0 || pass.Length == 0)
         {
-            OsStatus.Text = "Upiši korisničko ime i lozinku.";
+            OsStatus.Text = Loc.T("wizard.enterUserPass");
             return;
         }
 
         if (key is null)
         {
-            OsStatus.Text = "Upiši i API ključ (vidi upute ispod polja).";
+            OsStatus.Text = Loc.T("wizard.enterKeyToo");
             return;
         }
 
@@ -118,7 +119,7 @@ public partial class OnlineSetupWindow : Window
         string key = OnlineSetup.CleanPastedKey(SubDlKey.Password);
         if (key.Length == 0)
         {
-            SubDlStatus.Text = "Zalijepi API ključ sa stranice SubDL.";
+            SubDlStatus.Text = Loc.T("wizard.pasteSubdlKey");
             return;
         }
 
@@ -136,7 +137,7 @@ public partial class OnlineSetupWindow : Window
         string pass = TitloviPassword.Password;
         if (user.Length == 0 || pass.Length == 0)
         {
-            TitloviStatus.Text = "Upiši korisničko ime i lozinku.";
+            TitloviStatus.Text = Loc.T("wizard.enterUserPass");
             return;
         }
 
@@ -159,19 +160,19 @@ public partial class OnlineSetupWindow : Window
     private static async Task<bool> RunTest(TextBlock status, Button button, Func<CancellationToken, Task<string>> test)
     {
         button.IsEnabled = false;
-        status.Text = "Provjeravam…";
+        status.Text = Loc.T("wizard.checking");
         try
         {
             using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(25));
-            status.Text = "✓ " + await test(timeout.Token) + " Spremljeno.";
+            status.Text = "✓ " + await test(timeout.Token) + " " + Loc.T("wizard.saved");
             return true;
         }
         catch (Exception ex) when (ex is ProviderException or HttpRequestException or TaskCanceledException or System.Text.Json.JsonException)
         {
             status.Text = "✗ " + (ex switch
             {
-                TaskCanceledException => "Izvor ne odgovara. Provjeri vezu s internetom i pokušaj ponovno.",
-                HttpRequestException => "Nema veze s izvorom. Provjeri vezu s internetom.",
+                TaskCanceledException => Loc.T("wizard.timeout"),
+                HttpRequestException => Loc.T("wizard.noConnection"),
                 _ => ex.Message,
             });
             return false;

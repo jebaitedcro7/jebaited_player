@@ -37,7 +37,7 @@ public sealed class CandidateRow(SubtitleCandidate candidate, bool isBest)
             ConfidenceText,
         }
         .Concat(Candidate.Reasons)
-        .Append(Candidate.Downloads > 0 ? $"preuzeto {Candidate.Downloads}×" : null)
+        .Append(Candidate.Downloads > 0 ? Loc.T("online.downloads", Candidate.Downloads) : null)
         .Where(s => !string.IsNullOrEmpty(s))!);
 }
 
@@ -57,7 +57,7 @@ public sealed class OnlineSubtitleController : ObservableObject
     private SubtitleQuery? _query;
     private bool _busy;
     private bool _noticeShown;
-    private string _status = string.Empty;
+    private Func<string> _status = () => string.Empty;
     private string _providerStatus = string.Empty;
     private string _queryTitle = string.Empty;
     private string _queryYear = string.Empty;
@@ -101,10 +101,24 @@ public sealed class OnlineSubtitleController : ObservableObject
         private set => SetField(ref _busy, value);
     }
 
-    public string Status
+    /// <summary>Stanje pretrage na trenutnom jeziku (slaže se pri čitanju, pa prati promjenu jezika).</summary>
+    public string Status => _status();
+
+    /// <summary>Promjena jezika: stanje i opisi rezultata na novom jeziku.</summary>
+    public void RefreshTexts()
     {
-        get => _status;
-        private set => SetField(ref _status, value);
+        for (int i = 0; i < Results.Count; i++)
+        {
+            Results[i] = new CandidateRow(Results[i].Candidate, Results[i].IsBest);
+        }
+
+        OnPropertyChanged(string.Empty);
+    }
+
+    private void SetStatus(Func<string> status)
+    {
+        _status = status;
+        OnPropertyChanged(nameof(Status));
     }
 
     public string ProviderStatus
@@ -138,18 +152,13 @@ public sealed class OnlineSubtitleController : ObservableObject
     }
 
     /// <summary>1 titl, 2 titla, 5 titlova, 21 titl…</summary>
-    public static string CountText(int n) => (n % 10, n % 100) switch
-    {
-        (1, not 11) => $"{n} titl",
-        (>= 2 and <= 4, < 12 or > 14) => $"{n} titla",
-        _ => $"{n} titlova",
-    };
+    public static string CountText(int n) => Loc.Plural("online.count", n);
 
     public static string ConfidenceText(MatchConfidence confidence) => confidence switch
     {
-        MatchConfidence.Sure => "isto izdanje",
-        MatchConfidence.Likely => "vjerojatno odgovara",
-        _ => "nesigurno",
+        MatchConfidence.Sure => Loc.T("online.conf.sure"),
+        MatchConfidence.Likely => Loc.T("online.conf.likely"),
+        _ => Loc.T("online.conf.unsure"),
     };
 
     /// <summary>Nakon promjene ključeva u postavkama.</summary>
@@ -199,7 +208,7 @@ public sealed class OnlineSubtitleController : ObservableObject
 
         if (!_service.AnyAvailable)
         {
-            Status = "Nijedan izvor nije postavljen. Desni klik → Titlovi → Postavi titlove s interneta…";
+            SetStatus(() => Loc.T("online.noSources"));
             return;
         }
 
@@ -233,7 +242,7 @@ public sealed class OnlineSubtitleController : ObservableObject
                 if (!_noticeShown)
                 {
                     _noticeShown = true;
-                    Message?.Invoke("Za titlove s interneta: desni klik → Titlovi → Postavi titlove s interneta…");
+                    Message?.Invoke(Loc.T("online.setupHint"));
                 }
 
                 return;
@@ -264,17 +273,17 @@ public sealed class OnlineSubtitleController : ObservableObject
             else if (decision.Best is { } best)
             {
                 LastAutoResult = $"ponuđeno: {best.Language} ({ConfidenceText(best.Confidence)})";
-                Message?.Invoke($"Pronađeni titlovi ({SubtitleLanguage.DisplayName(best.Language)}), ali nisam siguran da odgovaraju ovom izdanju. Ctrl+F za izbor.");
+                Message?.Invoke(Loc.T("online.unsureFound", SubtitleLanguage.DisplayName(best.Language)));
             }
             else if (outcome.Providers.Any(p => p.Ok))
             {
                 LastAutoResult = "nema rezultata";
-                Message?.Invoke($"Na internetu nema titlova ({languages}).");
+                Message?.Invoke(Loc.T("online.noneFound", languages));
             }
             else
             {
                 LastAutoResult = "greška: " + outcome.Providers.FirstOrDefault()?.Error;
-                Message?.Invoke($"Pretraga titlova nije uspjela: {outcome.Providers.FirstOrDefault()?.Error}");
+                Message?.Invoke(Loc.T("online.searchFailed", outcome.Providers.FirstOrDefault()?.Error));
             }
         }
         catch (OperationCanceledException)
@@ -311,7 +320,7 @@ public sealed class OnlineSubtitleController : ObservableObject
         {
             foreach (SubtitleCandidate c in pool)
             {
-                Status = $"Provjeravam prema govoru: {c.DisplayName}…";
+                SetStatus(() => Loc.T("online.verifying", c.DisplayName));
                 DownloadedSubtitle file;
                 try
                 {
@@ -347,8 +356,8 @@ public sealed class OnlineSubtitleController : ObservableObject
                     string path = SaveDownloaded(file, video, c);
                     _subtitles.LoadFiles([path]);
                     LastAutoResult = $"auto: {c.Provider} {c.Language} {c.DisplayName} (govor: {r?.Verdict.ToString() ?? "bez provjere"})";
-                    Status = $"Učitano: {Path.GetFileName(path)}";
-                    Message?.Invoke($"Preuzeti titlovi s interneta: {SubtitleLanguage.DisplayName(c.Language)} ({c.Provider})");
+                    SetStatus(() => Loc.T("online.loaded", Path.GetFileName(path)));
+                    Message?.Invoke(Loc.T("online.downloadedAuto", SubtitleLanguage.DisplayName(c.Language), c.Provider));
                     return true;
                 }
 
@@ -369,15 +378,16 @@ public sealed class OnlineSubtitleController : ObservableObject
         }
 
         LastAutoResult = $"odbačeno: {mismatched} (ne poklapa se s govorom)";
-        Status = $"Pronađeni titlovi ({SubtitleLanguage.DisplayName(language)}) ne poklapaju se s govorom u ovom videu.";
-        Message?.Invoke($"Pronađeni titlovi ({SubtitleLanguage.DisplayName(language)}) ne poklapaju se s govorom u ovom videu, pa nisu učitani. Ctrl+F za ručni izbor.");
+        SetStatus(() => Loc.T("online.mismatchStatus", SubtitleLanguage.DisplayName(language)));
+        Message?.Invoke(Loc.T("online.mismatchMessage", SubtitleLanguage.DisplayName(language)));
         return true;
     }
 
     private async Task<SearchOutcome> RunSearchAsync(SubtitleQuery query)
     {
         IsBusy = true;
-        Status = $"Tražim titlove: {query.Title}{(query.IsEpisode ? $" S{query.Season:00}E{query.Episode:00}" : query.Year is int y ? $" ({y})" : string.Empty)}…";
+        string what = $"{query.Title}{(query.IsEpisode ? $" S{query.Season:00}E{query.Episode:00}" : query.Year is int y ? $" ({y})" : string.Empty)}";
+        SetStatus(() => Loc.T("online.searching", what));
         try
         {
             SearchOutcome outcome = await _service.SearchAsync(query, useCache: true, CancellationToken.None);
@@ -389,10 +399,9 @@ public sealed class OnlineSubtitleController : ObservableObject
             }
 
             ProviderStatus = string.Join(" · ", outcome.Providers.Select(p =>
-                p.Ok ? $"{p.Provider}: {p.Count}{(p.FromCache ? " (spremljeno)" : string.Empty)}" : $"{p.Provider}: {p.Error}"));
-            Status = outcome.Candidates.Count == 0
-                ? "Nema titlova za ovaj upit. Probaj ispraviti naslov, godinu ili epizodu."
-                : $"Pronađeno: {CountText(outcome.Candidates.Count)}. Oznaka jezika: zeleno = isto izdanje, žuto = vjerojatno, sivo = nesigurno.";
+                p.Ok ? $"{p.Provider}: {p.Count}{(p.FromCache ? $" ({Loc.T("online.cached")})" : string.Empty)}" : $"{p.Provider}: {p.Error}"));
+            int found = outcome.Candidates.Count;
+            SetStatus(() => found == 0 ? Loc.T("online.noResults") : Loc.T("online.found", CountText(found)));
             Log.Info($"Pretraga titlova '{query.Title}': {ProviderStatus}");
             return outcome;
         }
@@ -410,21 +419,21 @@ public sealed class OnlineSubtitleController : ObservableObject
         }
 
         IsBusy = true;
-        Status = $"Preuzimam: {candidate.DisplayName}…";
+        SetStatus(() => Loc.T("online.downloading", candidate.DisplayName));
         try
         {
             DownloadedSubtitle downloaded = await _service.DownloadAsync(candidate, _query, CancellationToken.None);
             string path = SaveDownloaded(downloaded, video, candidate);
             _subtitles.LoadFiles([path]);
             string text = $"{SubtitleLanguage.DisplayName(candidate.Language)} ({candidate.Provider}, {ConfidenceText(candidate.Confidence)})";
-            Status = $"Učitano: {Path.GetFileName(path)}";
-            Message?.Invoke(auto ? $"Preuzeti titlovi s interneta: {text}" : $"Učitani titlovi: {text}");
+            SetStatus(() => Loc.T("online.loaded", Path.GetFileName(path)));
+            Message?.Invoke(auto ? Loc.T("online.downloadedText", text) : Loc.T("online.loadedText", text));
             Log.Info($"Preuzeti titlovi {candidate.Provider}/{candidate.DownloadReference}{(_service.LastDownloadFromCache ? " (iz predmemorije, bez trošenja limita)" : string.Empty)} → {path}");
         }
         catch (Exception ex) when (ex is ProviderException or HttpRequestException or IOException or UnauthorizedAccessException
                                        or TaskCanceledException or System.Text.Json.JsonException)
         {
-            Status = $"Preuzimanje nije uspjelo: {ex.Message}";
+            SetStatus(() => Loc.T("online.downloadFailed", ex.Message));
             Message?.Invoke(Status);
             Log.Warn(Status);
         }
@@ -487,7 +496,7 @@ public sealed class OnlineSubtitleController : ObservableObject
             }
         }
 
-        throw new IOException("Preuzete titlove nije moguće spremiti.");
+        throw new IOException(Loc.T("online.saveFailed"));
     }
 
     private async Task<SubtitleQuery> BuildQueryAsync(string videoPath, IReadOnlyList<string> languages)

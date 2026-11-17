@@ -23,20 +23,21 @@ public partial class SubtitleSettingsWindow : Window
         WindowTheme.UseDarkTitleBar(this);
         MaxHeight = Math.Max(400, SystemParameters.WorkArea.Height - 24);
 
-        foreach (var (name, color) in SubtitleStyleSettings.Colors)
+        foreach (var (nameKey, color) in SubtitleStyleSettings.Colors)
         {
             var swatch = new RadioButton
             {
                 Style = (Style)FindResource("ColorSwatch"),
                 Tag = new SolidColorBrush((Color)ColorConverter.ConvertFromString(color)),
-                ToolTip = name,
                 GroupName = "SubtitleColor",
             };
+            swatch.Bind(ToolTipProperty, nameKey);
             swatch.Checked += (_, _) => UpdateStyle(s => s.Color = color);
             ColorPanel.Children.Add(swatch);
         }
 
         LoadFromSettings();
+        this.OnLanguageChanged(() => RefreshLanguages(LanguageList.SelectedIndex));
 
         AutoLoadBox.Checked += (_, _) => _settings.AutoLoadSubtitles = true;
         AutoLoadBox.Unchecked += (_, _) => _settings.AutoLoadSubtitles = false;

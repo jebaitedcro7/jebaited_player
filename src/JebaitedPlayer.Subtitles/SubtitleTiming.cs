@@ -1,5 +1,25 @@
 namespace JebaitedPlayer.Subtitles;
 
+/// <summary>Česta razlika u broju sličica: titlovi rađeni za jedan fps, video u drugom.</summary>
+public readonly record struct FrameRatePreset(double SubtitleFps, double VideoFps)
+{
+    public const double Ntsc = 24000.0 / 1001.0;
+
+    public double Speed => SubtitleFps / VideoFps;
+
+    /// <summary>"25 fps → video 23,976 fps" (brojevi prema jeziku sučelja).</summary>
+    public string Text => Loc.T("fps.preset", Fps(SubtitleFps), Fps(VideoFps));
+
+    /// <summary>"titlovi za 25 fps → video 23,976 fps" (za opis korekcije).</summary>
+    public string Description => Loc.T("fps.presetFor", Fps(SubtitleFps), Fps(VideoFps));
+
+    /// <summary>Preset kojem je brzina dovoljno blizu, ili null.</summary>
+    public static FrameRatePreset? Find(double speed, double tolerance) =>
+        SubtitleTiming.FrameRatePresets.Where(p => Math.Abs(p.Speed - speed) < tolerance).Select(p => (FrameRatePreset?)p).FirstOrDefault();
+
+    private static string Fps(double fps) => fps.ToString("0.###", Loc.Culture);
+}
+
 /// <summary>
 /// Linearna korekcija vremena titlova: <c>prikaz = original × Speed + DelayMs</c>.
 /// <para>
@@ -13,14 +33,14 @@ public readonly record struct SubtitleTiming(double Speed, double DelayMs)
     public static SubtitleTiming Identity => new(1.0, 0);
 
     /// <summary>Česte razlike u broju sličica: titlovi rađeni za jedan fps, video u drugom.</summary>
-    public static IReadOnlyList<(string Name, double Speed)> FrameRatePresets { get; } =
+    public static IReadOnlyList<FrameRatePreset> FrameRatePresets { get; } =
     [
-        ("Titlovi 25 fps → video 23,976 fps", 25.0 / (24000.0 / 1001.0)),
-        ("Titlovi 23,976 fps → video 25 fps", 24000.0 / 1001.0 / 25.0),
-        ("Titlovi 25 fps → video 24 fps", 25.0 / 24.0),
-        ("Titlovi 24 fps → video 25 fps", 24.0 / 25.0),
-        ("Titlovi 24 fps → video 23,976 fps", 24.0 / (24000.0 / 1001.0)),
-        ("Titlovi 23,976 fps → video 24 fps", 24000.0 / 1001.0 / 24.0),
+        new(25, FrameRatePreset.Ntsc),
+        new(FrameRatePreset.Ntsc, 25),
+        new(25, 24),
+        new(24, 25),
+        new(24, FrameRatePreset.Ntsc),
+        new(FrameRatePreset.Ntsc, 24),
     ];
 
     public bool IsIdentity => Math.Abs(Speed - 1) < 1e-9 && Math.Abs(DelayMs) < 0.5;

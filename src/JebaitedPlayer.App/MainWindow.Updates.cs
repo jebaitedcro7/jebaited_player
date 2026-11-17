@@ -77,7 +77,7 @@ public partial class MainWindow
         if (_updates is { State: UpdateState.Ready } u && !_updateNoticeShown && !_closing)
         {
             _updateNoticeShown = true;
-            Notify($"Nova verzija {u.ReadyVersion} je preuzeta. Instalirat će se kad zatvoriš player.");
+            Notify(Loc.T("update.downloaded", u.ReadyVersion));
         }
     }
 

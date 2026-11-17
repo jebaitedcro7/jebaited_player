@@ -29,13 +29,14 @@ public static class SubtitleEncoding
     }
 
     /// <summary>Encodinzi koje korisnik može ručno odabrati.</summary>
-    public static IReadOnlyList<(int CodePage, string Name)> ManualChoices { get; } =
+    /// <remarks>Naziv se čita svaki put, pa prati jezik sučelja.</remarks>
+    public static IReadOnlyList<(int CodePage, string Name)> ManualChoices =>
     [
         (65001, "UTF-8"),
-        (1250, "Windows-1250 (srednja Europa)"),
+        (1250, Loc.T("encoding.cp1250")),
         (28592, "ISO-8859-2 (Latin-2)"),
-        (1251, "Windows-1251 (ćirilica)"),
-        (1252, "Windows-1252 (zapadna Europa)"),
+        (1251, Loc.T("encoding.cp1251")),
+        (1252, Loc.T("encoding.cp1252")),
         (1200, "UTF-16 LE"),
         (1201, "UTF-16 BE"),
     ];
@@ -86,7 +87,7 @@ public static class SubtitleEncoding
 
         if (Array.IndexOf(data, (byte)0) < 0 && !HasHighBytes(data))
         {
-            return new EncodingDetection(Get(65001), "UTF-8 (samo ASCII)", 1, 0);
+            return new EncodingDetection(Get(65001), Loc.T("encoding.asciiOnly"), 1, 0);
         }
 
         if (Utf8.IsValid(data))
@@ -121,7 +122,7 @@ public static class SubtitleEncoding
     {
         if (forced != null)
         {
-            detection = new EncodingDetection(forced, NameOf(forced.CodePage) + " (ručno)", 1, BomLength(data, forced.CodePage));
+            detection = new EncodingDetection(forced, Loc.T("encoding.manual", NameOf(forced.CodePage)), 1, BomLength(data, forced.CodePage));
         }
         else
         {

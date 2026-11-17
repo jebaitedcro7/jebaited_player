@@ -70,6 +70,11 @@ public sealed record SyncResult
 
     public string Detail { get; init; } = string.Empty;
 
+    /// <summary>Ključ opisa za sučelje (Languages/*.json: "syncDetail.&lt;ključ&gt;"), uz parametre <see cref="DetailArgs"/>.</summary>
+    public string DetailKey { get; init; } = string.Empty;
+
+    public object[] DetailArgs { get; init; } = [];
+
     /// <summary>Rezultat po dijelovima filma (za dijagnostiku i log).</summary>
     public IReadOnlyList<SyncPart> Parts { get; init; } = [];
 
@@ -189,7 +194,7 @@ public static class SubtitleAligner
         List<Cue> cues = Normalize(rawCues);
         if (cues.Count < 15)
         {
-            return new SyncResult { Verdict = SyncVerdict.NotEnoughData, Detail = $"premalo replika ({cues.Count})" };
+            return new SyncResult { Verdict = SyncVerdict.NotEnoughData, Detail = $"premalo replika ({cues.Count})", DetailKey = "fewCues", DetailArgs = [cues.Count] };
         }
 
         if (speech.DurationSeconds < 60 || speech.SpeechRatio < 0.01 || speech.SpeechRatio > 0.99)
@@ -198,6 +203,8 @@ public static class SubtitleAligner
             {
                 Verdict = SyncVerdict.NotEnoughData,
                 Detail = $"premalo zvuka ili govora ({speech.DurationSeconds:0} s, govor {speech.SpeechRatio:P0})",
+                DetailKey = "littleSpeech",
+                DetailArgs = [speech.DurationSeconds, speech.SpeechRatio],
             };
         }
 
@@ -361,10 +368,13 @@ public static class SubtitleAligner
 
         SyncVerdict verdict;
         string detail;
+        string detailKey;
+        object[] detailArgs = [];
         if (evidence < options.MinEvidence)
         {
             verdict = SyncVerdict.Mismatch;
             detail = "replike se ne poklapaju s govorom";
+            detailKey = "mismatch";
             confidence = 0;
         }
         else if (confirmedShare < options.MinConfirmedShare)
@@ -373,22 +383,30 @@ public static class SubtitleAligner
             detail = segments.Count > 1
                 ? $"titlovi za drugo izdanje, ali pouzdano je izmjereno samo {confirmedShare:P0} replika"
                 : $"poklapanje je preslabo (pouzdano {confirmedShare:P0} replika)";
+            detailKey = segments.Count > 1 ? "uncertainParts" : "weak";
+            detailArgs = [confirmedShare];
         }
         else if (maxShift <= options.InSyncToleranceSeconds)
         {
             verdict = SyncVerdict.InSync;
             detail = $"poklapa se {agreeing} od {checks.Count} dijelova";
+            detailKey = "agree";
+            detailArgs = [agreeing, checks.Count];
         }
         else if (segments.Count == 1)
         {
             verdict = SyncVerdict.Corrected;
             detail = $"poklapa se {agreeing} od {checks.Count} dijelova";
+            detailKey = "agree";
+            detailArgs = [agreeing, checks.Count];
         }
         else
         {
             verdict = SyncVerdict.CorrectedInParts;
             detail = $"titlovi za drugo izdanje: {segments.Count} dijelova, pomak od {segments.Min(s => s.Offset):+0.0;-0.0} do " +
                      $"{segments.Max(s => s.Offset):+0.0;-0.0} s (poklapa se {agreeing} od {checks.Count} dijelova)";
+            detailKey = "parts";
+            detailArgs = [segments.Count, segments.Min(s => s.Offset), segments.Max(s => s.Offset), agreeing, checks.Count];
         }
 
         return new SyncResult
@@ -408,6 +426,8 @@ public static class SubtitleAligner
             Parts = checks,
             MaxShiftSeconds = maxShift,
             Detail = detail,
+            DetailKey = detailKey,
+            DetailArgs = detailArgs,
         };
     }
 

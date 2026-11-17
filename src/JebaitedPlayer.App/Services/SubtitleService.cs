@@ -36,7 +36,7 @@ public static class SubtitleService
         var info = new FileInfo(path);
         if (!info.Exists)
         {
-            throw new FileNotFoundException("Datoteka titlova ne postoji.", path);
+            throw new FileNotFoundException(Loc.T("error.subtitleMissing"), path);
         }
 
         string ext = info.Extension.ToLowerInvariant();
@@ -58,7 +58,7 @@ public static class SubtitleService
             string idx = Path.ChangeExtension(path, ".idx");
             if (!File.Exists(idx))
             {
-                throw new InvalidDataException("VobSub titlovi (.sub) trebaju pripadajuću .idx datoteku.");
+                throw new InvalidDataException(Loc.T("error.vobSubNeedsIdx"));
             }
 
             return new PreparedSubtitle(path, idx, SubtitleFormat.VobSub, null, null, languageFromName, 0, true);
@@ -66,7 +66,7 @@ public static class SubtitleService
 
         if (info.Length > MaxTextSubtitleBytes)
         {
-            throw new InvalidDataException("Datoteka je prevelika za titlove (više od 20 MB).");
+            throw new InvalidDataException(Loc.T("error.subtitleTooLarge"));
         }
 
         byte[] bytes = File.ReadAllBytes(path);
@@ -74,13 +74,13 @@ public static class SubtitleService
         string text = SubtitleEncoding.Decode(bytes, forced, out EncodingDetection detection);
         if (LooksBinary(text))
         {
-            throw new InvalidDataException("Datoteka ne izgleda kao tekstualni titl.");
+            throw new InvalidDataException(Loc.T("error.notTextSubtitle"));
         }
 
         SubtitleDocument doc = SubtitleParser.Parse(text, path, videoFps);
         if (doc.Cues.Count == 0)
         {
-            throw new InvalidDataException("U datoteci nisu pronađeni titlovi.");
+            throw new InvalidDataException(Loc.T("error.noCuesFound"));
         }
 
         string? language = languageFromName ??
@@ -104,7 +104,7 @@ public static class SubtitleService
     {
         if (prepared.IsBitmap)
         {
-            throw new InvalidOperationException("Slikovne titlove nije moguće ispraviti po dijelovima.");
+            throw new InvalidOperationException(Loc.T("error.bitmapPiecewise"));
         }
 
         byte[] bytes = File.ReadAllBytes(prepared.OriginalPath);
@@ -125,7 +125,7 @@ public static class SubtitleService
         string text = SubtitleEncoding.Decode(bytes, null, out _);
         if (LooksBinary(text))
         {
-            throw new InvalidDataException("Datoteka ne izgleda kao tekstualni titl.");
+            throw new InvalidDataException(Loc.T("error.notTextSubtitle"));
         }
 
         return ToCues(SubtitleParser.Parse(text, fileName, videoFps));
@@ -140,7 +140,7 @@ public static class SubtitleService
     {
         if (subtitle.IsBitmap)
         {
-            throw new InvalidOperationException("Slikovne titlove nije moguće spremiti s novom sinkronizacijom.");
+            throw new InvalidOperationException(Loc.T("error.bitmapSave"));
         }
 
         byte[] bytes = File.ReadAllBytes(subtitle.OriginalPath);

@@ -1,5 +1,3 @@
-using System.Globalization;
-
 namespace JebaitedPlayer.Subtitles;
 
 /// <summary>Točka ručnog poravnanja: replika koja u izvornoj datoteci počinje u <paramref name="OriginalMs"/> treba početi u <paramref name="TargetMs"/>.</summary>
@@ -22,7 +20,6 @@ public sealed record AnchorSolution(SubtitleTiming Timing, SubtitleTimeMap? Map,
 public static class SyncAnchors
 {
     private const double ToleranceMs = 300;
-    private static readonly CultureInfo Hr = CultureInfo.GetCultureInfo("hr-HR");
 
     /// <param name="cues">Izvorna vremena replika (za granice između dijelova).</param>
     public static AnchorSolution Solve(IReadOnlyList<SyncAnchor> anchors, IReadOnlyList<(long StartMs, long EndMs)> cues)
@@ -30,25 +27,25 @@ public static class SyncAnchors
         List<SyncAnchor> points = [.. anchors.OrderBy(a => a.OriginalMs)];
         if (points.Count == 0)
         {
-            return new AnchorSolution(SubtitleTiming.Identity, null, "Nema točaka.");
+            return new AnchorSolution(SubtitleTiming.Identity, null, Loc.T("anchors.none"));
         }
 
         if (points.Count == 1)
         {
             var single = new SubtitleTiming(1, points[0].OffsetMs);
-            return new AnchorSolution(single, null, $"Pomak {Seconds(single.DelayMs)}");
+            return new AnchorSolution(single, null, Loc.T("anchors.offset", Seconds(single.DelayMs)));
         }
 
         // Jedan pomak ili jedna brzina (najmanji kvadrati) za sve točke.
         (double speed, double delay) = Fit(points);
         double worst = points.Max(p => Math.Abs(p.OriginalMs * speed + delay - p.TargetMs));
         bool nearOne = Math.Abs(speed - 1) <= 0.0015;
-        string? preset = SubtitleTiming.FrameRatePresets.FirstOrDefault(p => Math.Abs(p.Speed - speed) < 0.0006).Name;
+        FrameRatePreset? preset = FrameRatePreset.Find(speed, 0.0006);
         if (worst <= ToleranceMs && (nearOne || preset != null))
         {
-            if (preset != null)
+            if (preset is { } p0)
             {
-                speed = SubtitleTiming.FrameRatePresets.First(p => p.Name == preset).Speed;
+                speed = p0.Speed;
                 delay = points.Average(p => p.TargetMs - p.OriginalMs * speed);
             }
             else if (Math.Abs(speed - 1) < 0.0002)
@@ -58,9 +55,12 @@ public static class SyncAnchors
             }
 
             var linear = new SubtitleTiming(speed, delay);
+            string speedText = speed.ToString("0.0000", Loc.Culture);
             string what = Math.Abs(speed - 1) < 1e-9
-                ? $"Pomak {Seconds(delay)}"
-                : $"Brzina {speed.ToString("0.0000", Hr)}×{(preset != null ? $" ({preset.Replace("Titlovi ", "titlovi za ")})" : string.Empty)}, pomak {Seconds(delay)}";
+                ? Loc.T("anchors.offset", Seconds(delay))
+                : preset is { } p1
+                    ? Loc.T("anchors.speedPresetOffset", speedText, p1.Description, Seconds(delay))
+                    : Loc.T("anchors.speedOffset", speedText, Seconds(delay));
             return new AnchorSolution(linear, null, what);
         }
 
@@ -88,11 +88,11 @@ public static class SyncAnchors
         var map = new SubtitleTimeMap(segments);
         if (segments.Count == 1)
         {
-            return new AnchorSolution(new SubtitleTiming(1, segments[0].OffsetMs), null, $"Pomak {Seconds(segments[0].OffsetMs)}");
+            return new AnchorSolution(new SubtitleTiming(1, segments[0].OffsetMs), null, Loc.T("anchors.offset", Seconds(segments[0].OffsetMs)));
         }
 
         return new AnchorSolution(SubtitleTiming.Identity, map,
-            $"Po dijelovima ({segments.Count}): " + string.Join(" / ", segments.Select(s => Seconds(s.OffsetMs))));
+            Loc.T("anchors.parts", segments.Count, string.Join(" / ", segments.Select(s => Seconds(s.OffsetMs)))));
     }
 
     /// <summary>Početak replike nakon najdulje pauze između dva izvorna vremena (granica između dijelova).</summary>
@@ -130,6 +130,6 @@ public static class SyncAnchors
     private static string Seconds(double ms)
     {
         string sign = ms > 0.5 ? "+" : ms < -0.5 ? "−" : string.Empty;
-        return $"{sign}{(Math.Abs(ms) / 1000).ToString("0.0", Hr)} s";
+        return $"{sign}{(Math.Abs(ms) / 1000).ToString("0.0", Loc.Culture)} s";
     }
 }

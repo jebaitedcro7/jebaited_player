@@ -21,7 +21,8 @@ internal static class ShellIntegration
     public const string ProgIdPrefix = "jebaited_player.";
     public const string DefaultRoot = "Software";
 
-    private const string Description = "Lagani video player s automatskim pronalaženjem i sinkronizacijom hrvatskih titlova.";
+    /// <summary>Opis u Windowsima, na jeziku sučelja u trenutku registracije (osvježava se pri promjeni jezika).</summary>
+    private static string Description => Loc.T("shell.description");
 
     /// <summary>Registriraj (ili osvježi) jebaited_player za zadani exe. Sigurno za ponavljanje.</summary>
     public static int Register(string exePath, string root = DefaultRoot)
@@ -42,8 +43,9 @@ internal static class ShellIntegration
             string progId = ProgIdPrefix + ext.TrimStart('.');
             using (RegistryKey key = hkcu.CreateSubKey($@"{root}\Classes\{progId}"))
             {
-                key.SetValue(string.Empty, $"{ext.TrimStart('.').ToUpperInvariant()} {(isVideo ? "video" : "zvuk")}");
-                key.SetValue("FriendlyTypeName", $"{ext.TrimStart('.').ToUpperInvariant()} {(isVideo ? "video" : "zvuk")} (jebaited_player)");
+                string typeName = Loc.T(isVideo ? "shell.typeVideo" : "shell.typeAudio", ext.TrimStart('.').ToUpperInvariant());
+                key.SetValue(string.Empty, typeName);
+                key.SetValue("FriendlyTypeName", $"{typeName} (jebaited_player)");
             }
 
             using (RegistryKey key = hkcu.CreateSubKey($@"{root}\Classes\{progId}\DefaultIcon"))
@@ -139,6 +141,32 @@ internal static class ShellIntegration
         return key?.GetValue("ExePath") as string;
     }
 
+    /// <summary>
+    /// Promjena jezika: opisi u Windowsima ("MKV video", "Reproduciraj u jebaited_playeru") ponovno se zapišu na novom
+    /// jeziku, ali samo ako je registriran upravo ovaj exe (prijenosna verzija i drugi primjerci se ne diraju).
+    /// </summary>
+    public static void RefreshTextsInBackground()
+    {
+        string? exe = Environment.ProcessPath;
+        if (exe is null || !IsRegisteredFor(exe))
+        {
+            return;
+        }
+
+        _ = Task.Run(() =>
+        {
+            try
+            {
+                Register(exe);
+                Log.Info($"Registracija u Windowsu osvježena na jezik {Loc.Current}.");
+            }
+            catch (Exception ex) when (ex is UnauthorizedAccessException or System.Security.SecurityException or IOException)
+            {
+                Log.Warn($"Registracija u Windowsu nije osvježena: {ex.Message}");
+            }
+        });
+    }
+
     public static bool IsRegisteredFor(string exePath, string root = DefaultRoot) =>
         RegisteredExe(root) is { } registered &&
         string.Equals(Path.GetFullPath(registered), Path.GetFullPath(exePath), StringComparison.OrdinalIgnoreCase);
@@ -172,7 +200,7 @@ internal static class ShellIntegration
 
         using (RegistryKey open = hkcu.CreateSubKey($@"{baseKey}\shell\open"))
         {
-            open.SetValue(string.Empty, "Reproduciraj u jebaited_playeru");
+            open.SetValue(string.Empty, Loc.T("shell.openVerb"));
 
             // Bez ovoga Explorer ne nudi naredbu za više od 15 označenih datoteka.
             open.SetValue("MultiSelectModel", "Player");

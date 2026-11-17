@@ -64,6 +64,23 @@ public partial class App : Application
             JebaitedPlayer.Views.WindowTheme.Apply(theme);
         }
 
+        // Jezik: dijagnostika ga zadaje bez mijenjanja postavki (zadano hrvatski, za postojeće provjere u skriptama);
+        // inače zapamćeni jezik ili, prvi put, prozor za odabir (bez odabira ostaje engleski).
+        if (options.IsDiagnostics || options.DiagLanguage != null)
+        {
+            Loc.SetLanguage(options.DiagLanguage ?? "hr");
+        }
+        else if (!string.IsNullOrWhiteSpace(settings.Language))
+        {
+            Loc.SetLanguage(settings.Language);
+        }
+        else
+        {
+            ChooseLanguage(settings);
+        }
+
+        Log.Info($"Jezik sučelja: {Loc.Current}");
+
         var window = new MainWindow(settings, options);
         MainWindow = window;
         if (_instance != null)
@@ -74,11 +91,33 @@ public partial class App : Application
         window.Show();
     }
 
+    /// <summary>
+    /// Prvo pokretanje (Velopack ga radi odmah nakon instalacije) ili prvo nakon nadogradnje s verzije bez jezika:
+    /// prozor za odabir jezika. Nova instalacija dobiva i zadane jezike titlova prema odabranom jeziku.
+    /// </summary>
+    private void ChooseLanguage(AppSettings settings)
+    {
+        // Prvi prozor bi postao glavni i njegovo zatvaranje bi ugasilo aplikaciju.
+        ShutdownMode = ShutdownMode.OnExplicitShutdown;
+        new JebaitedPlayer.Views.LanguagePickerWindow().ShowDialog();
+        ShutdownMode = ShutdownMode.OnMainWindowClose;
+
+        settings.Language = Loc.Current;
+        if (settings.IsNew)
+        {
+            settings.SubtitleLanguages = AppSettings.DefaultSubtitleLanguages(Loc.Current);
+        }
+
+        settings.Save();
+        Log.Info($"Jezik odabran pri prvom pokretanju: {Loc.Current} (titlovi: {string.Join(", ", settings.SubtitleLanguages)})");
+        ShellIntegration.RefreshTextsInBackground();
+    }
+
     private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
     {
         Log.Error("Neobrađena greška u sučelju", e.Exception);
         MessageBox.Show(
-            $"Dogodila se neočekivana greška:\n{e.Exception.Message}\n\nDetalji su zapisani u log:\n{Log.FilePath}",
+            Loc.T("error.unexpected", e.Exception.Message, Log.FilePath),
             "jebaited_player", MessageBoxButton.OK, MessageBoxImage.Warning);
         e.Handled = true;
     }

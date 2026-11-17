@@ -20,6 +20,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Alien logo (UFO dio originalnog assets/logo.png) za početni ekran i odabir jezika. -->
+    <Resource Include="..\..\assets\logo-ufo.png" Link="Assets\logo-ufo.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <!-- Instalacija i nadogradnje preko GitHub Releases (MIT). -->
     <PackageReference Include="Velopack" Version="1.2.161" />
   </ItemGroup>
@@ -32,11 +37,17 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\JebaitedPlayer.Localization\JebaitedPlayer.Localization.csproj" />
     <ProjectReference Include="..\JebaitedPlayer.Mpv\JebaitedPlayer.Mpv.csproj" />
     <ProjectReference Include="..\JebaitedPlayer.Subtitles\JebaitedPlayer.Subtitles.csproj" />
     <ProjectReference Include="..\JebaitedPlayer.Library\JebaitedPlayer.Library.csproj" />
     <ProjectReference Include="..\JebaitedPlayer.Online\JebaitedPlayer.Online.csproj" />
     <ProjectReference Include="..\JebaitedPlayer.Sync\JebaitedPlayer.Sync.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Tekstovi sučelja (Languages/*.json). -->
+    <Using Include="JebaitedPlayer.Localization" />
   </ItemGroup>
 
   <ItemGroup>

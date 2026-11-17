@@ -28,7 +28,7 @@ public sealed class OpenSubtitlesProvider(HttpClient http, Func<OpenSubtitlesCre
 
     public async Task<IReadOnlyList<SubtitleCandidate>> SearchAsync(SubtitleQuery query, CancellationToken ct)
     {
-        OpenSubtitlesCredentials c = credentials() ?? throw new ProviderException("Nije upisan API ključ.");
+        OpenSubtitlesCredentials c = credentials() ?? throw new ProviderException(Loc.T("online.noApiKey"));
         var p = new Dictionary<string, string>
         {
             ["languages"] = string.Join(",", query.Languages.Select(ToApiLanguage).Distinct().OrderBy(l => l, StringComparer.Ordinal)),
@@ -66,7 +66,7 @@ public sealed class OpenSubtitlesProvider(HttpClient http, Func<OpenSubtitlesCre
 
     public async Task<DownloadedSubtitle> DownloadAsync(SubtitleCandidate candidate, SubtitleQuery query, CancellationToken ct)
     {
-        OpenSubtitlesCredentials c = credentials() ?? throw new ProviderException("Nije upisan API ključ.");
+        OpenSubtitlesCredentials c = credentials() ?? throw new ProviderException(Loc.T("online.noApiKey"));
         await EnsureLoginAsync(c, ct);
 
         using var request = new HttpRequestMessage(HttpMethod.Post, $"https://{_host}/api/v1/download")
@@ -78,7 +78,7 @@ public sealed class OpenSubtitlesProvider(HttpClient http, Func<OpenSubtitlesCre
         AddHeaders(request, c);
         using HttpResponseMessage response = await SendAsync(request, ct);
         using JsonDocument doc = JsonDocument.Parse(await OnlineHttp.ReadTextAsync(response, ct));
-        string link = Json.Str(doc.RootElement, "link") ?? throw new ProviderException("OpenSubtitles nije vratio poveznicu za preuzimanje.");
+        string link = Json.Str(doc.RootElement, "link") ?? throw new ProviderException(Loc.T("online.os.noLink"));
         string fileName = Json.Str(doc.RootElement, "file_name") ?? candidate.FileName ?? "titlovi.srt";
 
         var uri = new Uri(link);
@@ -94,18 +94,18 @@ public sealed class OpenSubtitlesProvider(HttpClient http, Func<OpenSubtitlesCre
     /// <summary>Provjera ključa i (ako je upisan) računa, za prozor "Izvori titlova".</summary>
     public async Task<string> TestAsync(CancellationToken ct)
     {
-        OpenSubtitlesCredentials c = credentials() ?? throw new ProviderException("Nije upisan API ključ.");
+        OpenSubtitlesCredentials c = credentials() ?? throw new ProviderException(Loc.T("online.noApiKey"));
         _token = null;
         if (!string.IsNullOrWhiteSpace(c.Username))
         {
             int allowed = await EnsureLoginAsync(c, ct);
-            return $"Prijava uspjela. Dnevno dopušteno preuzimanja: {allowed}.";
+            return Loc.T("online.os.loginOk", allowed);
         }
 
         using var request = new HttpRequestMessage(HttpMethod.Get, $"https://{_host}/api/v1/infos/formats");
         AddHeaders(request, c);
         using HttpResponseMessage response = await SendAsync(request, ct);
-        return "API ključ radi (bez prijave: 5 preuzimanja dnevno).";
+        return Loc.T("online.os.keyOk");
     }
 
     internal static IReadOnlyList<SubtitleCandidate> ParseSearch(string json)
@@ -178,7 +178,7 @@ public sealed class OpenSubtitlesProvider(HttpClient http, Func<OpenSubtitlesCre
         request.Headers.TryAddWithoutValidation("Api-Key", c.ApiKey);
         using HttpResponseMessage response = await SendAsync(request, ct, isLogin: true);
         using JsonDocument doc = JsonDocument.Parse(await OnlineHttp.ReadTextAsync(response, ct));
-        _token = Json.Str(doc.RootElement, "token") ?? throw new ProviderException("OpenSubtitles prijava nije vratila token.");
+        _token = Json.Str(doc.RootElement, "token") ?? throw new ProviderException(Loc.T("online.os.noToken"));
         _tokenExpires = DateTime.UtcNow.AddHours(12);
         if (Json.Str(doc.RootElement, "base_url") is { Length: > 0 } baseUrl)
         {
@@ -225,12 +225,12 @@ public sealed class OpenSubtitlesProvider(HttpClient http, Func<OpenSubtitlesCre
         response.Dispose();
         throw response.StatusCode switch
         {
-            HttpStatusCode.Unauthorized when isLogin => new ProviderException("Prijava na OpenSubtitles nije uspjela (korisničko ime ili lozinka)."),
-            HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden => new ProviderException("OpenSubtitles je odbio API ključ."),
-            HttpStatusCode.NotAcceptable => new ProviderException($"Dnevni limit preuzimanja s OpenSubtitles je potrošen. {ResetText(body)}".Trim()),
-            HttpStatusCode.TooManyRequests => new ProviderException("OpenSubtitles: previše zahtjeva, pokušaj malo kasnije."),
-            HttpStatusCode.Gone => new ProviderException("Poveznica za preuzimanje je istekla, pokušaj ponovno."),
-            _ => new ProviderException($"OpenSubtitles greška {(int)response.StatusCode}{(message is null ? string.Empty : ": " + message)}"),
+            HttpStatusCode.Unauthorized when isLogin => new ProviderException(Loc.T("online.os.loginFailed")),
+            HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden => new ProviderException(Loc.T("online.os.keyRejected")),
+            HttpStatusCode.NotAcceptable => new ProviderException(Loc.T("online.os.limit", ResetText(body)).Trim()),
+            HttpStatusCode.TooManyRequests => new ProviderException(Loc.T("online.os.tooMany")),
+            HttpStatusCode.Gone => new ProviderException(Loc.T("online.os.linkExpired")),
+            _ => new ProviderException(Loc.T("online.os.error", (int)response.StatusCode) + (message is null ? string.Empty : ": " + message)),
         };
     }
 
@@ -252,7 +252,7 @@ public sealed class OpenSubtitlesProvider(HttpClient http, Func<OpenSubtitlesCre
         try
         {
             using JsonDocument doc = JsonDocument.Parse(body);
-            return Json.Str(doc.RootElement, "reset_time") is { } reset ? $"Obnavlja se za {reset}." : string.Empty;
+            return Json.Str(doc.RootElement, "reset_time") is { } reset ? Loc.T("online.os.resetsIn", reset) : string.Empty;
         }
         catch (JsonException)
         {

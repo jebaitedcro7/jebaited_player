@@ -29,7 +29,7 @@ public sealed class PlayerViewModel : ObservableObject
     private long _ignorePositionUntil;
 
     private string? _titleOverride;
-    private bool _showWelcomeShortcuts = true;
+    private bool _showWelcomeShortcuts;
 
     public PlayerViewModel(AppSettings settings, WatchStore? store)
     {
@@ -95,6 +95,15 @@ public sealed class PlayerViewModel : ObservableObject
     public SubtitleController Subtitles { get; }
 
     public IReadOnlyList<ShortcutInfo> Shortcuts => KeyboardShortcuts.All;
+
+    /// <summary>Promjena jezika: tekstovi koje slažu kontroleri (popis, povijest, titlovi, prečaci) na novom jeziku.</summary>
+    public void RefreshTexts()
+    {
+        Library.RefreshTexts();
+        Subtitles.RefreshTexts();
+        Extras.NotifyAllChanged();
+        OnPropertyChanged(nameof(Shortcuts));
+    }
 
     public string VersionText => "v" + AppPaths.Version;
 
@@ -377,13 +386,13 @@ public sealed class PlayerViewModel : ObservableObject
     public void ChangeVolume(double delta)
     {
         Volume += delta;
-        ShowOsd($"Glasnoća: {Volume:0} %");
+        ShowOsd(Loc.T("osd.volume", Volume));
     }
 
     public void ToggleMute()
     {
         IsMuted = !IsMuted;
-        ShowOsd(IsMuted ? "Zvuk isključen" : "Zvuk uključen");
+        ShowOsd(IsMuted ? Loc.T("osd.muted") : Loc.T("osd.unmuted"));
     }
 
     public void FrameStep(bool back)
@@ -488,7 +497,7 @@ public sealed class PlayerViewModel : ObservableObject
         }
 
         IsLoading = false;
-        ErrorMessage = $"Datoteku nije moguće reproducirati ({e.ErrorText ?? "nepoznata greška"}).";
+        ErrorMessage = Loc.T("error.cannotPlay", e.ErrorText ?? Loc.T("error.unknown"));
         Log.Warn($"Reprodukcija nije uspjela: {e.ErrorText}");
         LoadFailed?.Invoke(this, EventArgs.Empty);
     }

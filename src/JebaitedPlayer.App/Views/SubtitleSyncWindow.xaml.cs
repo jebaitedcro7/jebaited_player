@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using JebaitedPlayer.Infrastructure;
 using JebaitedPlayer.Subtitles;
 using JebaitedPlayer.ViewModels;
 
@@ -27,16 +28,24 @@ public partial class SubtitleSyncWindow : Window
         MaxHeight = Math.Max(400, SystemParameters.WorkArea.Height - 24);
         WindowTheme.UseDarkTitleBar(this);
 
-        AddPreset("Bez korekcije", 1.0);
-        foreach (var (name, speed) in SubtitleTiming.FrameRatePresets)
-        {
-            AddPreset(name.Replace("Titlovi ", string.Empty), speed);
-        }
+        BuildPresets();
+        this.OnLanguageChanged(BuildPresets);
 
         DelayBox.KeyDown += CommitOnEnter;
         SpeedBox.KeyDown += CommitOnEnter;
         PreviewKeyDown += OnPreviewKeyDown;
         Loaded += (_, _) => _subtitles.RefreshNearbyCues();
+    }
+
+    /// <summary>Gumbi za drugi FPS (nazivi s brojevima prema jeziku, pa se ponovno slažu kad se jezik promijeni).</summary>
+    private void BuildPresets()
+    {
+        PresetPanel.Children.Clear();
+        AddPreset(Loc.T("sync.noCorrection"), 1.0);
+        foreach (FrameRatePreset preset in SubtitleTiming.FrameRatePresets)
+        {
+            AddPreset(preset.Text, preset.Speed);
+        }
     }
 
     private void AddPreset(string text, double speed)
@@ -119,7 +128,7 @@ public partial class SubtitleSyncWindow : Window
         AdvancedPanel.Visibility = show ? Visibility.Visible : Visibility.Collapsed;
         if (sender is Button button)
         {
-            button.Content = show ? "Napredno ▴" : "Napredno ▾";
+            button.Bind(ContentProperty, show ? "sync.advancedOpen" : "sync.advanced");
         }
     }
 
@@ -143,10 +152,10 @@ public partial class SubtitleSyncWindow : Window
         string suggested = _subtitles.SuggestedSavePath(track);
         var dialog = new Microsoft.Win32.SaveFileDialog
         {
-            Title = "Spremi sinkronizirane titlove",
+            Title = Loc.T("dialog.saveSynced"),
             FileName = Path.GetFileName(suggested),
             InitialDirectory = Path.GetDirectoryName(suggested),
-            Filter = "SRT titlovi|*.srt|ASS titlovi|*.ass;*.ssa|Sve datoteke|*.*",
+            Filter = $"{Loc.T("dialog.srtSubtitles")}|*.srt|{Loc.T("dialog.assSubtitles")}|*.ass;*.ssa|{Loc.T("dialog.allFiles")}|*.*",
             FilterIndex = Path.GetExtension(suggested) == ".srt" ? 1 : 2,
             OverwritePrompt = true,
         };
@@ -162,7 +171,7 @@ public partial class SubtitleSyncWindow : Window
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidOperationException)
         {
-            MessageBox.Show(this, $"Titlovi nisu spremljeni:\n{ex.Message}", "jebaited_player", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show(this, Loc.T("error.saveSyncedFailed", ex.Message), "jebaited_player", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }
 }

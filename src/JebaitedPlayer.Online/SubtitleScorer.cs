@@ -38,7 +38,7 @@ public static class SubtitleScorer
         if (c.HashMatch)
         {
             score += 100;
-            c.Reasons.Add("otisak datoteke odgovara");
+            c.Reasons.Add(Loc.T("score.hash"));
         }
 
         // Epizoda: druga epizoda se odbacuje.
@@ -57,7 +57,7 @@ public static class SubtitleScorer
             {
                 episodeMatch = true;
                 score += 25;
-                c.Reasons.Add("ista epizoda");
+                c.Reasons.Add(Loc.T("score.sameEpisode"));
             }
         }
         else
@@ -68,12 +68,12 @@ public static class SubtitleScorer
                 if (Math.Abs(year.Value - query.Year.Value) <= 1)
                 {
                     score += 10;
-                    c.Reasons.Add("ista godina");
+                    c.Reasons.Add(Loc.T("score.sameYear"));
                 }
                 else
                 {
                     score -= 40;
-                    c.Reasons.Add($"druga godina ({year})");
+                    c.Reasons.Add(Loc.T("score.otherYear", year));
                 }
             }
         }
@@ -87,7 +87,7 @@ public static class SubtitleScorer
             if (a.Length > 0 && b.Length > 0 && !a.Contains(b) && !b.Contains(a))
             {
                 score -= 30;
-                c.Reasons.Add("drugi naslov");
+                c.Reasons.Add(Loc.T("score.otherTitle"));
             }
         }
 
@@ -98,7 +98,7 @@ public static class SubtitleScorer
         {
             otherShow = true;
             score -= 60;
-            c.Reasons.Add($"naziv izdanja je za drugi naslov ({other})");
+            c.Reasons.Add(Loc.T("score.releaseOtherTitle", other));
         }
 
         // Podaci izdanja (iz naziva releasea titla i naziva video datoteke).
@@ -113,18 +113,18 @@ public static class SubtitleScorer
         if (groupMatch)
         {
             score += 20;
-            c.Reasons.Add($"ista release grupa ({video.ReleaseGroup})");
+            c.Reasons.Add(Loc.T("score.sameGroup", video.ReleaseGroup));
         }
 
         if (sourceMatch)
         {
             score += 10;
-            c.Reasons.Add($"isti izvor ({video.Source})");
+            c.Reasons.Add(Loc.T("score.sameSource", video.Source));
         }
         else if (video.Source != null && release.Source != null)
         {
             score -= 5;
-            c.Reasons.Add($"drugi izvor ({release.Source})");
+            c.Reasons.Add(Loc.T("score.otherSource", release.Source));
         }
 
         if (resolutionMatch)
@@ -141,20 +141,20 @@ public static class SubtitleScorer
             else
             {
                 score -= 10;
-                c.Reasons.Add($"drugi fps ({fps:0.###})");
+                c.Reasons.Add(Loc.T("score.otherFps", fps));
             }
         }
 
         if (c.MachineTranslated)
         {
             score -= 40;
-            c.Reasons.Add("strojni prijevod");
+            c.Reasons.Add(Loc.T("score.machine"));
         }
 
         if (c.HearingImpaired)
         {
             score -= 3;
-            c.Reasons.Add("za gluhe i nagluhe");
+            c.Reasons.Add(Loc.T("score.hearingImpaired"));
         }
 
         score += Math.Min(5, Math.Log10(c.Downloads + 1));

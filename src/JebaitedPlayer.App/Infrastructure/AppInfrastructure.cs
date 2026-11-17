@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Reflection;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace JebaitedPlayer.Infrastructure;
 
@@ -133,6 +134,27 @@ public sealed class AppSettings
     /// <summary>"dark" (zadano) ili "light".</summary>
     public string Theme { get; set; } = "dark";
 
+    /// <summary>
+    /// Jezik sučelja ("en", "de", "hr"…). Prazno dok ga korisnik ne odabere (prvo pokretanje ili nadogradnja s 1.0.x):
+    /// tada se ponudi odabir, a bez odabira vrijedi engleski.
+    /// </summary>
+    public string? Language { get; set; }
+
+    /// <summary>Postavke nisu postojale (nova instalacija): zadani jezici titlova prate odabrani jezik sučelja.</summary>
+    [JsonIgnore]
+    public bool IsNew { get; private set; }
+
+    /// <summary>Zadani prioritet jezika titlova za novi jezik sučelja (samo za novu instalaciju).</summary>
+    public static List<string> DefaultSubtitleLanguages(string uiLanguage) => uiLanguage switch
+    {
+        "hr" => ["hr", "sr", "bs", "en"],
+        "bs" => ["bs", "hr", "sr", "en"],
+        "sr" => ["sr", "hr", "bs", "en"],
+        "sl" => ["sl", "hr", "en"],
+        "de" => ["de", "en"],
+        _ => ["en"],
+    };
+
     /// <summary>Na kraju epizode sama krene sljedeća (nakon odbrojavanja). Isključeno: samo ponudi.</summary>
     public bool AutoPlayNext { get; set; } = true;
 
@@ -166,7 +188,7 @@ public sealed class AppSettings
             Log.Warn($"Postavke nisu učitane, koriste se zadane: {ex.Message}");
         }
 
-        return new AppSettings();
+        return new AppSettings { IsNew = true };
     }
 
     public void Save()
@@ -210,12 +232,13 @@ public sealed class SubtitleStyleSettings
     public static IReadOnlyList<string> Fonts { get; } =
         ["Segoe UI Semibold", "Segoe UI", "Arial", "Calibri", "Verdana", "Tahoma", "Trebuchet MS"];
 
-    public static IReadOnlyList<(string Name, string Color)> Colors { get; } =
+    /// <summary>Boje: ključ naziva (prijevod u Languages/*.json) i boja.</summary>
+    public static IReadOnlyList<(string NameKey, string Color)> Colors { get; } =
     [
-        ("Bijela", "#FFFFFF"),
-        ("Žuta", "#FFE14D"),
-        ("Svijetlosiva", "#D9D9D9"),
-        ("Svijetloplava", "#A8DCFF"),
+        ("subSettings.colorWhite", "#FFFFFF"),
+        ("subSettings.colorYellow", "#FFE14D"),
+        ("subSettings.colorLightGray", "#D9D9D9"),
+        ("subSettings.colorLightBlue", "#A8DCFF"),
     ];
 
     public string FontName { get; set; } = "Segoe UI Semibold";
@@ -289,6 +312,15 @@ public sealed class StartupOptions
 
     /// <summary>Tema samo za ovo pokretanje ("dark" ili "light"), bez spremanja u postavke.</summary>
     public string? DiagTheme { get; private set; }
+
+    /// <summary>
+    /// Jezik sučelja samo za ovo pokretanje ("en", "de", "hr"…), bez spremanja u postavke. Bez njega dijagnostika radi
+    /// na hrvatskom (provjere u skriptama su pisane za hrvatske tekstove).
+    /// </summary>
+    public string? DiagLanguage { get; private set; }
+
+    /// <summary>Mapa za snimke u dijagnostici (npr. neutralna putanja za snimke zaslona u priručniku).</summary>
+    public string? DiagScreenshotFolder { get; private set; }
 
     /// <summary>
     /// Tipke koje dijagnostika "pritisne" redom (isti put kao prava tipkovnica), npr. "B;OemPlus;O;S;Ctrl+D".
@@ -395,6 +427,12 @@ public sealed class StartupOptions
                 case "--diag-theme" when i + 1 < args.Length:
                     o.DiagTheme = args[++i] == "light" ? "light" : "dark";
                     break;
+                case "--diag-lang" when i + 1 < args.Length:
+                    o.DiagLanguage = args[++i];
+                    break;
+                case "--diag-screenshot-folder" when i + 1 < args.Length:
+                    o.DiagScreenshotFolder = args[++i];
+                    break;
                 case "--diag-keys" when i + 1 < args.Length:
                     o.DiagKeys = args[++i];
                     break;
@@ -470,10 +508,10 @@ public static class MediaFormats
         ["mp3", "aac", "flac", "wav", "ogg", "opus", "ac3", "dts", "eac3", "m4a", "wma", "mka"];
 
     public static string DialogFilter =>
-        $"Video i audio|{Pattern(Video.Concat(Audio))}|Video|{Pattern(Video)}|Audio|{Pattern(Audio)}|Sve datoteke|*.*";
+        $"{Loc.T("dialog.videoAndAudio")}|{Pattern(Video.Concat(Audio))}|Video|{Pattern(Video)}|Audio|{Pattern(Audio)}|{Loc.T("dialog.allFiles")}|*.*";
 
     public static string SubtitleDialogFilter =>
-        $"Titlovi|{string.Join(";", JebaitedPlayer.Subtitles.SubtitleFormats.Extensions.Select(e => "*" + e))}|Sve datoteke|*.*";
+        $"{Loc.T("controls.subtitles")}|{string.Join(";", JebaitedPlayer.Subtitles.SubtitleFormats.Extensions.Select(e => "*" + e))}|{Loc.T("dialog.allFiles")}|*.*";
 
     public static bool IsSubtitle(string path) => JebaitedPlayer.Subtitles.SubtitleFormats.IsSubtitleFile(path);
 
@@ -485,29 +523,30 @@ public sealed record ShortcutInfo(string Keys, string Description);
 
 public static class KeyboardShortcuts
 {
-    public static IReadOnlyList<ShortcutInfo> All { get; } =
+    /// <summary>Popis na trenutnom jeziku (gradi se pri svakom čitanju, pa prati promjenu jezika).</summary>
+    public static IReadOnlyList<ShortcutInfo> All =>
     [
-        new("Razmaknica / K", "Reproduciraj / pauziraj"),
-        new("← / →", "5 s natrag / naprijed"),
-        new("Ctrl + ← / →", "30 s natrag / naprijed"),
-        new("↑ / ↓ / kotačić", "Glasnoća"),
-        new("M", "Isključi / uključi zvuk"),
-        new("F / dvoklik", "Cijeli zaslon (Esc za izlaz)"),
-        new(", / .", "Kadar natrag / naprijed"),
-        new("N / P / L", "Sljedeća / prethodna epizoda / popis epizoda"),
-        new("Ctrl + O / Ctrl + Shift + O", "Otvori video / otvori mapu"),
-        new("Ctrl + T / Ctrl + F", "Učitaj titlove iz datoteke / traži na internetu"),
-        new("V / J", "Prikaži ili sakrij titlove / sljedeći titlovi"),
-        new("G / H", "Titlovi ranije / kasnije (100 ms; Shift 1 s, Ctrl 10 ms)"),
-        new("Z, zatim X", "Sinkronizacija: čujem repliku, zatim njezin titl"),
-        new("A", "Automatska sinkronizacija titlova prema govoru"),
-        new("B", "Sljedeća audio traka"),
-        new("+ / − / Backspace", "Brža / sporija / normalna reprodukcija (0,5–2×)"),
-        new("O", "Omjer slike"),
-        new("S / Shift + S", "Snimka zaslona (s titlovima / bez titlova)"),
-        new("Ctrl + D", "Dodaj u omiljene / ukloni"),
-        new("Ctrl + Backspace", "Vrati originalnu sinkronizaciju titlova"),
-        new("F1", "Prikaži prečace"),
+        new(Loc.T("shortcut.playPause.keys"), Loc.T("shortcut.playPause")),
+        new("← / →", Loc.T("shortcut.seek5")),
+        new("Ctrl + ← / →", Loc.T("shortcut.seek30")),
+        new(Loc.T("shortcut.volume.keys"), Loc.T("shortcut.volume")),
+        new("M", Loc.T("shortcut.mute")),
+        new(Loc.T("shortcut.fullscreen.keys"), Loc.T("shortcut.fullscreen")),
+        new(", / .", Loc.T("shortcut.frame")),
+        new("N / P / L", Loc.T("shortcut.episodes")),
+        new("Ctrl + O / Ctrl + Shift + O", Loc.T("shortcut.open")),
+        new("Ctrl + T / Ctrl + F", Loc.T("shortcut.subtitleFiles")),
+        new("V / J", Loc.T("shortcut.subtitleToggle")),
+        new("G / H", Loc.T("shortcut.subtitleDelay")),
+        new(Loc.T("shortcut.zx.keys"), Loc.T("shortcut.zx")),
+        new("A", Loc.T("shortcut.autoSync")),
+        new("B", Loc.T("menu.nextAudio")),
+        new("+ / − / Backspace", Loc.T("shortcut.speed")),
+        new("O", Loc.T("shortcut.aspect")),
+        new("S / Shift + S", Loc.T("shortcut.screenshot")),
+        new("Ctrl + D", Loc.T("shortcut.favorite")),
+        new("Ctrl + Backspace", Loc.T("shortcut.resetSync")),
+        new("F1", Loc.T("shortcut.help")),
     ];
 
     public static string AsOsdText() => string.Join("\n", All.Select(s => $"{s.Keys}   —   {s.Description}"));

@@ -18,6 +18,15 @@
     <SolidColorBrush x:Key="SelectionBrush" Color="#D3EEDA" />
     <SolidColorBrush x:Key="ScrollThumbBrush" Color="#4D000000" />
 
+    <!-- Poluprozirna podloga popisa na početnom ekranu (preko svemirske pozadine). -->
+    <SolidColorBrush x:Key="HomeCardBrush" Color="#B3FFFFFF" />
+
+    <!-- Sjaj iza loga na početnom ekranu i u odabiru jezika. -->
+    <RadialGradientBrush x:Key="LogoGlowBrush">
+        <GradientStop Color="#00FFFFFF" Offset="0" />
+        <GradientStop Color="#00000000" Offset="1" />
+    </RadialGradientBrush>
+
     <FontFamily x:Key="UiFont">Segoe UI Variable Text, Segoe UI</FontFamily>
     <FontFamily x:Key="IconFont">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
 

@@ -13,6 +13,9 @@ internal static class WindowTheme
 {
     public static bool IsDark { get; private set; } = true;
 
+    /// <summary>Tema je promijenjena (prekidač na početnom ekranu i u postavkama ostaju usklađeni).</summary>
+    public static event Action? Changed;
+
     public static string Current => IsDark ? "dark" : "light";
 
     public static void Apply(string theme)
@@ -48,6 +51,8 @@ internal static class WindowTheme
         {
             ApplyTitleBar(window);
         }
+
+        Changed?.Invoke();
     }
 
     /// <summary>Naslovna traka (Windows 11) u boji teme, čim prozor dobije handle.</summary>

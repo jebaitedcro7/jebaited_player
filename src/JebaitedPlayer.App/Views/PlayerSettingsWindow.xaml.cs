@@ -44,9 +44,17 @@ public partial class PlayerSettingsWindow : Window
         updates.Changed += onUpdate;
         Closed += (_, _) => updates.Changed -= onUpdate;
         UpdateUpdateStatus();
+        this.OnLanguageChanged(() =>
+        {
+            UpdateUpdateStatus();
+            UpdateShellStatus();
+        });
 
         LightThemeBox.Checked += (_, _) => SetTheme("light");
         LightThemeBox.Unchecked += (_, _) => SetTheme("dark");
+        Action syncTheme = () => LightThemeBox.IsChecked = !WindowTheme.IsDark;
+        WindowTheme.Changed += syncTheme;
+        Closed += (_, _) => WindowTheme.Changed -= syncTheme;
         AutoNextBox.Checked += (_, _) => SetAutoNext(true);
         AutoNextBox.Unchecked += (_, _) => SetAutoNext(false);
         UpNextSlider.ValueChanged += (_, e) =>
@@ -61,6 +69,11 @@ public partial class PlayerSettingsWindow : Window
 
     private void SetTheme(string theme)
     {
+        if (theme == WindowTheme.Current)
+        {
+            return;
+        }
+
         _settings.Theme = theme;
         WindowTheme.Apply(theme);
     }
@@ -78,7 +91,7 @@ public partial class PlayerSettingsWindow : Window
     {
         var dialog = new Microsoft.Win32.OpenFolderDialog
         {
-            Title = "Mapa za snimke zaslona",
+            Title = Loc.T("dialog.screenshotFolder"),
             InitialDirectory = Directory.Exists(_vm.Extras.ScreenshotFolder) ? _vm.Extras.ScreenshotFolder : null,
         };
         if (dialog.ShowDialog(this) == true)
@@ -98,7 +111,7 @@ public partial class PlayerSettingsWindow : Window
 
     private void UpdateUpdateStatus()
     {
-        VersionText.Text = $"jebaited_player {_updates.CurrentVersion}{(_updates.IsPortable ? " (prijenosna verzija)" : string.Empty)}";
+        VersionText.Text = $"jebaited_player {_updates.CurrentVersion}{(_updates.IsPortable ? " " + Loc.T("settings.portable") : string.Empty)}";
         UpdateStatusText.Text = _updates.Status;
         bool installed = _updates.IsInstalled;
         AutoUpdateBox.Visibility = installed ? Visibility.Visible : Visibility.Collapsed;
@@ -125,10 +138,10 @@ public partial class PlayerSettingsWindow : Window
         string? registered = ShellIntegration.RegisteredExe();
         bool current = exe != null && ShellIntegration.IsRegisteredFor(exe);
         ShellStatusText.Text = registered is null
-            ? "jebaited_player nije registriran u Windowsu (nema ga u „Otvori pomoću”)."
+            ? Loc.T("settings.shellNotRegistered")
             : current
-                ? "Registriran: video i audio datoteke imaju „Otvori pomoću → jebaited_player”."
-                : $"Registriran je drugi primjerak playera ({registered}). „Postavi kao zadani player” prebacuje registraciju na ovaj.";
+                ? Loc.T("settings.shellRegistered")
+                : Loc.T("settings.shellOther", registered);
         UnregisterButton.Visibility = registered is null ? Visibility.Collapsed : Visibility.Visible;
     }
 
@@ -147,7 +160,7 @@ public partial class PlayerSettingsWindow : Window
         catch (Exception ex) when (ex is UnauthorizedAccessException or System.Security.SecurityException or IOException)
         {
             Log.Error("Registracija u Windowsu", ex);
-            MessageBox.Show(this, $"Registracija nije uspjela: {ex.Message}", "jebaited_player", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show(this, Loc.T("error.registrationFailed", ex.Message), "jebaited_player", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
 
         UpdateShellStatus();

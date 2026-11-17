@@ -20,6 +20,9 @@ public abstract class ObservableObject : INotifyPropertyChanged
         return true;
     }
 
+    /// <summary>Sva vezana svojstva ponovno se pročitaju (npr. nakon promjene jezika).</summary>
+    public void NotifyAllChanged() => OnPropertyChanged(string.Empty);
+
     protected void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }

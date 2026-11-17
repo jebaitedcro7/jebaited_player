@@ -1,0 +1,20 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/JebaitedPlayer.App/JebaitedPlayer.App.csproj" />
+    <Project Path="src/JebaitedPlayer.Library/JebaitedPlayer.Library.csproj" />
+    <Project Path="src/JebaitedPlayer.Mpv/JebaitedPlayer.Mpv.csproj" />
+    <Project Path="src/JebaitedPlayer.Online/JebaitedPlayer.Online.csproj" />
+    <Project Path="src/JebaitedPlayer.Subtitles/JebaitedPlayer.Subtitles.csproj" />
+    <Project Path="src/JebaitedPlayer.Sync/JebaitedPlayer.Sync.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/JebaitedPlayer.App.Tests/JebaitedPlayer.App.Tests.csproj" />
+    <Project Path="tests/JebaitedPlayer.Library.Tests/JebaitedPlayer.Library.Tests.csproj" />
+    <Project Path="tests/JebaitedPlayer.Online.Tests/JebaitedPlayer.Online.Tests.csproj" />
+    <Project Path="tests/JebaitedPlayer.Subtitles.Tests/JebaitedPlayer.Subtitles.Tests.csproj" />
+    <Project Path="tests/JebaitedPlayer.Sync.Tests/JebaitedPlayer.Sync.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tools/">
+    <Project Path="tools/SyncLab/SyncLab.csproj" />
+  </Folder>
+</Solution>

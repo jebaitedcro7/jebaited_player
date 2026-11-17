@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Razvojni alat za M5: izvlačenje zvuka, detekcija govora i poravnanje izvan playera (mjerenje i kalibracija). -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <PlatformTarget>x64</PlatformTarget>
+    <RootNamespace>SyncLab</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\JebaitedPlayer.Mpv\JebaitedPlayer.Mpv.csproj" />
+    <ProjectReference Include="..\..\src\JebaitedPlayer.Sync\JebaitedPlayer.Sync.csproj" />
+    <ProjectReference Include="..\..\src\JebaitedPlayer.Subtitles\JebaitedPlayer.Subtitles.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\third_party\libmpv\libmpv-2.dll" Link="libmpv-2.dll" CopyToOutputDirectory="PreserveNewest" Visible="false" />
+  </ItemGroup>
+
+</Project>

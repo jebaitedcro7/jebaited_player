@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>JebaitedPlayer.Online</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\JebaitedPlayer.Library\JebaitedPlayer.Library.csproj" />
+    <ProjectReference Include="..\JebaitedPlayer.Subtitles\JebaitedPlayer.Subtitles.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="JebaitedPlayer.Online.Tests" />
+  </ItemGroup>
+
+</Project>

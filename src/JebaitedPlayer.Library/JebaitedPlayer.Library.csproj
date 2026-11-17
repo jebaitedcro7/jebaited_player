@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>JebaitedPlayer.Library</RootNamespace>
+  </PropertyGroup>
+
+  <!-- 11.0.0 (SQLitePCLRaw 3.0.5, SQLite 3.53.4) ispravlja CVE-2025-6965 iz starije verzije. -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="11.0.0" />
+  </ItemGroup>
+
+</Project>

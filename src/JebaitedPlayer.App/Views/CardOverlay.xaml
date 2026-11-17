@@ -1,0 +1,56 @@
+<Window x:Class="JebaitedPlayer.Views.CardOverlay"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="jebaited_player obavijesti"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        ShowInTaskbar="False" ShowActivated="False" ResizeMode="NoResize"
+        Focusable="False" UseLayoutRounding="True" Width="800" Height="450"
+        Foreground="{DynamicResource TextPrimaryBrush}" FontFamily="{DynamicResource UiFont}" FontSize="13">
+
+    <!-- Kartice leže na videu, pa su uvijek tamne, bez obzira na temu. -->
+    <Window.Resources>
+        <ResourceDictionary Source="/Themes/Dark.xaml" />
+    </Window.Resources>
+
+    <!-- Prozirni sloj preko videa; potpuno prozirni dijelovi propuštaju miš do videa. -->
+    <Grid>
+        <!-- Nastavak gledanja -->
+        <Border Style="{StaticResource Card}" HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="560"
+                Visibility="{Binding Library.HasResumeOffer, Converter={StaticResource BoolToVisibility}}">
+            <StackPanel>
+                <TextBlock Text="Nastaviti gledanje?" FontSize="20" FontWeight="SemiBold" />
+                <TextBlock Text="{Binding Title}" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,6,0,0"
+                           TextWrapping="Wrap" />
+                <StackPanel Orientation="Horizontal" Margin="0,18,0,0">
+                    <Button Style="{StaticResource AccentButton}" Command="{Binding Library.ResumeContinueCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE768;" FontFamily="{DynamicResource IconFont}" FontSize="14" VerticalAlignment="Center" />
+                            <TextBlock Text="{Binding Library.ResumeText}" Margin="8,0,0,0" FontSize="14" FontWeight="SemiBold"
+                                       VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource SecondaryButton}" Content="Od početka" Margin="10,0,0,0" Padding="16,9"
+                            Command="{Binding Library.ResumeFromStartCommand}" />
+                </StackPanel>
+                <TextBlock Text="Enter = nastavi · Home = od početka" Style="{StaticResource HintText}" Margin="0,12,0,0" />
+            </StackPanel>
+        </Border>
+
+        <!-- Sljedeća epizoda -->
+        <Border Style="{StaticResource Card}" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,24,136" Width="380"
+                Visibility="{Binding Library.HasUpNext, Converter={StaticResource BoolToVisibility}}">
+            <StackPanel>
+                <TextBlock Text="{Binding Library.UpNextText}" Foreground="{DynamicResource AccentBrush}" FontWeight="SemiBold" />
+                <TextBlock Text="{Binding Library.UpNext.Info.DisplayTitle}" FontSize="16" Margin="0,4,0,0" TextWrapping="Wrap" />
+                <StackPanel Orientation="Horizontal" Margin="0,14,0,0">
+                    <Button Style="{StaticResource AccentButton}" Padding="16,8" Command="{Binding Library.UpNextPlayCommand}">
+                        <TextBlock Text="Pusti sada" FontWeight="SemiBold" />
+                    </Button>
+                    <Button Style="{StaticResource SecondaryButton}" Content="Odustani" Margin="10,0,0,0" Padding="14,8"
+                            Command="{Binding Library.UpNextCancelCommand}" />
+                </StackPanel>
+                <TextBlock Text="Enter = pusti sada · Esc = odustani" Style="{StaticResource HintText}" Margin="0,10,0,0" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

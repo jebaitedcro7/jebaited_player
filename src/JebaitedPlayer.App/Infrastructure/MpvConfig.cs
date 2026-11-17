@@ -1,0 +1,143 @@
+using System.Globalization;
+using JebaitedPlayer.Mpv;
+using JebaitedPlayer.Mpv.Native;
+using JebaitedPlayer.Subtitles;
+
+namespace JebaitedPlayer.Infrastructure;
+
+/// <summary>Zadane mpv postavke za jebaited_player.</summary>
+internal static class MpvConfig
+{
+    public static readonly (string Name, string Value)[] BaseOptions =
+    [
+        // Prikaz i hardversko dekodiranje (D3D11 + NVDEC/D3D11VA bez kopiranja kroz CPU).
+        ("vo", "gpu-next"),
+        ("gpu-api", "d3d11"),
+        ("hwdec", "auto-safe"),
+
+        // Ponašanje reprodukcije.
+        ("idle", "yes"),
+        ("keep-open", "yes"),
+        ("force-window", "no"),
+
+        // Snimke zaslona (M6): format se određuje po nastavku datoteke (.jpg), kvaliteta 95.
+        ("screenshot-jpeg-quality", "95"),
+
+        // Sučelje i ulaz radi aplikacija, ne mpv.
+        ("osc", "no"),
+        ("input-default-bindings", "no"),
+        ("input-vo-keyboard", "no"),
+        ("input-cursor", "no"),
+        ("cursor-autohide", "no"),
+        ("drag-and-drop", "no"),
+
+        // Bez skripti i vanjskih programa (sigurnost i manja potrošnja).
+        ("ytdl", "no"),
+        ("load-scripts", "no"),
+        ("load-stats-overlay", "no"),
+        ("load-console", "no"),
+        ("load-auto-profiles", "no"),
+        ("load-select", "no"),
+        ("load-positioning", "no"),
+        ("load-commands", "no"),
+        ("load-context-menu", "no"),
+
+        // Kratke poruke na videu (glasnoća, premotavanje), bez mpv-ove trake.
+        ("osd-level", "1"),
+        ("osd-bar", "no"),
+        ("osd-font", "Segoe UI"),
+        ("osd-font-size", "32"),
+        ("osd-border-size", "2"),
+        ("osd-duration", "1200"),
+        ("osd-margin-x", "32"),
+        ("osd-margin-y", "28"),
+
+        // Vanjske titlove učitava aplikacija: prepozna encoding i preda mpv-u UTF-8 kopiju.
+        ("sub-auto", "no"),
+        ("sub-codepage", "utf-8"),
+        ("audio-file-auto", "no"),
+
+        // Ugrađeni titlovi: ako nema nijednog jezika s popisa prioriteta, ne prikazuj ništa.
+        ("subs-fallback", "no"),
+
+        ("volume-max", "100"),
+        ("background-color", "#000000"),
+    ];
+
+    public static readonly (string Name, MpvFormat Format)[] ObservedProperties =
+    [
+        ("pause", MpvFormat.Flag),
+        ("duration", MpvFormat.Double),
+        ("volume", MpvFormat.Double),
+        ("mute", MpvFormat.Flag),
+        ("media-title", MpvFormat.String),
+        ("idle-active", MpvFormat.Flag),
+        ("eof-reached", MpvFormat.Flag),
+        ("time-pos", MpvFormat.Double),
+        ("track-list", MpvFormat.String),
+        ("sid", MpvFormat.String),
+        ("sub-delay", MpvFormat.Double),
+        ("sub-speed", MpvFormat.Double),
+        ("sub-visibility", MpvFormat.Flag),
+        ("sub-start", MpvFormat.Double),
+        ("aid", MpvFormat.String),
+        ("speed", MpvFormat.Double),
+    ];
+
+    // Nazivi nekih opcija razlikuju se među verzijama mpv-a; stvarne nazive otkrivamo pri pokretanju.
+    private static string _outlineSizeOption = "sub-outline-size";
+    private static string _outlineColorOption = "sub-outline-color";
+    private static string _backgroundBoxValue = "background-box";
+
+    public static string LanguagePriority(AppSettings settings) => SubtitleLanguage.BuildMpvSlang(settings.SubtitleLanguages);
+
+    /// <summary>Prije mpv_initialize: otkrij nazive opcija i postavi jezik i izgled titlova.</summary>
+    public static void ApplySubtitleOptionsBeforeInit(MpvPlayer player, AppSettings settings)
+    {
+        player.TrySetOption("slang", LanguagePriority(settings));
+
+        if (!player.TrySetOption("sub-outline-size", "2"))
+        {
+            _outlineSizeOption = "sub-border-size";
+            _outlineColorOption = "sub-border-color";
+        }
+
+        if (!player.TrySetOption("sub-border-style", "background-box"))
+        {
+            _backgroundBoxValue = "opaque-box";
+        }
+
+        foreach (var (name, value) in StyleOptions(settings.SubtitleStyle))
+        {
+            if (!player.TrySetOption(name, value))
+            {
+                Log.Warn($"mpv opcija titlova nije prihvaćena: {name}={value}");
+            }
+        }
+    }
+
+    /// <summary>Tijekom rada: primijeni izgled titlova odmah.</summary>
+    public static void ApplyStyle(MpvPlayer player, SubtitleStyleSettings style)
+    {
+        foreach (var (name, value) in StyleOptions(style))
+        {
+            player.SetPropertyAsync(name, value);
+        }
+    }
+
+    private static IEnumerable<(string Name, string Value)> StyleOptions(SubtitleStyleSettings s)
+    {
+        yield return ("sub-font", s.FontName);
+        yield return ("sub-font-size", F(s.FontSize));
+        yield return ("sub-color", s.Color);
+        yield return ("sub-bold", s.Bold ? "yes" : "no");
+        yield return ("sub-pos", F(Math.Round(s.Position)));
+        yield return (_outlineSizeOption, F(s.OutlineSize));
+        yield return (_outlineColorOption, "#000000");
+        yield return ("sub-border-style", s.BackgroundBox ? _backgroundBoxValue : "outline-and-shadow");
+        yield return ("sub-back-color", "#A0000000");
+        yield return ("sub-shadow-offset", s.BackgroundBox ? "0" : "1");
+    }
+
+    private static string F(double value) => value.ToString("0.##", CultureInfo.InvariantCulture);
+}

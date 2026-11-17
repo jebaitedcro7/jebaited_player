@@ -1,0 +1,90 @@
+<Window x:Class="JebaitedPlayer.Views.SubtitleSettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Postavke titlova"
+        SizeToContent="WidthAndHeight" ResizeMode="NoResize" ShowInTaskbar="False"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource WindowBackgroundBrush}"
+        Foreground="{DynamicResource TextPrimaryBrush}"
+        FontFamily="{DynamicResource UiFont}" FontSize="13" UseLayoutRounding="True">
+
+    <!-- Gumbi su uvijek vidljivi; ostatak se pomiče ako prozor ne stane na zaslon. -->
+    <DockPanel>
+        <DockPanel DockPanel.Dock="Bottom" LastChildFill="False" Margin="22,0,22,16">
+            <Border DockPanel.Dock="Top" Height="1" Background="{DynamicResource MenuBorderBrush}" Margin="0,0,0,14" />
+            <Button DockPanel.Dock="Left" Style="{StaticResource SecondaryButton}" Content="Vrati zadani izgled" Click="OnResetStyle" />
+            <Button DockPanel.Dock="Right" Style="{StaticResource SecondaryButton}" Content="Zatvori" Click="OnClose" Margin="0,0,0,6" />
+        </DockPanel>
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+    <StackPanel Margin="22,10,22,16" Width="440">
+        <!-- Jezici -->
+        <TextBlock Style="{StaticResource SectionHeader}" Text="Jezici titlova (redoslijed prioriteta)" />
+        <TextBlock Style="{StaticResource HintText}"
+                   Text="Bira se prvi jezik s popisa koji postoji. Ako nema nijednog, titlovi se ne prikazuju." />
+        <Grid Margin="0,10,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <ListBox x:Name="LanguageList" MinHeight="120" />
+            <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                <Button Style="{StaticResource SecondaryButton}" Content="Gore" Click="OnMoveUp" Margin="0,0,0,6" />
+                <Button Style="{StaticResource SecondaryButton}" Content="Dolje" Click="OnMoveDown" Margin="0,0,0,6" />
+                <Button Style="{StaticResource SecondaryButton}" Content="Ukloni" Click="OnRemove" Margin="0,0,0,6" />
+                <Button x:Name="AddLanguageButton" Style="{StaticResource SecondaryButton}" Content="Dodaj jezik…" Click="OnAddLanguage" Margin="0" />
+            </StackPanel>
+        </Grid>
+        <CheckBox x:Name="AutoLoadBox" Content="Automatski učitaj lokalne titlove istog naziva kao video" Margin="0,12,0,0" />
+        <CheckBox x:Name="AutoSyncBox" Content="Provjeri i sinkroniziraj vanjske titlove prema govoru u filmu" Margin="0,6,0,0" />
+
+        <!-- Izgled -->
+        <TextBlock Style="{StaticResource SectionHeader}" Text="Izgled" Margin="0,22,0,2" />
+        <TextBlock Style="{StaticResource HintText}"
+                   Text="Promjene se odmah vide na videu. ASS titlovi zadržavaju svoje stilove." />
+
+        <Grid Margin="0,12,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="110" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="50" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="Font" VerticalAlignment="Center" />
+            <Button x:Name="FontButton" Grid.Column="1" Grid.ColumnSpan="2" Style="{StaticResource SecondaryButton}"
+                    HorizontalContentAlignment="Left" Click="OnChooseFont" Margin="0,0,0,8" />
+
+            <TextBlock Grid.Row="1" Text="Veličina" VerticalAlignment="Center" />
+            <Slider x:Name="SizeSlider" Grid.Row="1" Grid.Column="1" Style="{StaticResource PlayerSlider}" Minimum="24" Maximum="80"
+                    VerticalAlignment="Center" Margin="0,5" />
+            <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Value, ElementName=SizeSlider, StringFormat=0}"
+                       HorizontalAlignment="Right" VerticalAlignment="Center" />
+
+            <TextBlock Grid.Row="2" Text="Obrub" VerticalAlignment="Center" />
+            <Slider x:Name="OutlineSlider" Grid.Row="2" Grid.Column="1" Style="{StaticResource PlayerSlider}" Minimum="0" Maximum="5"
+                    VerticalAlignment="Center" Margin="0,5" />
+            <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding Value, ElementName=OutlineSlider, StringFormat=0.0}"
+                       HorizontalAlignment="Right" VerticalAlignment="Center" />
+
+            <TextBlock Grid.Row="3" Text="Visina na ekranu" VerticalAlignment="Center" />
+            <Slider x:Name="PositionSlider" Grid.Row="3" Grid.Column="1" Style="{StaticResource PlayerSlider}" Minimum="50" Maximum="100"
+                    VerticalAlignment="Center" Margin="0,5" />
+            <TextBlock Grid.Row="3" Grid.Column="2" Text="{Binding Value, ElementName=PositionSlider, StringFormat=0}"
+                       HorizontalAlignment="Right" VerticalAlignment="Center" />
+
+            <TextBlock Grid.Row="4" Text="Boja" VerticalAlignment="Center" Margin="0,8,0,0" />
+            <StackPanel x:Name="ColorPanel" Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,8,0,0" />
+        </Grid>
+
+        <CheckBox x:Name="BoldBox" Content="Podebljano" Margin="0,12,0,0" />
+        <CheckBox x:Name="BackgroundBox" Content="Tamna pozadina iza teksta" />
+    </StackPanel>
+    </ScrollViewer>
+    </DockPanel>
+</Window>

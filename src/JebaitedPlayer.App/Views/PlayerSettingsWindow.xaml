@@ -1,0 +1,89 @@
+<Window x:Class="JebaitedPlayer.Views.PlayerSettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Postavke"
+        SizeToContent="WidthAndHeight" ResizeMode="NoResize" ShowInTaskbar="False"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource WindowBackgroundBrush}"
+        Foreground="{DynamicResource TextPrimaryBrush}"
+        FontFamily="{DynamicResource UiFont}" FontSize="13" UseLayoutRounding="True">
+
+    <DockPanel>
+        <DockPanel DockPanel.Dock="Bottom" LastChildFill="False" Margin="22,0,22,16">
+            <Border DockPanel.Dock="Top" Height="1" Background="{DynamicResource MenuBorderBrush}" Margin="0,0,0,14" />
+            <Button DockPanel.Dock="Right" Style="{StaticResource SecondaryButton}" Content="Zatvori" Click="OnClose" Margin="0,0,0,6" />
+        </DockPanel>
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+            <StackPanel Margin="22,8,22,16" Width="440">
+                <!-- Izgled -->
+                <TextBlock Style="{StaticResource SectionHeader}" Text="Izgled" />
+                <CheckBox x:Name="LightThemeBox" Content="Svijetla tema" />
+                <TextBlock Style="{StaticResource HintText}" Text="Mijenja se odmah. Kontrole preko videa ostaju tamne, da se dobro vide na slici." />
+
+                <!-- Serije -->
+                <TextBlock Style="{StaticResource SectionHeader}" Text="Serije" />
+                <CheckBox x:Name="AutoNextBox" Content="Na kraju epizode automatski pokreni sljedeću" />
+                <Grid Margin="0,8,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="44" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Odbrojavanje" VerticalAlignment="Center" Margin="0,0,14,0" />
+                    <Slider x:Name="UpNextSlider" Grid.Column="1" Style="{StaticResource PlayerSlider}" Minimum="5" Maximum="30"
+                            TickFrequency="5" IsSnapToTickEnabled="True" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="2" Text="{Binding Value, ElementName=UpNextSlider, StringFormat={}{0:0} s}"
+                               HorizontalAlignment="Right" VerticalAlignment="Center" />
+                </Grid>
+                <TextBlock Style="{StaticResource HintText}"
+                           Text="Kad je isključeno, kartica samo ponudi sljedeću epizodu (Enter je pokreće)." />
+
+                <!-- Snimke zaslona -->
+                <TextBlock Style="{StaticResource SectionHeader}" Text="Snimke zaslona" />
+                <TextBlock x:Name="ShotFolderText" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" />
+                <WrapPanel Margin="0,8,0,0">
+                    <Button Style="{StaticResource SecondaryButton}" Content="Promijeni mapu…" Click="OnChooseFolder" />
+                    <Button Style="{StaticResource SecondaryButton}" Content="Zadana mapa" Click="OnDefaultFolder" />
+                    <Button Style="{StaticResource SecondaryButton}" Content="Otvori mapu" Click="OnOpenFolder" />
+                </WrapPanel>
+                <TextBlock Style="{StaticResource HintText}" Text="S = snimka s titlovima, Shift+S = samo slika. Sprema se kao JPG u punoj rezoluciji videa." />
+
+                <!-- Titlovi -->
+                <TextBlock Style="{StaticResource SectionHeader}" Text="Titlovi" />
+                <WrapPanel>
+                    <Button Style="{StaticResource SecondaryButton}" Content="Postavke titlova…" Click="OnSubtitleSettings" />
+                    <Button Style="{StaticResource SecondaryButton}" Content="Titlovi s interneta (vodič)…" Click="OnOnlineSetup" />
+                    <Button Style="{StaticResource SecondaryButton}" Content="Izvori titlova (ključevi)…" Click="OnSources" />
+                </WrapPanel>
+
+                <!-- Windows -->
+                <TextBlock Style="{StaticResource SectionHeader}" Text="Windows" />
+                <TextBlock x:Name="ShellStatusText" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" />
+                <WrapPanel Margin="0,8,0,0">
+                    <Button Style="{StaticResource SecondaryButton}" Content="Postavi kao zadani player…" Click="OnSetDefaultPlayer" />
+                    <Button x:Name="UnregisterButton" Style="{StaticResource SecondaryButton}" Content="Ukloni iz „Otvori pomoću”" Click="OnUnregister" />
+                </WrapPanel>
+                <TextBlock Style="{StaticResource HintText}"
+                           Text="Windows ne dopušta programima da se sami postave kao zadani. Otvorit će se Postavke sustava Windows: klikni „Postavi zadano” (ili odaberi vrste datoteka jednu po jednu)." />
+
+                <!-- Nadogradnje -->
+                <TextBlock Style="{StaticResource SectionHeader}" Text="Nadogradnje" />
+                <TextBlock x:Name="VersionText" FontWeight="SemiBold" />
+                <TextBlock x:Name="UpdateStatusText" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" />
+                <CheckBox x:Name="AutoUpdateBox" Content="Automatski preuzmi nove verzije" Margin="0,8,0,0" />
+                <WrapPanel x:Name="UpdateButtons" Margin="0,8,0,0">
+                    <Button x:Name="CheckUpdateButton" Style="{StaticResource SecondaryButton}" Content="Provjeri sada" Click="OnCheckUpdate" />
+                    <Button x:Name="RestartUpdateButton" Style="{StaticResource SecondaryButton}" Content="Nadogradi i ponovno pokreni" Click="OnRestartUpdate" />
+                </WrapPanel>
+                <TextBlock Style="{StaticResource HintText}"
+                           Text="Nova verzija se preuzima u pozadini i instalira kad zatvoriš player. Postavke, povijest gledanja i ključevi ostaju." />
+
+                <!-- Napredno -->
+                <TextBlock Style="{StaticResource SectionHeader}" Text="Napredno" />
+                <CheckBox x:Name="GpuUiBox" Content="Iscrtavaj sučelje preko GPU-a" />
+                <TextBlock Style="{StaticResource HintText}"
+                           Text="Vrijedi nakon ponovnog pokretanja. Isključeno je pouzdanije (na nekim računalima GPU iscrtavanje sučelja ostavlja bijele prozore). Video se uvijek iscrtava preko GPU-a." />
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+</Window>

@@ -1,0 +1,20 @@
+# Build output
+bin/
+obj/
+publish/
+Releases/
+*.user
+*.suo
+.vs/
+.vscode/
+*.log
+
+# Velike binarne datoteke (izvor i SHA256 zapisani su u third_party/libmpv/SOURCE.md)
+third_party/libmpv/*.dll
+third_party/libmpv/*.dll.a
+
+# Testni video i titlovi (generiraju se lokalno, ne idu u git)
+testdata/
+
+# Lokalne tajne (ključ aplikacije za OpenSubtitles), nikad u gitu
+secrets/

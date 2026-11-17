@@ -1,0 +1,177 @@
+<Window x:Class="JebaitedPlayer.Views.SubtitleSyncWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Sinkronizacija titlova"
+        SizeToContent="WidthAndHeight" ResizeMode="NoResize" ShowInTaskbar="False"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource WindowBackgroundBrush}"
+        Foreground="{DynamicResource TextPrimaryBrush}"
+        FontFamily="{DynamicResource UiFont}" FontSize="13" UseLayoutRounding="True">
+
+    <!-- Gumbi su uvijek vidljivi; ostatak se pomiče ako prozor ne stane na zaslon. -->
+    <DockPanel>
+        <DockPanel DockPanel.Dock="Bottom" LastChildFill="False" Margin="22,0,22,16">
+            <Border DockPanel.Dock="Top" Height="1" Background="{DynamicResource MenuBorderBrush}" Margin="0,0,0,14" />
+            <Button DockPanel.Dock="Left" Style="{StaticResource SecondaryButton}" Content="Resetiraj sinkronizaciju" Click="OnReset"
+                    ToolTip="Vrati titlove kakvi su u datoteci (Ctrl+Backspace)" />
+            <Button DockPanel.Dock="Left" Style="{StaticResource SecondaryButton}" Content="Spremi sinkronizirane titlove…"
+                    IsEnabled="{Binding CanSaveSynced}" Click="OnSave" />
+            <Button DockPanel.Dock="Right" Style="{StaticResource SecondaryButton}" Content="Zatvori" Click="OnClose" Margin="0,0,0,6" />
+        </DockPanel>
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+    <StackPanel Margin="22,18,22,16" Width="540">
+        <TextBlock Text="{Binding SelectedTrackText}" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" />
+        <TextBlock Text="{Binding TimingSummary}" FontSize="17" FontWeight="SemiBold" Margin="0,4,0,0" TextWrapping="Wrap" />
+
+        <!-- 1. Automatski prema govoru -->
+        <TextBlock Style="{StaticResource SectionHeader}" Text="1. Automatski prema govoru (preporučeno)" />
+        <Grid x:Name="AutoPanel" Margin="0,2,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel VerticalAlignment="Center">
+                <TextBlock Text="{Binding Status}" TextWrapping="Wrap" />
+                <ProgressBar Style="{StaticResource ThinProgress}" Maximum="1" Value="{Binding ProgressValue, Mode=OneWay}" Margin="0,6,0,0"
+                             Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}" />
+            </StackPanel>
+            <Button Grid.Column="1" Style="{StaticResource AccentButton}" Padding="14,7" Margin="12,0,0,0" VerticalAlignment="Top"
+                    Command="{Binding SyncCommand}">
+                <TextBlock Text="Sinkroniziraj (A)" FontWeight="SemiBold" />
+            </Button>
+        </Grid>
+
+        <!-- 2. Pomak -->
+        <TextBlock Style="{StaticResource SectionHeader}" Text="2. Pomak: svi titlovi ranije ili kasnije" />
+        <TextBlock Style="{StaticResource HintText}"
+                   Text="Kad titlovi cijelo vrijeme jednako kasne ili žure. Minus = titlovi ranije, plus = kasnije. Tipke G / H (0,1 s), sa Shiftom 1 s." />
+        <Grid Margin="0,10,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" Style="{StaticResource SecondaryButton}" Content="−5 s" Tag="-5000" Click="OnDelayStep" />
+            <Button Grid.Column="1" Style="{StaticResource SecondaryButton}" Content="−1 s" Tag="-1000" Click="OnDelayStep" />
+            <Button Grid.Column="2" Style="{StaticResource SecondaryButton}" Content="−0,5" Tag="-500" Click="OnDelayStep" />
+            <Button Grid.Column="3" Style="{StaticResource SecondaryButton}" Content="−0,1" Tag="-100" Click="OnDelayStep" />
+            <DockPanel Grid.Column="4" Margin="0,0,6,6">
+                <TextBlock DockPanel.Dock="Right" Text="s" VerticalAlignment="Center" Margin="6,0,0,0"
+                           Foreground="{DynamicResource TextSecondaryBrush}" />
+                <TextBox x:Name="DelayBox" Text="{Binding DelaySecondsInput, UpdateSourceTrigger=LostFocus}" TextAlignment="Right"
+                         ToolTip="Upiši točan pomak u sekundama (npr. −2,5) i pritisni Enter" />
+            </DockPanel>
+            <Button Grid.Column="5" Style="{StaticResource SecondaryButton}" Content="+0,1" Tag="100" Click="OnDelayStep" />
+            <Button Grid.Column="6" Style="{StaticResource SecondaryButton}" Content="+0,5" Tag="500" Click="OnDelayStep" />
+            <Button Grid.Column="7" Style="{StaticResource SecondaryButton}" Content="+1 s" Tag="1000" Click="OnDelayStep" />
+            <Button Grid.Column="8" Style="{StaticResource SecondaryButton}" Content="+5 s" Tag="5000" Click="OnDelayStep" Margin="0,0,0,6" />
+        </Grid>
+
+        <!-- 3. Postupno -->
+        <TextBlock Style="{StaticResource SectionHeader}" Text="3. Titlovi postupno kasne ili žure" />
+        <TextBlock Style="{StaticResource HintText}"
+                   Text="Kad su titlovi točni ovdje gdje si sada, a dalje u filmu sve više kasne ili žure. Replika koja je sad na ekranu ostaje gdje jest; svaki klik mijenja 0,5 s na svakih 10 minuta." />
+        <WrapPanel Margin="0,10,0,0">
+            <Button Style="{StaticResource SecondaryButton}" Content="Titlovi postupno kasne" Click="OnGradualLate"
+                    ToolTip="Dalje u filmu titlovi dolaze sve ranije" />
+            <Button Style="{StaticResource SecondaryButton}" Content="Titlovi postupno žure" Click="OnGradualEarly"
+                    ToolTip="Dalje u filmu titlovi dolaze sve kasnije" />
+            <Button Style="{StaticResource SecondaryButton}" Content="Bez postupne korekcije" Click="OnGradualReset" />
+        </WrapPanel>
+        <TextBlock Text="{Binding GradualText}" Style="{StaticResource HintText}" Margin="0,2,0,0" />
+
+        <!-- 4. Po replici -->
+        <TextBlock Style="{StaticResource SectionHeader}" Text="4. Poravnaj po replici (bez žurbe)" />
+        <TextBlock Style="{StaticResource HintText}"
+                   Text="1. Pauziraj film kad čuješ početak neke replike (razmaknica; zarez i točka za kadar natrag i naprijed).  2. U popisu odaberi tu repliku i klikni ‘Ova replika počinje sada’.  Ako titlovi dalje u filmu opet odstupaju (npr. nakon promjene scene), ponovi tamo: player iz točaka izračuna pomak, brzinu ili ispravak po dijelovima." />
+        <DockPanel Margin="0,10,0,6" LastChildFill="False">
+            <Button DockPanel.Dock="Left" Style="{StaticResource SecondaryButton}" Content="Prikaži replike oko ovog mjesta" Click="OnRefreshCues" />
+            <Button DockPanel.Dock="Right" x:Name="AnchorButton" Style="{StaticResource AccentButton}" Padding="14,7" Margin="0,0,0,6"
+                    Click="OnAddAnchor" IsEnabled="False">
+                <TextBlock Text="Ova replika počinje sada" FontWeight="SemiBold" />
+            </Button>
+        </DockPanel>
+        <ListBox x:Name="CueList" ItemsSource="{Binding NearbyCues}" Height="170" MouseDoubleClick="OnCueDoubleClick"
+                 SelectionChanged="OnCueSelectionChanged">
+            <!-- Zajednički stil popisa nema pomicanje; ovdje replika može biti više nego što stane. -->
+            <ListBox.Template>
+                <ControlTemplate TargetType="ListBox">
+                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="1" CornerRadius="6" Padding="4">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+                            <ItemsPresenter />
+                        </ScrollViewer>
+                    </Border>
+                </ControlTemplate>
+            </ListBox.Template>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <DockPanel>
+                        <TextBlock DockPanel.Dock="Left" Text="{Binding Time}" Width="72" Foreground="{DynamicResource TextSecondaryBrush}" />
+                        <TextBlock Text="{Binding Text}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Text}">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Style.Triggers>
+                                        <!-- Replika koja je sad na ekranu (ili zadnja prije ovog mjesta). -->
+                                        <DataTrigger Binding="{Binding IsCurrent}" Value="True">
+                                            <Setter Property="FontWeight" Value="SemiBold" />
+                                            <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </DockPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <ItemsControl ItemsSource="{Binding Anchors}" Margin="0,8,0,0">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <DockPanel Margin="0,2">
+                        <Button DockPanel.Dock="Right" Style="{StaticResource LinkButton}" Content="Ukloni" Click="OnRemoveAnchor" Tag="{Binding}" />
+                        <TextBlock Text="{Binding Description}" TextWrapping="Wrap" />
+                    </DockPanel>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <DockPanel LastChildFill="True" Margin="0,4,0,0">
+            <Button DockPanel.Dock="Right" Style="{StaticResource LinkButton}" Content="Poništi točke" Click="OnClearAnchors" VerticalAlignment="Top" />
+            <TextBlock Text="{Binding AnchorStatus}" Style="{StaticResource HintText}" Margin="0" />
+        </DockPanel>
+
+        <!-- Napredno -->
+        <Button Style="{StaticResource LinkButton}" Content="Napredno ▾" Click="OnToggleAdvanced" HorizontalAlignment="Left" Margin="0,16,0,0" />
+        <StackPanel x:Name="AdvancedPanel" Visibility="Collapsed">
+            <TextBlock Style="{StaticResource SectionHeader}" Text="Brzina za drugi FPS" />
+            <TextBlock Style="{StaticResource HintText}"
+                       Text="Samo kad su titlovi rađeni za drugi broj sličica (npr. PAL DVD 25 fps, a video 23,976 fps). Pogrešan odabir pomakne titlove na kraju filma i za minutu." />
+            <WrapPanel x:Name="PresetPanel" Margin="0,10,0,0" />
+            <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                <TextBlock Text="Faktor brzine:" VerticalAlignment="Center" />
+                <TextBox x:Name="SpeedBox" Width="110" Margin="10,0,0,0" Text="{Binding SpeedInput, UpdateSourceTrigger=LostFocus}"
+                         TextAlignment="Right" />
+                <TextBlock Text="(1,0000 = bez korekcije)" VerticalAlignment="Center" Margin="10,0,0,0"
+                           Foreground="{DynamicResource TextSecondaryBrush}" />
+            </StackPanel>
+
+            <TextBlock Style="{StaticResource SectionHeader}" Text="Stari način: tipke Z i X tijekom reprodukcije" />
+            <TextBlock Style="{StaticResource HintText}"
+                       Text="Kad čuješ repliku pritisni Z, a kad se pojavi njezin titl X (redoslijed nije bitan)." />
+            <WrapPanel Margin="0,10,0,0">
+                <Button Style="{StaticResource SecondaryButton}" Content="Čujem repliku (Z)" Click="OnMarkAudio" />
+                <Button Style="{StaticResource SecondaryButton}" Content="Titl te replike (X)" Click="OnMarkSubtitle" />
+                <Button Style="{StaticResource SecondaryButton}" Content="Poništi točke" Click="OnResetPoints" />
+            </WrapPanel>
+            <TextBlock Text="{Binding SyncStatus}" Style="{StaticResource HintText}" Margin="0,2,0,0" />
+        </StackPanel>
+    </StackPanel>
+    </ScrollViewer>
+    </DockPanel>
+</Window>

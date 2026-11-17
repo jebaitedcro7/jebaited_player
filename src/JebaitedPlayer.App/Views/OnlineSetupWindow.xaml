@@ -1,0 +1,205 @@
+<Window x:Class="JebaitedPlayer.Views.OnlineSetupWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Titlovi s interneta – postavljanje"
+        Width="560" SizeToContent="Height" ResizeMode="NoResize" ShowInTaskbar="False"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource WindowBackgroundBrush}"
+        Foreground="{DynamicResource TextPrimaryBrush}"
+        FontFamily="{DynamicResource UiFont}" FontSize="13" UseLayoutRounding="True">
+
+    <Window.Resources>
+        <Style x:Key="StepNumber" TargetType="TextBlock">
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+            <Setter Property="Width" Value="22" />
+            <Setter Property="Margin" Value="0,2,0,0" />
+        </Style>
+        <Style x:Key="StepText" TargetType="TextBlock">
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="Margin" Value="0,2,0,0" />
+        </Style>
+        <Style x:Key="PageTitle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Margin" Value="0,6,0,4" />
+        </Style>
+    </Window.Resources>
+
+    <DockPanel>
+        <!-- Gumbi -->
+        <DockPanel DockPanel.Dock="Bottom" LastChildFill="False" Margin="22,0,22,16">
+            <Border DockPanel.Dock="Top" Height="1" Background="{DynamicResource MenuBorderBrush}" Margin="0,0,0,14" />
+            <TextBlock x:Name="PageCounter" DockPanel.Dock="Left" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" />
+            <Button x:Name="NextButton" DockPanel.Dock="Right" Style="{StaticResource AccentButton}" Padding="18,8" Click="OnNext" Margin="8,0,0,0">
+                <TextBlock x:Name="NextText" Text="Dalje" FontWeight="SemiBold" />
+            </Button>
+            <Button x:Name="SkipButton" DockPanel.Dock="Right" Style="{StaticResource SecondaryButton}" Content="Preskoči" Click="OnSkip" Margin="8,0,0,0" />
+            <Button x:Name="BackButton" DockPanel.Dock="Right" Style="{StaticResource SecondaryButton}" Content="Natrag" Click="OnBack" Margin="0" />
+        </DockPanel>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+            <Grid Margin="22,10,22,16">
+
+                <!-- 1. Uvod -->
+                <StackPanel x:Name="IntroPage">
+                    <TextBlock Style="{StaticResource PageTitle}" Text="Hrvatski titlovi s interneta" />
+                    <TextBlock TextWrapping="Wrap"
+                               Text="Kad uz video nema titlova, player ih sam potraži na internetu, provjeri prema govoru u filmu i uskladi. Za to treba besplatan račun na barem jednom izvoru titlova. Traje oko dvije minute." />
+                    <Border Style="{StaticResource Card}" Margin="0,14,0,0" Padding="14,10">
+                        <StackPanel>
+                            <TextBlock Text="OpenSubtitles.com — preporučeno" FontWeight="SemiBold" />
+                            <TextBlock x:Name="OsIntroText" Style="{StaticResource HintText}" Margin="0,2,0,8"
+                                       Text="Najviše titlova i jedini izvor koji prepoznaje točno izdanje tvog videa. Trebaju samo korisničko ime i lozinka." />
+                            <TextBlock Text="SubDL.com — neobavezno" FontWeight="SemiBold" />
+                            <TextBlock Style="{StaticResource HintText}" Margin="0,2,0,8"
+                                       Text="Dodatni titlovi kad ih OpenSubtitles nema. Treba ključ s njihove stranice (kopiraš i zalijepiš)." />
+                            <TextBlock Text="Titlovi.com — neobavezno" FontWeight="SemiBold" />
+                            <TextBlock Style="{StaticResource HintText}" Margin="0,2,0,0"
+                                       Text="Velika hrvatska baza. Korisničko ime i lozinka." />
+                        </StackPanel>
+                    </Border>
+                    <TextBlock Style="{StaticResource HintText}" Margin="0,12,0,0"
+                               Text="Lozinke i ključevi spremaju se kriptirani (Windows DPAPI) samo na ovom računalu i šalju se samo izvoru kojem pripadaju." />
+                </StackPanel>
+
+                <!-- 2. OpenSubtitles -->
+                <StackPanel x:Name="OsPage" Visibility="Collapsed">
+                    <TextBlock Style="{StaticResource PageTitle}" Text="OpenSubtitles.com" />
+                    <TextBlock Style="{StaticResource HintText}" Margin="0,0,0,10"
+                               Text="Ako već imaš račun, preskoči na 4. korak." />
+                    <DockPanel Margin="0,4,0,0">
+                        <TextBlock Style="{StaticResource StepNumber}" Text="1." />
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource StepText}" Text="Otvori stranicu za registraciju:" />
+                            <Button Style="{StaticResource SecondaryButton}" HorizontalAlignment="Left" Margin="0,6,0,0"
+                                    Content="Otvori opensubtitles.com (registracija)" Tag="https://www.opensubtitles.com/en/users/sign_up" Click="OnLinkClick" />
+                        </StackPanel>
+                    </DockPanel>
+                    <DockPanel Margin="0,10,0,0">
+                        <TextBlock Style="{StaticResource StepNumber}" Text="2." />
+                        <TextBlock Style="{StaticResource StepText}" Text="Upiši korisničko ime, e-mail i lozinku i potvrdi registraciju (stranica može tražiti i potvrdu da nisi robot)." />
+                    </DockPanel>
+                    <DockPanel Margin="0,10,0,0">
+                        <TextBlock Style="{StaticResource StepNumber}" Text="3." />
+                        <TextBlock Style="{StaticResource StepText}" Text="Otvori e-mail od OpenSubtitles i klikni poveznicu za potvrdu računa (pogledaj i mapu neželjene pošte)." />
+                    </DockPanel>
+                    <DockPanel Margin="0,10,0,0">
+                        <TextBlock Style="{StaticResource StepNumber}" Text="4." />
+                        <TextBlock Style="{StaticResource StepText}" Text="Ovdje upiši isto korisničko ime i lozinku:" />
+                    </DockPanel>
+                    <Grid Margin="22,8,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="120" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Korisničko ime" VerticalAlignment="Center" />
+                        <TextBox x:Name="OsUser" Grid.Column="1" Margin="0,3" />
+                        <TextBlock Grid.Row="1" Text="Lozinka" VerticalAlignment="Center" />
+                        <PasswordBox x:Name="OsPassword" Grid.Row="1" Grid.Column="1" Margin="0,3" />
+                        <TextBlock x:Name="OsKeyLabel" Grid.Row="2" Text="API ključ" VerticalAlignment="Center" />
+                        <DockPanel x:Name="OsKeyRow" Grid.Row="2" Grid.Column="1" Margin="0,3">
+                            <Button DockPanel.Dock="Right" Style="{StaticResource SecondaryButton}" Content="Zalijepi" Margin="6,0,0,0" Padding="10,4" Click="OnPasteOsKey" />
+                            <PasswordBox x:Name="OsKey" />
+                        </DockPanel>
+                    </Grid>
+                    <StackPanel x:Name="OsKeyHelp" Margin="22,6,0,0">
+                        <TextBlock Style="{StaticResource HintText}" Margin="0"
+                                   Text="Ova verzija playera nema ugrađen ključ aplikacije, pa treba i tvoj API ključ: na stranici s ključevima klikni „New consumer”, upiši bilo koji naziv (npr. jebaited_player), spremi i kopiraj „API key”." />
+                        <Button Style="{StaticResource SecondaryButton}" HorizontalAlignment="Left" Margin="0,6,0,0"
+                                Content="Otvori stranicu s ključevima" Tag="https://www.opensubtitles.com/en/consumers" Click="OnLinkClick" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="22,12,0,0">
+                        <Button x:Name="OsTestButton" Style="{StaticResource AccentButton}" Padding="16,7" Click="OnTestOpenSubtitles">
+                            <TextBlock Text="Provjeri i spremi" FontWeight="SemiBold" />
+                        </Button>
+                    </StackPanel>
+                    <TextBlock x:Name="OsStatus" TextWrapping="Wrap" Margin="22,8,0,0" />
+                </StackPanel>
+
+                <!-- 3. SubDL -->
+                <StackPanel x:Name="SubDlPage" Visibility="Collapsed">
+                    <TextBlock Style="{StaticResource PageTitle}" Text="SubDL.com (neobavezno)" />
+                    <DockPanel Margin="0,4,0,0">
+                        <TextBlock Style="{StaticResource StepNumber}" Text="1." />
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource StepText}" Text="Otvori SubDL i prijavi se. Ako nemaš račun, napravi ga (Sign up) i potvrdi e-mail." />
+                            <Button Style="{StaticResource SecondaryButton}" HorizontalAlignment="Left" Margin="0,6,0,0"
+                                    Content="Otvori subdl.com (API ključ)" Tag="https://subdl.com/panel/api" Click="OnLinkClick" />
+                        </StackPanel>
+                    </DockPanel>
+                    <DockPanel Margin="0,10,0,0">
+                        <TextBlock Style="{StaticResource StepNumber}" Text="2." />
+                        <TextBlock Style="{StaticResource StepText}" Text="Na stranici „API” kopiraj svoj API ključ (Ctrl+C)." />
+                    </DockPanel>
+                    <DockPanel Margin="0,10,0,0">
+                        <TextBlock Style="{StaticResource StepNumber}" Text="3." />
+                        <TextBlock Style="{StaticResource StepText}" Text="Zalijepi ga ovdje:" />
+                    </DockPanel>
+                    <DockPanel Margin="22,8,0,0">
+                        <Button DockPanel.Dock="Right" Style="{StaticResource SecondaryButton}" Content="Zalijepi" Margin="6,0,0,0" Padding="10,4" Click="OnPasteSubDlKey" />
+                        <PasswordBox x:Name="SubDlKey" />
+                    </DockPanel>
+                    <StackPanel Orientation="Horizontal" Margin="22,12,0,0">
+                        <Button x:Name="SubDlTestButton" Style="{StaticResource AccentButton}" Padding="16,7" Click="OnTestSubDl">
+                            <TextBlock Text="Provjeri i spremi" FontWeight="SemiBold" />
+                        </Button>
+                    </StackPanel>
+                    <TextBlock x:Name="SubDlStatus" TextWrapping="Wrap" Margin="22,8,0,0" />
+                </StackPanel>
+
+                <!-- 4. Titlovi.com -->
+                <StackPanel x:Name="TitloviPage" Visibility="Collapsed">
+                    <TextBlock Style="{StaticResource PageTitle}" Text="Titlovi.com (neobavezno)" />
+                    <TextBlock Style="{StaticResource HintText}" Margin="0,0,0,10"
+                               Text="Player koristi isto sučelje kao službeni Titlovi.com dodatak za Kodi, uz tvoj račun. Uvjeti korištenja za druge aplikacije nisu javno potvrđeni, zato je ovaj izvor neobavezan." />
+                    <DockPanel Margin="0,4,0,0">
+                        <TextBlock Style="{StaticResource StepNumber}" Text="1." />
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource StepText}" Text="Otvori titlovi.com i napravi račun (Registracija), zatim potvrdi e-mail." />
+                            <Button Style="{StaticResource SecondaryButton}" HorizontalAlignment="Left" Margin="0,6,0,0"
+                                    Content="Otvori titlovi.com" Tag="https://titlovi.com/" Click="OnLinkClick" />
+                        </StackPanel>
+                    </DockPanel>
+                    <DockPanel Margin="0,10,0,0">
+                        <TextBlock Style="{StaticResource StepNumber}" Text="2." />
+                        <TextBlock Style="{StaticResource StepText}" Text="Ovdje upiši korisničko ime i lozinku:" />
+                    </DockPanel>
+                    <Grid Margin="22,8,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="120" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Korisničko ime" VerticalAlignment="Center" />
+                        <TextBox x:Name="TitloviUser" Grid.Column="1" Margin="0,3" />
+                        <TextBlock Grid.Row="1" Text="Lozinka" VerticalAlignment="Center" />
+                        <PasswordBox x:Name="TitloviPassword" Grid.Row="1" Grid.Column="1" Margin="0,3" />
+                    </Grid>
+                    <StackPanel Orientation="Horizontal" Margin="22,12,0,0">
+                        <Button x:Name="TitloviTestButton" Style="{StaticResource AccentButton}" Padding="16,7" Click="OnTestTitlovi">
+                            <TextBlock Text="Provjeri i spremi" FontWeight="SemiBold" />
+                        </Button>
+                    </StackPanel>
+                    <TextBlock x:Name="TitloviStatus" TextWrapping="Wrap" Margin="22,8,0,0" />
+                </StackPanel>
+
+                <!-- 5. Gotovo -->
+                <StackPanel x:Name="DonePage" Visibility="Collapsed">
+                    <TextBlock Style="{StaticResource PageTitle}" Text="Gotovo" />
+                    <TextBlock x:Name="DoneSummary" TextWrapping="Wrap" />
+                    <TextBlock Style="{StaticResource HintText}" Margin="0,14,0,0"
+                               Text="Kasnije: desni klik na video → Titlovi → „Postavi titlove s interneta…” (ovaj vodič) ili „Izvori titlova (ključevi)…”." />
+                </StackPanel>
+            </Grid>
+        </ScrollViewer>
+    </DockPanel>
+</Window>

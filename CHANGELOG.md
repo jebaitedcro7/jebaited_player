@@ -1,5 +1,9 @@
 # Promjene
 
+## 1.0.1
+
+- Provjera automatskih nadogradnji (1.0.0 → 1.0.1). Rad playera se ne mijenja.
+
 ## 1.0.0
 
 Prvo javno izdanje.

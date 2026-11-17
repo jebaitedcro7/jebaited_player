@@ -170,6 +170,94 @@ public sealed class AppSettings
     /// <summary>Mapa za snimke zaslona; prazno = Slike\jebaited_player.</summary>
     public string? ScreenshotFolder { get; set; }
 
+    // --- UPGRADE 3: nove postavke (stare settings.json datoteke ih nemaju, pa vrijede zadane) ---------------------
+
+    /// <summary>Ponovno otvaranje započetog videa: "ask" (kartica, zadano), "resume" (nastavi sam) ili "start" (od početka).</summary>
+    public string ResumeMode { get; set; } = "ask";
+
+    /// <summary>Strelica lijevo/desno premota ovoliko sekundi (Ctrl + strelica šest puta više).</summary>
+    public int SeekStepSeconds { get; set; } = 5;
+
+    /// <summary>Video otvoren iz playera ili Windowsa ide odmah u cijeli zaslon.</summary>
+    public bool OpenFullscreen { get; set; }
+
+    /// <summary>Dok se video reproducira, player je iznad ostalih prozora.</summary>
+    public bool OnTopWhilePlaying { get; set; }
+
+    /// <summary>Željeni jezik zvuka (kod, npr. "en"); prazno = kako je zadano u datoteci.</summary>
+    public string? AudioLanguage { get; set; }
+
+    /// <summary>Izlazni uređaj zvuka (mpv "audio-device"); "auto" = zadani uređaj sustava.</summary>
+    public string AudioDevice { get; set; } = "auto";
+
+    /// <summary>Pomak zvuka u ms (pozitivno = zvuk kasnije), npr. za Bluetooth slušalice.</summary>
+    public double AudioDelayMs { get; set; }
+
+    /// <summary>Ujednačavanje glasnoće (tiši glasni prizori, razumljiviji dijalog).</summary>
+    public bool NormalizeAudio { get; set; }
+
+    /// <summary>Hardversko dekodiranje (grafička kartica).</summary>
+    public bool HardwareDecoding { get; set; } = true;
+
+    /// <summary>Kvaliteta slike: "balanced" (zadano), "high" ili "fast".</summary>
+    public string VideoQuality { get; set; } = "balanced";
+
+    /// <summary>Omjer slike za nove videe ("auto" = izvorni).</summary>
+    public string DefaultAspect { get; set; } = "auto";
+
+    /// <summary>HDR prolaz na HDR zaslon (kad je HDR uključen u Windowsima).</summary>
+    public bool HdrPassthrough { get; set; }
+
+    /// <summary>Koliko sekundi bez pomicanja miša kontrole (i Home) ostaju vidljive.</summary>
+    public double ControlsHideSeconds { get; set; } = 2.5;
+
+    /// <summary>Kodiranje za stare titlove koji nisu UTF-8 (npr. 1250); prazno = prepoznaj automatski.</summary>
+    public int? SubtitleCodePage { get; set; }
+
+    /// <summary>Ponuđene vrijednosti (postavke; neispravna vrijednost iz datoteke vraća se na zadanu).</summary>
+    public static readonly IReadOnlyList<int> SeekSteps = [5, 10, 15, 30];
+
+    public static readonly IReadOnlyList<double> HideDelays = [1.5, 2.5, 4, 6, 10];
+
+    public static readonly IReadOnlyList<string> ResumeModes = ["ask", "resume", "start"];
+
+    public static readonly IReadOnlyList<string> VideoQualities = ["balanced", "high", "fast"];
+
+    /// <summary>Vrijednosti izvan ponuđenih (ručno uređena datoteka) vraćaju se na zadane.</summary>
+    public void Normalize()
+    {
+        if (!ResumeModes.Contains(ResumeMode))
+        {
+            ResumeMode = "ask";
+        }
+
+        if (!SeekSteps.Contains(SeekStepSeconds))
+        {
+            SeekStepSeconds = 5;
+        }
+
+        if (!VideoQualities.Contains(VideoQuality))
+        {
+            VideoQuality = "balanced";
+        }
+
+        if (!HideDelays.Any(d => Math.Abs(d - ControlsHideSeconds) < 0.01))
+        {
+            ControlsHideSeconds = 2.5;
+        }
+
+        AudioDelayMs = Math.Clamp(Math.Round(AudioDelayMs / 50) * 50, -2000, 2000);
+        if (string.IsNullOrWhiteSpace(AudioDevice))
+        {
+            AudioDevice = "auto";
+        }
+
+        if (string.IsNullOrWhiteSpace(DefaultAspect))
+        {
+            DefaultAspect = "auto";
+        }
+    }
+
     public SubtitleStyleSettings SubtitleStyle { get; set; } = new();
 
     public OnlineSettings Online { get; set; } = new();
@@ -180,7 +268,9 @@ public sealed class AppSettings
         {
             if (File.Exists(AppPaths.SettingsFile))
             {
-                return JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(AppPaths.SettingsFile)) ?? new AppSettings();
+                AppSettings loaded = JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(AppPaths.SettingsFile)) ?? new AppSettings();
+                loaded.Normalize();
+                return loaded;
             }
         }
         catch (Exception ex)
@@ -327,6 +417,12 @@ public sealed class StartupOptions
     /// </summary>
     public string? DiagKeys { get; private set; }
 
+    /// <summary>
+    /// Test sučelja stvarnim mišem (UPGRADE 3): "timeline" (klik i povlačenje po traci), "home" (tipka Home, skrivanje
+    /// s kontrolama, nastavak gledanja), "home-fullscreen" (isto u cijelom zaslonu). Pomiče pravi kursor.
+    /// </summary>
+    public string? DiagUiTest { get; private set; }
+
     /// <summary>Automatska sljedeća epizoda samo za ovo pokretanje ("on"/"off").</summary>
     public bool? DiagAutoNext { get; private set; }
 
@@ -435,6 +531,9 @@ public sealed class StartupOptions
                     break;
                 case "--diag-keys" when i + 1 < args.Length:
                     o.DiagKeys = args[++i];
+                    break;
+                case "--diag-ui-test" when i + 1 < args.Length:
+                    o.DiagUiTest = args[++i];
                     break;
                 case "--diag-autonext" when i + 1 < args.Length:
                     o.DiagAutoNext = args[++i] != "off";

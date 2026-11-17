@@ -4,96 +4,279 @@
         xmlns:loc="clr-namespace:JebaitedPlayer.Infrastructure"
         xmlns:views="clr-namespace:JebaitedPlayer.Views"
         Title="{loc:T settings.title}"
-        SizeToContent="WidthAndHeight" ResizeMode="NoResize" ShowInTaskbar="False"
+        Width="900" Height="660" MinWidth="700" MinHeight="440" ShowInTaskbar="False"
         WindowStartupLocation="CenterOwner"
         Background="{DynamicResource WindowBackgroundBrush}"
         Foreground="{DynamicResource TextPrimaryBrush}"
         FontFamily="{DynamicResource UiFont}" FontSize="13" UseLayoutRounding="True">
 
+    <!-- Postavke u karticama (UPGRADE 3). Sve se primjenjuje odmah i sprema pri zatvaranju. -->
     <DockPanel>
-        <DockPanel DockPanel.Dock="Bottom" LastChildFill="False" Margin="22,0,22,16">
-            <Border DockPanel.Dock="Top" Height="1" Background="{DynamicResource MenuBorderBrush}" Margin="0,0,0,14" />
-            <Button DockPanel.Dock="Right" Style="{StaticResource SecondaryButton}" Content="{loc:T common.close}" Click="OnClose" Margin="0,0,0,6" />
+        <DockPanel DockPanel.Dock="Bottom" LastChildFill="False" Margin="0">
+            <Border DockPanel.Dock="Top" Height="1" Background="{DynamicResource MenuBorderBrush}" />
+            <TextBlock DockPanel.Dock="Left" Style="{StaticResource HintText}" Text="{loc:T settings.savedHint}"
+                       VerticalAlignment="Center" Margin="22,0,0,0" />
+            <Button DockPanel.Dock="Right" Style="{StaticResource SecondaryButton}" Content="{loc:T common.close}" Click="OnClose"
+                    Margin="0,12,22,12" />
         </DockPanel>
-        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
-            <StackPanel Margin="22,8,22,16" Width="440">
-                <!-- Jezik -->
-                <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T settings.language}" />
-                <views:LanguageSelector />
-                <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.languageHint}" />
 
-                <!-- Izgled -->
-                <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T settings.appearance}" />
-                <DockPanel Margin="0,2,0,0">
-                    <ToggleButton x:Name="LightThemeBox" Style="{StaticResource SwitchToggle}" VerticalAlignment="Center" />
-                    <TextBlock Text="{loc:T settings.lightTheme}" VerticalAlignment="Center" Margin="10,0,0,0" />
-                </DockPanel>
-                <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.themeHint}" />
+        <TabControl x:Name="Tabs" Style="{StaticResource SettingsTabs}">
 
-                <!-- Serije -->
-                <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T settings.series}" />
-                <CheckBox x:Name="AutoNextBox" Content="{loc:T settings.autoNext}" />
-                <Grid Margin="0,8,0,0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="44" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="{loc:T settings.countdown}" VerticalAlignment="Center" Margin="0,0,14,0" />
-                    <Slider x:Name="UpNextSlider" Grid.Column="1" Style="{StaticResource PlayerSlider}" Minimum="5" Maximum="30"
-                            TickFrequency="5" IsSnapToTickEnabled="True" VerticalAlignment="Center" />
-                    <TextBlock Grid.Column="2" Text="{Binding Value, ElementName=UpNextSlider, StringFormat={}{0:0} s}"
-                               HorizontalAlignment="Right" VerticalAlignment="Center" />
-                </Grid>
-                <TextBlock Style="{StaticResource HintText}"
-                           Text="{loc:T settings.autoNextHint}" />
+            <!-- 1. Općenito -->
+            <TabItem x:Name="GeneralTab" Style="{StaticResource SettingsTab}" Tag="&#xE713;" Header="{loc:T settings.tabGeneral}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+                    <StackPanel Margin="28,20,28,24" MaxWidth="640" HorizontalAlignment="Left">
+                        <TextBlock Style="{StaticResource TabTitle}" Text="{loc:T settings.tabGeneral}" />
+                        <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.generalHint}" />
 
-                <!-- Snimke zaslona -->
-                <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T settings.screenshots}" />
-                <TextBlock x:Name="ShotFolderText" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" />
-                <WrapPanel Margin="0,8,0,0">
-                    <Button Style="{StaticResource SecondaryButton}" Content="{loc:T settings.changeFolder}" Click="OnChooseFolder" />
-                    <Button Style="{StaticResource SecondaryButton}" Content="{loc:T settings.defaultFolder}" Click="OnDefaultFolder" />
-                    <Button Style="{StaticResource SecondaryButton}" Content="{loc:T settings.openFolder}" Click="OnOpenFolder" />
-                </WrapPanel>
-                <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.screenshotsHint}" />
+                        <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T settings.playback}" />
+                        <TextBlock Text="{loc:T settings.resumeLabel}" Margin="0,4,0,0" />
+                        <RadioButton x:Name="ResumeAsk" GroupName="Resume" Content="{loc:T settings.resumeAsk}" />
+                        <RadioButton x:Name="ResumeAuto" GroupName="Resume" Content="{loc:T settings.resumeAuto}" />
+                        <RadioButton x:Name="ResumeStart" GroupName="Resume" Content="{loc:T settings.resumeStart}" />
+                        <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.resumeHint}" Margin="0,6,0,0" />
 
-                <!-- Titlovi -->
-                <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T settings.subtitles}" />
-                <WrapPanel>
-                    <Button Style="{StaticResource SecondaryButton}" Content="{loc:T settings.subtitleSettings}" Click="OnSubtitleSettings" />
-                    <Button Style="{StaticResource SecondaryButton}" Content="{loc:T settings.onlineGuide}" Click="OnOnlineSetup" />
-                    <Button Style="{StaticResource SecondaryButton}" Content="{loc:T settings.sources}" Click="OnSources" />
-                </WrapPanel>
+                        <TextBlock Text="{loc:T settings.seekStep}" Margin="0,16,0,0" />
+                        <Button x:Name="SeekStepButton" Style="{StaticResource ChoiceButton}" Click="OnSeekStepClick" />
+                        <TextBlock x:Name="SeekStepHint" Style="{StaticResource HintText}" Margin="0,6,0,0" />
 
-                <!-- Windows -->
-                <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T settings.windows}" />
-                <TextBlock x:Name="ShellStatusText" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" />
-                <WrapPanel Margin="0,8,0,0">
-                    <Button Style="{StaticResource SecondaryButton}" Content="{loc:T settings.setDefault}" Click="OnSetDefaultPlayer" />
-                    <Button x:Name="UnregisterButton" Style="{StaticResource SecondaryButton}" Content="{loc:T settings.unregister}" Click="OnUnregister" />
-                </WrapPanel>
-                <TextBlock Style="{StaticResource HintText}"
-                           Text="{loc:T settings.setDefaultHint}" />
+                        <CheckBox x:Name="OpenFullscreenBox" Content="{loc:T settings.openFullscreen}" Margin="0,16,0,0" />
+                        <CheckBox x:Name="OnTopBox" Margin="0,8,0,0">
+                            <TextBlock Text="{loc:T settings.onTop}" TextWrapping="Wrap" />
+                        </CheckBox>
 
-                <!-- Nadogradnje -->
-                <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T settings.updates}" />
-                <TextBlock x:Name="VersionText" FontWeight="SemiBold" />
-                <TextBlock x:Name="UpdateStatusText" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" />
-                <CheckBox x:Name="AutoUpdateBox" Content="{loc:T settings.autoUpdate}" Margin="0,8,0,0" />
-                <WrapPanel x:Name="UpdateButtons" Margin="0,8,0,0">
-                    <Button x:Name="CheckUpdateButton" Style="{StaticResource SecondaryButton}" Content="{loc:T settings.checkNow}" Click="OnCheckUpdate" />
-                    <Button x:Name="RestartUpdateButton" Style="{StaticResource SecondaryButton}" Content="{loc:T settings.restartUpdate}" Click="OnRestartUpdate" />
-                </WrapPanel>
-                <TextBlock Style="{StaticResource HintText}"
-                           Text="{loc:T settings.updatesHint}" />
+                        <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T settings.series}" Margin="0,24,0,2" />
+                        <CheckBox x:Name="AutoNextBox" Content="{loc:T settings.autoNext}" />
+                        <Grid Margin="0,8,0,0" MaxWidth="440" HorizontalAlignment="Left">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="260" />
+                                <ColumnDefinition Width="44" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{loc:T settings.countdown}" VerticalAlignment="Center" Margin="0,0,14,0" />
+                            <Slider x:Name="UpNextSlider" Grid.Column="1" Style="{StaticResource PlayerSlider}" Minimum="5" Maximum="30"
+                                    TickFrequency="5" IsSnapToTickEnabled="True" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="2" Text="{Binding Value, ElementName=UpNextSlider, StringFormat={}{0:0} s}"
+                                       HorizontalAlignment="Right" VerticalAlignment="Center" />
+                        </Grid>
+                        <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.autoNextHint}" />
 
-                <!-- Napredno -->
-                <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T settings.advanced}" />
-                <CheckBox x:Name="GpuUiBox" Content="{loc:T settings.gpuUi}" />
-                <TextBlock Style="{StaticResource HintText}"
-                           Text="{loc:T settings.gpuUiHint}" />
-            </StackPanel>
-        </ScrollViewer>
+                        <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T settings.screenshots}" Margin="0,24,0,2" />
+                        <TextBlock x:Name="ShotFolderText" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" />
+                        <WrapPanel Margin="0,8,0,0">
+                            <Button Style="{StaticResource SecondaryButton}" Content="{loc:T settings.changeFolder}" Click="OnChooseFolder" />
+                            <Button Style="{StaticResource SecondaryButton}" Content="{loc:T settings.defaultFolder}" Click="OnDefaultFolder" />
+                            <Button Style="{StaticResource SecondaryButton}" Content="{loc:T settings.openFolder}" Click="OnOpenFolder" />
+                        </WrapPanel>
+                        <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.screenshotsHint}" />
+
+                        <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T settings.windows}" Margin="0,24,0,2" />
+                        <TextBlock x:Name="ShellStatusText" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" />
+                        <WrapPanel Margin="0,8,0,0">
+                            <Button Style="{StaticResource SecondaryButton}" Content="{loc:T settings.setDefault}" Click="OnSetDefaultPlayer" />
+                            <Button x:Name="UnregisterButton" Style="{StaticResource SecondaryButton}" Content="{loc:T settings.unregister}" Click="OnUnregister" />
+                        </WrapPanel>
+                        <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.setDefaultHint}" />
+                        <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.singleInstanceHint}" Margin="0,6,0,0" />
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- 2. Jezik -->
+            <TabItem x:Name="LanguageTab" Style="{StaticResource SettingsTab}" Tag="&#xF2B7;" Header="{loc:T settings.tabLanguage}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+                    <StackPanel Margin="28,20,28,24" MaxWidth="640" HorizontalAlignment="Left">
+                        <TextBlock Style="{StaticResource TabTitle}" Text="{loc:T settings.tabLanguage}" />
+                        <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.languageHint}" Margin="0,0,0,14" />
+                        <views:LanguageSelector Width="460" HorizontalAlignment="Left" />
+                        <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.languageRemembered}" Margin="0,16,0,0" />
+                        <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.languageSubtitlesHint}" Margin="0,6,0,0" />
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- 3. Titlovi -->
+            <TabItem x:Name="SubtitlesTab" Style="{StaticResource SettingsTab}" Tag="&#xE7F0;" Header="{loc:T settings.tabSubtitles}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+                    <StackPanel Margin="28,20,28,24" MaxWidth="640" HorizontalAlignment="Left">
+                        <TextBlock Style="{StaticResource TabTitle}" Text="{loc:T settings.tabSubtitles}" />
+                        <ContentControl x:Name="SubtitlesHost" Focusable="False" />
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- 4. Zvuk -->
+            <TabItem x:Name="AudioTab" Style="{StaticResource SettingsTab}" Tag="&#xE767;" Header="{loc:T settings.tabAudio}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+                    <StackPanel Margin="28,20,28,24" MaxWidth="640" HorizontalAlignment="Left">
+                        <TextBlock Style="{StaticResource TabTitle}" Text="{loc:T settings.tabAudio}" />
+
+                        <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T settings.volume}" Margin="0,8,0,2" />
+                        <Grid Margin="0,6,0,0" Width="420" HorizontalAlignment="Left">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="56" />
+                            </Grid.ColumnDefinitions>
+                            <Slider x:Name="VolumeSlider" Style="{StaticResource PlayerSlider}" Minimum="0" Maximum="100"
+                                    SmallChange="5" LargeChange="10" VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="1" Text="{Binding Value, ElementName=VolumeSlider, StringFormat={}{0:0} %}"
+                                       HorizontalAlignment="Right" VerticalAlignment="Center" />
+                        </Grid>
+                        <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.volumeHint}" />
+                        <CheckBox x:Name="NormalizeBox" Margin="0,12,0,0">
+                            <TextBlock Text="{loc:T settings.normalize}" TextWrapping="Wrap" />
+                        </CheckBox>
+                        <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.normalizeHint}" Margin="28,4,0,0" />
+
+                        <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T settings.audioTrack}" Margin="0,24,0,2" />
+                        <TextBlock Text="{loc:T settings.audioLanguage}" Margin="0,4,0,0" />
+                        <Button x:Name="AudioLanguageButton" Style="{StaticResource ChoiceButton}" Click="OnAudioLanguageClick" />
+                        <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.audioLanguageHint}" Margin="0,6,0,0" />
+
+                        <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T settings.audioDevice}" Margin="0,24,0,2" />
+                        <Button x:Name="AudioDeviceButton" Style="{StaticResource ChoiceButton}" Click="OnAudioDeviceClick" MinWidth="320" />
+                        <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.audioDeviceHint}" Margin="0,6,0,0" />
+
+                        <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T settings.audioDelay}" Margin="0,24,0,2" />
+                        <Grid Margin="0,6,0,0" Width="520" HorizontalAlignment="Left">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="78" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Slider x:Name="AudioDelaySlider" Style="{StaticResource PlayerSlider}" Minimum="-2000" Maximum="2000"
+                                    SmallChange="50" LargeChange="250" TickFrequency="50" IsSnapToTickEnabled="True" VerticalAlignment="Center" />
+                            <TextBlock x:Name="AudioDelayText" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                            <Button Grid.Column="2" Style="{StaticResource SecondaryButton}" Content="{loc:T settings.reset}"
+                                    Click="OnResetAudioDelay" Margin="12,0,0,0" />
+                        </Grid>
+                        <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.audioDelayHint}" Margin="0,6,0,0" />
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- 5. Slika -->
+            <TabItem x:Name="VideoTab" Style="{StaticResource SettingsTab}" Tag="&#xE714;" Header="{loc:T settings.tabVideo}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+                    <StackPanel Margin="28,20,28,24" MaxWidth="640" HorizontalAlignment="Left">
+                        <TextBlock Style="{StaticResource TabTitle}" Text="{loc:T settings.tabVideo}" />
+
+                        <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T settings.quality}" Margin="0,8,0,2" />
+                        <RadioButton x:Name="QualityBalanced" GroupName="Quality" Content="{loc:T settings.qualityBalanced}" />
+                        <RadioButton x:Name="QualityHigh" GroupName="Quality" Content="{loc:T settings.qualityHigh}" />
+                        <RadioButton x:Name="QualityFast" GroupName="Quality" Content="{loc:T settings.qualityFast}" />
+                        <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.qualityHint}" Margin="0,6,0,0" />
+
+                        <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T settings.decoding}" Margin="0,24,0,2" />
+                        <CheckBox x:Name="HwdecBox" Content="{loc:T settings.hwdec}" />
+                        <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.hwdecHint}" Margin="28,4,0,0" />
+
+                        <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T settings.aspect}" Margin="0,24,0,2" />
+                        <Button x:Name="AspectButton" Style="{StaticResource ChoiceButton}" Click="OnAspectClick" />
+                        <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.aspectHint}" Margin="0,6,0,0" />
+
+                        <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T settings.hdr}" Margin="0,24,0,2" />
+                        <CheckBox x:Name="HdrBox">
+                            <TextBlock Text="{loc:T settings.hdrPassthrough}" TextWrapping="Wrap" />
+                        </CheckBox>
+                        <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.hdrHint}" Margin="28,4,0,0" />
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- 6. Izgled -->
+            <TabItem x:Name="AppearanceTab" Style="{StaticResource SettingsTab}" Tag="&#xE790;" Header="{loc:T settings.appearance}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+                    <StackPanel Margin="28,20,28,24" MaxWidth="640" HorizontalAlignment="Left">
+                        <TextBlock Style="{StaticResource TabTitle}" Text="{loc:T settings.appearance}" />
+
+                        <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T settings.theme}" Margin="0,8,0,2" />
+                        <RadioButton x:Name="ThemeDark" GroupName="Theme" Content="{loc:T settings.themeDark}" />
+                        <RadioButton x:Name="ThemeLight" GroupName="Theme" Content="{loc:T settings.themeLight}" />
+                        <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.themeHint}" Margin="0,6,0,0" />
+
+                        <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T settings.controls}" Margin="0,24,0,2" />
+                        <TextBlock Text="{loc:T settings.hideControls}" Margin="0,4,0,0" />
+                        <Button x:Name="HideControlsButton" Style="{StaticResource ChoiceButton}" Click="OnHideControlsClick" />
+                        <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.hideControlsHint}" Margin="0,6,0,0" />
+
+                        <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T settings.advanced}" Margin="0,24,0,2" />
+                        <CheckBox x:Name="GpuUiBox" Content="{loc:T settings.gpuUi}" />
+                        <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.gpuUiHint}" Margin="28,4,0,0" />
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- 7. Nadogradnje -->
+            <TabItem x:Name="UpdatesTab" Style="{StaticResource SettingsTab}" Tag="&#xE895;" Header="{loc:T settings.updates}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+                    <StackPanel Margin="28,20,28,24" MaxWidth="640" HorizontalAlignment="Left">
+                        <TextBlock Style="{StaticResource TabTitle}" Text="{loc:T settings.updates}" />
+                        <TextBlock x:Name="VersionText" FontSize="15" FontWeight="SemiBold" Margin="0,8,0,0" />
+                        <TextBlock x:Name="UpdateStatusText" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,4,0,0" />
+                        <CheckBox x:Name="AutoUpdateBox" Content="{loc:T settings.autoUpdate}" Margin="0,12,0,0" />
+                        <WrapPanel x:Name="UpdateButtons" Margin="0,10,0,0">
+                            <Button x:Name="CheckUpdateButton" Style="{StaticResource SecondaryButton}" Content="{loc:T settings.checkNow}" Click="OnCheckUpdate" />
+                            <Button x:Name="RestartUpdateButton" Style="{StaticResource SecondaryButton}" Content="{loc:T settings.restartUpdate}" Click="OnRestartUpdate" />
+                        </WrapPanel>
+                        <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.updatesHint}" />
+
+                        <TextBlock x:Name="WhatsNewTitle" Style="{StaticResource SectionHeader}" Margin="0,24,0,2" />
+                        <TextBlock x:Name="WhatsNewDate" Style="{StaticResource HintText}" />
+                        <StackPanel x:Name="WhatsNewList" Margin="0,6,0,0" />
+                        <WrapPanel Margin="0,12,0,0">
+                            <Button Style="{StaticResource SecondaryButton}" Content="{loc:T settings.viewHistory}" Click="OnViewHistory" />
+                            <Button Style="{StaticResource SecondaryButton}" Content="{loc:T settings.githubReleases}" Click="OnGitHubReleases" />
+                        </WrapPanel>
+                        <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.historyHint}" />
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- 8. O aplikaciji -->
+            <TabItem x:Name="AboutTab" Style="{StaticResource SettingsTab}" Tag="&#xE946;" Header="{loc:T settings.tabAbout}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+                    <StackPanel Margin="28,20,28,24" MaxWidth="640" HorizontalAlignment="Left">
+                        <DockPanel>
+                            <Image DockPanel.Dock="Left" Source="/Assets/logo-ufo.png" Height="84" Margin="0,0,18,0"
+                                   RenderOptions.BitmapScalingMode="HighQuality" VerticalAlignment="Center" />
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="jebaited_player" FontSize="24" FontWeight="SemiBold" />
+                                <TextBlock Text="jebaited_cro" FontSize="15" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2,0,0" />
+                                <TextBlock x:Name="AboutVersionText" Margin="0,6,0,0" />
+                            </StackPanel>
+                        </DockPanel>
+                        <TextBlock Text="{loc:T settings.aboutDescription}" TextWrapping="Wrap" Margin="0,16,0,0" />
+
+                        <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T settings.license}" Margin="0,24,0,2" />
+                        <TextBlock Text="{loc:T settings.licenseText}" TextWrapping="Wrap" />
+                        <WrapPanel Margin="0,10,0,0">
+                            <Button Style="{StaticResource SecondaryButton}" Content="{loc:T settings.licenseButton}" Click="OnLicense" />
+                            <Button Style="{StaticResource SecondaryButton}" Content="{loc:T settings.sourceCode}" Click="OnSourceCode" />
+                        </WrapPanel>
+
+                        <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T settings.technologies}" Margin="0,20,0,2" />
+                        <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.technologiesHint}" />
+                        <StackPanel x:Name="TechnologyList" Margin="0,8,0,0" />
+                        <Button Style="{StaticResource SecondaryButton}" Content="{loc:T settings.thirdParty}" Click="OnThirdParty"
+                                HorizontalAlignment="Left" Margin="0,10,0,0" />
+
+                        <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T settings.docs}" Margin="0,20,0,2" />
+                        <WrapPanel Margin="0,6,0,0">
+                            <Button Style="{StaticResource SecondaryButton}" Content="{loc:T settings.manual}" Click="OnManual" />
+                            <Button Style="{StaticResource SecondaryButton}" Content="{loc:T settings.viewHistory}" Click="OnViewHistory" />
+                        </WrapPanel>
+                        <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.manualHint}" />
+
+                        <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T settings.privacy}" Margin="0,20,0,2" />
+                        <TextBlock Text="{loc:T settings.privacyText}" TextWrapping="Wrap" />
+                        <WrapPanel Margin="0,10,0,0">
+                            <Button Style="{StaticResource SecondaryButton}" Content="{loc:T settings.privacyButton}" Click="OnPrivacy" />
+                            <Button Style="{StaticResource SecondaryButton}" Content="{loc:T settings.codeSigning}" Click="OnCodeSigning" />
+                        </WrapPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+        </TabControl>
     </DockPanel>
 </Window>

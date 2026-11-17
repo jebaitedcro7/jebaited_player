@@ -131,6 +131,15 @@ public static partial class SubtitleLanguage
         "it" => ["it", "ita"],
         "es" => ["es", "spa"],
         "hu" => ["hu", "hun"],
+        "pt" => ["pt", "por"],
+        "ru" => ["ru", "rus"],
+        "pl" => ["pl", "pol"],
+        "cs" => ["cs", "ces", "cze"],
+        "nl" => ["nl", "nld", "dut"],
+        "tr" => ["tr", "tur"],
+        "ja" => ["ja", "jpn"],
+        "ko" => ["ko", "kor"],
+        "zh" => ["zh", "zho", "chi"],
         _ => [code],
     };
 

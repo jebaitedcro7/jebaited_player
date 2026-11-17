@@ -1,0 +1,265 @@
+{
+  "repository": "https://github.com/jebaitedcro7/jebaited_player",
+  "changelog": {
+    "en": {
+      "languageName": "English",
+      "title": "Changelog",
+      "intro": "All notable changes to jebaited_player. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [Semantic Versioning](https://semver.org/) (MAJOR = big changes that may break compatibility, MINOR = new features, PATCH = bug fixes and small improvements).",
+      "other": "Other languages: [Deutsch](CHANGELOG_DE.md) · [Hrvatski](CHANGELOG_HR.md). The same history is included in the player (click the version number on the home screen). This file is generated from `src/JebaitedPlayer.App/History/update-history.json`.",
+      "features": "Added",
+      "improvements": "Improved",
+      "fixes": "Fixed",
+      "known": "Known issues",
+      "release": "Release",
+      "compare": "Changes since"
+    },
+    "de": {
+      "languageName": "Deutsch",
+      "title": "Änderungsprotokoll",
+      "intro": "Alle wichtigen Änderungen an jebaited_player. Format: [Keep a Changelog](https://keepachangelog.com/de/1.1.0/); Versionen nach [Semantic Versioning](https://semver.org/lang/de/) (MAJOR = große Änderungen, die die Kompatibilität betreffen können, MINOR = neue Funktionen, PATCH = Fehlerbehebungen und kleine Verbesserungen).",
+      "other": "Andere Sprachen: [English](CHANGELOG.md) · [Hrvatski](CHANGELOG_HR.md). Derselbe Verlauf ist im Player enthalten (Klick auf die Versionsnummer auf dem Startbildschirm). Diese Datei wird aus `src/JebaitedPlayer.App/History/update-history.json` erzeugt.",
+      "features": "Neu",
+      "improvements": "Verbessert",
+      "fixes": "Behoben",
+      "known": "Bekannte Probleme",
+      "release": "Release",
+      "compare": "Änderungen seit"
+    },
+    "hr": {
+      "languageName": "Hrvatski",
+      "title": "Povijest promjena",
+      "intro": "Sve važnije promjene jebaited_playera. Oblik: [Keep a Changelog](https://keepachangelog.com/hr/1.1.0/); verzije po [Semantic Versioning](https://semver.org/lang/hr/) (MAJOR = velike promjene koje mogu utjecati na kompatibilnost, MINOR = nove funkcionalnosti, PATCH = popravci i manja poboljšanja).",
+      "other": "Drugi jezici: [English](CHANGELOG.md) · [Deutsch](CHANGELOG_DE.md). Ista povijest je i u playeru (klik na broj verzije na početnom ekranu). Ova datoteka nastaje iz `src/JebaitedPlayer.App/History/update-history.json`.",
+      "features": "Novo",
+      "improvements": "Poboljšano",
+      "fixes": "Ispravljeno",
+      "known": "Poznati problemi",
+      "release": "Izdanje",
+      "compare": "Promjene od"
+    }
+  },
+  "versions": [
+    {
+      "version": "1.2.0",
+      "date": "2026-11-17",
+      "notes": {
+        "en": {
+          "summary": "Player controls, settings in tabs and the update history.",
+          "features": [
+            "Home button at the top left of the player: back to the home screen without closing the app. The position is saved, so you can continue watching later. It shows and hides together with the other controls, also in full screen.",
+            "Timeline: click anywhere to jump there right away. Dragging still works, and a bubble shows the time under the mouse.",
+            "Settings are now split into tabs: General, Language, Subtitles, Audio, Video, Appearance, Updates and About.",
+            "New settings: what happens when you reopen a video (ask, resume or start from the beginning), seek step for the arrow keys, open videos in full screen, keep the player on top, preferred audio language, audio output device, audio delay, volume levelling, hardware decoding, picture quality, default aspect ratio, HDR passthrough, how long the controls stay visible and the encoding for old subtitles.",
+            "Update history: click the version number on the home screen. It is included in the app, so it works without the internet; when you are online, newer versions from GitHub are shown too."
+          ],
+          "improvements": [
+            "A click on the timeline seeks precisely at once (no second jump). The timeline is easier to hit and gets thicker under the mouse.",
+            "“Back to the home screen” is also in the right-click menu.",
+            "Code signing policy, privacy statement and automatic builds on GitHub Actions, as preparation for free code signing by SignPath Foundation."
+          ],
+          "fixes": [],
+          "known": [
+            "The app is not digitally signed yet, so Windows SmartScreen or Smart App Control may warn before the installation.",
+            "The progress window of the installer comes from Velopack and is only in English."
+          ]
+        },
+        "de": {
+          "summary": "Player-Steuerung, Einstellungen in Tabs und der Update-Verlauf.",
+          "features": [
+            "Startseite-Taste oben links im Player: zurück zum Startbildschirm, ohne die App zu schließen. Die Position wird gespeichert, du kannst später weiterschauen. Sie erscheint und verschwindet zusammen mit den anderen Steuerelementen, auch im Vollbild.",
+            "Zeitleiste: Klicke irgendwo hin, um sofort dorthin zu springen. Ziehen funktioniert weiterhin, und eine Blase zeigt die Zeit unter der Maus.",
+            "Die Einstellungen sind jetzt in Tabs aufgeteilt: Allgemein, Sprache, Untertitel, Audio, Video, Darstellung, Updates und Info.",
+            "Neue Einstellungen: was beim erneuten Öffnen eines Videos passiert (fragen, fortsetzen oder von vorne), Sprungweite der Pfeiltasten, Videos im Vollbild öffnen, Player im Vordergrund halten, bevorzugte Audiosprache, Audioausgabegerät, Audioverzögerung, Lautstärkeausgleich, Hardware-Dekodierung, Bildqualität, Standard-Seitenverhältnis, HDR-Durchleitung, wie lange die Steuerelemente sichtbar bleiben und die Kodierung alter Untertitel.",
+            "Update-Verlauf: Klicke auf die Versionsnummer auf dem Startbildschirm. Er ist in der App enthalten und funktioniert ohne Internet; online werden auch neuere Versionen von GitHub angezeigt."
+          ],
+          "improvements": [
+            "Ein Klick auf die Zeitleiste springt sofort genau an die Stelle (kein zweiter Sprung). Die Zeitleiste ist leichter zu treffen und wird unter der Maus dicker.",
+            "„Zurück zum Startbildschirm“ gibt es auch im Rechtsklickmenü.",
+            "Richtlinie zur Code-Signierung, Datenschutzerklärung und automatische Builds mit GitHub Actions als Vorbereitung für die kostenlose Code-Signierung durch die SignPath Foundation."
+          ],
+          "fixes": [],
+          "known": [
+            "Die App ist noch nicht digital signiert, daher können Windows SmartScreen oder Smart App Control vor der Installation warnen.",
+            "Das Fortschrittsfenster des Installationsprogramms stammt von Velopack und ist nur auf Englisch."
+          ]
+        },
+        "hr": {
+          "summary": "Kontrole playera, postavke u karticama i povijest nadogradnji.",
+          "features": [
+            "Tipka Početna gore lijevo u playeru: povratak na početni ekran bez zatvaranja aplikacije. Pozicija se sprema, pa možeš nastaviti gledati kasnije. Pojavljuje se i skriva zajedno s ostalim kontrolama, i u cijelom zaslonu.",
+            "Vremenska traka: klikni bilo gdje i reprodukcija odmah skoči na to mjesto. Povlačenje i dalje radi, a oblačić pokazuje vrijeme ispod miša.",
+            "Postavke su sada podijeljene u kartice: Općenito, Jezik, Titlovi, Zvuk, Slika, Izgled, Nadogradnje i O aplikaciji.",
+            "Nove postavke: što se događa kad ponovno otvoriš video (pitaj, nastavi ili od početka), korak premotavanja strelicama, otvaranje videa u cijelom zaslonu, player uvijek iznad ostalih prozora, željeni jezik zvuka, izlazni uređaj zvuka, kašnjenje zvuka, ujednačavanje glasnoće, hardversko dekodiranje, kvaliteta slike, zadani omjer slike, HDR prolaz, koliko dugo su kontrole vidljive i kodiranje starih titlova.",
+            "Povijest nadogradnji: klikni na broj verzije na početnom ekranu. Uključena je u aplikaciju, pa radi i bez interneta; kad si na mreži, prikazuju se i novije verzije s GitHuba."
+          ],
+          "improvements": [
+            "Klik na vremensku traku odmah precizno premota (bez drugog skoka). Traku je lakše pogoditi i pod mišem postaje deblja.",
+            "„Natrag na početni ekran” je i u izborniku desnog klika.",
+            "Pravila potpisivanja koda, izjava o privatnosti i automatske izrade na GitHub Actions, kao priprema za besplatno potpisivanje preko SignPath Foundationa."
+          ],
+          "fixes": [],
+          "known": [
+            "Aplikacija još nije digitalno potpisana, pa Windows SmartScreen ili Smart App Control mogu upozoriti prije instalacije.",
+            "Prozor napretka instalacije je Velopackov i samo je na engleskom."
+          ]
+        }
+      }
+    },
+    {
+      "version": "1.1.0",
+      "date": "2026-11-17",
+      "notes": {
+        "en": {
+          "summary": "Languages, a new home screen, themes and manuals.",
+          "features": [
+            "Interface in English, German and Croatian; under “More languages” also Bosnian, Serbian (Latin) and Slovenian. All menus, settings, messages, errors, sync, online subtitles, the episode list and the history are translated.",
+            "Language choice on the first start (right after the installation); without a choice, English stays. The language can be changed in Settings at once, without a restart, and is remembered.",
+            "New home screen: the Alien logo and the name jebaited_cro, a discreet space background, a gear for Settings at the bottom left and a dark/light theme switch.",
+            "Manuals in three languages (Quick Start, Basic Guide, Advanced Guide) with screenshots: README_EN, README_DE and README_HR."
+          ],
+          "improvements": [
+            "A new installation gets default subtitle languages that match the chosen language. Existing settings, watch history and keys are kept."
+          ],
+          "fixes": [],
+          "known": [
+            "The progress window of the installer comes from Velopack and is only in English.",
+            "The app is not digitally signed yet, so Windows SmartScreen or Smart App Control may warn before the installation."
+          ]
+        },
+        "de": {
+          "summary": "Sprachen, ein neuer Startbildschirm, Designs und Handbücher.",
+          "features": [
+            "Oberfläche auf Englisch, Deutsch und Kroatisch; unter „Weitere Sprachen“ auch Bosnisch, Serbisch (Latein) und Slowenisch. Alle Menüs, Einstellungen, Meldungen, Fehler, Synchronisierung, Online-Untertitel, die Folgenliste und der Verlauf sind übersetzt.",
+            "Sprachauswahl beim ersten Start (direkt nach der Installation); ohne Auswahl bleibt Englisch. Die Sprache lässt sich in den Einstellungen sofort und ohne Neustart ändern und wird gespeichert.",
+            "Neuer Startbildschirm: das Alien-Logo und der Name jebaited_cro, ein dezenter Weltraumhintergrund, ein Zahnrad für die Einstellungen unten links und ein Schalter für dunkles/helles Design.",
+            "Handbücher in drei Sprachen (Quick Start, Basic Guide, Advanced Guide) mit Screenshots: README_EN, README_DE und README_HR."
+          ],
+          "improvements": [
+            "Eine neue Installation erhält Standard-Untertitelsprachen passend zur gewählten Sprache. Vorhandene Einstellungen, der Wiedergabeverlauf und Schlüssel bleiben erhalten."
+          ],
+          "fixes": [],
+          "known": [
+            "Das Fortschrittsfenster des Installationsprogramms stammt von Velopack und ist nur auf Englisch.",
+            "Die App ist noch nicht digital signiert, daher können Windows SmartScreen oder Smart App Control vor der Installation warnen."
+          ]
+        },
+        "hr": {
+          "summary": "Jezici, novi početni ekran, teme i priručnici.",
+          "features": [
+            "Sučelje na engleskom, njemačkom i hrvatskom, a pod „Više jezika” i bosanski, srpski (latinica) i slovenski. Prevedeni su svi izbornici, postavke, poruke, greške, sinkronizacija, titlovi s interneta, popis epizoda i povijest.",
+            "Odabir jezika pri prvom pokretanju (odmah nakon instalacije); bez odabira ostaje engleski. Jezik se mijenja u Postavkama, odmah i bez ponovnog pokretanja, i pamti se.",
+            "Novi početni ekran: Alien logo i ime jebaited_cro, diskretna svemirska pozadina, zupčanik za Postavke dolje lijevo i prekidač tamna/svijetla tema.",
+            "Priručnici na tri jezika (Quick Start, Basic Guide, Advanced Guide) sa snimkama zaslona: README_EN, README_DE i README_HR."
+          ],
+          "improvements": [
+            "Nova instalacija dobiva zadane jezike titlova prema odabranom jeziku. Postojeće postavke, povijest gledanja i ključevi ostaju."
+          ],
+          "fixes": [],
+          "known": [
+            "Prozor napretka instalacije je Velopackov i samo je na engleskom.",
+            "Aplikacija još nije digitalno potpisana, pa Windows SmartScreen ili Smart App Control mogu upozoriti prije instalacije."
+          ]
+        }
+      }
+    },
+    {
+      "version": "1.0.1",
+      "date": "2026-11-17",
+      "notes": {
+        "en": {
+          "summary": "Check of the automatic updates. The player works the same as in 1.0.0.",
+          "features": [],
+          "improvements": [
+            "Verified automatic updates from GitHub: version 1.0.0 updates itself to 1.0.1, and settings and watch history are kept."
+          ],
+          "fixes": [],
+          "known": [
+            "The app is not digitally signed yet, so Windows SmartScreen or Smart App Control may warn before the installation."
+          ]
+        },
+        "de": {
+          "summary": "Prüfung der automatischen Updates. Der Player funktioniert wie in 1.0.0.",
+          "features": [],
+          "improvements": [
+            "Automatische Updates von GitHub geprüft: Version 1.0.0 aktualisiert sich selbst auf 1.0.1, Einstellungen und Wiedergabeverlauf bleiben erhalten."
+          ],
+          "fixes": [],
+          "known": [
+            "Die App ist noch nicht digital signiert, daher können Windows SmartScreen oder Smart App Control vor der Installation warnen."
+          ]
+        },
+        "hr": {
+          "summary": "Provjera automatskih nadogradnji. Player radi isto kao u 1.0.0.",
+          "features": [],
+          "improvements": [
+            "Provjerene automatske nadogradnje s GitHuba: verzija 1.0.0 sama se nadogradi na 1.0.1, a postavke i povijest gledanja ostaju."
+          ],
+          "fixes": [],
+          "known": [
+            "Aplikacija još nije digitalno potpisana, pa Windows SmartScreen ili Smart App Control mogu upozoriti prije instalacije."
+          ]
+        }
+      }
+    },
+    {
+      "version": "1.0.0",
+      "date": "2026-11-17",
+      "notes": {
+        "en": {
+          "summary": "First public release.",
+          "features": [
+            "Plays almost every video and audio format (mpv): H.264, HEVC, AV1, VP9, 4K, HDR, 5.1 sound and hardware decoding.",
+            "Subtitles from the internet: OpenSubtitles, SubDL and Titlovi.com; the subtitles for your release are chosen automatically and saved next to the video.",
+            "Sync to the speech: offset, speed (25 / 23.976 fps) and a piecewise correction for a different cut; subtitles for another episode are rejected.",
+            "Manual sync: offset, gradual delay, alignment by line (without hurry) and Z/X.",
+            "Series: episode list, continue watching and the next episode.",
+            "Guide for subtitles from the internet: opens the sign-up, checks and saves your details (encrypted).",
+            "Windows: a single instance (a new file goes to the open player), several files at once, “Open with”, file type registration and setting the default player through Windows Settings.",
+            "Installation without administrator rights, shortcuts and automatic updates (installed when the player closes); settings and history are kept."
+          ],
+          "improvements": [],
+          "fixes": [],
+          "known": [
+            "The app is not digitally signed yet, so Windows SmartScreen or Smart App Control may warn before the installation."
+          ]
+        },
+        "de": {
+          "summary": "Erste öffentliche Version.",
+          "features": [
+            "Spielt fast jedes Video- und Audioformat ab (mpv): H.264, HEVC, AV1, VP9, 4K, HDR, 5.1-Ton und Hardware-Dekodierung.",
+            "Untertitel aus dem Internet: OpenSubtitles, SubDL und Titlovi.com; die Untertitel für deine Version werden automatisch gewählt und neben dem Video gespeichert.",
+            "Synchronisierung zur Sprache: Versatz, Geschwindigkeit (25 / 23,976 fps) und abschnittsweise Korrektur für eine andere Schnittfassung; Untertitel einer anderen Folge werden abgelehnt.",
+            "Manuelle Synchronisierung: Versatz, schrittweise Verzögerung, Ausrichtung nach Zeile (ohne Eile) und Z/X.",
+            "Serien: Folgenliste, Weiterschauen und die nächste Folge.",
+            "Assistent für Untertitel aus dem Internet: öffnet die Registrierung, prüft und speichert deine Daten (verschlüsselt).",
+            "Windows: eine einzige Instanz (eine neue Datei geht an den offenen Player), mehrere Dateien auf einmal, „Öffnen mit“, Registrierung der Dateitypen und Festlegen als Standardplayer über die Windows-Einstellungen.",
+            "Installation ohne Administratorrechte, Verknüpfungen und automatische Updates (beim Schließen des Players installiert); Einstellungen und Verlauf bleiben erhalten."
+          ],
+          "improvements": [],
+          "fixes": [],
+          "known": [
+            "Die App ist noch nicht digital signiert, daher können Windows SmartScreen oder Smart App Control vor der Installation warnen."
+          ]
+        },
+        "hr": {
+          "summary": "Prvo javno izdanje.",
+          "features": [
+            "Reprodukcija gotovo svih video i audio formata (mpv): H.264, HEVC, AV1, VP9, 4K, HDR, 5.1 zvuk i hardversko dekodiranje.",
+            "Titlovi s interneta: OpenSubtitles, SubDL i Titlovi.com; titlovi za tvoje izdanje biraju se automatski i spremaju uz video.",
+            "Sinkronizacija prema govoru: pomak, brzina (25 / 23,976 fps) i ispravak po dijelovima za drugu montažu; titlovi druge epizode se odbijaju.",
+            "Ručna sinkronizacija: pomak, postupno kašnjenje, poravnanje po replici (bez žurbe) i Z/X.",
+            "Serije: popis epizoda, nastavak gledanja i sljedeća epizoda.",
+            "Vodič za titlove s interneta: otvori registraciju, provjeri i spremi podatke (kriptirano).",
+            "Windows: jedna instanca (nova datoteka ide u otvoreni player), više datoteka odjednom, „Otvori pomoću”, registracija formata i postavljanje zadanog playera kroz Postavke sustava Windows.",
+            "Instalacija bez administratora, prečaci i automatske nadogradnje (instaliraju se pri zatvaranju playera); postavke i povijest ostaju."
+          ],
+          "improvements": [],
+          "fixes": [],
+          "known": [
+            "Aplikacija još nije digitalno potpisana, pa Windows SmartScreen ili Smart App Control mogu upozoriti prije instalacije."
+          ]
+        }
+      }
+    }
+  ]
+}

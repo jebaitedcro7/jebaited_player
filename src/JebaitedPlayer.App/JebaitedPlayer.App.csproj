@@ -25,6 +25,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Povijest nadogradnji (UPGRADE 3): ugrađena u program, pa radi bez interneta; iz nje nastaju i CHANGELOG*.md. -->
+    <EmbeddedResource Include="History\update-history.json" LogicalName="update-history.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <!-- Instalacija i nadogradnje preko GitHub Releases (MIT). -->
     <PackageReference Include="Velopack" Version="1.2.161" />
   </ItemGroup>

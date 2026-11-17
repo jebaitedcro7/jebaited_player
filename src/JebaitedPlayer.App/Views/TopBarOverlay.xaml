@@ -1,0 +1,39 @@
+<Window x:Class="JebaitedPlayer.Views.TopBarOverlay"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:JebaitedPlayer.Infrastructure"
+        Title="{loc:T controls.topBarTitle}"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        ShowInTaskbar="False" ShowActivated="False" ResizeMode="NoResize"
+        Focusable="False" AllowDrop="True" UseLayoutRounding="True"
+        Width="800" Height="64"
+        Foreground="{DynamicResource TextPrimaryBrush}"
+        FontFamily="{DynamicResource UiFont}">
+
+    <!-- Kontrole leže na videu, pa su uvijek tamne, bez obzira na temu (kao donja traka). -->
+    <Window.Resources>
+        <ResourceDictionary Source="/Themes/Dark.xaml" />
+    </Window.Resources>
+
+    <!-- Gornja traka preko videa (UPGRADE 3): Home gore lijevo. Prikazuje se i skriva zajedno s donjim kontrolama.
+         Gradijent nikad nije potpuno proziran, da bi primao miš (klik na prazan dio radi kao klik na video). -->
+    <Border x:Name="Strip">
+        <Border.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                <GradientStop Color="#A0000000" Offset="0" />
+                <GradientStop Color="#50000000" Offset="0.55" />
+                <GradientStop Color="#03000000" Offset="1" />
+            </LinearGradientBrush>
+        </Border.Background>
+
+        <Button x:Name="HomeButton" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="14,10,0,0"
+                Style="{StaticResource IconButton}" Width="Auto" Padding="0" Click="OnHomeClick"
+                ToolTip="{loc:T controls.homeTooltip}" AutomationProperties.Name="{loc:T controls.home}">
+            <StackPanel Orientation="Horizontal" Margin="10,0,14,0">
+                <TextBlock Text="&#xE80F;" FontFamily="{DynamicResource IconFont}" FontSize="17" VerticalAlignment="Center" />
+                <TextBlock Text="{loc:T controls.home}" FontFamily="{DynamicResource UiFont}" FontSize="14" Margin="9,0,0,1"
+                           VerticalAlignment="Center" />
+            </StackPanel>
+        </Button>
+    </Border>
+</Window>

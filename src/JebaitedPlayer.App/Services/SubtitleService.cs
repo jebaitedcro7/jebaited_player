@@ -27,6 +27,9 @@ public sealed record PreparedSubtitle(
 /// </summary>
 public static class SubtitleService
 {
+    /// <summary>Kodiranje starih titlova iz postavki (UPGRADE 3); null = prepoznaj automatski.</summary>
+    public static int? FallbackCodePage { get; set; }
+
     public const long MaxTextSubtitleBytes = 20L * 1024 * 1024;
 
     private static readonly UTF8Encoding Utf8WithBom = new(encoderShouldEmitUTF8Identifier: true);
@@ -71,7 +74,7 @@ public static class SubtitleService
 
         byte[] bytes = File.ReadAllBytes(path);
         Encoding? forced = forcedCodePage is int cp ? SubtitleEncoding.Get(cp) : null;
-        string text = SubtitleEncoding.Decode(bytes, forced, out EncodingDetection detection);
+        string text = SubtitleEncoding.Decode(bytes, forced, out EncodingDetection detection, FallbackCodePage);
         if (LooksBinary(text))
         {
             throw new InvalidDataException(Loc.T("error.notTextSubtitle"));

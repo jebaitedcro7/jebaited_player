@@ -93,6 +93,7 @@ public sealed class LibraryController : ObservableObject
     private double? _resumeOffer;
     private string? _pendingResumePath;
     private double? _pendingResumePosition;
+    private bool _pendingResumeAuto;
     private PlaylistItem? _upNext;
     private int _upNextSeconds;
     private long _upNextDeadline;
@@ -175,6 +176,12 @@ public sealed class LibraryController : ObservableObject
 
     /// <summary>Isključeno: na kraju epizode kartica samo ponudi sljedeću, bez odbrojavanja.</summary>
     public bool AutoPlayNext { get; set; } = true;
+
+    /// <summary>
+    /// Ponovno otvaranje započetog videa (UPGRADE 3): "ask" = kartica "Nastaviti gledanje?" (zadano), "resume" = nastavi
+    /// sam od spremljene pozicije, "start" = od početka (pozicija se i dalje sprema za "Nastavi gledati").
+    /// </summary>
+    public string ResumeMode { get; set; } = "ask";
 
     public string PlaylistTitle
     {
@@ -309,8 +316,14 @@ public sealed class LibraryController : ObservableObject
         WatchEntry? entry = Safe(() => _store?.Get(item.Path));
         bool resume = entry is { Watched: false } e && e.Position >= MinResumeSeconds &&
                       (e.Duration <= 0 || e.Position < e.Duration - 20);
+        if (ResumeMode == "start")
+        {
+            resume = false;
+        }
+
         _pendingResumePath = resume ? item.Path : null;
         _pendingResumePosition = resume ? entry!.Position : null;
+        _pendingResumeAuto = resume && ResumeMode == "resume";
 
         foreach (PlaylistItem p in Playlist)
         {
@@ -378,6 +391,17 @@ public sealed class LibraryController : ObservableObject
     }
 
     public void UpNextCancel() => UpNext = null;
+
+    /// <summary>
+    /// Tipka Home: spremi poziciju (pa se pri ponovnom otvaranju nudi nastavak) i makni kartice.
+    /// Dok je otvorena kartica "Nastaviti gledanje?", ostaje ranije spremljena pozicija.
+    /// </summary>
+    public void LeaveToHome()
+    {
+        SaveCurrentPosition();
+        ResumeOffer = null;
+        UpNext = null;
+    }
 
     /// <summary>Poziva UI timer: povremeno spremanje pozicije i odbrojavanje do sljedeće epizode.</summary>
     public void OnTick()
@@ -619,10 +643,20 @@ public sealed class LibraryController : ObservableObject
         if (_pendingResumePosition is double position &&
             string.Equals(_pendingResumePath, path, StringComparison.OrdinalIgnoreCase))
         {
-            // Video je učitan pauziran: pokaži kadar na kojem si stao i pitaj.
+            // Video je učitan pauziran: pokaži kadar na kojem si stao i pitaj (ili, uz "resume", samo nastavi).
             _vm.SeekAbsolute(position, exact: true);
-            ResumeOffer = position;
+            if (_pendingResumeAuto)
+            {
+                _vm.SetPaused(false);
+                Message?.Invoke(Loc.T("notice.resumedAt", TimeFormat.Format(position, position >= 3600)));
+            }
+            else
+            {
+                ResumeOffer = position;
+            }
         }
+
+        _pendingResumeAuto = false;
 
         _pendingResumePath = null;
         _pendingResumePosition = null;

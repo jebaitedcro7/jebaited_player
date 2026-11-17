@@ -21,8 +21,11 @@ namespace JebaitedPlayer;
 public partial class MainWindow : Window
 {
     private const double OverlayHeightDip = 116;
+    private const double TopBarHeightDip = 64;
     private const double DefaultSubtitleMarginY = 22;
-    private static readonly TimeSpan HideControlsAfter = TimeSpan.FromSeconds(2.5);
+
+    /// <summary>Koliko dugo bez pomicanja miša kontrole (i Home) ostaju vidljive; iz postavki (Izgled), zadano 2,5 s.</summary>
+    private TimeSpan HideControlsAfter => TimeSpan.FromSeconds(Math.Clamp(_settings.ControlsHideSeconds, 1, 30));
 
     private double _appliedSubtitleMargin = DefaultSubtitleMarginY;
 
@@ -37,6 +40,7 @@ public partial class MainWindow : Window
     private readonly SpeechAnalysisService _speech;
     private readonly AutoSyncController _autoSync;
     private ControlsOverlay? _overlay;
+    private TopBarOverlay? _topBar;
     private MpvPlayer? _player;
     private nint _hwnd;
     private DateTime _lastActivity = DateTime.UtcNow;
@@ -114,6 +118,8 @@ public partial class MainWindow : Window
         _online.Verifier = _autoSync;
         _ = Task.Run(() => _speech.CleanupCache(TimeSpan.FromDays(120)));
         _vm.Subtitles.ForcedCodePageForQueued = options.DiagEncoding;
+        SubtitleService.FallbackCodePage = settings.SubtitleCodePage;
+        _vm.MediaLoaded += (_, _) => OnMediaLoadedForWindow();
         SubtitleService.CleanupCache(TimeSpan.FromDays(14));
         if (!options.IsDiagnostics && JebaitedPlayer.Online.SubtitleSearchService.PurgeCachedKeys(AppPaths.SearchCacheDir) is int purged and > 0)
         {
@@ -194,6 +200,7 @@ public partial class MainWindow : Window
             }
         }
 
+        InitializeUiTests();
         Loaded += OnLoaded;
         LocationChanged += (_, _) => UpdateOverlayBounds();
         SizeChanged += (_, _) => UpdateOverlayBounds();
@@ -271,6 +278,18 @@ public partial class MainWindow : Window
                 break;
             case "language-picker":
                 new LanguagePickerWindow { Owner = this }.Show();
+                break;
+
+            // UPGRADE 3: kartice postavki ("settings-audio"…), povijest nadogradnji i izbornik broja verzije.
+            case not null when show.StartsWith("settings-", StringComparison.Ordinal)
+                               && Enum.TryParse(show["settings-".Length..], ignoreCase: true, out SettingsTab tab):
+                ShowPlayerSettings(tab);
+                break;
+            case "update-history":
+                ShowUpdateHistory();
+                break;
+            case "version-menu":
+                ShowVersionMenu();
                 break;
         }
     }
@@ -380,6 +399,7 @@ public partial class MainWindow : Window
         }
 
         _overlay?.Hide();
+        _topBar?.Hide();
         _cards?.Hide();
         Hide();
 
@@ -401,6 +421,7 @@ public partial class MainWindow : Window
         ApplyUpdateOnExit();
         _closeConfirmed = true;
         _overlay?.Close();
+        _topBar?.Close();
         _cards?.Close();
         Close();
     }
@@ -415,6 +436,30 @@ public partial class MainWindow : Window
         _overlay.SpeedMenuRequested += (_, button) => ShowItemsMenu(button, AddSpeedItems);
         _overlay.PlaylistToggleRequested += (_, _) => SetPlaylistPanel(PlaylistPanel.Visibility != Visibility.Visible);
         _ = _overlay.Handle;
+
+        // Gornja traka s tipkom Home (UPGRADE 3): prazan dio radi kao video (klik, dvoklik, desni klik, kotačić).
+        _topBar = new TopBarOverlay { Owner = this };
+        _topBar.UserActivity += (_, _) => RegisterActivity();
+        _topBar.FilesDropped += (_, files) => OpenFiles(files);
+        _topBar.HomeRequested += (_, _) => GoHome();
+        _topBar.BackgroundClick += (_, _) =>
+        {
+            RegisterActivity();
+            _vm.TogglePause();
+        };
+        _topBar.BackgroundDoubleClick += (_, _) =>
+        {
+            // Prvi klik dvoklika je već pauzirao/pokrenuo video; vrati to stanje i promijeni cijeli zaslon (kao na videu).
+            _vm.TogglePause();
+            SetFullscreen(!_vm.IsFullscreen);
+        };
+        _topBar.BackgroundRightClick += (_, _) => ShowContextMenu();
+        _topBar.MouseWheel += (_, delta) =>
+        {
+            _vm.ChangeVolume(delta > 0 ? 5 : -5);
+            RegisterActivity();
+        };
+        _ = _topBar.Handle;
         InitializeLibraryUi();
 
         _uiTimer.Start();
@@ -483,8 +528,10 @@ public partial class MainWindow : Window
             }
 
             MpvConfig.ApplySubtitleOptionsBeforeInit(player, _settings);
+            MpvConfig.ApplyPlaybackOptionsBeforeInit(player, _settings);
             player.LogMessage += Log.Mpv;
             player.Initialize();
+            MpvConfig.CaptureDefaults(player);
             player.RequestLogMessages("warn");
             foreach (var (name, format) in MpvConfig.ObservedProperties)
             {
@@ -546,8 +593,33 @@ public partial class MainWindow : Window
         }
 
         _diag?.OnLoadRequested();
+        _fullscreenOnLoad = _settings.OpenFullscreen && !_options.IsDiagnostics;
         _ = OpenLibraryAsync(files, folders);
         RegisterActivity();
+        RestoreKeyboardFocus();
+    }
+
+    /// <summary>
+    /// Tipka Home (UPGRADE 3): spremi poziciju, zatvori video i vrati početni ekran. Aplikacija ostaje otvorena;
+    /// pri ponovnom otvaranju istog videa nudi se nastavak gledanja. Iz cijelog zaslona vraća se u prozor.
+    /// </summary>
+    internal void GoHome()
+    {
+        if (!_vm.HasMedia)
+        {
+            return;
+        }
+
+        _vm.RefreshPosition();
+        Log.Info($"Povratak na početni ekran: {Path.GetFileName(_vm.CurrentPath)} na {_vm.Position:0.0} s od {_vm.Duration:0.0} s (pozicija se sprema).");
+        _vm.Library.LeaveToHome();
+        _autoSync.Reset();
+        if (_vm.IsFullscreen)
+        {
+            SetFullscreen(false);
+        }
+
+        _vm.Stop();
         RestoreKeyboardFocus();
     }
 
@@ -594,6 +666,7 @@ public partial class MainWindow : Window
                 }
 
                 UpdateCards();
+                ApplyWindowSettings();
                 break;
             case nameof(PlayerViewModel.Title):
                 UpdateTitle();
@@ -644,20 +717,23 @@ public partial class MainWindow : Window
 
         bool show = _vm.HasMedia && IsVisible && WindowState != WindowState.Minimized &&
                     (_options.DiagShowControls || _vm.IsAudioOnly || _vm.IsPaused || _vm.IsScrubbing ||
-                     _contextMenuOpen || _overlay.IsMouseOver ||
+                     _contextMenuOpen || _overlay.IsMouseOver || _topBar?.IsMouseOver == true ||
                      DateTime.UtcNow - _lastActivity < HideControlsAfter);
 
         if (show != _overlayVisible)
         {
             _overlayVisible = show;
+            // Home (gornja traka) i donje kontrole uvijek se prikazuju i skrivaju zajedno.
             if (show)
             {
                 UpdateOverlayBounds();
                 _overlay.Show();
+                _topBar?.Show();
             }
             else
             {
                 _overlay.Hide();
+                _topBar?.Hide();
             }
 
             ApplySubtitleMargin();
@@ -703,6 +779,13 @@ public partial class MainWindow : Window
         int height = Math.Min(areaHeight, (int)Math.Round(OverlayHeightDip * scale));
         SetWindowPos(_overlay.Handle, 0, x, y + areaHeight - height, width, height,
             SWP_NOACTIVATE | SWP_NOZORDER | SWP_NOOWNERZORDER);
+        if (_topBar != null)
+        {
+            // Gornja traka: uz gornji rub videa (Home gore lijevo), najviše trećina visine videa.
+            int topHeight = Math.Max(1, Math.Min(areaHeight / 3, (int)Math.Round(TopBarHeightDip * scale)));
+            SetWindowPos(_topBar.Handle, 0, x, y, width, topHeight, SWP_NOACTIVATE | SWP_NOZORDER | SWP_NOOWNERZORDER);
+        }
+
         if (_cards != null)
         {
             SetWindowPos(_cards.Handle, 0, x, y, width, areaHeight, SWP_NOACTIVATE | SWP_NOZORDER | SWP_NOOWNERZORDER);
@@ -882,6 +965,7 @@ public partial class MainWindow : Window
         bool ctrl = mods.HasFlag(ModifierKeys.Control);
         bool shift = mods.HasFlag(ModifierKeys.Shift);
         double step = ctrl ? 10 : shift ? 1000 : 100;
+        int seek = Math.Clamp(_settings.SeekStepSeconds, 1, 60);
         SubtitleController subs = _vm.Subtitles;
         switch (key)
         {
@@ -913,10 +997,10 @@ public partial class MainWindow : Window
                 _vm.TogglePause();
                 return true;
             case Key.Left:
-                _vm.SeekRelative(ctrl ? -30 : -5);
+                _vm.SeekRelative(ctrl ? -seek * 6 : -seek);
                 return true;
             case Key.Right:
-                _vm.SeekRelative(ctrl ? 30 : 5);
+                _vm.SeekRelative(ctrl ? seek * 6 : seek);
                 return true;
             case Key.Up:
                 _vm.ChangeVolume(5);

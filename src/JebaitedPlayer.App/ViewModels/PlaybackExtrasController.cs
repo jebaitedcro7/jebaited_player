@@ -143,6 +143,7 @@ public sealed class PlaybackExtrasController(AppSettings settings, PlayerViewMod
     public void Attach(MpvPlayer player)
     {
         _player = player;
+        ApplyAspect(settings.DefaultAspect, announce: false);
         player.PropertyChanged += (_, e) =>
         {
             switch (e.Name)
@@ -288,7 +289,10 @@ public sealed class PlaybackExtrasController(AppSettings settings, PlayerViewMod
 
     // --- Omjer slike ---------------------------------------------------------------------------------------------
 
-    public void SetAspect(string mode)
+    public void SetAspect(string mode) => ApplyAspect(mode, announce: true);
+
+    /// <summary>Omjer slike; bez poruke na videu kad dolazi iz postavki (zadani omjer, UPGRADE 3).</summary>
+    public void ApplyAspect(string mode, bool announce)
     {
         if (_player is null || AspectModes.All(m => m.Value != mode))
         {
@@ -298,7 +302,10 @@ public sealed class PlaybackExtrasController(AppSettings settings, PlayerViewMod
         _player.SetPropertyAsync("video-aspect-override", mode is "auto" or "fill" ? "-1" : mode);
         _player.SetPropertyAsync("panscan", mode == "fill" ? 1.0 : 0.0);
         AspectMode = mode;
-        vm.ShowOsd(Loc.T("osd.aspect", AspectName));
+        if (announce)
+        {
+            vm.ShowOsd(Loc.T("osd.aspect", AspectName));
+        }
     }
 
     /// <summary>Tipka O: sljedeći omjer slike.</summary>

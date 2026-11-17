@@ -195,8 +195,10 @@
                         <TextBlock Text="&#xE706;" FontFamily="{DynamicResource IconFont}" FontSize="14" VerticalAlignment="Center"
                                    Foreground="{DynamicResource TextSecondaryBrush}" />
                     </StackPanel>
-                    <TextBlock DockPanel.Dock="Right" Text="{Binding VersionText}" FontSize="11" VerticalAlignment="Center"
-                               Foreground="{DynamicResource TextSecondaryBrush}" />
+                    <!-- Broj verzije: klik otvara povijest nadogradnji (UPGRADE 3). -->
+                    <Button x:Name="VersionButton" DockPanel.Dock="Right" Style="{StaticResource LinkButton}" Content="{Binding VersionText}"
+                            FontSize="11" VerticalAlignment="Center" Click="OnVersionClick"
+                            ToolTip="{loc:T history.versionTooltip}" AutomationProperties.Name="{loc:T history.versionTooltip}" />
                 </DockPanel>
             </Grid>
         </Grid>

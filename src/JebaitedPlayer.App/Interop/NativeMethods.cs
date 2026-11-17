@@ -155,6 +155,37 @@ internal static class NativeMethods
     [DllImport("shell32.dll")]
     public static extern void DragFinish(nint hDrop);
 
+    [DllImport("user32.dll")]
+    public static extern bool SetCursorPos(int x, int y);
+
+    /// <summary>Dijagnostika (UPGRADE 3): pritisak ili otpuštanje lijeve tipke miša na mjestu kursora (pravi ulaz, kao korisnik).</summary>
+    public static void MouseButton(bool down)
+    {
+        var input = new INPUT { type = 0, mi = new MOUSEINPUT { dwFlags = down ? 0x0002u : 0x0004u } };
+        SendInput(1, [input], Marshal.SizeOf<INPUT>());
+    }
+
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern uint SendInput(uint count, INPUT[] inputs, int size);
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct INPUT
+    {
+        public uint type;
+        public MOUSEINPUT mi;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct MOUSEINPUT
+    {
+        public int dx;
+        public int dy;
+        public uint mouseData;
+        public uint dwFlags;
+        public uint time;
+        public nint dwExtraInfo;
+    }
+
     [DllImport("dwmapi.dll")]
     public static extern int DwmSetWindowAttribute(nint hwnd, int attribute, ref int value, int size);
 }

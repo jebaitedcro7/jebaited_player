@@ -42,6 +42,7 @@ public sealed class PlayerViewModel : ObservableObject
         {
             AutoPlayNext = settings.AutoPlayNext,
             UpNextDelaySeconds = Math.Clamp(settings.UpNextSeconds, 3, 60),
+            ResumeMode = settings.ResumeMode,
         };
         Extras = new PlaybackExtrasController(settings, this, store);
         PlayPauseCommand = new RelayCommand(TogglePause, () => HasMedia);
@@ -304,6 +305,29 @@ public sealed class PlayerViewModel : ObservableObject
     }
 
     public void SetPaused(bool paused) => _player?.SetPropertyAsync("pause", paused);
+
+    /// <summary>
+    /// Zatvori trenutni video i vrati se na početni ekran (tipka Home). mpv ostaje pokrenut (sljedeće otvaranje je odmah).
+    /// Poziciju prije toga sprema <see cref="LibraryController.LeaveToHome"/>.
+    /// </summary>
+    public void Stop()
+    {
+        if (_player is null || !HasMedia)
+        {
+            return;
+        }
+
+        _player.CommandAsync("stop");
+        CurrentPath = null;
+        _titleOverride = null;
+        _eofReached = false;
+        IsLoading = false;
+        IsScrubbing = false;
+        IsAudioOnly = false;
+        HasMedia = false;
+        Position = 0;
+        Duration = 0;
+    }
 
     public void TogglePause()
     {

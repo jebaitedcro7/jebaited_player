@@ -1,28 +1,15 @@
-<Window x:Class="JebaitedPlayer.Views.SubtitleSettingsWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:loc="clr-namespace:JebaitedPlayer.Infrastructure"
-        Title="{loc:T subSettings.title}"
-        SizeToContent="WidthAndHeight" ResizeMode="NoResize" ShowInTaskbar="False"
-        WindowStartupLocation="CenterOwner"
-        Background="{DynamicResource WindowBackgroundBrush}"
-        Foreground="{DynamicResource TextPrimaryBrush}"
-        FontFamily="{DynamicResource UiFont}" FontSize="13" UseLayoutRounding="True">
+<UserControl x:Class="JebaitedPlayer.Views.SubtitleSettingsPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="clr-namespace:JebaitedPlayer.Infrastructure">
 
-    <!-- Gumbi su uvijek vidljivi; ostatak se pomiče ako prozor ne stane na zaslon. -->
-    <DockPanel>
-        <DockPanel DockPanel.Dock="Bottom" LastChildFill="False" Margin="22,0,22,16">
-            <Border DockPanel.Dock="Top" Height="1" Background="{DynamicResource MenuBorderBrush}" Margin="0,0,0,14" />
-            <Button DockPanel.Dock="Left" Style="{StaticResource SecondaryButton}" Content="{loc:T subSettings.resetStyle}" Click="OnResetStyle" />
-            <Button DockPanel.Dock="Right" Style="{StaticResource SecondaryButton}" Content="{loc:T common.close}" Click="OnClose" Margin="0,0,0,6" />
-        </DockPanel>
-    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
-    <StackPanel Margin="22,10,22,16" Width="440">
+    <!-- Postavke titlova (kartica "Titlovi"): jezici i prioritet, automatika, izvori, kodiranje, izgled i sinkronizacija.
+         Sve se primjenjuje odmah. -->
+    <StackPanel>
         <!-- Jezici -->
-        <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T subSettings.languages}" />
-        <TextBlock Style="{StaticResource HintText}"
-                   Text="{loc:T subSettings.languagesHint}" />
-        <Grid Margin="0,10,0,0">
+        <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T subSettings.languages}" Margin="0,8,0,2" />
+        <TextBlock Style="{StaticResource HintText}" Text="{loc:T subSettings.languagesHint}" />
+        <Grid Margin="0,10,0,0" Width="460" HorizontalAlignment="Left">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
@@ -35,15 +22,31 @@
                 <Button x:Name="AddLanguageButton" Style="{StaticResource SecondaryButton}" Content="{loc:T subSettings.addLanguage}" Click="OnAddLanguage" Margin="0" />
             </StackPanel>
         </Grid>
-        <CheckBox x:Name="AutoLoadBox" Content="{loc:T subSettings.autoLoad}" Margin="0,12,0,0" />
-        <CheckBox x:Name="AutoSyncBox" Content="{loc:T subSettings.autoSync}" Margin="0,6,0,0" />
+
+        <!-- Automatika -->
+        <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T sources.automatic}" Margin="0,24,0,2" />
+        <CheckBox x:Name="AutoLoadBox" Content="{loc:T subSettings.autoLoad}" />
+        <CheckBox x:Name="AutoSearchBox" Content="{loc:T sources.autoSearch}" />
+        <CheckBox x:Name="SaveNextBox" Content="{loc:T sources.saveNext}" />
+
+        <!-- Izvori na internetu -->
+        <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T subSettings.sources}" Margin="0,24,0,2" />
+        <TextBlock Style="{StaticResource HintText}" Text="{loc:T subSettings.sourcesHint}" />
+        <WrapPanel Margin="0,8,0,0">
+            <Button Style="{StaticResource SecondaryButton}" Content="{loc:T settings.sources}" Click="OnSources" />
+            <Button Style="{StaticResource SecondaryButton}" Content="{loc:T settings.onlineGuide}" Click="OnOnlineSetup" />
+        </WrapPanel>
+
+        <!-- Kodiranje -->
+        <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T subSettings.encoding}" Margin="0,24,0,2" />
+        <Button x:Name="EncodingButton" Style="{StaticResource ChoiceButton}" Click="OnEncodingClick" MinWidth="320" />
+        <TextBlock Style="{StaticResource HintText}" Text="{loc:T subSettings.encodingHint}" Margin="0,6,0,0" />
 
         <!-- Izgled -->
-        <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T settings.appearance}" Margin="0,22,0,2" />
-        <TextBlock Style="{StaticResource HintText}"
-                   Text="{loc:T subSettings.styleHint}" />
+        <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T subSettings.style}" Margin="0,24,0,2" />
+        <TextBlock Style="{StaticResource HintText}" Text="{loc:T subSettings.styleHint}" />
 
-        <Grid Margin="0,12,0,0">
+        <Grid Margin="0,12,0,0" Width="460" HorizontalAlignment="Left">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" MinWidth="110" />
                 <ColumnDefinition Width="*" />
@@ -58,8 +61,8 @@
             </Grid.RowDefinitions>
 
             <TextBlock Text="{loc:T subSettings.font}" VerticalAlignment="Center" Margin="0,0,12,8" />
-            <Button x:Name="FontButton" Grid.Column="1" Grid.ColumnSpan="2" Style="{StaticResource SecondaryButton}"
-                    HorizontalContentAlignment="Left" Click="OnChooseFont" Margin="0,0,0,8" />
+            <Button x:Name="FontButton" Grid.Column="1" Grid.ColumnSpan="2" Style="{StaticResource ChoiceButton}"
+                    Click="OnChooseFont" Margin="0,0,0,8" MinWidth="0" HorizontalAlignment="Stretch" />
 
             <TextBlock Grid.Row="1" Text="{loc:T subSettings.size}" VerticalAlignment="Center" Margin="0,0,12,0" />
             <Slider x:Name="SizeSlider" Grid.Row="1" Grid.Column="1" Style="{StaticResource PlayerSlider}" Minimum="24" Maximum="80"
@@ -85,7 +88,12 @@
 
         <CheckBox x:Name="BoldBox" Content="{loc:T subSettings.bold}" Margin="0,12,0,0" />
         <CheckBox x:Name="BackgroundBox" Content="{loc:T subSettings.background}" />
+        <Button Style="{StaticResource SecondaryButton}" Content="{loc:T subSettings.resetStyle}" Click="OnResetStyle"
+                HorizontalAlignment="Left" Margin="0,12,0,0" />
+
+        <!-- Sinkronizacija -->
+        <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T subSettings.sync}" Margin="0,24,0,2" />
+        <CheckBox x:Name="AutoSyncBox" Content="{loc:T subSettings.autoSync}" />
+        <TextBlock Style="{StaticResource HintText}" Text="{loc:T subSettings.syncHint}" Margin="0,8,0,0" />
     </StackPanel>
-    </ScrollViewer>
-    </DockPanel>
-</Window>
+</UserControl>

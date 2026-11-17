@@ -13,7 +13,6 @@ namespace JebaitedPlayer;
 public partial class MainWindow
 {
     private SubtitleSyncWindow? _syncWindow;
-    private SubtitleSettingsWindow? _subtitleSettingsWindow;
 
     private void ShowContextMenu()
     {
@@ -22,6 +21,11 @@ public partial class MainWindow
         menu.Items.Add(Item(Loc.T("menu.openFolder"), "Ctrl+Shift+O", ShowOpenFolderDialog));
         menu.Items.Add(Item(Loc.T("menu.playPause"), Loc.T("key.space"), _vm.TogglePause, _vm.HasMedia));
         menu.Items.Add(Item(Loc.T("menu.fullscreen"), "F", () => SetFullscreen(!_vm.IsFullscreen)));
+        if (_vm.HasMedia)
+        {
+            menu.Items.Add(Item(Loc.T("menu.goHome"), null, GoHome));
+        }
+
         menu.Items.Add(new Separator());
         if (_vm.HasMedia && _vm.Library.HasPlaylist)
         {
@@ -114,25 +118,6 @@ public partial class MainWindow
 
         items.Add(new Separator());
         items.Add(Item(Loc.T("menu.nextAspect"), "O", extras.CycleAspect));
-    }
-
-    private PlayerSettingsWindow? _playerSettingsWindow;
-
-    private void ShowPlayerSettings()
-    {
-        if (_playerSettingsWindow is { IsLoaded: true })
-        {
-            _playerSettingsWindow.Activate();
-            return;
-        }
-
-        _playerSettingsWindow = new PlayerSettingsWindow(_settings, _vm, ShowSubtitleSettings, ShowSourcesWindow, () => ShowOnlineSetup(), Updates, RestartForUpdate) { Owner = this };
-        _playerSettingsWindow.Closed += (_, _) =>
-        {
-            _playerSettingsWindow = null;
-            Activate();
-        };
-        _playerSettingsWindow.Show();
     }
 
     private void ShowSubtitleMenu(FrameworkElement placementTarget)
@@ -332,7 +317,7 @@ public partial class MainWindow
         // Dugi nazivi (npr. puno ime datoteke titla) skraćuju se s "…", a puni naziv je u oblačiću: preširok izbornik ne stane
         // pokraj glavnog, pa ga Windows prebaci preko njega i "desno" više nema ničega.
         object content = header.Length <= 60
-            ? header
+            ? header.Replace("_", "__", StringComparison.Ordinal) // "_" bi inače bio pristupna tipka (nestao bi iz naziva)
             : new TextBlock { Text = header, TextTrimming = TextTrimming.CharacterEllipsis, MaxWidth = 420 };
         var item = new HoverIntentMenuItem
         {
@@ -383,22 +368,5 @@ public partial class MainWindow
             Activate();
         };
         _syncWindow.Show();
-    }
-
-    private void ShowSubtitleSettings()
-    {
-        if (_subtitleSettingsWindow is { IsLoaded: true })
-        {
-            _subtitleSettingsWindow.Activate();
-            return;
-        }
-
-        _subtitleSettingsWindow = new SubtitleSettingsWindow(_settings, _vm.Subtitles) { Owner = this };
-        _subtitleSettingsWindow.Closed += (_, _) =>
-        {
-            _subtitleSettingsWindow = null;
-            Activate();
-        };
-        _subtitleSettingsWindow.Show();
     }
 }

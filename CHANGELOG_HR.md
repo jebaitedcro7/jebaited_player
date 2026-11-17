@@ -1,0 +1,87 @@
+# Povijest promjena
+
+Sve važnije promjene jebaited_playera. Oblik: [Keep a Changelog](https://keepachangelog.com/hr/1.1.0/); verzije po [Semantic Versioning](https://semver.org/lang/hr/) (MAJOR = velike promjene koje mogu utjecati na kompatibilnost, MINOR = nove funkcionalnosti, PATCH = popravci i manja poboljšanja).
+
+Drugi jezici: [English](CHANGELOG.md) · [Deutsch](CHANGELOG_DE.md). Ista povijest je i u playeru (klik na broj verzije na početnom ekranu). Ova datoteka nastaje iz `src/JebaitedPlayer.App/History/update-history.json`.
+
+## [1.2.0] - 2026-11-17
+
+Kontrole playera, postavke u karticama i povijest nadogradnji.
+
+### Novo
+
+- Tipka Početna gore lijevo u playeru: povratak na početni ekran bez zatvaranja aplikacije. Pozicija se sprema, pa možeš nastaviti gledati kasnije. Pojavljuje se i skriva zajedno s ostalim kontrolama, i u cijelom zaslonu.
+- Vremenska traka: klikni bilo gdje i reprodukcija odmah skoči na to mjesto. Povlačenje i dalje radi, a oblačić pokazuje vrijeme ispod miša.
+- Postavke su sada podijeljene u kartice: Općenito, Jezik, Titlovi, Zvuk, Slika, Izgled, Nadogradnje i O aplikaciji.
+- Nove postavke: što se događa kad ponovno otvoriš video (pitaj, nastavi ili od početka), korak premotavanja strelicama, otvaranje videa u cijelom zaslonu, player uvijek iznad ostalih prozora, željeni jezik zvuka, izlazni uređaj zvuka, kašnjenje zvuka, ujednačavanje glasnoće, hardversko dekodiranje, kvaliteta slike, zadani omjer slike, HDR prolaz, koliko dugo su kontrole vidljive i kodiranje starih titlova.
+- Povijest nadogradnji: klikni na broj verzije na početnom ekranu. Uključena je u aplikaciju, pa radi i bez interneta; kad si na mreži, prikazuju se i novije verzije s GitHuba.
+
+### Poboljšano
+
+- Klik na vremensku traku odmah precizno premota (bez drugog skoka). Traku je lakše pogoditi i pod mišem postaje deblja.
+- „Natrag na početni ekran” je i u izborniku desnog klika.
+- Pravila potpisivanja koda, izjava o privatnosti i automatske izrade na GitHub Actions, kao priprema za besplatno potpisivanje preko SignPath Foundationa.
+
+### Poznati problemi
+
+- Aplikacija još nije digitalno potpisana, pa Windows SmartScreen ili Smart App Control mogu upozoriti prije instalacije.
+- Prozor napretka instalacije je Velopackov i samo je na engleskom.
+
+Izdanje: [v1.2.0](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v1.2.0) · Promjene od [v1.1.0...v1.2.0](https://github.com/jebaitedcro7/jebaited_player/compare/v1.1.0...v1.2.0)
+
+## [1.1.0] - 2026-11-17
+
+Jezici, novi početni ekran, teme i priručnici.
+
+### Novo
+
+- Sučelje na engleskom, njemačkom i hrvatskom, a pod „Više jezika” i bosanski, srpski (latinica) i slovenski. Prevedeni su svi izbornici, postavke, poruke, greške, sinkronizacija, titlovi s interneta, popis epizoda i povijest.
+- Odabir jezika pri prvom pokretanju (odmah nakon instalacije); bez odabira ostaje engleski. Jezik se mijenja u Postavkama, odmah i bez ponovnog pokretanja, i pamti se.
+- Novi početni ekran: Alien logo i ime jebaited_cro, diskretna svemirska pozadina, zupčanik za Postavke dolje lijevo i prekidač tamna/svijetla tema.
+- Priručnici na tri jezika (Quick Start, Basic Guide, Advanced Guide) sa snimkama zaslona: README_EN, README_DE i README_HR.
+
+### Poboljšano
+
+- Nova instalacija dobiva zadane jezike titlova prema odabranom jeziku. Postojeće postavke, povijest gledanja i ključevi ostaju.
+
+### Poznati problemi
+
+- Prozor napretka instalacije je Velopackov i samo je na engleskom.
+- Aplikacija još nije digitalno potpisana, pa Windows SmartScreen ili Smart App Control mogu upozoriti prije instalacije.
+
+Izdanje: [v1.1.0](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v1.1.0) · Promjene od [v1.0.1...v1.1.0](https://github.com/jebaitedcro7/jebaited_player/compare/v1.0.1...v1.1.0)
+
+## [1.0.1] - 2026-11-17
+
+Provjera automatskih nadogradnji. Player radi isto kao u 1.0.0.
+
+### Poboljšano
+
+- Provjerene automatske nadogradnje s GitHuba: verzija 1.0.0 sama se nadogradi na 1.0.1, a postavke i povijest gledanja ostaju.
+
+### Poznati problemi
+
+- Aplikacija još nije digitalno potpisana, pa Windows SmartScreen ili Smart App Control mogu upozoriti prije instalacije.
+
+Izdanje: [v1.0.1](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v1.0.1) · Promjene od [v1.0.0...v1.0.1](https://github.com/jebaitedcro7/jebaited_player/compare/v1.0.0...v1.0.1)
+
+## [1.0.0] - 2026-11-17
+
+Prvo javno izdanje.
+
+### Novo
+
+- Reprodukcija gotovo svih video i audio formata (mpv): H.264, HEVC, AV1, VP9, 4K, HDR, 5.1 zvuk i hardversko dekodiranje.
+- Titlovi s interneta: OpenSubtitles, SubDL i Titlovi.com; titlovi za tvoje izdanje biraju se automatski i spremaju uz video.
+- Sinkronizacija prema govoru: pomak, brzina (25 / 23,976 fps) i ispravak po dijelovima za drugu montažu; titlovi druge epizode se odbijaju.
+- Ručna sinkronizacija: pomak, postupno kašnjenje, poravnanje po replici (bez žurbe) i Z/X.
+- Serije: popis epizoda, nastavak gledanja i sljedeća epizoda.
+- Vodič za titlove s interneta: otvori registraciju, provjeri i spremi podatke (kriptirano).
+- Windows: jedna instanca (nova datoteka ide u otvoreni player), više datoteka odjednom, „Otvori pomoću”, registracija formata i postavljanje zadanog playera kroz Postavke sustava Windows.
+- Instalacija bez administratora, prečaci i automatske nadogradnje (instaliraju se pri zatvaranju playera); postavke i povijest ostaju.
+
+### Poznati problemi
+
+- Aplikacija još nije digitalno potpisana, pa Windows SmartScreen ili Smart App Control mogu upozoriti prije instalacije.
+
+Izdanje: [v1.0.0](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v1.0.0)

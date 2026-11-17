@@ -8,20 +8,25 @@ using JebaitedPlayer.ViewModels;
 
 namespace JebaitedPlayer.Views;
 
-/// <summary>Postavke titlova: prioritet jezika, automatsko učitavanje i izgled. Sve se primjenjuje odmah.</summary>
-public partial class SubtitleSettingsWindow : Window
+/// <summary>
+/// Postavke titlova u kartici "Titlovi" (UPGRADE 3; prije zaseban prozor): prioritet jezika (prvi = zadani), automatsko
+/// učitavanje i traženje, izvori na internetu, kodiranje starih titlova, izgled i sinkronizacija. Sve se primjenjuje odmah.
+/// </summary>
+public partial class SubtitleSettingsPanel : UserControl
 {
     private readonly AppSettings _settings;
     private readonly SubtitleController _subtitles;
+    private readonly Action _openSources;
+    private readonly Action _openOnlineSetup;
     private bool _loading = true;
 
-    public SubtitleSettingsWindow(AppSettings settings, SubtitleController subtitles)
+    public SubtitleSettingsPanel(AppSettings settings, SubtitleController subtitles, Action openSources, Action openOnlineSetup)
     {
         _settings = settings;
         _subtitles = subtitles;
+        _openSources = openSources;
+        _openOnlineSetup = openOnlineSetup;
         InitializeComponent();
-        WindowTheme.UseDarkTitleBar(this);
-        MaxHeight = Math.Max(400, SystemParameters.WorkArea.Height - 24);
 
         foreach (var (nameKey, color) in SubtitleStyleSettings.Colors)
         {
@@ -37,12 +42,15 @@ public partial class SubtitleSettingsWindow : Window
         }
 
         LoadFromSettings();
-        this.OnLanguageChanged(() => RefreshLanguages(LanguageList.SelectedIndex));
 
         AutoLoadBox.Checked += (_, _) => _settings.AutoLoadSubtitles = true;
         AutoLoadBox.Unchecked += (_, _) => _settings.AutoLoadSubtitles = false;
         AutoSyncBox.Checked += (_, _) => _settings.AutoSyncSubtitles = true;
         AutoSyncBox.Unchecked += (_, _) => _settings.AutoSyncSubtitles = false;
+        AutoSearchBox.Checked += (_, _) => _settings.Online.AutoSearch = true;
+        AutoSearchBox.Unchecked += (_, _) => _settings.Online.AutoSearch = false;
+        SaveNextBox.Checked += (_, _) => _settings.Online.SaveNextToVideo = true;
+        SaveNextBox.Unchecked += (_, _) => _settings.Online.SaveNextToVideo = false;
         SizeSlider.ValueChanged += (_, e) => UpdateStyle(s => s.FontSize = Math.Round(e.NewValue));
         OutlineSlider.ValueChanged += (_, e) => UpdateStyle(s => s.OutlineSize = Math.Round(e.NewValue * 2) / 2);
         PositionSlider.ValueChanged += (_, e) => UpdateStyle(s => s.Position = Math.Round(e.NewValue));
@@ -50,8 +58,14 @@ public partial class SubtitleSettingsWindow : Window
         BoldBox.Unchecked += (_, _) => UpdateStyle(s => s.Bold = false);
         BackgroundBox.Checked += (_, _) => UpdateStyle(s => s.BackgroundBox = true);
         BackgroundBox.Unchecked += (_, _) => UpdateStyle(s => s.BackgroundBox = false);
-        Closed += (_, _) => _settings.Save();
         _loading = false;
+    }
+
+    /// <summary>Promjena jezika sučelja: nazivi jezika i kodiranja na novom jeziku.</summary>
+    public void RefreshTexts()
+    {
+        RefreshLanguages(LanguageList.SelectedIndex);
+        UpdateEncodingText();
     }
 
     private void LoadFromSettings()
@@ -60,6 +74,9 @@ public partial class SubtitleSettingsWindow : Window
         RefreshLanguages();
         AutoLoadBox.IsChecked = _settings.AutoLoadSubtitles;
         AutoSyncBox.IsChecked = _settings.AutoSyncSubtitles;
+        AutoSearchBox.IsChecked = _settings.Online.AutoSearch;
+        SaveNextBox.IsChecked = _settings.Online.SaveNextToVideo;
+        UpdateEncodingText();
 
         SubtitleStyleSettings s = _settings.SubtitleStyle;
         FontButton.Content = s.FontName;
@@ -76,6 +93,9 @@ public partial class SubtitleSettingsWindow : Window
 
         _loading = false;
     }
+
+    private void UpdateEncodingText() =>
+        EncodingButton.Content = _settings.SubtitleCodePage is int cp ? SubtitleEncoding.NameOf(cp) : Loc.T("menu.encodingAuto");
 
     private void RefreshLanguages(int select = -1)
     {
@@ -144,6 +164,30 @@ public partial class SubtitleSettingsWindow : Window
         }
     }
 
+    private void OnEncodingClick(object sender, RoutedEventArgs e)
+    {
+        var menu = new ContextMenu { PlacementTarget = EncodingButton, Placement = PlacementMode.Bottom };
+        var auto = new MenuItem { Header = Loc.T("menu.encodingAuto"), IsChecked = _settings.SubtitleCodePage is null };
+        auto.Click += (_, _) => SetEncoding(null);
+        menu.Items.Add(auto);
+        foreach (var (codePage, name) in SubtitleEncoding.ManualChoices.Where(c => c.CodePage is not (65001 or 1200 or 1201)))
+        {
+            int cp = codePage;
+            var item = new MenuItem { Header = name, IsChecked = _settings.SubtitleCodePage == cp };
+            item.Click += (_, _) => SetEncoding(cp);
+            menu.Items.Add(item);
+        }
+
+        menu.IsOpen = true;
+    }
+
+    private void SetEncoding(int? codePage)
+    {
+        _settings.SubtitleCodePage = codePage;
+        Services.SubtitleService.FallbackCodePage = codePage;
+        UpdateEncodingText();
+    }
+
     private void OnChooseFont(object sender, RoutedEventArgs e)
     {
         var menu = new ContextMenu { PlacementTarget = FontButton, Placement = PlacementMode.Bottom };
@@ -173,7 +217,9 @@ public partial class SubtitleSettingsWindow : Window
         _subtitles.ApplyStyle();
     }
 
-    private void OnClose(object sender, RoutedEventArgs e) => Close();
+    private void OnSources(object sender, RoutedEventArgs e) => _openSources();
+
+    private void OnOnlineSetup(object sender, RoutedEventArgs e) => _openOnlineSetup();
 
     private void UpdateStyle(Action<SubtitleStyleSettings> change)
     {

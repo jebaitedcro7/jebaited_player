@@ -1,26 +1,87 @@
-# Promjene
+# Changelog
 
-## 1.1.0
+All notable changes to jebaited_player. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [Semantic Versioning](https://semver.org/) (MAJOR = big changes that may break compatibility, MINOR = new features, PATCH = bug fixes and small improvements).
 
-- Jezici: sučelje na engleskom, njemačkom i hrvatskom, a pod „Više jezika” bosanski, srpski (latinica) i slovenski. Prevedeni su svi izbornici, postavke, poruke, greške, sinkronizacija, titlovi s interneta, popis epizoda i povijest.
-- Odabir jezika pri prvom pokretanju (odmah nakon instalacije); bez odabira ostaje engleski. Jezik se mijenja u Postavkama, odmah i bez ponovnog pokretanja, i pamti se.
-- Novi početni ekran: Alien logo i ime jebaited_cro, diskretna svemirska pozadina, zupčanik za Postavke dolje lijevo i prekidač tamna/svijetla tema.
-- Priručnici na tri jezika (Quick Start, Basic Guide, Advanced Guide) sa snimkama zaslona: README_EN, README_DE, README_HR.
-- Nova instalacija dobiva zadane jezike titlova prema odabranom jeziku. Postojeće postavke, povijest gledanja i ključevi ostaju.
+Other languages: [Deutsch](CHANGELOG_DE.md) · [Hrvatski](CHANGELOG_HR.md). The same history is included in the player (click the version number on the home screen). This file is generated from `src/JebaitedPlayer.App/History/update-history.json`.
 
-## 1.0.1
+## [1.2.0] - 2026-11-17
 
-- Provjera automatskih nadogradnji (1.0.0 → 1.0.1). Rad playera se ne mijenja.
+Player controls, settings in tabs and the update history.
 
-## 1.0.0
+### Added
 
-Prvo javno izdanje.
+- Home button at the top left of the player: back to the home screen without closing the app. The position is saved, so you can continue watching later. It shows and hides together with the other controls, also in full screen.
+- Timeline: click anywhere to jump there right away. Dragging still works, and a bubble shows the time under the mouse.
+- Settings are now split into tabs: General, Language, Subtitles, Audio, Video, Appearance, Updates and About.
+- New settings: what happens when you reopen a video (ask, resume or start from the beginning), seek step for the arrow keys, open videos in full screen, keep the player on top, preferred audio language, audio output device, audio delay, volume levelling, hardware decoding, picture quality, default aspect ratio, HDR passthrough, how long the controls stay visible and the encoding for old subtitles.
+- Update history: click the version number on the home screen. It is included in the app, so it works without the internet; when you are online, newer versions from GitHub are shown too.
 
-- Reprodukcija gotovo svih video i audio formata (mpv): H.264, HEVC, AV1, VP9, 4K, HDR, 5.1 zvuk, hardversko dekodiranje.
-- Titlovi s interneta: OpenSubtitles, SubDL i Titlovi.com; automatski odabir titlova za tvoje izdanje i spremanje uz video.
-- Sinkronizacija prema govoru: pomak, brzina (25 / 23,976 fps) i ispravak po dijelovima za drugu montažu; titlovi druge epizode se odbijaju.
-- Ručna sinkronizacija: pomak, postupno kašnjenje, poravnanje po replici (bez žurbe) i Z/X.
-- Serije: popis epizoda, nastavak gledanja, sljedeća epizoda.
-- Vodič za titlove s interneta: otvori registraciju, provjeri i spremi podatke (kriptirano).
-- Windows: jedna instanca (nova datoteka ide u otvoreni player), više datoteka odjednom, „Otvori pomoću”, registracija formata, postavljanje zadanog playera kroz Postavke sustava Windows.
-- Instalacija bez administratora, prečaci, automatske nadogradnje (instaliraju se pri zatvaranju playera); postavke i povijest ostaju.
+### Improved
+
+- A click on the timeline seeks precisely at once (no second jump). The timeline is easier to hit and gets thicker under the mouse.
+- “Back to the home screen” is also in the right-click menu.
+- Code signing policy, privacy statement and automatic builds on GitHub Actions, as preparation for free code signing by SignPath Foundation.
+
+### Known issues
+
+- The app is not digitally signed yet, so Windows SmartScreen or Smart App Control may warn before the installation.
+- The progress window of the installer comes from Velopack and is only in English.
+
+Release: [v1.2.0](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v1.2.0) · Changes since [v1.1.0...v1.2.0](https://github.com/jebaitedcro7/jebaited_player/compare/v1.1.0...v1.2.0)
+
+## [1.1.0] - 2026-11-17
+
+Languages, a new home screen, themes and manuals.
+
+### Added
+
+- Interface in English, German and Croatian; under “More languages” also Bosnian, Serbian (Latin) and Slovenian. All menus, settings, messages, errors, sync, online subtitles, the episode list and the history are translated.
+- Language choice on the first start (right after the installation); without a choice, English stays. The language can be changed in Settings at once, without a restart, and is remembered.
+- New home screen: the Alien logo and the name jebaited_cro, a discreet space background, a gear for Settings at the bottom left and a dark/light theme switch.
+- Manuals in three languages (Quick Start, Basic Guide, Advanced Guide) with screenshots: README_EN, README_DE and README_HR.
+
+### Improved
+
+- A new installation gets default subtitle languages that match the chosen language. Existing settings, watch history and keys are kept.
+
+### Known issues
+
+- The progress window of the installer comes from Velopack and is only in English.
+- The app is not digitally signed yet, so Windows SmartScreen or Smart App Control may warn before the installation.
+
+Release: [v1.1.0](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v1.1.0) · Changes since [v1.0.1...v1.1.0](https://github.com/jebaitedcro7/jebaited_player/compare/v1.0.1...v1.1.0)
+
+## [1.0.1] - 2026-11-17
+
+Check of the automatic updates. The player works the same as in 1.0.0.
+
+### Improved
+
+- Verified automatic updates from GitHub: version 1.0.0 updates itself to 1.0.1, and settings and watch history are kept.
+
+### Known issues
+
+- The app is not digitally signed yet, so Windows SmartScreen or Smart App Control may warn before the installation.
+
+Release: [v1.0.1](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v1.0.1) · Changes since [v1.0.0...v1.0.1](https://github.com/jebaitedcro7/jebaited_player/compare/v1.0.0...v1.0.1)
+
+## [1.0.0] - 2026-11-17
+
+First public release.
+
+### Added
+
+- Plays almost every video and audio format (mpv): H.264, HEVC, AV1, VP9, 4K, HDR, 5.1 sound and hardware decoding.
+- Subtitles from the internet: OpenSubtitles, SubDL and Titlovi.com; the subtitles for your release are chosen automatically and saved next to the video.
+- Sync to the speech: offset, speed (25 / 23.976 fps) and a piecewise correction for a different cut; subtitles for another episode are rejected.
+- Manual sync: offset, gradual delay, alignment by line (without hurry) and Z/X.
+- Series: episode list, continue watching and the next episode.
+- Guide for subtitles from the internet: opens the sign-up, checks and saves your details (encrypted).
+- Windows: a single instance (a new file goes to the open player), several files at once, “Open with”, file type registration and setting the default player through Windows Settings.
+- Installation without administrator rights, shortcuts and automatic updates (installed when the player closes); settings and history are kept.
+
+### Known issues
+
+- The app is not digitally signed yet, so Windows SmartScreen or Smart App Control may warn before the installation.
+
+Release: [v1.0.0](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v1.0.0)

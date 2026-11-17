@@ -28,6 +28,14 @@ Each manual has three parts: **Quick Start**, **Basic Guide** and **Advanced Gui
 
 The interface is available in English, Deutsch, Hrvatski, Bosanski, Srpski (latinica) and Slovenščina; you choose the language on first start and can change it any time in Settings.
 
+The releases are **not code signed yet**, so Windows SmartScreen may warn and Smart App Control may block the installer. Please do not turn Smart App Control off; see the [code signing policy](CODE_SIGNING.md) for the plan (free code signing for open source by SignPath Foundation).
+
+## Changes
+
+Every version with its date, new features, improvements, fixes and known issues: [CHANGELOG.md](CHANGELOG.md) · [Deutsch](CHANGELOG_DE.md) · [Hrvatski](CHANGELOG_HR.md), and on the [releases page](https://github.com/jebaitedcro7/jebaited_player/releases). The same history is in the player: click the version number on the home screen. Versions follow [Semantic Versioning](https://semver.org).
+
 ## License
 
-[GPL-3.0](LICENSE). Third-party components: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Changes: [CHANGELOG.md](CHANGELOG.md).
+[GPL-3.0](LICENSE). Third-party components: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
+[Code signing policy](CODE_SIGNING.md) · [Privacy policy](PRIVACY.md)

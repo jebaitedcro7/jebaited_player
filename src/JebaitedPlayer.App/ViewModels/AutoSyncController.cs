@@ -108,17 +108,20 @@ public sealed class AutoSyncController : ObservableObject
                 _audioTrack = e.Value as string;
             }
         };
-        player.StartFile += (_, _) =>
-        {
-            // Novi video: stara analiza više ne treba.
-            _cts?.Cancel();
-            _speech.Cancel();
-            LastResult = null;
-            LastTrackKey = null;
-            IsBusy = false;
-            ProgressValue = 0;
-            SetStatus(() => Loc.T("autosync.notStarted"));
-        };
+        // Novi video: stara analiza više ne treba.
+        player.StartFile += (_, _) => Reset();
+    }
+
+    /// <summary>Prekini analizu i zaboravi rezultat (novi video ili povratak na početni ekran).</summary>
+    public void Reset()
+    {
+        _cts?.Cancel();
+        _speech.Cancel();
+        LastResult = null;
+        LastTrackKey = null;
+        IsBusy = false;
+        ProgressValue = 0;
+        SetStatus(() => Loc.T("autosync.notStarted"));
     }
 
     /// <summary>Ručno pokretanje (tipka A, izbornik, prozor sinkronizacije) za odabrane titlove.</summary>

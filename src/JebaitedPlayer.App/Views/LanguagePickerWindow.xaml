@@ -25,5 +25,10 @@
         <Button Style="{StaticResource AccentButton}" HorizontalAlignment="Stretch" Margin="0,20,0,0" Click="OnContinue">
             <TextBlock Text="{loc:T picker.continue}" FontWeight="SemiBold" FontSize="14" />
         </Button>
+
+        <!-- Privatnost (UPGRADE 3): prikazuje se odmah nakon instalacije; isto je u Postavke → O aplikaciji. -->
+        <TextBlock Text="{loc:T settings.privacyText}" Style="{StaticResource HintText}" TextAlignment="Center" Margin="0,18,0,0" />
+        <Button Style="{StaticResource LinkButton}" Content="{loc:T settings.privacyButton}" HorizontalAlignment="Center"
+                FontSize="12" Margin="0,6,0,0" Click="OnPrivacy" />
     </StackPanel>
 </Window>

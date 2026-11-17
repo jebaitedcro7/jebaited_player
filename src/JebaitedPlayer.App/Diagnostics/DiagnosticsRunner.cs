@@ -36,6 +36,9 @@ public sealed class DiagnosticsRunner(
     /// <summary>Datoteke primljene iz drugih pokretanja (test jedne instance), po zahtjevu.</summary>
     public List<string[]> ExternalOpens { get; } = [];
 
+    /// <summary>Test sučelja stvarnim mišem (--diag-ui-test), vrati rezultate za JSON.</summary>
+    public Func<Task<Dictionary<string, object?>>>? UiTest { get; set; }
+
     /// <summary>Test nadogradnje: provjeri i preuzmi iz zadane mape, vrati stanje za JSON.</summary>
     public Func<Task<Dictionary<string, object?>>>? UpdateProbe { get; set; }
 
@@ -379,6 +382,11 @@ public sealed class DiagnosticsRunner(
             if (UpdateProbe is { } probeUpdate)
             {
                 result["update"] = await probeUpdate();
+            }
+
+            if (UiTest is { } uiTest)
+            {
+                result["uiTest"] = await uiTest();
             }
 
             if (options.DiagResume is { } choice)

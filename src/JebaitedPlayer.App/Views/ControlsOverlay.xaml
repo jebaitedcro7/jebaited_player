@@ -39,8 +39,20 @@
                     <ColumnDefinition Width="Auto" MinWidth="52" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="{Binding PositionText}" Style="{StaticResource TimeText}" HorizontalAlignment="Left" />
-                <Slider x:Name="Timeline" Grid.Column="1" Style="{StaticResource PlayerSlider}" Margin="12,0"
-                        Minimum="0" Maximum="{Binding TimelineMaximum}" Value="{Binding Position, Mode=OneWay}" />
+                <Slider x:Name="Timeline" Grid.Column="1" Style="{StaticResource TimelineSlider}" Margin="12,0"
+                        Minimum="0" Maximum="{Binding TimelineMaximum}" Value="{Binding Position, Mode=OneWay}"
+                        AutomationProperties.Name="{loc:T controls.timeline}" />
+
+                <!-- Pod mišem: vrijeme na koje vodi klik (oblačić iznad trake) i oznaka na traci. Ne prima miš. -->
+                <Canvas x:Name="SeekPreview" Grid.Column="1" Margin="12,0" IsHitTestVisible="False" Visibility="Collapsed">
+                    <Border x:Name="SeekMarker" Width="2" Height="12" Background="#E6FFFFFF" CornerRadius="1" Canvas.Top="8" />
+                    <Border x:Name="SeekBubble" Background="#F0202020" BorderBrush="#40FFFFFF" BorderThickness="1"
+                            CornerRadius="5" Padding="8,3" Canvas.Top="-26">
+                        <TextBlock x:Name="SeekBubbleText" FontSize="13" Typography.NumeralAlignment="Tabular"
+                                   Foreground="{DynamicResource TextPrimaryBrush}" />
+                    </Border>
+                </Canvas>
+
                 <TextBlock Grid.Column="2" Text="{Binding DurationText}" Style="{StaticResource TimeText}" HorizontalAlignment="Right" />
             </Grid>
 

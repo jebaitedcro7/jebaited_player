@@ -117,6 +117,26 @@ public static class SubtitleEncoding
         return new EncodingDetection(Get(bestCp), NameOf(bestCp), confidence, 0);
     }
 
+    /// <summary>
+    /// Kao <see cref="Decode(byte[], Encoding?, out EncodingDetection)"/>, ali stari titlovi (nisu UTF-8/UTF-16, imaju
+    /// naša ili druga posebna slova) čitaju se kodiranjem iz postavki umjesto pogađanja. UTF-8, UTF-16 i BOM imaju prednost.
+    /// </summary>
+    public static string Decode(byte[] data, Encoding? forced, out EncodingDetection detection, int? fallbackCodePage)
+    {
+        if (forced is null && fallbackCodePage is int fallback)
+        {
+            EncodingDetection auto = Detect(data);
+            if (auto.BomLength == 0 && SingleByteCandidates.Contains(auto.Encoding.CodePage))
+            {
+                Encoding chosen = Get(fallback);
+                detection = new EncodingDetection(chosen, Loc.T("encoding.settings", NameOf(fallback)), 1, 0);
+                return chosen.GetString(data).TrimStart('﻿');
+            }
+        }
+
+        return Decode(data, forced, out detection);
+    }
+
     /// <summary>Dekodira titlove; ako je <paramref name="forced"/> zadan, koristi njega umjesto prepoznavanja.</summary>
     public static string Decode(byte[] data, Encoding? forced, out EncodingDetection detection)
     {

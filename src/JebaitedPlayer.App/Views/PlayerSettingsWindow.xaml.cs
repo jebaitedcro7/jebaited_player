@@ -1,60 +1,159 @@
+using System.Diagnostics;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Media;
 using JebaitedPlayer.Infrastructure;
 using JebaitedPlayer.Services;
+using JebaitedPlayer.Subtitles;
 using JebaitedPlayer.ViewModels;
 
 namespace JebaitedPlayer.Views;
 
-/// <summary>Opće postavke playera: tema, sljedeća epizoda, mapa snimki, poveznice na postavke titlova.</summary>
+/// <summary>Kartice postavki (UPGRADE 3), redom kako su u prozoru.</summary>
+public enum SettingsTab
+{
+    General,
+    Language,
+    Subtitles,
+    Audio,
+    Video,
+    Appearance,
+    Updates,
+    About,
+}
+
+/// <summary>Izlazni uređaj zvuka (mpv "audio-device-list").</summary>
+public sealed record AudioDeviceInfo(string Name, string Description);
+
+/// <summary>Što prozor postavki traži od glavnog prozora (otvaranje drugih prozora, primjena na mpv).</summary>
+internal interface ISettingsHost
+{
+    void OpenSources();
+
+    void OpenOnlineSetup();
+
+    void RestartForUpdate();
+
+    void ShowUpdateHistory();
+
+    /// <summary>Postavke zvuka i slike odmah na video (ako je otvoren).</summary>
+    void ApplyPlaybackSettings();
+
+    /// <summary>Postavke prozora (npr. iznad ostalih prozora) odmah.</summary>
+    void ApplyWindowSettings();
+
+    Task<IReadOnlyList<AudioDeviceInfo>> GetAudioDevicesAsync();
+
+    /// <summary>Spremaju li se postavke pri zatvaranju (u dijagnostici ne: testovi nikad ne mijenjaju tvoje postavke).</summary>
+    bool PersistSettings { get; }
+}
+
+/// <summary>
+/// Postavke playera u karticama (UPGRADE 3): Općenito, Jezik, Titlovi, Zvuk, Slika, Izgled, Nadogradnje i O aplikaciji.
+/// Svaka promjena vrijedi odmah; datoteka postavki se sprema pri zatvaranju prozora.
+/// </summary>
 public partial class PlayerSettingsWindow : Window
 {
+    /// <summary>Jezici zvuka koji se nude (kod jezika; naziv iz Languages/*.json).</summary>
+    private static readonly string[] AudioLanguages = ["en", "de", "hr", "sr", "bs", "sl", "fr", "it", "es", "pt", "ru", "pl", "cs", "hu", "nl", "tr", "ja", "ko", "zh"];
+
+    /// <summary>Tehnologije koje player koristi (vlastita imena, ne prevode se); licence su u THIRD_PARTY_NOTICES.md.</summary>
+    private static readonly (string Name, string License)[] Technologies =
+    [
+        ("mpv / libmpv", "GPL-2.0-or-later"),
+        ("FFmpeg, libass, libplacebo", "GPL / LGPL / ISC"),
+        (".NET / WPF", "MIT"),
+        ("Velopack", "MIT"),
+        ("Microsoft.Data.Sqlite", "MIT"),
+        ("SQLitePCLRaw", "Apache-2.0"),
+        ("SQLite", "Public domain"),
+        ("WebRtcVadSharp", "MIT"),
+        ("WebRTC VAD", "BSD-3-Clause"),
+    ];
+
     private readonly AppSettings _settings;
     private readonly PlayerViewModel _vm;
-    private readonly Action _openSubtitleSettings;
-    private readonly Action _openSources;
-    private readonly Action _openOnlineSetup;
     private readonly UpdateService _updates;
-    private readonly Action _restartForUpdate;
+    private readonly ISettingsHost _host;
+    private readonly SubtitleSettingsPanel _subtitlesPanel;
+    private IReadOnlyList<AudioDeviceInfo> _audioDevices = [];
+    private bool _loading = true;
 
-    public PlayerSettingsWindow(AppSettings settings, PlayerViewModel vm, Action openSubtitleSettings, Action openSources,
-        Action openOnlineSetup, UpdateService updates, Action restartForUpdate)
+    internal PlayerSettingsWindow(AppSettings settings, PlayerViewModel vm, UpdateService updates, ISettingsHost host, SettingsTab tab)
     {
         _settings = settings;
         _vm = vm;
-        _openSubtitleSettings = openSubtitleSettings;
-        _openSources = openSources;
-        _openOnlineSetup = openOnlineSetup;
         _updates = updates;
-        _restartForUpdate = restartForUpdate;
+        _host = host;
         InitializeComponent();
         WindowTheme.UseDarkTitleBar(this);
-        MaxHeight = Math.Max(400, SystemParameters.WorkArea.Height - 24);
+        MaxHeight = Math.Max(420, SystemParameters.WorkArea.Height - 24);
+        Height = Math.Min(Height, MaxHeight);
+        Width = Math.Min(Width, Math.Max(MinWidth, SystemParameters.WorkArea.Width - 24));
 
-        LightThemeBox.IsChecked = !WindowTheme.IsDark;
-        AutoNextBox.IsChecked = settings.AutoPlayNext;
-        UpNextSlider.Value = Math.Clamp(settings.UpNextSeconds, 5, 30);
-        UpNextSlider.IsEnabled = settings.AutoPlayNext;
-        GpuUiBox.IsChecked = settings.UiGpuRendering;
-        UpdateFolderText();
-        UpdateShellStatus();
-        AutoUpdateBox.IsChecked = settings.AutoUpdate;
-        AutoUpdateBox.Checked += (_, _) => _settings.AutoUpdate = true;
-        AutoUpdateBox.Unchecked += (_, _) => _settings.AutoUpdate = false;
-        EventHandler onUpdate = (_, _) => Dispatcher.BeginInvoke(UpdateUpdateStatus);
-        updates.Changed += onUpdate;
-        Closed += (_, _) => updates.Changed -= onUpdate;
-        UpdateUpdateStatus();
-        this.OnLanguageChanged(() =>
+        _subtitlesPanel = new SubtitleSettingsPanel(settings, vm.Subtitles, host.OpenSources, host.OpenOnlineSetup);
+        SubtitlesHost.Content = _subtitlesPanel;
+
+        LoadGeneral();
+        LoadAudio();
+        LoadVideo();
+        LoadAppearance();
+        LoadUpdates();
+        LoadAbout();
+        SelectTab(tab);
+        _loading = false;
+
+        this.OnLanguageChanged(RefreshTexts);
+        Closed += (_, _) =>
         {
-            UpdateUpdateStatus();
-            UpdateShellStatus();
-        });
+            if (_host.PersistSettings)
+            {
+                _settings.Save();
+            }
+        };
+        Loaded += async (_, _) => await LoadAudioDevicesAsync();
+    }
 
-        LightThemeBox.Checked += (_, _) => SetTheme("light");
-        LightThemeBox.Unchecked += (_, _) => SetTheme("dark");
-        Action syncTheme = () => LightThemeBox.IsChecked = !WindowTheme.IsDark;
-        WindowTheme.Changed += syncTheme;
-        Closed += (_, _) => WindowTheme.Changed -= syncTheme;
+    /// <summary>Otvori zadanu karticu (npr. "Titlovi" iz izbornika titlova, "Nadogradnje" iz izbornika verzije).</summary>
+    public void SelectTab(SettingsTab tab) => Tabs.SelectedIndex = (int)tab;
+
+    /// <summary>Dijagnostika: naziv i broj otvorene kartice.</summary>
+    internal SettingsTab SelectedTab => (SettingsTab)Math.Max(0, Tabs.SelectedIndex);
+
+    private void RefreshTexts()
+    {
+        UpdateSeekStepTexts();
+        UpdateAudioTexts();
+        UpdateAspectText();
+        UpdateHideControlsText();
+        UpdateUpdateStatus();
+        UpdateShellStatus();
+        UpdateWhatsNew();
+        AboutVersionText.Text = Loc.T("settings.aboutVersion", _updates.CurrentVersion);
+        _subtitlesPanel.RefreshTexts();
+    }
+
+    // --- 1. Općenito ---------------------------------------------------------------------------------------------
+
+    private void LoadGeneral()
+    {
+        (_settings.ResumeMode switch { "resume" => ResumeAuto, "start" => ResumeStart, _ => ResumeAsk }).IsChecked = true;
+        ResumeAsk.Checked += (_, _) => SetResumeMode("ask");
+        ResumeAuto.Checked += (_, _) => SetResumeMode("resume");
+        ResumeStart.Checked += (_, _) => SetResumeMode("start");
+        UpdateSeekStepTexts();
+
+        OpenFullscreenBox.IsChecked = _settings.OpenFullscreen;
+        OpenFullscreenBox.Checked += (_, _) => _settings.OpenFullscreen = true;
+        OpenFullscreenBox.Unchecked += (_, _) => _settings.OpenFullscreen = false;
+        OnTopBox.IsChecked = _settings.OnTopWhilePlaying;
+        OnTopBox.Checked += (_, _) => SetOnTop(true);
+        OnTopBox.Unchecked += (_, _) => SetOnTop(false);
+
+        AutoNextBox.IsChecked = _settings.AutoPlayNext;
+        UpNextSlider.Value = Math.Clamp(_settings.UpNextSeconds, 5, 30);
+        UpNextSlider.IsEnabled = _settings.AutoPlayNext;
         AutoNextBox.Checked += (_, _) => SetAutoNext(true);
         AutoNextBox.Unchecked += (_, _) => SetAutoNext(false);
         UpNextSlider.ValueChanged += (_, e) =>
@@ -62,20 +161,39 @@ public partial class PlayerSettingsWindow : Window
             _settings.UpNextSeconds = (int)Math.Round(e.NewValue);
             _vm.Library.UpNextDelaySeconds = _settings.UpNextSeconds;
         };
-        GpuUiBox.Checked += (_, _) => _settings.UiGpuRendering = true;
-        GpuUiBox.Unchecked += (_, _) => _settings.UiGpuRendering = false;
-        Closed += (_, _) => _settings.Save();
+
+        UpdateFolderText();
+        UpdateShellStatus();
     }
 
-    private void SetTheme(string theme)
+    private void SetResumeMode(string mode)
     {
-        if (theme == WindowTheme.Current)
+        if (_loading)
         {
             return;
         }
 
-        _settings.Theme = theme;
-        WindowTheme.Apply(theme);
+        _settings.ResumeMode = mode;
+        _vm.Library.ResumeMode = mode;
+    }
+
+    private void UpdateSeekStepTexts()
+    {
+        SeekStepButton.Content = Loc.T("settings.seconds", _settings.SeekStepSeconds);
+        SeekStepHint.Text = Loc.T("settings.seekStepHint", _settings.SeekStepSeconds * 6);
+    }
+
+    private void OnSeekStepClick(object sender, RoutedEventArgs e) =>
+        ShowChoices(SeekStepButton, AppSettings.SeekSteps.Select(s => (Loc.T("settings.seconds", s), s == _settings.SeekStepSeconds, (Action)(() =>
+        {
+            _settings.SeekStepSeconds = s;
+            UpdateSeekStepTexts();
+        }))));
+
+    private void SetOnTop(bool on)
+    {
+        _settings.OnTopWhilePlaying = on;
+        _host.ApplyWindowSettings();
     }
 
     private void SetAutoNext(bool on)
@@ -108,29 +226,6 @@ public partial class PlayerSettingsWindow : Window
     }
 
     private void OnOpenFolder(object sender, RoutedEventArgs e) => _vm.Extras.OpenScreenshotFolder();
-
-    private void UpdateUpdateStatus()
-    {
-        VersionText.Text = $"jebaited_player {_updates.CurrentVersion}{(_updates.IsPortable ? " " + Loc.T("settings.portable") : string.Empty)}";
-        UpdateStatusText.Text = _updates.Status;
-        bool installed = _updates.IsInstalled;
-        AutoUpdateBox.Visibility = installed ? Visibility.Visible : Visibility.Collapsed;
-        UpdateButtons.Visibility = installed ? Visibility.Visible : Visibility.Collapsed;
-        CheckUpdateButton.IsEnabled = _updates.State is not (UpdateState.Checking or UpdateState.Downloading);
-        RestartUpdateButton.Visibility = _updates.State == UpdateState.Ready ? Visibility.Visible : Visibility.Collapsed;
-    }
-
-    private async void OnCheckUpdate(object sender, RoutedEventArgs e)
-    {
-        await _updates.CheckAndDownloadAsync();
-        UpdateUpdateStatus();
-    }
-
-    private void OnRestartUpdate(object sender, RoutedEventArgs e)
-    {
-        Close();
-        _restartForUpdate();
-    }
 
     private void UpdateShellStatus()
     {
@@ -181,11 +276,298 @@ public partial class PlayerSettingsWindow : Window
         UpdateShellStatus();
     }
 
-    private void OnSubtitleSettings(object sender, RoutedEventArgs e) => _openSubtitleSettings();
+    // --- 4. Zvuk -------------------------------------------------------------------------------------------------
 
-    private void OnSources(object sender, RoutedEventArgs e) => _openSources();
+    private void LoadAudio()
+    {
+        VolumeSlider.Value = _vm.Volume;
+        VolumeSlider.ValueChanged += (_, e) =>
+        {
+            _vm.Volume = e.NewValue;
+            _settings.Volume = _vm.Volume;
+        };
+        NormalizeBox.IsChecked = _settings.NormalizeAudio;
+        NormalizeBox.Checked += (_, _) => ChangePlayback(() => _settings.NormalizeAudio = true);
+        NormalizeBox.Unchecked += (_, _) => ChangePlayback(() => _settings.NormalizeAudio = false);
+        AudioDelaySlider.Value = _settings.AudioDelayMs;
+        AudioDelaySlider.ValueChanged += (_, e) => ChangePlayback(() =>
+        {
+            _settings.AudioDelayMs = Math.Round(e.NewValue / 50) * 50;
+            UpdateAudioTexts();
+        });
+        UpdateAudioTexts();
+    }
 
-    private void OnOnlineSetup(object sender, RoutedEventArgs e) => _openOnlineSetup();
+    private void UpdateAudioTexts()
+    {
+        AudioLanguageButton.Content = _settings.AudioLanguage is { Length: > 0 } lang
+            ? SubtitleLanguage.DisplayName(lang)
+            : Loc.T("settings.audioLanguageDefault");
+        AudioDelayText.Text = Loc.T("settings.milliseconds", _settings.AudioDelayMs.ToString("+0;−0;0", Loc.Culture));
+        AudioDeviceButton.Content = _settings.AudioDevice == "auto"
+            ? Loc.T("settings.audioDeviceDefault")
+            : _audioDevices.FirstOrDefault(d => d.Name == _settings.AudioDevice)?.Description ?? _settings.AudioDevice;
+    }
+
+    private async Task LoadAudioDevicesAsync()
+    {
+        try
+        {
+            _audioDevices = await _host.GetAudioDevicesAsync();
+        }
+        catch (Exception ex)
+        {
+            Log.Warn($"Popis audio uređaja nije dostupan: {ex.Message}");
+        }
+
+        UpdateAudioTexts();
+    }
+
+    private void OnAudioLanguageClick(object sender, RoutedEventArgs e)
+    {
+        var choices = new List<(string, bool, Action)>
+        {
+            (Loc.T("settings.audioLanguageDefault"), string.IsNullOrEmpty(_settings.AudioLanguage), () => SetAudioLanguage(null)),
+        };
+        choices.AddRange(AudioLanguages.Select(code => (SubtitleLanguage.DisplayName(code), code == _settings.AudioLanguage, (Action)(() => SetAudioLanguage(code)))));
+        ShowChoices(AudioLanguageButton, choices);
+    }
+
+    private void SetAudioLanguage(string? code) => ChangePlayback(() =>
+    {
+        _settings.AudioLanguage = code;
+        UpdateAudioTexts();
+    });
+
+    private void OnAudioDeviceClick(object sender, RoutedEventArgs e)
+    {
+        var choices = new List<(string, bool, Action)>
+        {
+            (Loc.T("settings.audioDeviceDefault"), _settings.AudioDevice == "auto", () => SetAudioDevice("auto")),
+        };
+        choices.AddRange(_audioDevices.Where(d => d.Name != "auto")
+            .Select(d => (d.Description, d.Name == _settings.AudioDevice, (Action)(() => SetAudioDevice(d.Name)))));
+        ShowChoices(AudioDeviceButton, choices);
+    }
+
+    private void SetAudioDevice(string name) => ChangePlayback(() =>
+    {
+        _settings.AudioDevice = name;
+        UpdateAudioTexts();
+    });
+
+    private void OnResetAudioDelay(object sender, RoutedEventArgs e) => AudioDelaySlider.Value = 0;
+
+    // --- 5. Slika ------------------------------------------------------------------------------------------------
+
+    private void LoadVideo()
+    {
+        (_settings.VideoQuality switch { "high" => QualityHigh, "fast" => QualityFast, _ => QualityBalanced }).IsChecked = true;
+        QualityBalanced.Checked += (_, _) => ChangePlayback(() => _settings.VideoQuality = "balanced");
+        QualityHigh.Checked += (_, _) => ChangePlayback(() => _settings.VideoQuality = "high");
+        QualityFast.Checked += (_, _) => ChangePlayback(() => _settings.VideoQuality = "fast");
+        HwdecBox.IsChecked = _settings.HardwareDecoding;
+        HwdecBox.Checked += (_, _) => ChangePlayback(() => _settings.HardwareDecoding = true);
+        HwdecBox.Unchecked += (_, _) => ChangePlayback(() => _settings.HardwareDecoding = false);
+        HdrBox.IsChecked = _settings.HdrPassthrough;
+        HdrBox.Checked += (_, _) => ChangePlayback(() => _settings.HdrPassthrough = true);
+        HdrBox.Unchecked += (_, _) => ChangePlayback(() => _settings.HdrPassthrough = false);
+        UpdateAspectText();
+    }
+
+    private void UpdateAspectText() =>
+        AspectButton.Content = PlaybackExtrasController.AspectModes.FirstOrDefault(m => m.Value == _settings.DefaultAspect).NameKey is { } key
+            ? Loc.T(key)
+            : _settings.DefaultAspect;
+
+    private void OnAspectClick(object sender, RoutedEventArgs e) =>
+        ShowChoices(AspectButton, PlaybackExtrasController.AspectModes.Select(m => (Loc.T(m.NameKey), m.Value == _settings.DefaultAspect, (Action)(() =>
+        {
+            _settings.DefaultAspect = m.Value;
+            UpdateAspectText();
+            _vm.Extras.ApplyAspect(m.Value, announce: false);
+        }))));
+
+    /// <summary>Promjena zvuka ili slike: zapamti i odmah primijeni na otvoreni video.</summary>
+    private void ChangePlayback(Action change)
+    {
+        if (_loading)
+        {
+            return;
+        }
+
+        change();
+        _host.ApplyPlaybackSettings();
+    }
+
+    // --- 6. Izgled -----------------------------------------------------------------------------------------------
+
+    private void LoadAppearance()
+    {
+        (WindowTheme.IsDark ? ThemeDark : ThemeLight).IsChecked = true;
+        ThemeDark.Checked += (_, _) => SetTheme("dark");
+        ThemeLight.Checked += (_, _) => SetTheme("light");
+        Action syncTheme = () => (WindowTheme.IsDark ? ThemeDark : ThemeLight).IsChecked = true;
+        WindowTheme.Changed += syncTheme;
+        Closed += (_, _) => WindowTheme.Changed -= syncTheme;
+        UpdateHideControlsText();
+
+        GpuUiBox.IsChecked = _settings.UiGpuRendering;
+        GpuUiBox.Checked += (_, _) => _settings.UiGpuRendering = true;
+        GpuUiBox.Unchecked += (_, _) => _settings.UiGpuRendering = false;
+    }
+
+    private void SetTheme(string theme)
+    {
+        if (_loading || theme == WindowTheme.Current)
+        {
+            return;
+        }
+
+        _settings.Theme = theme;
+        WindowTheme.Apply(theme);
+    }
+
+    private void UpdateHideControlsText() => HideControlsButton.Content = Loc.T("settings.seconds", _settings.ControlsHideSeconds);
+
+    private void OnHideControlsClick(object sender, RoutedEventArgs e) =>
+        ShowChoices(HideControlsButton, AppSettings.HideDelays.Select(d => (Loc.T("settings.seconds", d), Math.Abs(d - _settings.ControlsHideSeconds) < 0.01, (Action)(() =>
+        {
+            _settings.ControlsHideSeconds = d;
+            UpdateHideControlsText();
+        }))));
+
+    // --- 7. Nadogradnje ------------------------------------------------------------------------------------------
+
+    private void LoadUpdates()
+    {
+        AutoUpdateBox.IsChecked = _settings.AutoUpdate;
+        AutoUpdateBox.Checked += (_, _) => _settings.AutoUpdate = true;
+        AutoUpdateBox.Unchecked += (_, _) => _settings.AutoUpdate = false;
+        EventHandler onUpdate = (_, _) => Dispatcher.BeginInvoke(UpdateUpdateStatus);
+        _updates.Changed += onUpdate;
+        Closed += (_, _) => _updates.Changed -= onUpdate;
+        UpdateUpdateStatus();
+        UpdateWhatsNew();
+    }
+
+    private void UpdateUpdateStatus()
+    {
+        VersionText.Text = $"jebaited_player {_updates.CurrentVersion}{(_updates.IsPortable ? " " + Loc.T("settings.portable") : string.Empty)}";
+        UpdateStatusText.Text = _updates.Status;
+        bool installed = _updates.IsInstalled;
+        AutoUpdateBox.Visibility = installed ? Visibility.Visible : Visibility.Collapsed;
+        UpdateButtons.Visibility = installed ? Visibility.Visible : Visibility.Collapsed;
+        CheckUpdateButton.IsEnabled = _updates.State is not (UpdateState.Checking or UpdateState.Downloading);
+        RestartUpdateButton.Visibility = _updates.State == UpdateState.Ready ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    /// <summary>"Što je novo": bilješke instalirane verzije iz ugrađene povijesti nadogradnji.</summary>
+    private void UpdateWhatsNew()
+    {
+        ReleaseEntry? entry = UpdateHistory.Find(_updates.CurrentVersion) ?? UpdateHistory.Versions.FirstOrDefault();
+        WhatsNewList.Children.Clear();
+        if (entry is null)
+        {
+            WhatsNewTitle.Visibility = WhatsNewDate.Visibility = Visibility.Collapsed;
+            return;
+        }
+
+        WhatsNewTitle.Text = Loc.T("settings.whatsNew", entry.Version);
+        WhatsNewDate.Text = UpdateHistory.FormatDate(entry);
+        ReleaseNotesText notes = entry.NotesFor(Loc.Current);
+        foreach (string item in notes.Features.Concat(notes.Improvements))
+        {
+            var row = new DockPanel { Margin = new Thickness(2, 3, 0, 3) };
+            var bullet = new TextBlock { Text = "•", Margin = new Thickness(0, 0, 8, 0), Foreground = (Brush)FindResource("AccentBrush") };
+            DockPanel.SetDock(bullet, Dock.Left);
+            row.Children.Add(bullet);
+            row.Children.Add(new TextBlock { Text = item, TextWrapping = TextWrapping.Wrap });
+            WhatsNewList.Children.Add(row);
+        }
+    }
+
+    private async void OnCheckUpdate(object sender, RoutedEventArgs e)
+    {
+        await _updates.CheckAndDownloadAsync();
+        UpdateUpdateStatus();
+    }
+
+    private void OnRestartUpdate(object sender, RoutedEventArgs e)
+    {
+        Close();
+        _host.RestartForUpdate();
+    }
+
+    private void OnViewHistory(object sender, RoutedEventArgs e) => _host.ShowUpdateHistory();
+
+    private void OnGitHubReleases(object sender, RoutedEventArgs e) => OpenUrl(UpdateHistory.Repository + "/releases");
+
+    // --- 8. O aplikaciji -----------------------------------------------------------------------------------------
+
+    private void LoadAbout()
+    {
+        AboutVersionText.Text = Loc.T("settings.aboutVersion", _updates.CurrentVersion);
+        foreach (var (name, license) in Technologies)
+        {
+            var row = new DockPanel { Margin = new Thickness(0, 2, 0, 2) };
+            var text = new TextBlock { Text = name, MinWidth = 260 };
+            DockPanel.SetDock(text, Dock.Left);
+            row.Children.Add(text);
+            row.Children.Add(new TextBlock { Text = license, Foreground = (Brush)FindResource("TextSecondaryBrush") });
+            TechnologyList.Children.Add(row);
+        }
+    }
+
+    private void OnLicense(object sender, RoutedEventArgs e) => OpenUrl(UpdateHistory.Repository + "/blob/main/LICENSE");
+
+    private void OnSourceCode(object sender, RoutedEventArgs e) => OpenUrl(UpdateHistory.Repository);
+
+    private void OnThirdParty(object sender, RoutedEventArgs e) => OpenUrl(UpdateHistory.Repository + "/blob/main/THIRD_PARTY_NOTICES.md");
+
+    private void OnPrivacy(object sender, RoutedEventArgs e) => OpenUrl(UpdateHistory.Repository + "/blob/main/PRIVACY.md");
+
+    private void OnCodeSigning(object sender, RoutedEventArgs e) => OpenUrl(UpdateHistory.Repository + "/blob/main/CODE_SIGNING.md");
+
+    /// <summary>Priručnik na jeziku sučelja (njemački, hrvatski za hr/bs/sr, inače engleski).</summary>
+    private void OnManual(object sender, RoutedEventArgs e)
+    {
+        string file = Loc.Current switch
+        {
+            "de" => "README_DE.md",
+            "hr" or "bs" or "sr" => "README_HR.md",
+            _ => "README_EN.md",
+        };
+        OpenUrl($"{UpdateHistory.Repository}/blob/main/{file}");
+    }
+
+    // --- Zajedničko ----------------------------------------------------------------------------------------------
+
+    /// <summary>Popis mogućnosti ispod gumba (umjesto ComboBoxa, u boji teme); kvačica uz odabranu.</summary>
+    private static void ShowChoices(Button button, IEnumerable<(string Text, bool IsChecked, Action Choose)> choices)
+    {
+        var menu = new ContextMenu { PlacementTarget = button, Placement = PlacementMode.Bottom };
+        foreach (var (text, isChecked, choose) in choices)
+        {
+            var item = new MenuItem { Header = text.Replace("_", "__", StringComparison.Ordinal), IsChecked = isChecked };
+            item.Click += (_, _) => choose();
+            menu.Items.Add(item);
+        }
+
+        menu.IsOpen = true;
+    }
+
+    private static void OpenUrl(string url)
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+        }
+        catch (Exception ex) when (ex is System.ComponentModel.Win32Exception or InvalidOperationException)
+        {
+            Log.Warn($"Poveznica se nije otvorila: {ex.Message}");
+        }
+    }
 
     private void OnClose(object sender, RoutedEventArgs e) => Close();
 }

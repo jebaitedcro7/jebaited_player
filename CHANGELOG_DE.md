@@ -1,0 +1,87 @@
+# Änderungsprotokoll
+
+Alle wichtigen Änderungen an jebaited_player. Format: [Keep a Changelog](https://keepachangelog.com/de/1.1.0/); Versionen nach [Semantic Versioning](https://semver.org/lang/de/) (MAJOR = große Änderungen, die die Kompatibilität betreffen können, MINOR = neue Funktionen, PATCH = Fehlerbehebungen und kleine Verbesserungen).
+
+Andere Sprachen: [English](CHANGELOG.md) · [Hrvatski](CHANGELOG_HR.md). Derselbe Verlauf ist im Player enthalten (Klick auf die Versionsnummer auf dem Startbildschirm). Diese Datei wird aus `src/JebaitedPlayer.App/History/update-history.json` erzeugt.
+
+## [1.2.0] - 2026-11-17
+
+Player-Steuerung, Einstellungen in Tabs und der Update-Verlauf.
+
+### Neu
+
+- Startseite-Taste oben links im Player: zurück zum Startbildschirm, ohne die App zu schließen. Die Position wird gespeichert, du kannst später weiterschauen. Sie erscheint und verschwindet zusammen mit den anderen Steuerelementen, auch im Vollbild.
+- Zeitleiste: Klicke irgendwo hin, um sofort dorthin zu springen. Ziehen funktioniert weiterhin, und eine Blase zeigt die Zeit unter der Maus.
+- Die Einstellungen sind jetzt in Tabs aufgeteilt: Allgemein, Sprache, Untertitel, Audio, Video, Darstellung, Updates und Info.
+- Neue Einstellungen: was beim erneuten Öffnen eines Videos passiert (fragen, fortsetzen oder von vorne), Sprungweite der Pfeiltasten, Videos im Vollbild öffnen, Player im Vordergrund halten, bevorzugte Audiosprache, Audioausgabegerät, Audioverzögerung, Lautstärkeausgleich, Hardware-Dekodierung, Bildqualität, Standard-Seitenverhältnis, HDR-Durchleitung, wie lange die Steuerelemente sichtbar bleiben und die Kodierung alter Untertitel.
+- Update-Verlauf: Klicke auf die Versionsnummer auf dem Startbildschirm. Er ist in der App enthalten und funktioniert ohne Internet; online werden auch neuere Versionen von GitHub angezeigt.
+
+### Verbessert
+
+- Ein Klick auf die Zeitleiste springt sofort genau an die Stelle (kein zweiter Sprung). Die Zeitleiste ist leichter zu treffen und wird unter der Maus dicker.
+- „Zurück zum Startbildschirm“ gibt es auch im Rechtsklickmenü.
+- Richtlinie zur Code-Signierung, Datenschutzerklärung und automatische Builds mit GitHub Actions als Vorbereitung für die kostenlose Code-Signierung durch die SignPath Foundation.
+
+### Bekannte Probleme
+
+- Die App ist noch nicht digital signiert, daher können Windows SmartScreen oder Smart App Control vor der Installation warnen.
+- Das Fortschrittsfenster des Installationsprogramms stammt von Velopack und ist nur auf Englisch.
+
+Release: [v1.2.0](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v1.2.0) · Änderungen seit [v1.1.0...v1.2.0](https://github.com/jebaitedcro7/jebaited_player/compare/v1.1.0...v1.2.0)
+
+## [1.1.0] - 2026-11-17
+
+Sprachen, ein neuer Startbildschirm, Designs und Handbücher.
+
+### Neu
+
+- Oberfläche auf Englisch, Deutsch und Kroatisch; unter „Weitere Sprachen“ auch Bosnisch, Serbisch (Latein) und Slowenisch. Alle Menüs, Einstellungen, Meldungen, Fehler, Synchronisierung, Online-Untertitel, die Folgenliste und der Verlauf sind übersetzt.
+- Sprachauswahl beim ersten Start (direkt nach der Installation); ohne Auswahl bleibt Englisch. Die Sprache lässt sich in den Einstellungen sofort und ohne Neustart ändern und wird gespeichert.
+- Neuer Startbildschirm: das Alien-Logo und der Name jebaited_cro, ein dezenter Weltraumhintergrund, ein Zahnrad für die Einstellungen unten links und ein Schalter für dunkles/helles Design.
+- Handbücher in drei Sprachen (Quick Start, Basic Guide, Advanced Guide) mit Screenshots: README_EN, README_DE und README_HR.
+
+### Verbessert
+
+- Eine neue Installation erhält Standard-Untertitelsprachen passend zur gewählten Sprache. Vorhandene Einstellungen, der Wiedergabeverlauf und Schlüssel bleiben erhalten.
+
+### Bekannte Probleme
+
+- Das Fortschrittsfenster des Installationsprogramms stammt von Velopack und ist nur auf Englisch.
+- Die App ist noch nicht digital signiert, daher können Windows SmartScreen oder Smart App Control vor der Installation warnen.
+
+Release: [v1.1.0](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v1.1.0) · Änderungen seit [v1.0.1...v1.1.0](https://github.com/jebaitedcro7/jebaited_player/compare/v1.0.1...v1.1.0)
+
+## [1.0.1] - 2026-11-17
+
+Prüfung der automatischen Updates. Der Player funktioniert wie in 1.0.0.
+
+### Verbessert
+
+- Automatische Updates von GitHub geprüft: Version 1.0.0 aktualisiert sich selbst auf 1.0.1, Einstellungen und Wiedergabeverlauf bleiben erhalten.
+
+### Bekannte Probleme
+
+- Die App ist noch nicht digital signiert, daher können Windows SmartScreen oder Smart App Control vor der Installation warnen.
+
+Release: [v1.0.1](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v1.0.1) · Änderungen seit [v1.0.0...v1.0.1](https://github.com/jebaitedcro7/jebaited_player/compare/v1.0.0...v1.0.1)
+
+## [1.0.0] - 2026-11-17
+
+Erste öffentliche Version.
+
+### Neu
+
+- Spielt fast jedes Video- und Audioformat ab (mpv): H.264, HEVC, AV1, VP9, 4K, HDR, 5.1-Ton und Hardware-Dekodierung.
+- Untertitel aus dem Internet: OpenSubtitles, SubDL und Titlovi.com; die Untertitel für deine Version werden automatisch gewählt und neben dem Video gespeichert.
+- Synchronisierung zur Sprache: Versatz, Geschwindigkeit (25 / 23,976 fps) und abschnittsweise Korrektur für eine andere Schnittfassung; Untertitel einer anderen Folge werden abgelehnt.
+- Manuelle Synchronisierung: Versatz, schrittweise Verzögerung, Ausrichtung nach Zeile (ohne Eile) und Z/X.
+- Serien: Folgenliste, Weiterschauen und die nächste Folge.
+- Assistent für Untertitel aus dem Internet: öffnet die Registrierung, prüft und speichert deine Daten (verschlüsselt).
+- Windows: eine einzige Instanz (eine neue Datei geht an den offenen Player), mehrere Dateien auf einmal, „Öffnen mit“, Registrierung der Dateitypen und Festlegen als Standardplayer über die Windows-Einstellungen.
+- Installation ohne Administratorrechte, Verknüpfungen und automatische Updates (beim Schließen des Players installiert); Einstellungen und Verlauf bleiben erhalten.
+
+### Bekannte Probleme
+
+- Die App ist noch nicht digital signiert, daher können Windows SmartScreen oder Smart App Control vor der Installation warnen.
+
+Release: [v1.0.0](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v1.0.0)

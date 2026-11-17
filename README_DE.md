@@ -23,7 +23,7 @@ jebaited_player ist ein leichter Videoplayer für Windows. Er spielt fast jedes 
 
 1. Öffne die [neueste Version](https://github.com/jebaitedcro7/jebaited_player/releases/latest) und lade **`JebaitedPlayer-win-Setup.exe`** herunter.
 2. Starte die Datei. Die Installation dauert ein paar Sekunden und braucht keine Administratorrechte. Auf dem Desktop und im Startmenü erscheint die Verknüpfung **jebaited_player**.
-3. Windows zeigt eventuell das blaue Fenster „Der Computer wurde durch Windows geschützt“, weil die App nicht digital signiert ist. Klicke auf **Weitere Informationen → Trotzdem ausführen**.
+3. Windows zeigt eventuell das blaue Fenster „Der Computer wurde durch Windows geschützt“, weil die App noch nicht digital signiert ist. Klicke auf **Weitere Informationen → Trotzdem ausführen**. Ist **Smart App Control** eingeschaltet, kann Windows das Installationsprogramm blockieren; bitte schalte Smart App Control nicht aus, sondern warte auf eine signierte Version (siehe [CODE_SIGNING.md](CODE_SIGNING.md)).
 4. Nach der Installation startet der Player und fragt nach der **Sprache**. English ist vorausgewählt, Deutsch und Hrvatski stehen daneben, die übrigen Sprachen findest du unter **Weitere Sprachen**. Wenn du nur auf **Continue** / **Weiter** klickst (oder das Fenster schließt), bleibt der Player auf Englisch. Die Sprache lässt sich jederzeit in den Einstellungen ändern.
 
 <p align="center"><img src="manual/images/de/language-picker.png" width="420" alt="Sprachauswahl beim ersten Start"></p>
@@ -57,18 +57,19 @@ Du brauchst Windows 10 oder 11 (64 Bit). Sonst muss nichts installiert werden (D
 - **Weiterschauen** zeigt die letzten Videos mit der Stelle, an der du aufgehört hast. Klicken zum Fortsetzen, **×** entfernt einen Eintrag aus dem Verlauf.
 - **Favoriten** enthält Filme und ganze Serien (Ctrl+D während der Wiedergabe). Eine Serie öffnet sich bei der Folge, bei der du gerade bist.
 - **Tastenkürzel (F1)** zeigt alle Tastenkürzel.
-- Unten links: das **Zahnrad** öffnet die Einstellungen, der **Schalter** wechselt zwischen dunklem und hellem Design. Unten rechts: die Version.
+- Unten links: das **Zahnrad** öffnet die Einstellungen, der **Schalter** wechselt zwischen dunklem und hellem Design. Unten rechts: die **Version** — ein Klick darauf öffnet den [Update-Verlauf](#update-verlauf).
 
 ### Wiedergabe-Steuerung
 
 <p align="center"><img src="manual/images/de/playback.jpg" width="760" alt="Wiedergabe mit Steuerung und Untertiteln"></p>
 
-Die Steuerung erscheint, wenn du die Maus bewegst, und verschwindet während der Wiedergabe. Alles Weitere ist im Menü: **Rechtsklick** auf das Bild.
+Die Steuerung erscheint, wenn du die Maus bewegst, und verschwindet während der Wiedergabe (die Zeit stellst du unter Einstellungen → Darstellung ein). Alles Weitere ist im Menü: **Rechtsklick** auf das Bild.
 
 | Element | Funktion |
 |---|---|
+| ⌂ Startseite (oben links) | Zurück zum Startbildschirm, ohne den Player zu schließen. Die Position wird gespeichert, du kannst später weiterschauen. Erscheint und verschwindet zusammen mit der übrigen Steuerung. |
 | Wiedergabe / Pause | Leertaste oder K, oder Klick auf das Bild |
-| Zeitleiste | Klicken oder ziehen; ← / → springen 5 s, Ctrl+← / → 30 s; , / . ein Bild zurück / vor |
+| Zeitleiste | Irgendwo klicken springt sofort dorthin, oder ziehen. Eine Blase zeigt die Zeit unter der Maus. ← / → springen 5 s, Ctrl+← / → 30 s (einstellbar unter Einstellungen → Allgemein); , / . ein Bild zurück / vor |
 | Lautstärke | ↑ / ↓ oder Mausrad; M schaltet den Ton aus |
 | ♡ | Zu Favoriten hinzufügen / entfernen (Ctrl+D) |
 | ☰ | Folgenliste (L) |
@@ -76,7 +77,7 @@ Die Steuerung erscheint, wenn du die Maus bewegst, und verschwindet während der
 | Öffnen | Datei öffnen (Ctrl+O) |
 | ⤢ | Vollbild (F) |
 
-Öffnest du ein Video, das du schon angefangen hast, fragt der Player **Weiterschauen?** (Enter = fortsetzen, Pos1 = von vorne).
+Öffnest du ein Video, das du schon angefangen hast, fragt der Player **Weiterschauen?** (Enter = fortsetzen, Pos1 = von vorne). Unter Einstellungen → Allgemein kannst du stattdessen immer fortsetzen oder immer von vorne beginnen lassen.
 
 ### Folgenliste
 
@@ -85,7 +86,7 @@ Die Steuerung erscheint, wenn du die Maus bewegst, und verschwindet während der
 - Beim Öffnen eines Ordners oder einer einzelnen Folge entsteht eine Liste aller Folgen, gruppiert nach Serie und Staffel. Sample-Dateien werden übersprungen.
 - **N** / **P** nächste / vorherige Folge, **L** blendet die Liste ein oder aus.
 - Die aktuelle Folge ist grün; ein Häkchen bedeutet angesehen (ab 95 %). Rechtsklick auf eine Folge markiert sie als angesehen oder nicht angesehen.
-- Am Ende einer Folge bietet eine Karte die nächste an und startet sie nach einem Countdown (einstellbar unter Einstellungen → Serien, oder abschaltbar).
+- Am Ende einer Folge bietet eine Karte die nächste an und startet sie nach einem Countdown (einstellbar unter Einstellungen → Allgemein → Serien, oder abschaltbar).
 
 ### Untertitel
 
@@ -95,49 +96,58 @@ Die Schaltfläche **CC** (oder Rechtsklick → **Untertitel**) öffnet das Unter
 - **Untertitel im Internet suchen…** (Ctrl+F) und **Untertitel aus Datei laden…** (Ctrl+T);
 - **Zeichenkodierung** für Dateien mit falschen Zeichen;
 - **Nach Sprache synchronisieren** (A), **Untertitel-Synchronisation…**, **Ursprüngliche Synchronisation wiederherstellen** (Ctrl+Backspace), **Untertitel ausblenden** (V);
-- **Untertitel-Einstellungen…**, **Untertitel aus dem Internet einrichten…**, **Untertitelquellen (Schlüssel)…**.
+- **Untertitel-Einstellungen…** (öffnet Einstellungen → Untertitel), **Untertitel aus dem Internet einrichten…**, **Untertitelquellen (Schlüssel)…**.
 
-Untertitel mit demselben Namen wie das Video (`Film.srt`, `Film.de.srt`, `Film.ger.srt`…) und Untertitel in MKV-Dateien werden automatisch geladen. Welche Sprache zuerst gewählt wird, legst du unter **Untertitel-Einstellungen → Untertitelsprachen (Reihenfolge der Priorität)** fest.
+Untertitel mit demselben Namen wie das Video (`Film.srt`, `Film.de.srt`, `Film.ger.srt`…) und Untertitel in MKV-Dateien werden automatisch geladen. Welche Sprache zuerst gewählt wird, legst du unter **Einstellungen → Untertitel → Untertitelsprachen (Reihenfolge der Priorität)** fest.
 
-<p align="center"><img src="manual/images/de/subtitle-settings.png" width="420" alt="Untertitel-Einstellungen"></p>
+<p align="center"><img src="manual/images/de/subtitle-settings.png" width="640" alt="Einstellungen, Tab Untertitel"></p>
 
-Im selben Fenster stellst du das Aussehen ein: Schrift, Größe, Umrandung, Höhe auf dem Bildschirm, Farbe, Fett und einen dunklen Hintergrund hinter dem Text. Änderungen sind sofort im Video sichtbar (ASS-Untertitel behalten ihre eigenen Stile).
+Im selben Tab stellst du die automatische Suche, die Zeichenkodierung alter Untertitel und das Aussehen ein: Schrift, Größe, Umrandung, Höhe auf dem Bildschirm, Farbe, Fett und einen dunklen Hintergrund hinter dem Text. Änderungen sind sofort im Video sichtbar (ASS-Untertitel behalten ihre eigenen Stile).
 
 ### Audio
 
 - **Lautstärke:** ↑ / ↓, Mausrad oder Schieberegler; **M** schaltet den Ton aus.
 - **Audiospur:** **B** wechselt zur nächsten, oder Rechtsklick → **Audio** und eine Spur wählen (Sprache, Format und Kanäle werden angezeigt). Die Wahl wird pro Video gespeichert.
+- **Einstellungen → Audio:** bevorzugte Audiosprache, Ausgabegerät, Audio-Synchronisierung (z. B. für Bluetooth-Kopfhörer) und Lautstärkeausgleich für leise Dialoge.
 
 ### Sprache der App
 
-<p align="center"><img src="manual/images/de/settings.png" width="420" alt="Einstellungen"></p>
+<p align="center"><img src="manual/images/de/settings.png" width="640" alt="Einstellungen, Tab Sprache"></p>
 
-Öffne die Einstellungen (Zahnrad auf dem Startbildschirm oder Rechtsklick → **Einstellungen…**). Ganz oben unter **Sprache** auf English, Deutsch oder Hrvatski klicken; Bosanski, Srpski und Slovenščina stehen unter **Weitere Sprachen**. Der ganze Player wechselt sofort, auch offene Fenster, Menüs und Meldungen. Ein Neustart ist nicht nötig, und die Sprache bleibt nach dem Schließen, einem Neustart des Computers und einem Update erhalten.
+Öffne die Einstellungen (Zahnrad auf dem Startbildschirm oder Rechtsklick → **Einstellungen…**) und den Tab **Sprache**. Auf English, Deutsch oder Hrvatski klicken; Bosanski, Srpski und Slovenščina stehen unter **Weitere Sprachen**. Der ganze Player wechselt sofort, auch offene Fenster, Menüs und Meldungen. Ein Neustart ist nicht nötig, und die Sprache bleibt nach dem Schließen, einem Neustart des Computers und einem Update erhalten.
 
 ### Dunkles / helles Design
 
 <p align="center"><img src="manual/images/de/home-light.jpg" width="760" alt="Helles Design"></p>
 
-Mit dem Schalter unten links auf dem Startbildschirm (Mond = dunkel, Sonne = hell) oder unter **Einstellungen → Darstellung → Helles Design**. Die Änderung gilt sofort und wird gespeichert. Dunkel ist Standard. Die Steuerung über dem Video bleibt immer dunkel, damit sie auf dem Bild gut sichtbar ist; Video und Untertitel werden vom Design nicht verändert.
+Mit dem Schalter unten links auf dem Startbildschirm (Mond = dunkel, Sonne = hell) oder unter **Einstellungen → Darstellung → Design**. Die Änderung gilt sofort und wird gespeichert. Dunkel ist Standard. Die Steuerung über dem Video bleibt immer dunkel, damit sie auf dem Bild gut sichtbar ist; Video und Untertitel werden vom Design nicht verändert.
 
 ### Verlauf und Favoriten
 
-- Die Position wird alle paar Sekunden und beim Schließen des Players gespeichert.
+- Die Position wird alle paar Sekunden, beim Pausieren, beim Klick auf **Startseite** und beim Schließen des Players gespeichert.
 - **Weiterschauen** zeigt die letzten Videos (× entfernt eines aus dem Verlauf).
 - **Favoriten:** Ctrl+D fügt einen Film oder die ganze Serie der aktuellen Folge hinzu; × auf dem Startbildschirm entfernt ihn.
 
 ### Einstellungen
 
-| Bereich | Was du einstellst |
+Die Einstellungen sind in Tabs aufgeteilt. Jede Änderung gilt sofort (auch für das laufende Video) und wird gespeichert.
+
+| Tab | Was du einstellst |
 |---|---|
+| Allgemein | Fortsetzen eines begonnenen Videos (fragen / fortsetzen / von vorne), Sprungweite der Pfeiltasten, Videos im Vollbild öffnen, Player im Vordergrund halten, Serien (nächste Folge, Countdown), Screenshot-Ordner, „Öffnen mit“ und Standard-Player |
 | Sprache | Sprache der App |
-| Darstellung | Helles / dunkles Design |
-| Serien | Nächste Folge automatisch abspielen, Länge des Countdowns |
-| Screenshots | Ordner für Screenshots (Standard: Bilder\jebaited_player) |
-| Untertitel | Untertitel-Einstellungen, Anleitung für Untertitel aus dem Internet, Untertitelquellen (Schlüssel) |
-| Windows | „Öffnen mit“ und Standard-Player festlegen |
-| Updates | Version, jetzt prüfen, automatischer Download |
-| Erweitert | Oberfläche über die GPU darstellen (standardmäßig aus) |
+| Untertitel | Untertitelsprachen und ihre Reihenfolge, automatisches Laden und Suchen, Quellen im Internet, Zeichenkodierung alter Untertitel, Aussehen, Synchronisierung |
+| Audio | Lautstärke, Lautstärkeausgleich, bevorzugte Audiosprache, Ausgabegerät, Audio-Synchronisierung |
+| Video | Bildqualität, Hardware-Dekodierung, Standard-Seitenverhältnis, HDR |
+| Darstellung | Dunkles / helles Design, wie lange die Steuerung sichtbar bleibt, Oberfläche über die GPU darstellen |
+| Updates | Version, jetzt prüfen, automatischer Download, Neuerungen, Update-Verlauf |
+| Info | Version, Lizenz, verwendete Technologien, Handbuch, Datenschutz, Richtlinie zur Code-Signierung |
+
+### Update-Verlauf
+
+<p align="center"><img src="manual/images/de/update-history.png" width="560" alt="Update-Verlauf"></p>
+
+Klicke unten rechts auf dem Startbildschirm auf die Versionsnummer und wähle **Update-Verlauf anzeigen**. Jede Version steht mit Datum, neuen Funktionen, Verbesserungen, Fehlerbehebungen und bekannten Problemen da. Der Verlauf ist im Player enthalten und funktioniert ohne Internet; online erscheinen neuere Versionen von GitHub oben. Derselbe Verlauf steht in [CHANGELOG_DE.md](CHANGELOG_DE.md) und auf der [Release-Seite](https://github.com/jebaitedcro7/jebaited_player/releases).
 
 ---
 
@@ -197,16 +207,17 @@ Archive von Untertitelseiten: ZIP wird unterstützt, RAR noch nicht.
 - **Seitenverhältnis:** **O** oder Rechtsklick → **Seitenverhältnis** (Original, 16:9, 4:3, 1,85:1, 2,35:1, Bild füllen).
 - **Screenshot:** **S** mit Untertiteln, **Shift+S** nur Bild; gespeichert als JPG in voller Videoauflösung.
 - **Zeichenkodierung:** CC → Zeichenkodierung, wenn Buchstaben wie ä, ö, ü, ß, č, ć, ž falsch aussehen.
-- **Standard-Player:** Einstellungen → Windows → **Als Standard-Player festlegen…**; die Windows-Einstellungen öffnen sich, dort auf „Als Standard festlegen“ klicken. Windows erlaubt Programmen nicht, das selbst zu tun.
+- **Standard-Player:** Einstellungen → Allgemein → Windows → **Als Standard-Player festlegen…**; die Windows-Einstellungen öffnen sich, dort auf „Als Standard festlegen“ klicken. Windows erlaubt Programmen nicht, das selbst zu tun.
 - **Ein Fenster:** Eine Datei, die du öffnest, während der Player läuft, geht an den offenen Player; mehrere ausgewählte Dateien öffnen sich als eine Liste.
 - **Oberfläche über die GPU darstellen:** standardmäßig aus (zuverlässiger); gilt nach einem Neustart. Video nutzt immer die GPU.
+- **Bildqualität und Dekodierung:** Einstellungen → Video — ausgewogen (Standard), hohe Qualität (schärfere Skalierung, mehr GPU-Last) oder schnell (ältere Computer); die Hardware-Dekodierung lässt sich abschalten, wenn das Bild fehlerhaft ist.
 
 ### Tastenkürzel
 
 | Taste | Aktion |
 |---|---|
 | Leertaste / K | Wiedergabe / Pause |
-| ← / → | 5 s zurück / vor (Ctrl: 30 s) |
+| ← / → | 5 s zurück / vor (Ctrl: 30 s; einstellbar unter Einstellungen → Allgemein) |
 | ↑ / ↓ / Mausrad | Lautstärke |
 | M | Ton aus / an |
 | F / Doppelklick | Vollbild (Esc zum Beenden) |
@@ -234,11 +245,11 @@ Einstellungen (auch Sprache und Design), Verlauf, Schlüssel und Zwischenspeiche
 
 ### Problemlösung
 
-- **„Der Computer wurde durch Windows geschützt“** — die App ist nicht signiert: Weitere Informationen → Trotzdem ausführen.
-- **Es werden keine Untertitel gefunden** — prüfe, ob eine Quelle eingerichtet ist (Einstellungen → Untertitel → Untertitelquellen). Ist das Tageslimit aufgebraucht, warte bis morgen oder füge SubDL hinzu. Manuell suchen kannst du immer mit **Ctrl+F** und dort Titel, Staffel und Folge korrigieren.
+- **„Der Computer wurde durch Windows geschützt“** — die App ist noch nicht signiert: Weitere Informationen → Trotzdem ausführen. Smart App Control: siehe [CODE_SIGNING.md](CODE_SIGNING.md); bitte nicht ausschalten.
+- **Es werden keine Untertitel gefunden** — prüfe, ob eine Quelle eingerichtet ist (Einstellungen → Untertitel → Untertitelquellen (Schlüssel)). Ist das Tageslimit aufgebraucht, warte bis morgen oder füge SubDL hinzu. Manuell suchen kannst du immer mit **Ctrl+F** und dort Titel, Staffel und Folge korrigieren.
 - **Untertitel sind falsch oder passen nicht** — meldet der Player, dass sie nicht zur Sprache passen, gehören sie wahrscheinlich zu einer anderen Folge oder Version: Ctrl+F und andere wählen. Ctrl+Backspace macht die manuelle Synchronisation rückgängig.
-- **Seltsame Zeichen statt Buchstaben** — CC → Zeichenkodierung → Windows-1252, Windows-1250 oder ISO-8859-2.
-- **Weiße oder leere Fenster** — prüfe, dass Einstellungen → Erweitert → „Oberfläche über die GPU darstellen“ aus ist (Standard).
+- **Seltsame Zeichen statt Buchstaben** — CC → Zeichenkodierung → Windows-1252, Windows-1250 oder ISO-8859-2. Passiert das bei den meisten deiner Untertitel, stelle es einmal unter Einstellungen → Untertitel → Zeichenkodierung alter Untertitel ein.
+- **Weiße oder leere Fenster** — prüfe, dass Einstellungen → Darstellung → Erweitert → „Oberfläche über die GPU darstellen“ aus ist (Standard).
 - **Ein Video wird nicht abgespielt** — der Grund steht im Protokoll: `%LOCALAPPDATA%\jebaited_player\logs\app.log`. Öffne ein Issue auf GitHub und hänge es an (es enthält keine Passwörter oder Schlüssel).
 - **Deinstallieren** — Windows-Einstellungen → Apps → jebaited_player → Deinstallieren. Auch „Öffnen mit“ wird entfernt. Einstellungen und Verlauf bleiben in `%LOCALAPPDATA%\jebaited_player`; lösche den Ordner, wenn du sie nicht brauchst.
 
@@ -246,7 +257,7 @@ Einstellungen (auch Sprache und Design), Verlauf, Schlüssel und Zwischenspeiche
 
 - Ins Internet gehen nur: Untertitelsuchen (Titel, Jahr, Staffel/Folge, Datei-Fingerabdruck) an die Quellen, die du eingerichtet hast, die Anmeldung bei diesen Quellen mit deinem Konto und die Update-Prüfung auf GitHub.
 - Passwörter und Schlüssel sind verschlüsselt (Windows DPAPI, an dein Windows-Konto gebunden) und werden nie ins Protokoll geschrieben.
-- Keine Statistiken, kein Tracking.
+- Keine Statistiken, kein Tracking. Alle Details: [PRIVACY.md](PRIVACY.md).
 
 ### Übersetzungen
 

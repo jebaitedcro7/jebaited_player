@@ -22,8 +22,6 @@ public partial class SubtitleSourcesWindow : Window
         MaxHeight = Math.Max(400, SystemParameters.WorkArea.Height - 24);
 
         OnlineSettings o = settings.Online;
-        AutoSearchBox.IsChecked = o.AutoSearch;
-        SaveNextBox.IsChecked = o.SaveNextToVideo;
         OsEnabled.IsChecked = o.OpenSubtitlesEnabled;
         OsKey.Password = Secret.Unprotect(o.OpenSubtitlesApiKey) ?? string.Empty;
         OsUser.Text = o.OpenSubtitlesUsername ?? string.Empty;
@@ -42,8 +40,6 @@ public partial class SubtitleSourcesWindow : Window
     private void OnSaveClick(object sender, RoutedEventArgs e)
     {
         OnlineSettings o = _settings.Online;
-        o.AutoSearch = AutoSearchBox.IsChecked == true;
-        o.SaveNextToVideo = SaveNextBox.IsChecked == true;
         o.OpenSubtitlesEnabled = OsEnabled.IsChecked == true;
         o.OpenSubtitlesApiKey = Secret.Protect(OsKey.Password.Trim());
         o.OpenSubtitlesUsername = Empty(OsUser.Text);

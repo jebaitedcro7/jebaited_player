@@ -91,6 +91,115 @@ internal static class MpvConfig
 
     public static string LanguagePriority(AppSettings settings) => SubtitleLanguage.BuildMpvSlang(settings.SubtitleLanguages);
 
+    // --- UPGRADE 3: zvuk i slika iz postavki -----------------------------------------------------------------------
+
+    /// <summary>Ujednačavanje glasnoće (dynaudnorm): tiši glasni prizori, glasniji dijalog; bez rezanja vrhova.</summary>
+    public const string NormalizeFilter = "lavfi=[dynaudnorm=f=250:g=15:p=0.9:m=8]";
+
+    /// <summary>Opcije koje mijenja kvaliteta slike ("balanced" = zadane vrijednosti mpv-a).</summary>
+    private static readonly string[] QualityOptionNames =
+        ["scale", "cscale", "dscale", "dither", "correct-downscaling", "linear-downscaling", "sigmoid-upscaling", "hdr-compute-peak", "deband"];
+
+    private static readonly Dictionary<string, string> QualityDefaults = [];
+
+    private static IEnumerable<(string Name, string Value)> QualityValues(string quality) => quality switch
+    {
+        // Kao mpv-ov profil "high-quality": oštrije skaliranje i uklanjanje "stepenica" u gradijentima (više GPU-a).
+        "high" => [("scale", "ewa_lanczossharp"), ("cscale", "ewa_lanczossharp"), ("dscale", "mitchell"), ("deband", "yes")],
+
+        // Kao mpv-ov profil "fast": najjednostavnije skaliranje, za slabija računala.
+        "fast" =>
+        [
+            ("scale", "bilinear"), ("cscale", "bilinear"), ("dscale", "bilinear"), ("dither", "no"), ("correct-downscaling", "no"),
+            ("linear-downscaling", "no"), ("sigmoid-upscaling", "no"), ("hdr-compute-peak", "no"), ("deband", "no"),
+        ],
+        _ => [],
+    };
+
+    /// <summary>Opcije zvuka i slike iz postavki, prije mpv_initialize (zadane vrijednosti se ne postavljaju).</summary>
+    public static void ApplyPlaybackOptionsBeforeInit(MpvPlayer player, AppSettings s)
+    {
+        foreach (var (name, value) in PlaybackOptions(s, includeDefaults: false))
+        {
+            if (!player.TrySetOption(name, value))
+            {
+                Log.Warn($"mpv opcija iz postavki nije prihvaćena: {name}={value}");
+            }
+        }
+    }
+
+    /// <summary>Nakon mpv_initialize: zapamti zadane vrijednosti opcija kvalitete (za povratak na "balanced" tijekom rada).</summary>
+    public static void CaptureDefaults(MpvPlayer player)
+    {
+        foreach (string name in QualityOptionNames)
+        {
+            if (player.GetPropertyString($"option-info/{name}/default-value") is { } value)
+            {
+                QualityDefaults[name] = value;
+            }
+        }
+    }
+
+    /// <summary>Tijekom rada: primijeni postavke zvuka i slike odmah (promjena u Postavkama).</summary>
+    public static void ApplyPlaybackLive(MpvPlayer player, AppSettings s)
+    {
+        foreach (var (name, value) in PlaybackOptions(s, includeDefaults: true))
+        {
+            player.SetPropertyAsync(name, value);
+        }
+    }
+
+    /// <summary>mpv opcije za postavke zvuka i slike. S <paramref name="includeDefaults"/> i one koje vraćaju zadano stanje.</summary>
+    public static IEnumerable<(string Name, string Value)> PlaybackOptions(AppSettings s, bool includeDefaults)
+    {
+        if (!s.HardwareDecoding || includeDefaults)
+        {
+            yield return ("hwdec", s.HardwareDecoding ? "auto-safe" : "no");
+        }
+
+        if (s.AudioLanguage is { Length: > 0 } lang)
+        {
+            yield return ("alang", SubtitleLanguage.BuildMpvSlang([lang]));
+        }
+        else if (includeDefaults)
+        {
+            yield return ("alang", string.Empty);
+        }
+
+        if (s.AudioDevice != "auto" || includeDefaults)
+        {
+            yield return ("audio-device", s.AudioDevice);
+        }
+
+        if (Math.Abs(s.AudioDelayMs) > 0.5 || includeDefaults)
+        {
+            yield return ("audio-delay", F(s.AudioDelayMs / 1000.0));
+        }
+
+        if (s.NormalizeAudio || includeDefaults)
+        {
+            yield return ("af", s.NormalizeAudio ? NormalizeFilter : string.Empty);
+        }
+
+        if (s.HdrPassthrough || includeDefaults)
+        {
+            yield return ("target-colorspace-hint", s.HdrPassthrough ? "yes" : "no");
+        }
+
+        Dictionary<string, string> chosen = QualityValues(s.VideoQuality).ToDictionary(v => v.Name, v => v.Value);
+        foreach (string name in QualityOptionNames)
+        {
+            if (chosen.TryGetValue(name, out string? value))
+            {
+                yield return (name, value);
+            }
+            else if (includeDefaults && QualityDefaults.TryGetValue(name, out string? def))
+            {
+                yield return (name, def);
+            }
+        }
+    }
+
     /// <summary>Prije mpv_initialize: otkrij nazive opcija i postavi jezik i izgled titlova.</summary>
     public static void ApplySubtitleOptionsBeforeInit(MpvPlayer player, AppSettings settings)
     {

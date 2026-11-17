@@ -11,7 +11,7 @@
       JebaitedPlayer-<verzija>-full.nupkg / -delta.nupkg, releases.win.json  za nadogradnje
 
 .EXAMPLE
-  .\tools\release.ps1 -Version 1.0.0     (bilješke izdanja uzima iz CHANGELOG.md)
+  .\tools\release.ps1 -Version 1.2.0     (bilješke izdanja iz History\update-history.json, tools\release-notes.ps1)
 #>
 param(
     [Parameter(Mandatory)] [string]$Version,
@@ -92,15 +92,16 @@ try {
         "--outputDir", $OutputDir
     )
     if (-not $Notes) {
-        # Bilješke izdanja: odjeljak "## <verzija>" iz CHANGELOG.md (ako postoji).
-        $changelog = Join-Path $root "CHANGELOG.md"
-        if (Test-Path $changelog) {
-            $pattern = '(?ms)^## ' + [regex]::Escape($Version) + '\s*$(.*?)(?=^## |\z)'
-            $m = [regex]::Match((Get-Content $changelog -Raw -Encoding UTF8), $pattern)
-            if ($m.Success) {
-                $Notes = Join-Path $OutputDir "notes-$Version.md"
-                [IO.File]::WriteAllText($Notes, $m.Groups[1].Value.Trim() + "`n", (New-Object Text.UTF8Encoding $false))
-            }
+        # Bilješke izdanja (UPGRADE 3): engleski, njemački i hrvatski iz povijesti nadogradnji (update-history.json),
+        # s datumom i poveznicom na prethodnu verziju. Ista povijest je u playeru i u CHANGELOG*.md.
+        # Testne verzije (npr. 0.99.x u run-update-test.ps1) nisu u povijesti i nemaju bilješke.
+        $history = Get-Content (Join-Path $root "src\JebaitedPlayer.App\History\update-history.json") -Raw -Encoding UTF8
+        if ($history -match ('"version":\s*"' + [regex]::Escape($Version) + '"')) {
+            $Notes = Join-Path $OutputDir "notes-$Version.md"
+            & (Join-Path $PSScriptRoot "release-notes.ps1") -Version $Version -Out $Notes | Out-Host
+        }
+        else {
+            "Verzija $Version nije u update-history.json: izdanje bez bilješki."
         }
     }
     if ($Notes) { $packArgs += @("--releaseNotes", (Resolve-Path $Notes).Path) }

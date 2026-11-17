@@ -1,7 +1,9 @@
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Interop;
+using JebaitedPlayer.Infrastructure;
 using JebaitedPlayer.ViewModels;
 using static JebaitedPlayer.Interop.NativeMethods;
 
@@ -40,32 +42,91 @@ public partial class ControlsOverlay : Window
             e.Handled = true;
         };
 
-        // Vremensku traku vodimo sami: klik skoči na mjesto, povlačenje premotava uživo.
+        // Vremensku traku vodimo sami (UPGRADE 3): klik bilo gdje odmah precizno premota na to mjesto,
+        // povlačenje premotava uživo (ključni kadrovi), a na kraju povlačenja opet precizno.
+        // Klik se ovdje "potroši", pa nikad ne stigne do videa (nema pauze ni pokretanja).
         Timeline.PreviewMouseLeftButtonDown += (_, e) =>
         {
-            _vm.IsScrubbing = true;
-            Timeline.CaptureMouse();
-            ScrubToMouse(e);
             e.Handled = true;
+            if (!_vm.HasMedia || _vm.Duration <= 0)
+            {
+                return;
+            }
+
+            _vm.IsScrubbing = true;
+            _scrubMoved = false;
+            _scrubStartX = e.GetPosition(Timeline).X;
+            Timeline.CaptureMouse();
+            double value = ValueAt(e);
+            _vm.ScrubTo(value, final: true);
+            ShowPreview(e, value);
+            UserActivity?.Invoke(this, EventArgs.Empty);
         };
         Timeline.PreviewMouseMove += (_, e) =>
         {
             if (_vm.IsScrubbing && Timeline.IsMouseCaptured)
             {
-                ScrubToMouse(e);
+                if (Math.Abs(e.GetPosition(Timeline).X - _scrubStartX) >= 3)
+                {
+                    _scrubMoved = true;
+                }
+
+                if (_scrubMoved)
+                {
+                    double value = ValueAt(e);
+                    _vm.ScrubTo(value, final: false);
+                    ShowPreview(e, value);
+                }
+            }
+            else if (_vm.Duration > 0)
+            {
+                ShowPreview(e, ValueAt(e));
             }
         };
         Timeline.PreviewMouseLeftButtonUp += (_, e) =>
         {
             if (_vm.IsScrubbing)
             {
-                ScrubToMouse(e);
+                if (_scrubMoved)
+                {
+                    _vm.ScrubTo(ValueAt(e), final: true);
+                }
+
                 EndScrub();
                 e.Handled = true;
             }
         };
         Timeline.LostMouseCapture += (_, _) => EndScrub();
+        Timeline.MouseLeave += (_, _) =>
+        {
+            if (!_vm.IsScrubbing)
+            {
+                SeekPreview.Visibility = Visibility.Collapsed;
+            }
+        };
     }
+
+    private bool _scrubMoved;
+    private double _scrubStartX;
+
+    /// <summary>Oblačić s vremenom iznad trake (UPGRADE 3): vidljiv dok je miš na traci; dijagnostika ga čita.</summary>
+    internal string? SeekPreviewText => SeekPreview.Visibility == Visibility.Visible ? SeekBubbleText.Text : null;
+
+    /// <summary>Točno vrijeme (s) iz oblačića: tamo vodi klik na tom mjestu.</summary>
+    internal double? SeekPreviewSeconds => SeekPreview.Visibility == Visibility.Visible ? _previewSeconds : null;
+
+    private double _previewSeconds;
+
+    /// <summary>Točka na zaslonu (fizički pikseli) za zadani udio trake 0–1: ondje klik vodi na udio × trajanje.</summary>
+    internal Point TimelineScreenPoint(double fraction)
+    {
+        Track track = TimelineTrack ?? throw new InvalidOperationException("Traka nije spremna.");
+        double thumb = track.Thumb?.ActualWidth ?? 0;
+        double x = thumb / 2 + (track.ActualWidth - thumb) * Math.Clamp(fraction, 0, 1);
+        return track.PointToScreen(new Point(x, track.ActualHeight / 2));
+    }
+
+    private Track? TimelineTrack => Timeline.Template?.FindName("PART_Track", Timeline) as Track;
 
     public event EventHandler? UserActivity;
     public event EventHandler<string[]>? FilesDropped;
@@ -107,15 +168,34 @@ public partial class ControlsOverlay : Window
         e.Handled = true;
     }
 
-    private void ScrubToMouse(MouseEventArgs e)
+    /// <summary>Vrijeme (s) ispod miša: isto preslikavanje kao kružić trake (sredina kružića je na mišu).</summary>
+    private double ValueAt(MouseEventArgs e)
     {
-        if (Timeline.Template.FindName("PART_Track", Timeline) is not Track track)
+        if (TimelineTrack is not { } track)
         {
+            return _vm.Position;
+        }
+
+        return Math.Clamp(track.ValueFromPoint(e.GetPosition(track)), Timeline.Minimum, Timeline.Maximum);
+    }
+
+    private void ShowPreview(MouseEventArgs e, double value)
+    {
+        if (TimelineTrack is not { } track || _vm.Duration <= 0)
+        {
+            SeekPreview.Visibility = Visibility.Collapsed;
             return;
         }
 
-        double value = Math.Clamp(track.ValueFromPoint(e.GetPosition(track)), Timeline.Minimum, Timeline.Maximum);
-        _vm.ScrubTo(value, final: false);
+        double thumb = track.Thumb?.ActualWidth ?? 0;
+        double x = Math.Clamp(e.GetPosition(Timeline).X, thumb / 2, Math.Max(thumb / 2, Timeline.ActualWidth - thumb / 2));
+        _previewSeconds = value;
+        SeekBubbleText.Text = TimeFormat.Format(value, _vm.Duration >= 3600);
+        SeekPreview.Visibility = Visibility.Visible;
+        SeekBubble.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+        double width = SeekBubble.DesiredSize.Width;
+        Canvas.SetLeft(SeekBubble, Math.Clamp(x - width / 2, -40, Math.Max(-40, Timeline.ActualWidth + 40 - width)));
+        Canvas.SetLeft(SeekMarker, x - 1);
     }
 
     private void EndScrub()
@@ -126,10 +206,14 @@ public partial class ControlsOverlay : Window
         }
 
         _vm.IsScrubbing = false;
-        _vm.ScrubTo(_vm.Position, final: true);
         if (Timeline.IsMouseCaptured)
         {
             Timeline.ReleaseMouseCapture();
+        }
+
+        if (!Timeline.IsMouseOver)
+        {
+            SeekPreview.Visibility = Visibility.Collapsed;
         }
     }
 }

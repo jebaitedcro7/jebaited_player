@@ -25,4 +25,19 @@ public partial class LanguagePickerWindow : Window
     }
 
     private void OnContinue(object sender, RoutedEventArgs e) => Close();
+
+    private void OnPrivacy(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(Services.UpdateHistory.Repository + "/blob/main/PRIVACY.md")
+            {
+                UseShellExecute = true,
+            });
+        }
+        catch (Exception ex) when (ex is System.ComponentModel.Win32Exception or InvalidOperationException)
+        {
+            Infrastructure.Log.Warn($"Poveznica se nije otvorila: {ex.Message}");
+        }
+    }
 }

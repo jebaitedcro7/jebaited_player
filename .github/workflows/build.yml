@@ -1,0 +1,33 @@
+# Izrada i jedinični testovi na GitHubovim računalima (svaki push na main i svaki pull request).
+# Isti postupak kao lokalno: libmpv se preuzima i provjerava SHA256 (third_party/libmpv/SOURCE.md).
+name: Build and test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - name: libmpv (verified SHA-256)
+        shell: powershell
+        run: .\tools\get-libmpv.ps1
+
+      - name: Build
+        run: dotnet build jebaited_player.slnx -c Release --nologo
+
+      - name: Unit tests
+        run: dotnet test jebaited_player.slnx -c Release --no-build --nologo

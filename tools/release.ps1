@@ -80,6 +80,7 @@ try {
     $packArgs = @(
         "vpk", "pack",
         "--packId", "JebaitedPlayer",
+        "--runtime", "win-x64",
         "--packVersion", $Version,
         "--packDir", $publishDir,
         "--mainExe", "jebaited_player.exe",

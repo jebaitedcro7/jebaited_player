@@ -55,6 +55,7 @@ public partial class App : Application
             System.Windows.Media.RenderOptions.ProcessRenderMode = System.Windows.Interop.RenderMode.SoftwareOnly;
         }
 
+        Log.Info($"Inačica: {(AppPackage.IsStore ? "Microsoft Store (MSIX paket)" : "GitHub")}");
         Log.Info($"Sučelje: {(softwareUi ? "iscrtavanje bez GPU-a" : $"GPU iscrtavanje (WPF razina {System.Windows.Media.RenderCapability.Tier >> 16})")}");
 
         // Tema: dijagnostika je može zadati bez mijenjanja tvojih postavki.

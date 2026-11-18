@@ -219,7 +219,8 @@
                             <Button x:Name="CheckUpdateButton" Style="{StaticResource SecondaryButton}" Content="{loc:T settings.checkNow}" Click="OnCheckUpdate" />
                             <Button x:Name="RestartUpdateButton" Style="{StaticResource SecondaryButton}" Content="{loc:T settings.restartUpdate}" Click="OnRestartUpdate" />
                         </WrapPanel>
-                        <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.updatesHint}" />
+                        <TextBlock x:Name="UpdatesHintText" Style="{StaticResource HintText}" Text="{loc:T settings.updatesHint}" />
+                        <TextBlock x:Name="UpdatesStoreHintText" Style="{StaticResource HintText}" Text="{loc:T settings.updatesHintStore}" Visibility="Collapsed" />
 
                         <TextBlock x:Name="WhatsNewTitle" Style="{StaticResource SectionHeader}" Margin="0,24,0,2" />
                         <TextBlock x:Name="WhatsNewDate" Style="{StaticResource HintText}" />

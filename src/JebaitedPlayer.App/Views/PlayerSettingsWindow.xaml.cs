@@ -229,6 +229,14 @@ public partial class PlayerSettingsWindow : Window
 
     private void UpdateShellStatus()
     {
+        if (AppPackage.IsStore)
+        {
+            // Store inačica: vrste datoteka pridružuje manifest paketa; zadani player bira se u Zadanim aplikacijama.
+            ShellStatusText.Text = Loc.T("settings.shellStore");
+            UnregisterButton.Visibility = Visibility.Collapsed;
+            return;
+        }
+
         string? exe = Environment.ProcessPath;
         string? registered = ShellIntegration.RegisteredExe();
         bool current = exe != null && ShellIntegration.IsRegisteredFor(exe);
@@ -244,7 +252,7 @@ public partial class PlayerSettingsWindow : Window
     {
         try
         {
-            if (Environment.ProcessPath is { } exe && !ShellIntegration.IsRegisteredFor(exe))
+            if (!AppPackage.IsStore && Environment.ProcessPath is { } exe && !ShellIntegration.IsRegisteredFor(exe))
             {
                 int types = ShellIntegration.Register(exe);
                 Log.Info($"Registracija u Windowsu iz postavki: {types} vrsta datoteka ({exe})");
@@ -456,6 +464,8 @@ public partial class PlayerSettingsWindow : Window
         VersionText.Text = $"jebaited_player {_updates.CurrentVersion}{(_updates.IsPortable ? " " + Loc.T("settings.portable") : string.Empty)}";
         UpdateStatusText.Text = _updates.Status;
         bool installed = _updates.IsInstalled;
+        UpdatesHintText.Visibility = _updates.IsStore ? Visibility.Collapsed : Visibility.Visible;
+        UpdatesStoreHintText.Visibility = _updates.IsStore ? Visibility.Visible : Visibility.Collapsed;
         AutoUpdateBox.Visibility = installed ? Visibility.Visible : Visibility.Collapsed;
         UpdateButtons.Visibility = installed ? Visibility.Visible : Visibility.Collapsed;
         CheckUpdateButton.IsEnabled = _updates.State is not (UpdateState.Checking or UpdateState.Downloading);

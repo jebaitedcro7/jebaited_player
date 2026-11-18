@@ -33,12 +33,14 @@ public sealed class UpdateService
     private string _status = string.Empty;
 
     /// <param name="sourceOverride">Mapa s izdanjima umjesto GitHuba (samo za testove).</param>
-    public UpdateService(string? sourceOverride = null)
+    /// <param name="store">Inačica iz Microsoft Storea (zadano: prepoznaje se iz Windowsa). Tada nadogradnje radi Store.</param>
+    public UpdateService(string? sourceOverride = null, bool? store = null)
     {
-        string? repo = RepositoryUrl;
+        IsStore = store ?? AppPackage.IsStore;
+        string? repo = IsStore ? null : RepositoryUrl;
         try
         {
-            IUpdateSource? source = sourceOverride != null
+            IUpdateSource? source = IsStore ? null : sourceOverride != null
                 ? new SimpleFileSource(new DirectoryInfo(sourceOverride))
                 : repo != null ? new GithubSource(repo, null, false) : null;
             if (source != null)
@@ -62,6 +64,9 @@ public sealed class UpdateService
         .FirstOrDefault(a => a.Key == "UpdateRepositoryUrl")?.Value is { Length: > 0 } url ? url : null;
 
     public event EventHandler? Changed;
+
+    /// <summary>Inačica iz Microsoft Storea: nema Velopacka ni provjere na GitHubu.</summary>
+    public bool IsStore { get; }
 
     public bool IsInstalled => Safe(() => _manager?.IsInstalled) == true;
 
@@ -168,7 +173,7 @@ public sealed class UpdateService
 
     private string DescribeState() => _state switch
     {
-        UpdateState.NotInstalled => Loc.T("update.notInstalled"),
+        UpdateState.NotInstalled => Loc.T(IsStore ? "update.store" : "update.notInstalled"),
         UpdateState.Checking => Loc.T("update.checking"),
         UpdateState.Downloading => Loc.T("update.downloading"),
         UpdateState.UpToDate => Loc.T("update.upToDate"),

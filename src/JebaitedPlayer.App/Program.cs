@@ -14,11 +14,19 @@ internal static class Program
     {
         // Velopack: instalacija, nadogradnja i deinstalacija pokreću exe s posebnim argumentima; tada se ovdje
         // obavi registracija u Windowsu i proces završi. Preuzeta nadogradnja koja još nije instalirana primijeni se ovdje.
-        VelopackApp.Build()
-            .OnAfterInstallFastCallback(v => RunHook($"Instalirana verzija {v}", InstallHook.Install))
-            .OnAfterUpdateFastCallback(v => RunHook($"Nadograđeno na verziju {v}", InstallHook.Update))
-            .OnBeforeUninstallFastCallback(v => RunHook($"Deinstalacija verzije {v}", InstallHook.Uninstall))
-            .Run();
+        // Inačica iz Microsoft Storea: instalaciju i nadogradnje radi Store, pa Velopack ne smije ništa raditi.
+        if (!AppPackage.IsStore)
+        {
+            VelopackApp.Build()
+                .OnAfterInstallFastCallback(v => RunHook($"Instalirana verzija {v}", InstallHook.Install))
+                .OnAfterUpdateFastCallback(v => RunHook($"Nadograđeno na verziju {v}", InstallHook.Update))
+                .OnBeforeUninstallFastCallback(v => RunHook($"Deinstalacija verzije {v}", InstallHook.Uninstall))
+                .Run();
+        }
+        else if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("JEBAITED_DATA_DIR")))
+        {
+            ImportGitHubData();
+        }
 
         StartupOptions options;
         Exception? argsError = null;
@@ -34,6 +42,12 @@ internal static class Program
 
         if (options.RegisterCommand is { } command)
         {
+            if (AppPackage.IsStore)
+            {
+                // U paketu vrste datoteka pridružuje manifest; zapis u registry bi bio virtualiziran i beskoristan.
+                return 0;
+            }
+
             string root = options.DiagRegistryRoot ?? ShellIntegration.DefaultRoot;
             if (root != ShellIntegration.DefaultRoot && !root.StartsWith(@"Software\", StringComparison.OrdinalIgnoreCase))
             {
@@ -98,6 +112,25 @@ internal static class Program
             case InstallHook.Uninstall when registeredHere:
                 RunRegistration("unregister", ShellIntegration.DefaultRoot);
                 break;
+        }
+    }
+
+    /// <summary>Store inačica: jednom preuzmi postavke i povijest GitHub inačice (ako postoje). Greška ne smije spriječiti start.</summary>
+    private static void ImportGitHubData()
+    {
+        try
+        {
+            int files = LegacyDataImport.Run(AppPaths.GitHubDataDir, AppPaths.DataDir);
+            if (files > 0)
+            {
+                Log.Init();
+                Log.Info($"Preuzeti podaci GitHub inačice ({files} datoteke) iz {AppPaths.GitHubDataDir}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Init();
+            Log.Warn($"Podaci GitHub inačice nisu preuzeti: {ex.Message}");
         }
     }
 

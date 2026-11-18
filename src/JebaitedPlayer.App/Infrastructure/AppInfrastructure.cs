@@ -11,10 +11,23 @@ public static class AppPaths
     /// Postavke, povijest, ključevi i predmemorija. Namjerno izvan mape programa (%LOCALAPPDATA%\JebaitedPlayer),
     /// pa ih nadogradnja ni ponovna instalacija ne diraju. <c>JEBAITED_DATA_DIR</c> je samo za testove nadogradnje.
     /// </summary>
-    public static string DataDir { get; } =
-        Environment.GetEnvironmentVariable("JEBAITED_DATA_DIR") is { Length: > 0 } testDir && Path.IsPathFullyQualified(testDir)
+    public static string DataDir { get; } = ResolveDataDir(Environment.GetEnvironmentVariable("JEBAITED_DATA_DIR"), AppPackage.FamilyName);
+
+    /// <summary>Mapa podataka GitHub inačice; Store inačica iz nje jednom preuzme postavke i povijest (<see cref="LegacyDataImport"/>).</summary>
+    public static string GitHubDataDir => Path.Combine(LocalAppData, "jebaited_player");
+
+    private static string LocalAppData => Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+
+    /// <summary>
+    /// Testna mapa (JEBAITED_DATA_DIR), inače: Store inačica u vlastitoj mapi paketa (LocalState, Windows je ne virtualizira
+    /// pa nema podataka podijeljenih između stvarne i virtualne mape), GitHub inačica u %LOCALAPPDATA%\jebaited_player.
+    /// </summary>
+    internal static string ResolveDataDir(string? testDir, string? packageFamilyName) =>
+        testDir is { Length: > 0 } && Path.IsPathFullyQualified(testDir)
             ? testDir
-            : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "jebaited_player");
+            : packageFamilyName is { Length: > 0 }
+                ? Path.Combine(LocalAppData, "Packages", packageFamilyName, "LocalState", "jebaited_player")
+                : Path.Combine(LocalAppData, "jebaited_player");
 
     public static string LogsDir => Path.Combine(DataDir, "logs");
 

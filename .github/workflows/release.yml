@@ -1,0 +1,171 @@
+# Izdanje (UPGRADE 3): izrada, testovi, paketi za instalaciju i nadogradnju, i potpisivanje preko SignPath Foundationa.
+#
+# - Pokreće se ručno (Actions → Release → Run workflow) ili oznakom vX.Y.Z.
+# - Potpisivanje je isključeno dok u repozitoriju ne postoji varijabla SIGNPATH_ORGANIZATION_ID (Settings → Secrets and
+#   variables → Actions). Tada se uključuje samo od sebe; svaki zahtjev za potpis odobrava se ručno u SignPathu.
+# - Potrebno u GitHubu kad SignPath odobri projekt (vidi CODE_SIGNING.md):
+#     secret   SIGNPATH_API_TOKEN
+#     variable SIGNPATH_ORGANIZATION_ID, SIGNPATH_PROJECT_SLUG (npr. jebaited_player), SIGNPATH_POLICY_SLUG (release-signing)
+#   SignPath: artifact configuration "app" (PE datoteke playera unutar zip-a) i "installer" (Setup.exe unutar zip-a).
+# - Objava na GitHub Releases ostaje zaseban, ručni korak (tools/upload-release.ps1), nakon pregleda paketa.
+name: Release
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 40
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      app-artifact-id: ${{ steps.upload-app.outputs.artifact-id }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - name: Version (Directory.Build.props)
+        id: version
+        shell: pwsh
+        run: |
+          $v = ([regex]::Match((Get-Content Directory.Build.props -Raw), '<Version>([^<]+)</Version>')).Groups[1].Value
+          if ("${{ github.ref_type }}" -eq "tag" -and "${{ github.ref_name }}" -ne "v$v") { throw "Tag ${{ github.ref_name }} does not match version $v." }
+          "version=$v" >> $env:GITHUB_OUTPUT
+
+      - name: libmpv (verified SHA-256)
+        shell: powershell
+        run: .\tools\get-libmpv.ps1
+
+      - name: Unit tests
+        run: dotnet test jebaited_player.slnx -c Release --nologo
+
+      - name: Publish (self-contained win-x64)
+        run: >
+          dotnet publish src/JebaitedPlayer.App/JebaitedPlayer.App.csproj -c Release -r win-x64 --self-contained true
+          -p:Version=${{ steps.version.outputs.version }} -p:InformationalVersion=${{ steps.version.outputs.version }}
+          -o publish/app --nologo
+
+      - name: Release notes (EN/DE/HR from update-history.json)
+        shell: powershell
+        run: .\tools\release-notes.ps1 -Version ${{ steps.version.outputs.version }} -Out publish\notes.md
+
+      - uses: actions/upload-artifact@v7
+        id: upload-app
+        with:
+          name: app-unsigned
+          path: publish/app
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: release-notes
+          path: publish/notes.md
+
+  sign-app:
+    needs: build
+    if: ${{ vars.SIGNPATH_ORGANIZATION_ID != '' }}
+    runs-on: windows-latest
+    steps:
+      - name: SignPath (jebaited_player.exe and own DLLs)
+        uses: signpath/github-action-submit-signing-request@v2
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ vars.SIGNPATH_POLICY_SLUG }}
+          artifact-configuration-slug: app
+          github-artifact-id: ${{ needs.build.outputs.app-artifact-id }}
+          wait-for-completion: true
+          output-artifact-directory: signed/app
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: app-signed
+          path: signed/app
+          if-no-files-found: error
+
+  package:
+    needs: [build, sign-app]
+    if: ${{ always() && needs.build.result == 'success' && (needs.sign-app.result == 'success' || needs.sign-app.result == 'skipped') }}
+    runs-on: windows-latest
+    timeout-minutes: 30
+    outputs:
+      installer-artifact-id: ${{ steps.upload-installer.outputs.artifact-id }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: ${{ needs.sign-app.result == 'success' && 'app-signed' || 'app-unsigned' }}
+          path: publish/app
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: release-notes
+          path: publish
+
+      - name: Velopack (Setup.exe, portable, update packages)
+        shell: pwsh
+        run: |
+          dotnet tool restore
+          dotnet vpk download github --repoUrl https://github.com/jebaitedcro7/jebaited_player -o Releases
+          dotnet vpk pack --packId JebaitedPlayer --runtime win-x64 --packVersion ${{ needs.build.outputs.version }} `
+            --packDir publish/app --mainExe jebaited_player.exe --packTitle jebaited_player --packAuthors jebaited_player `
+            --icon assets/jebaited_player.ico --splashImage assets/icon-512.png --shortcuts "Desktop,StartMenuRoot" `
+            --releaseNotes publish/notes.md --outputDir Releases
+          if ($LASTEXITCODE -ne 0) { throw "vpk pack failed." }
+          Get-AuthenticodeSignature publish/app/jebaited_player.exe | Format-List Status, SignerCertificate
+
+      - uses: actions/upload-artifact@v7
+        id: upload-installer
+        with:
+          name: installer-unsigned
+          path: Releases/JebaitedPlayer-win-Setup.exe
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: release-packages
+          path: |
+            Releases/*${{ needs.build.outputs.version }}*
+            Releases/JebaitedPlayer-win-*
+            Releases/releases.win.json
+            Releases/assets.win.json
+            Releases/RELEASES
+          if-no-files-found: error
+
+  sign-installer:
+    needs: package
+    if: ${{ vars.SIGNPATH_ORGANIZATION_ID != '' && needs.package.result == 'success' }}
+    runs-on: windows-latest
+    steps:
+      - name: SignPath (JebaitedPlayer-win-Setup.exe)
+        uses: signpath/github-action-submit-signing-request@v2
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ vars.SIGNPATH_POLICY_SLUG }}
+          artifact-configuration-slug: installer
+          github-artifact-id: ${{ needs.package.outputs.installer-artifact-id }}
+          wait-for-completion: true
+          output-artifact-directory: signed/installer
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: installer-signed
+          path: signed/installer
+          if-no-files-found: error

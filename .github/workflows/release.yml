@@ -122,6 +122,13 @@ jobs:
         run: |
           dotnet tool restore
           dotnet vpk download github --repoUrl https://github.com/jebaitedcro7/jebaited_player -o Releases
+          # Probno pokretanje za već objavljenu verziju: Velopack (s pravom) odbija istu verziju, pa se radi testni
+          # paket bez delte. Takav paket se NE objavljuje; nova verzija se uvijek pakira s deltom od prethodne.
+          if (Test-Path "Releases/JebaitedPlayer-${{ needs.build.outputs.version }}-full.nupkg") {
+            Write-Output "::warning::Version ${{ needs.build.outputs.version }} is already published: test package without delta (do not upload)."
+            Remove-Item Releases -Recurse -Force
+            New-Item -ItemType Directory -Path Releases | Out-Null
+          }
           dotnet vpk pack --packId JebaitedPlayer --runtime win-x64 --packVersion ${{ needs.build.outputs.version }} `
             --packDir publish/app --mainExe jebaited_player.exe --packTitle jebaited_player --packAuthors jebaited_player `
             --icon assets/jebaited_player.ico --splashImage assets/icon-512.png --shortcuts "Desktop,StartMenuRoot" `

@@ -4,6 +4,21 @@ Sve važnije promjene jebaited_playera. Oblik: [Keep a Changelog](https://keepac
 
 Drugi jezici: [English](CHANGELOG.md) · [Deutsch](CHANGELOG_DE.md). Ista povijest je i u playeru (klik na broj verzije na početnom ekranu). Ova datoteka nastaje iz `src/JebaitedPlayer.App/History/update-history.json`.
 
+## [1.5.2] - 2026-11-19
+
+Popravak radija.
+
+### Ispravljeno
+
+- Radio nije svirao kad je postaja bila prvo što pustiš nakon pokretanja playera (npr. kad se player otvori kao mini player). Postaje sada uvijek sviraju.
+
+### Poznati problemi
+
+- Aplikacija još nije digitalno potpisana, pa Windows SmartScreen ili Smart App Control mogu upozoriti prije instalacije.
+- Prozor napretka instalacije je Velopackov i samo je na engleskom.
+
+Izdanje: [v1.5.2](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v1.5.2) · Promjene od [v1.5.1...v1.5.2](https://github.com/jebaitedcro7/jebaited_player/compare/v1.5.1...v1.5.2)
+
 ## [1.5.1] - 2026-11-19
 
 Radio: gumb za puštanje i jasna poruka.

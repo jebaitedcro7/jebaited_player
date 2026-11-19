@@ -94,6 +94,12 @@ public partial class MainWindow : IMiniPlayerHost
     /// <summary>Pokreni internetski stream (radio): mimo popisa i povijesti gledanja, kao glazba (mini player, glazbeni EQ).</summary>
     internal void PlayStream(string url, string name)
     {
+        // 1.5.2: mpv se stvara tek pri prvom otvaranju; radio može biti prvo što se pusti (npr. odmah iz mini playera).
+        if (!TryEnsurePlayer())
+        {
+            return;
+        }
+
         _userOpenPending = true;
         _vm.Library.DetachForStream();
         _vm.Load(url, startPaused: false, displayTitle: name);
@@ -121,6 +127,8 @@ public partial class MainWindow : IMiniPlayerHost
             SetFullscreen(false);
         }
 
+        // Dok je glavni prozor još vidljiv: pripremi mpv, da mini player (i radio iz njega) može odmah svirati.
+        TryEnsurePlayer();
         _mini ??= new MiniPlayerWindow(_vm, _settings, this);
         _mini.Show();
         _mini.Activate();
@@ -168,6 +176,22 @@ public partial class MainWindow : IMiniPlayerHost
     void IMiniPlayerHost.ShowSettings() => ShowPlayerSettings(SettingsTab.Appearance);
 
     void IMiniPlayerHost.ShowRadio(Window owner) => ShowRadio(owner);
+
+    /// <summary>Pokreni mpv ako još ne radi (inače bi učitavanje bilo tiho preskočeno). Greška se zapiše i javi.</summary>
+    private bool TryEnsurePlayer()
+    {
+        try
+        {
+            EnsurePlayer();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Log.Stability.Error("Pokretanje mpv-a", ex);
+            Notify(Loc.T("error.engineStart", ex.Message));
+            return false;
+        }
+    }
 
     /// <summary>Zatvaranje playera: mini prozor se zatvara s njim.</summary>
     private void CloseMiniPlayer()

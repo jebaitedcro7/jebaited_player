@@ -4,6 +4,21 @@ Alle wichtigen Änderungen an jebaited_player. Format: [Keep a Changelog](https:
 
 Andere Sprachen: [English](CHANGELOG.md) · [Hrvatski](CHANGELOG_HR.md). Derselbe Verlauf ist im Player enthalten (Klick auf die Versionsnummer auf dem Startbildschirm). Diese Datei wird aus `src/JebaitedPlayer.App/History/update-history.json` erzeugt.
 
+## [1.5.2] - 2026-11-19
+
+Radio-Korrektur.
+
+### Behoben
+
+- Das Radio spielte nichts, wenn ein Sender das Erste war, das nach dem Start abgespielt wurde (zum Beispiel wenn der Player als Mini-Player startete). Sender spielen jetzt immer.
+
+### Bekannte Probleme
+
+- Die App ist noch nicht digital signiert, daher können Windows SmartScreen oder Smart App Control vor der Installation warnen.
+- Das Fortschrittsfenster des Installationsprogramms stammt von Velopack und ist nur auf Englisch.
+
+Release: [v1.5.2](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v1.5.2) · Änderungen seit [v1.5.1...v1.5.2](https://github.com/jebaitedcro7/jebaited_player/compare/v1.5.1...v1.5.2)
+
 ## [1.5.1] - 2026-11-19
 
 Radio: eine Abspieltaste und klare Rückmeldung.

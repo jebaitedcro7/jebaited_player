@@ -61,6 +61,13 @@ Check "V3: stream nije u popisu ni povijesti" (-not $st.libraryCurrent -and -not
 Check "V3: favorit" ([int]$r.favorite.rows -ge 1 -and $r.favorite.inDb -and $r.favorite.star -and -not $r.favoriteRemoved) "redaka $($r.favorite.rows), u bazi $($r.favorite.inDb), uklonjen $(-not $r.favoriteRemoved)"
 Check "V3: kriv URL odbijen, ručni URL svira" (-not $r.badUrl -and $r.manualUrl.accepted -and $r.manualUrl.path -and [double]$r.manualUrl.position -ge 1.5) "kriv $($r.badUrl), ručni $($r.manualUrl.accepted), $($r.manualUrl.position) s"
 
+# --- 1.5.2: pokretanje bez datoteke, odmah mini player, radio kao prvo što se pusti ---------------------------------
+$dbc = Join-Path $script:DiagDir "ciklus3-radiocold.db"
+Remove-Item "$dbc*" -ErrorAction SilentlyContinue
+$null = Invoke-Diag -Name "ciklus3_radiocold" -File @() -Seconds 1 -ExtraArgs "--diag-ui-test radiocold --diag-db `"$dbc`"" -TimeoutSeconds 240
+$c = Read-Ui "ciklus3_radiocold"
+Check "1.5.2: bez datoteke, mini player, radio svira" (-not $c.playerBefore -and $c.playerAfterMini -and $c.clicked -and $c.station -and [double]$c.position -gt 2 -and $c.miniVisible) "mpv prije $($c.playerBefore) → poslije mini $($c.playerAfterMini), '$($c.station)' $($c.position) s, '$($c.status)'"
+
 $results | Format-Table -AutoSize -Wrap
 $failed = @($results | Where-Object { $_.Rezultat -ne "OK" }).Count
 Write-Host ("Ukupno {0}, uspješno {1}, grešaka {2}" -f $results.Count, ($results.Count - $failed), $failed)

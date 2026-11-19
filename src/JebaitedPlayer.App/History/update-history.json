@@ -40,6 +40,48 @@
   },
   "versions": [
     {
+      "version": "1.5.2",
+      "date": "2026-11-19",
+      "notes": {
+        "en": {
+          "summary": "Radio fix.",
+          "features": [],
+          "improvements": [],
+          "fixes": [
+            "Radio played nothing when a station was the first thing you played after starting the player (for example when the player opened as the mini player). Stations now always play."
+          ],
+          "known": [
+            "The app is not digitally signed yet, so Windows SmartScreen or Smart App Control may warn before the installation.",
+            "The progress window of the installer comes from Velopack and is only in English."
+          ]
+        },
+        "de": {
+          "summary": "Radio-Korrektur.",
+          "features": [],
+          "improvements": [],
+          "fixes": [
+            "Das Radio spielte nichts, wenn ein Sender das Erste war, das nach dem Start abgespielt wurde (zum Beispiel wenn der Player als Mini-Player startete). Sender spielen jetzt immer."
+          ],
+          "known": [
+            "Die App ist noch nicht digital signiert, daher können Windows SmartScreen oder Smart App Control vor der Installation warnen.",
+            "Das Fortschrittsfenster des Installationsprogramms stammt von Velopack und ist nur auf Englisch."
+          ]
+        },
+        "hr": {
+          "summary": "Popravak radija.",
+          "features": [],
+          "improvements": [],
+          "fixes": [
+            "Radio nije svirao kad je postaja bila prvo što pustiš nakon pokretanja playera (npr. kad se player otvori kao mini player). Postaje sada uvijek sviraju."
+          ],
+          "known": [
+            "Aplikacija još nije digitalno potpisana, pa Windows SmartScreen ili Smart App Control mogu upozoriti prije instalacije.",
+            "Prozor napretka instalacije je Velopackov i samo je na engleskom."
+          ]
+        }
+      }
+    },
+    {
       "version": "1.5.1",
       "date": "2026-11-19",
       "notes": {

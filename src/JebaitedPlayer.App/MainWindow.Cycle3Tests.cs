@@ -85,6 +85,46 @@ public partial class MainWindow
         return r;
     }
 
+    /// <summary>
+    /// 1.5.2: player pokrenut bez datoteke, odmah u mini playeru (kao kod vlasnika), pa radio kao prvo što se pusti.
+    /// Ranije mpv u tom slučaju nije postojao i ništa nije sviralo.
+    /// </summary>
+    private async Task<Dictionary<string, object?>> RadioColdUiTestAsync()
+    {
+        var r = new Dictionary<string, object?> { ["playerBefore"] = _player is not null, ["hasMediaBefore"] = _vm.HasMedia };
+        _diagAutoSwitch = true;
+        ShowMiniPlayer();
+        await Task.Delay(800);
+        r["playerAfterMini"] = _player is not null;
+        _player?.SetPropertyAsync("mute", "yes");
+        ShowRadio(_mini);
+        await Task.Delay(600);
+        RadioWindow radio = _radio!;
+        r["count"] = await radio.SearchAsync(null, "jazz", null);
+        RadioRow? playing = null;
+        int index = 0;
+        foreach (RadioRow row in radio.Results.Take(5).ToList())
+        {
+            r["clicked"] = ClickRadioPlay(radio, index++);
+            await WaitForAsync(() => _vm.HasMedia && !_vm.IsLoading && _vm.Position > 2 && _vm.CurrentPath == row.Url, 15000);
+            if (_vm.HasMedia && _vm.Position > 2 && _vm.CurrentPath == row.Url)
+            {
+                playing = row;
+                break;
+            }
+        }
+
+        await Task.Delay(1200);
+        r["station"] = playing?.Name;
+        r["position"] = Math.Round(_vm.Position, 1);
+        r["status"] = radio.Status;
+        r["miniVisible"] = _mini?.IsVisible;
+        r["mainVisible"] = IsVisible;
+        r["welcomeVisible"] = WelcomePanel.Visibility == System.Windows.Visibility.Visible;
+        radio.Close();
+        return r;
+    }
+
     private async Task<Dictionary<string, object?>> RadioUiTestAsync()
     {
         var r = new Dictionary<string, object?>();

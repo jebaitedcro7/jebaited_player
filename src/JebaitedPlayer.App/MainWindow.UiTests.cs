@@ -38,6 +38,7 @@ public partial class MainWindow
                     "mini" => await MiniUiTestAsync(),
                     "settings3" => await Settings3UiTestAsync(),
                     "radio" => await RadioUiTestAsync(),
+                    "radiocold" => await RadioColdUiTestAsync(),
                     _ => new Dictionary<string, object?> { ["error"] = "nepoznat scenarij " + scenario },
                 };
             }

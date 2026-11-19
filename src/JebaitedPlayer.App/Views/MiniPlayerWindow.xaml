@@ -87,23 +87,16 @@
                             MouseLeftButtonDown="OnTimeClick">
                         <StackPanel>
                             <TextBlock x:Name="TimeText" Text="00:00" FontFamily="Consolas" FontSize="26" Foreground="{StaticResource LcdText}" />
-                            <Grid Margin="0,2,0,0">
+                            <Grid Margin="0,2,0,0" Height="16">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="12" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="7" />
-                                    <RowDefinition Height="7" />
-                                </Grid.RowDefinitions>
-                                <TextBlock Text="L" FontSize="8" FontFamily="Consolas" Foreground="{StaticResource LcdBorder}" VerticalAlignment="Center" />
-                                <TextBlock Grid.Row="1" Text="R" FontSize="8" FontFamily="Consolas" Foreground="{StaticResource LcdBorder}" VerticalAlignment="Center" />
-                                <Border x:Name="VuTrackL" Grid.Column="1" Height="4" Background="{StaticResource LcdTrack}">
-                                    <Border x:Name="VuLeft" HorizontalAlignment="Left" Width="0" Background="{StaticResource LcdText}" />
-                                </Border>
-                                <Border Grid.Row="1" Grid.Column="1" Height="4" Background="{StaticResource LcdTrack}">
-                                    <Border x:Name="VuRight" HorizontalAlignment="Left" Width="0" Background="{StaticResource LcdText}" />
-                                </Border>
+                                <StackPanel x:Name="VuLabels" VerticalAlignment="Center">
+                                    <TextBlock Text="L" FontSize="8" FontFamily="Consolas" Height="8" Foreground="{StaticResource LcdBorder}" />
+                                    <TextBlock Text="R" FontSize="8" FontFamily="Consolas" Height="8" Foreground="{StaticResource LcdBorder}" />
+                                </StackPanel>
+                                <views:VuMeterView x:Name="Vu" Grid.Column="1" Height="14" VerticalAlignment="Center" />
                             </Grid>
                         </StackPanel>
                     </Border>
@@ -146,8 +139,11 @@
                     </StackPanel>
                 </DockPanel>
 
-                <Border x:Name="EqHost" Visibility="Collapsed" BorderThickness="0,1,0,0" BorderBrush="{DynamicResource MenuBorderBrush}" Padding="10,4,10,8">
-                    <views:EqualizerPanel x:Name="Equalizer" />
+                <Border x:Name="EqHost" Visibility="Collapsed" BorderThickness="0,1,0,0" BorderBrush="{DynamicResource MenuBorderBrush}" Padding="10,6,10,8">
+                    <StackPanel>
+                        <TextBlock x:Name="EqTitle" FontSize="11" Foreground="{DynamicResource AccentBrush}" />
+                        <views:EqualizerPanel x:Name="Equalizer" />
+                    </StackPanel>
                 </Border>
 
                 <Border x:Name="PlaylistHost" Visibility="Collapsed" BorderThickness="0,1,0,0" BorderBrush="{DynamicResource MenuBorderBrush}" Padding="4,4,4,14">

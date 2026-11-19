@@ -27,6 +27,8 @@ public sealed class EqualizerSettings
         ? [.. CustomGains]
         : [.. Equalizer.PresetGains(Preset)];
 
+    public EqualizerSettings Clone() => new() { Enabled = Enabled, Preset = Preset, Preamp = Preamp, CustomGains = [.. CustomGains] };
+
     /// <summary>Ručno uređena ili oštećena datoteka: nepoznat preset, kriva duljina i vrijednosti izvan raspona.</summary>
     public void Normalize()
     {
@@ -65,8 +67,43 @@ public sealed class MiniPlayerSettings
 
     public bool ShowPlaylist { get; set; }
 
-    public void Normalize() =>
+    /// <summary>Font zaslona (id iz <see cref="Fonts"/>).</summary>
+    public string Font { get; set; } = "lcd";
+
+    /// <summary>Izgled VU metra (id iz <see cref="VuStyles"/>); "off" isključuje i mjerenje (manje CPU-a).</summary>
+    public string VuStyle { get; set; } = "bars";
+
+    /// <summary>Glazba otvara mini player, film ili serija puni player (kad korisnik sam otvori datoteku).</summary>
+    public bool AutoSwitch { get; set; } = true;
+
+    /// <summary>Player je zatvoren dok je bio mini player: sljedeće pokretanje (bez datoteke) opet otvara mini player.</summary>
+    public bool WasOpen { get; set; }
+
+    /// <summary>Fontovi zaslona: id, naziv fonta (svi dolaze s Windowsima 10/11).</summary>
+    public static readonly IReadOnlyList<(string Id, string Family)> Fonts =
+    [
+        ("lcd", "Consolas"), ("digital", "Bahnschrift"), ("cascadia", "Cascadia Mono, Consolas"),
+        ("terminal", "Lucida Console"), ("typewriter", "Courier New"), ("modern", "Segoe UI"),
+    ];
+
+    /// <summary>Izgledi VU metra (ključ prijevoda "vu.&lt;id&gt;").</summary>
+    public static readonly IReadOnlyList<string> VuStyles = ["bars", "led", "lines", "off"];
+
+    public static string FontFamilyFor(string id) => Fonts.FirstOrDefault(f => f.Id == id).Family ?? Fonts[0].Family;
+
+    public void Normalize()
+    {
         Scale = double.IsFinite(Scale) ? Math.Clamp(Math.Round(Scale, 2), MinScale, MaxScale) : 1;
+        if (!Fonts.Any(f => f.Id == Font))
+        {
+            Font = "lcd";
+        }
+
+        if (!VuStyles.Contains(VuStyle))
+        {
+            VuStyle = "bars";
+        }
+    }
 }
 
 /// <summary>Pojasevi, preseti i mpv/ffmpeg filtar za equalizer.</summary>

@@ -116,6 +116,9 @@ U istoj kartici podešavaš automatsko traženje, kodiranje starih titlova i izg
 - Zeleni zaslon s vremenom (klik: preostalo vrijeme) i stvarnim mjeračem razine L/D, pomični izvođač i naslov, traka za premotavanje, prethodna / pokreni / pauza / zaustavi / sljedeća, otvori, glasnoća. **EQ** i **PL** ispod otvaraju equalizer i popis pjesama.
 - Gumb za traku pretvara ga u usku traku; povlačenje kuta, Ctrl + kotačić miša ili Ctrl + / − mijenja veličinu. Položaj i veličina se pamte.
 - Otvaranje jedne pjesme pušta cijeli album (sve pjesme iz mape) jednu za drugom, bez odbrojavanja.
+- Glazba otvara mini player, a film ili serija puni player (može se isključiti u Postavke → Izgled). Mini player se uvijek otvara gdje si ga ostavio.
+- Desni klik na mini player (ili Postavke → Izgled): šest fontova zaslona i četiri izgleda VU metra (trake, LED segmenti, tanke linije s vrhom, isključen).
+- Filmovi i serije imaju svoj equalizer, a glazba i radio svoj (Postavke → Zvuk: biraš koji uređuješ).
 
 ### Kopije i prijenos
 

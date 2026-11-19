@@ -106,7 +106,7 @@ internal static class MpvConfig
     public static string AudioFilter(AppSettings s)
     {
         var parts = new List<string>();
-        if (Equalizer.BuildFilters(s.Equalizer) is { } eq)
+        if (Equalizer.BuildFilters(MusicMode ? s.MusicEqualizer : s.Equalizer) is { } eq)
         {
             parts.Add(eq);
         }
@@ -132,6 +132,9 @@ internal static class MpvConfig
     public const string VuMeterFilter = "@vu:lavfi=[astats=metadata=1:reset=1]";
 
     public static bool VuMeter { get; set; }
+
+    /// <summary>Svira glazba ili radio (glazbeni equalizer); inače film ili serija (filmski equalizer).</summary>
+    public static bool MusicMode { get; set; }
 
     /// <summary>Opcije koje mijenja kvaliteta slike ("balanced" = zadane vrijednosti mpv-a).</summary>
     private static readonly string[] QualityOptionNames =

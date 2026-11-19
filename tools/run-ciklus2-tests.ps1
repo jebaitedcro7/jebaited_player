@@ -91,6 +91,19 @@ $bk = $m.back
 Check "V1: Ctrl+M natrag na puni player" ($bk.handled -and $bk.mainVisible -and -not $bk.miniVisible -and [double]$bk.advanced -gt 0.8 -and -not $bk.paused -and $bk.af -notmatch "astats") "glavni $($bk.mainVisible), napredak $($bk.advanced) s, af='$($bk.af)'"
 Check "V1: CPU (puni player / mini player)" ([double]$m.cpuMiniPlayer -le [double]$m.cpuFullPlayer + 3) ("puni {0} %, mini {1} % jedne jezgre" -f $m.cpuFullPlayer, $m.cpuMiniPlayer)
 
+# --- 1.4.1: dva equalizera, font i VU, automatsko prebacivanje, položaj ---------------------------------------
+$vs = $m.vuStyles
+Check "1.4.1: VU izgledi (trake, LED, linije) mjere, isključen ne mjeri" ($vs.bars.af -match "astats" -and $vs.led.af -match "astats" -and $vs.lines.af -match "astats" -and [double]$vs.led.level -gt -40 -and $vs.off.af -notmatch "astats") "trake $($vs.bars.level) dB, LED $($vs.led.level) dB, linije $($vs.lines.level) dB, isključen af='$($vs.off.af)'"
+Check "1.4.1: font zaslona" ($m.font -match "Bahnschrift") "'$($m.font)', snimka $($m.ledScreenshot)"
+$me = $m.musicEq
+Check "1.4.1: glazba ima svoj equalizer" ($me.musicMode -and $me.af -match "equalizer=f=31:t=o:w=1:g=7" -and $me.panelBoundToMusic -and $me.title -match "glazba|music") "af=$($me.af), ploča glazba $($me.panelBoundToMusic), '$($me.title)'"
+$ov = $m.openVideo
+Check "1.4.1: film otvara puni player i filmski EQ" ($ov.mainVisible -and -not $ov.miniVisible -and -not $ov.musicMode -and $ov.af -notmatch "equalizer") "glavni $($ov.mainVisible), mini $($ov.miniVisible), af='$($ov.af)'"
+$om = $m.openMusic
+Check "1.4.1: glazba otvara mini player i glazbeni EQ" (-not $om.mainVisible -and $om.miniVisible -and $om.musicMode -and $om.af -match "equalizer=f=31:t=o:w=1:g=7" -and [int]$om.playlist -eq 3) "glavni $($om.mainVisible), mini $($om.miniVisible), popis $($om.playlist)"
+$po = $m.position
+Check "1.4.1: mini player se otvara na zapamćenom mjestu" ([double]$po.reopened[0] -eq 210 -and [double]$po.reopened[1] -eq 160 -and [double]$po.saved[0] -eq 210) "spremljeno $($po.saved -join ', '), novi prozor $($po.reopened -join ', ')"
+
 $results | Format-Table -AutoSize -Wrap
 $failed = @($results | Where-Object { $_.Rezultat -ne "OK" }).Count
 Write-Host ("Ukupno {0}, uspješno {1}, grešaka {2}" -f $results.Count, ($results.Count - $failed), $failed)

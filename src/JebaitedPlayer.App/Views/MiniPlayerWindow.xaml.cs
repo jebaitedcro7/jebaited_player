@@ -28,6 +28,10 @@ internal interface IMiniPlayerHost
     bool HandleShortcut(Key key, ModifierKeys mods);
 
     string? GetMpvProperty(string name);
+
+    void RefreshAudioFilters();
+
+    void ShowSettings();
 }
 
 /// <summary>
@@ -66,7 +70,9 @@ public partial class MiniPlayerWindow : Window
         _host = host;
         InitializeComponent();
         DataContext = vm.Library;
-        Equalizer.Initialize(settings.Equalizer, host.ApplyPlaybackSettings, sliderHeight: 64, columnWidth: 34);
+        Equalizer.Initialize(CurrentEqualizer, host.ApplyPlaybackSettings, sliderHeight: 64, columnWidth: 34);
+        ContextMenuOpening += (_, _) => ContextMenu = BuildMenu();
+        ContextMenu = BuildMenu();
 
         VolumeSlider.Value = vm.Volume;
         VolumeSlider.ValueChanged += (_, e) =>
@@ -114,13 +120,102 @@ public partial class MiniPlayerWindow : Window
         CompactMarqueeBox.SizeChanged += (_, _) => StartMarquee(CompactMarqueeBox, CompactMarqueeText);
         this.OnLanguageChanged(() =>
         {
-            Equalizer.Refresh();
+            BindEqualizer();
             _marquee = string.Empty;
             Tick();
         });
 
         ApplyLayout();
+        ApplyDisplayStyle();
+        BindEqualizer();
         PlaceOnScreen();
+    }
+
+    // --- 1.4.1: equalizer prema sadržaju, font, VU, izbornik desnog klika ------------------------------------
+
+    /// <summary>Equalizer koji sada vrijedi: glazba i radio imaju svoj, filmovi i serije svoj.</summary>
+    private EqualizerSettings CurrentEqualizer => MpvConfig.MusicMode ? _settings.MusicEqualizer : _settings.Equalizer;
+
+    internal void BindEqualizer()
+    {
+        Equalizer.Bind(CurrentEqualizer);
+        EqTitle.Text = Loc.T(MpvConfig.MusicMode ? "mini.eqMusic" : "mini.eqMovies");
+    }
+
+    /// <summary>Font zaslona i izgled VU metra (desni klik ili Postavke → Izgled).</summary>
+    internal void ApplyDisplayStyle()
+    {
+        MiniPlayerSettings m = _settings.MiniPlayer;
+        var family = new FontFamily(MiniPlayerSettings.FontFamilyFor(m.Font));
+        TimeText.FontFamily = family;
+        MarqueeText.FontFamily = family;
+        CompactMarqueeText.FontFamily = family;
+        Vu.VuStyle = m.VuStyle;
+        VuLabels.Visibility = m.VuStyle == "off" ? Visibility.Hidden : Visibility.Visible;
+        _marquee = string.Empty;
+        if (IsVisible)
+        {
+            Tick();
+        }
+    }
+
+    internal void SetFont(string id)
+    {
+        _settings.MiniPlayer.Font = id;
+        ApplyDisplayStyle();
+    }
+
+    internal void SetVuStyle(string id)
+    {
+        _settings.MiniPlayer.VuStyle = id;
+        ApplyDisplayStyle();
+        _vuLeft = _vuRight = VuFloorDb;
+        Vu.SetLevels(VuFloorDb, VuFloorDb);
+        _host.RefreshAudioFilters();
+    }
+
+    private ContextMenu BuildMenu()
+    {
+        MiniPlayerSettings m = _settings.MiniPlayer;
+        var menu = new ContextMenu();
+        var fonts = new MenuItem { Header = Loc.T("mini.menuFont") };
+        foreach (var (id, _) in MiniPlayerSettings.Fonts)
+        {
+            fonts.Items.Add(Check(Loc.T("miniFont." + id), m.Font == id, () => SetFont(id)));
+        }
+
+        var vu = new MenuItem { Header = Loc.T("mini.menuVu") };
+        foreach (string id in MiniPlayerSettings.VuStyles)
+        {
+            vu.Items.Add(Check(Loc.T("vu." + id), m.VuStyle == id, () => SetVuStyle(id)));
+        }
+
+        var size = new MenuItem { Header = Loc.T("mini.menuSize") };
+        foreach (double s in new[] { 0.75, 1, 1.25, 1.5, 2, 2.5 })
+        {
+            size.Items.Add(Check($"{s * 100:0} %", Math.Abs(Scale - s) < 0.01, () => SetScale(s)));
+        }
+
+        menu.Items.Add(fonts);
+        menu.Items.Add(vu);
+        menu.Items.Add(size);
+        menu.Items.Add(new Separator());
+        menu.Items.Add(Check(Loc.T("mini.compact"), m.Compact, () => SetCompact(!m.Compact)));
+        menu.Items.Add(Check(Loc.T("mini.equalizer"), m.ShowEqualizer && !m.Compact, () => { m.Compact = false; SetPanels(!m.ShowEqualizer, m.ShowPlaylist); }));
+        menu.Items.Add(Check(Loc.T("mini.playlist"), m.ShowPlaylist && !m.Compact, () => { m.Compact = false; SetPanels(m.ShowEqualizer, !m.ShowPlaylist); }));
+        menu.Items.Add(Check(Loc.T("mini.autoSwitch"), m.AutoSwitch, () => m.AutoSwitch = !m.AutoSwitch));
+        menu.Items.Add(new Separator());
+        menu.Items.Add(Check(Loc.T("mini.settings"), false, _host.ShowSettings));
+        menu.Items.Add(Check(Loc.T("mini.fullPlayer"), false, _host.ShowFullPlayer));
+        menu.Items.Add(Check(Loc.T("mini.close"), false, _host.ClosePlayer));
+        return menu;
+    }
+
+    private static MenuItem Check(string header, bool isChecked, Action action)
+    {
+        var item = new MenuItem { Header = header.Replace("_", "__", StringComparison.Ordinal), IsChecked = isChecked };
+        item.Click += (_, _) => action();
+        return item;
     }
 
     internal double Scale => Zoom.ScaleX;
@@ -458,7 +553,7 @@ public partial class MiniPlayerWindow : Window
     /// <summary>VU metar: stvarna razina (RMS, dB) lijevog i desnog kanala iz mpv-a; brzo raste, polako pada.</summary>
     private async Task UpdateVuAsync()
     {
-        if (_vuBusy)
+        if (_vuBusy || _settings.MiniPlayer.VuStyle == "off")
         {
             return;
         }
@@ -478,8 +573,7 @@ public partial class MiniPlayerWindow : Window
 
             _vuLeft = l >= _vuLeft ? l : Math.Max(l, _vuLeft - 2.5);
             _vuRight = r >= _vuRight ? r : Math.Max(r, _vuRight - 2.5);
-            VuLeft.Width = VuWidth(_vuLeft);
-            VuRight.Width = VuWidth(_vuRight);
+            Vu.SetLevels(_vuLeft, _vuRight);
         }
         finally
         {
@@ -488,8 +582,6 @@ public partial class MiniPlayerWindow : Window
     }
 
     internal (double Left, double Right) VuLevels => (_vuLeft, _vuRight);
-
-    private double VuWidth(double db) => Math.Max(0, VuTrackL.ActualWidth * (Math.Clamp(db, VuFloorDb, 0) - VuFloorDb) / -VuFloorDb);
 
     private static double ParseDb(string? value) =>
         double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out double db) && double.IsFinite(db) ? db : VuFloorDb;

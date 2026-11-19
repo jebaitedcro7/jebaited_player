@@ -116,6 +116,9 @@ In the same tab you set the automatic search, the encoding of old subtitles and 
 - Green display with time (click: remaining time) and a real L/R level meter, scrolling artist and title, seek bar, previous / play / pause / stop / next, open, volume. **EQ** and **PL** open the equalizer and the playlist below.
 - The strip button makes it a thin bar; drag the corner, use Ctrl + mouse wheel or Ctrl + / − to make it bigger or smaller. Position and size are remembered.
 - Opening one song plays the whole album (all songs in the folder), one after another without a countdown.
+- Music opens the mini player, a film or series the full player (Settings → Appearance can turn this off). The mini player always opens where you left it.
+- Right-click the mini player (or Settings → Appearance) for six display fonts and four VU meter styles (bars, LED segments, thin lines with peak, off).
+- Films and series have their own equalizer, music and radio their own (Settings → Audio: choose which one to edit).
 
 ### Backup and transfer
 

@@ -52,3 +52,67 @@ public sealed class MiniPlayerTests
         Assert.AreEqual(string.Empty, MpvConfig.AudioFilter(new AppSettings()));
     }
 }
+
+/// <summary>1.4.1: odvojeni equalizeri (filmovi / glazba), font i VU mini playera.</summary>
+[TestClass]
+public sealed class SeparateEqualizerTests
+{
+    [TestCleanup]
+    public void Cleanup() => MpvConfig.MusicMode = false;
+
+    [TestMethod]
+    public void Settings_from_1_4_give_music_its_own_copy_of_the_equalizer()
+    {
+        AppSettings s = JsonSerializer.Deserialize<AppSettings>("""{ "Volume": 60, "Equalizer": { "Enabled": true, "Preset": "rock" } }""")!;
+        s.Normalize();
+        Assert.IsTrue(s.MusicEqualizer.Enabled);
+        Assert.AreEqual("rock", s.MusicEqualizer.Preset, "Zvuk glazbe se nakon nadogradnje ne mijenja.");
+
+        s.MusicEqualizer.Preset = "bass";
+        s.MusicEqualizer.CustomGains[0] = 6;
+        Assert.AreEqual("rock", s.Equalizer.Preset, "Odvojeni su: promjena glazbe ne dira filmove.");
+        Assert.AreEqual(0, s.Equalizer.CustomGains[0]);
+    }
+
+    [TestMethod]
+    public void The_equalizer_for_what_is_playing_is_used()
+    {
+        var s = new AppSettings
+        {
+            Equalizer = { Enabled = false },
+            MusicEqualizer = new EqualizerSettings { Enabled = true, Preset = "bass" },
+        };
+        MpvConfig.MusicMode = false;
+        Assert.AreEqual(string.Empty, MpvConfig.AudioFilter(s), "Film: filmski equalizer je isključen.");
+        MpvConfig.MusicMode = true;
+        StringAssert.Contains(MpvConfig.AudioFilter(s), "equalizer=f=31:t=o:w=1:g=7", "Glazba: Bass preset.");
+    }
+
+    [TestMethod]
+    public void Both_equalizers_survive_save_load_and_export_import()
+    {
+        var s = new AppSettings { Equalizer = { Enabled = true, Preset = "vocal" }, MusicEqualizer = new EqualizerSettings { Enabled = true, Preset = "electronic" } };
+        AppSettings l = JsonSerializer.Deserialize<AppSettings>(JsonSerializer.Serialize(s))!;
+        l.Normalize();
+        Assert.AreEqual("vocal", l.Equalizer.Preset);
+        Assert.AreEqual("electronic", l.MusicEqualizer.Preset);
+
+        var target = new AppSettings();
+        SettingsTransfer.ApplyTo(target, SettingsTransfer.Read(SettingsTransfer.Export(s, "1.4.1", DateTime.UtcNow)));
+        Assert.AreEqual("electronic", target.MusicEqualizer.Preset);
+        Assert.AreEqual("vocal", target.Equalizer.Preset);
+    }
+
+    [TestMethod]
+    public void Unknown_font_and_vu_style_fall_back_and_defaults_are_sensible()
+    {
+        var m = new MiniPlayerSettings { Font = "comic", VuStyle = "rainbow" };
+        m.Normalize();
+        Assert.AreEqual("lcd", m.Font);
+        Assert.AreEqual("bars", m.VuStyle);
+        Assert.IsTrue(new MiniPlayerSettings().AutoSwitch);
+        Assert.IsFalse(new MiniPlayerSettings().WasOpen);
+        Assert.AreEqual("Bahnschrift", MiniPlayerSettings.FontFamilyFor("digital"));
+        Assert.AreEqual("Consolas", MiniPlayerSettings.FontFamilyFor("nepostojeci"));
+    }
+}

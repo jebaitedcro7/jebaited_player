@@ -4,6 +4,28 @@ All notable changes to jebaited_player. Format: [Keep a Changelog](https://keepa
 
 Other languages: [Deutsch](CHANGELOG_DE.md) · [Hrvatski](CHANGELOG_HR.md). The same history is included in the player (click the version number on the home screen). This file is generated from `src/JebaitedPlayer.App/History/update-history.json`.
 
+## [1.4.1] - 2026-11-19
+
+Separate equalizers for films and music, mini player looks and automatic switching.
+
+### Added
+
+- Two equalizers: one for films and series, one for music and radio. The one for what is playing is used automatically. In Settings → Audio you choose which one you are editing, and the mini player shows the one for music.
+- Mini player looks: six display fonts and four VU meter styles (bars, LED segments, thin lines with peak, off). Right-click the mini player or go to Settings → Appearance.
+- Opening music starts the mini player, and opening a film or series starts the full player. This can be turned off.
+
+### Improved
+
+- The mini player always opens where you left it. If you close the player while it is the mini player, it starts as the mini player next time.
+- Right-click menu on the mini player: font, VU meter, size, strip, equalizer, playlist, automatic switching and settings.
+
+### Known issues
+
+- The app is not digitally signed yet, so Windows SmartScreen or Smart App Control may warn before the installation.
+- The progress window of the installer comes from Velopack and is only in English.
+
+Release: [v1.4.1](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v1.4.1) · Changes since [v1.4.0...v1.4.1](https://github.com/jebaitedcro7/jebaited_player/compare/v1.4.0...v1.4.1)
+
 ## [1.4.0] - 2026-11-19
 
 Mini music player, automatic backups and settings export and import.

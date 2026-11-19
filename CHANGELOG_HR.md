@@ -4,6 +4,28 @@ Sve važnije promjene jebaited_playera. Oblik: [Keep a Changelog](https://keepac
 
 Drugi jezici: [English](CHANGELOG.md) · [Deutsch](CHANGELOG_DE.md). Ista povijest je i u playeru (klik na broj verzije na početnom ekranu). Ova datoteka nastaje iz `src/JebaitedPlayer.App/History/update-history.json`.
 
+## [1.4.1] - 2026-11-19
+
+Odvojeni equalizeri za filmove i glazbu, izgled mini playera i automatsko prebacivanje.
+
+### Novo
+
+- Dva equalizera: jedan za filmove i serije, drugi za glazbu i radio. Sam se koristi onaj za ono što svira. U Postavke → Zvuk biraš koji uređuješ, a mini player prikazuje onaj za glazbu.
+- Izgled mini playera: šest fontova zaslona i četiri izgleda VU metra (trake, LED segmenti, tanke linije s vrhom, isključen). Desni klik na mini player ili Postavke → Izgled.
+- Otvaranje glazbe pokreće mini player, a otvaranje filma ili serije puni player. Može se isključiti.
+
+### Poboljšano
+
+- Mini player se uvijek otvara gdje si ga ostavio. Ako zatvoriš player dok je mini player, sljedeći put se opet otvara kao mini player.
+- Izbornik desnog klika na mini playeru: font, VU metar, veličina, traka, equalizer, popis pjesama, automatsko prebacivanje i postavke.
+
+### Poznati problemi
+
+- Aplikacija još nije digitalno potpisana, pa Windows SmartScreen ili Smart App Control mogu upozoriti prije instalacije.
+- Prozor napretka instalacije je Velopackov i samo je na engleskom.
+
+Izdanje: [v1.4.1](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v1.4.1) · Promjene od [v1.4.0...v1.4.1](https://github.com/jebaitedcro7/jebaited_player/compare/v1.4.0...v1.4.1)
+
 ## [1.4.0] - 2026-11-19
 
 Mini music player, automatske kopije te izvoz i uvoz postavki.

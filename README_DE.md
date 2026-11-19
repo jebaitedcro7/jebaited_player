@@ -116,6 +116,9 @@ Im selben Tab stellst du die automatische Suche, die Zeichenkodierung alter Unte
 - Grüne Anzeige mit Zeit (Klick: Restzeit) und echter L/R-Pegelanzeige, laufender Interpret und Titel, Suchleiste, Zurück / Abspielen / Pause / Stopp / Weiter, Öffnen, Lautstärke. **EQ** und **PL** öffnen darunter Equalizer und Wiedergabeliste.
 - Die Leisten-Taste macht daraus eine schmale Leiste; Ecke ziehen, Ctrl + Mausrad oder Ctrl + / − ändert die Größe. Position und Größe werden gespeichert.
 - Ein einzelnes Lied spielt das ganze Album (alle Lieder im Ordner) nacheinander ohne Countdown.
+- Musik öffnet den Mini-Player, ein Film oder eine Serie den vollen Player (abschaltbar unter Einstellungen → Darstellung). Der Mini-Player öffnet sich immer dort, wo du ihn gelassen hast.
+- Rechtsklick auf den Mini-Player (oder Einstellungen → Darstellung): sechs Anzeigeschriften und vier VU-Meter-Stile (Balken, LED-Segmente, dünne Linien mit Spitze, aus).
+- Filme und Serien haben einen eigenen Equalizer, Musik und Radio einen eigenen (Einstellungen → Audio: wählen, welcher bearbeitet wird).
 
 ### Sicherung und Übertragung
 

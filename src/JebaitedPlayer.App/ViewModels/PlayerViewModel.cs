@@ -60,6 +60,9 @@ public sealed class PlayerViewModel : ObservableObject
     /// <summary>Datoteka je učitana (argument: putanja).</summary>
     public event EventHandler<string>? MediaLoaded;
 
+    /// <summary>Učitavanje počinje (prije mpv naredbe): npr. odabir equalizera za glazbu ili film.</summary>
+    public event EventHandler<string>? LoadStarting;
+
     /// <summary>Reprodukcija je stigla do kraja datoteke.</summary>
     public event EventHandler? EndReached;
 
@@ -288,6 +291,7 @@ public sealed class PlayerViewModel : ObservableObject
             return;
         }
 
+        LoadStarting?.Invoke(this, path);
         ErrorMessage = string.Empty;
         Notice = string.Empty;
         IsLoading = true;

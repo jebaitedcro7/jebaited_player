@@ -124,6 +124,7 @@ public partial class MainWindow : Window
         _vm.Subtitles.ForcedCodePageForQueued = options.DiagEncoding;
         SubtitleService.FallbackCodePage = settings.SubtitleCodePage;
         _vm.MediaLoaded += (_, _) => OnMediaLoadedForWindow();
+        _vm.LoadStarting += (_, path) => OnLoadStarting(path);
         SubtitleService.CleanupCache(TimeSpan.FromDays(14));
         if (!options.IsDiagnostics && JebaitedPlayer.Online.SubtitleSearchService.PurgeCachedKeys(AppPaths.SearchCacheDir) is int purged and > 0)
         {
@@ -568,6 +569,7 @@ public partial class MainWindow : Window
 
     private void OpenFiles(IEnumerable<string> paths)
     {
+        _userOpenPending = true;
         var all = paths.ToList();
         var folders = all.Where(Directory.Exists).ToList();
         var subtitles = all.Where(File.Exists).Where(MediaFormats.IsSubtitle).ToList();

@@ -82,6 +82,17 @@ public sealed partial class SourceScanTests
             used.Add("eq." + preset.Groups[1].Value);
         }
 
+        // Mini player (1.4.1): "miniFont." + id fonta i "vu." + id izgleda VU metra.
+        foreach (Match font in MiniFontRegex().Matches(equalizer))
+        {
+            used.Add("miniFont." + font.Groups[1].Value);
+        }
+
+        foreach (Match vu in QuotedWordRegex().Matches(VuStylesRegex().Match(equalizer).Value))
+        {
+            used.Add("vu." + vu.Groups[1].Value);
+        }
+
         string[] unused = LanguageFileTests.Simple(english)
             .Concat(LanguageFileTests.PluralBases(english))
             .Where(k => !used.Contains(k))
@@ -201,6 +212,12 @@ public sealed partial class SourceScanTests
 
     [GeneratedRegex(@"\(""([a-z]+)"", \[")]
     private static partial Regex EqualizerPresetRegex();
+
+    [GeneratedRegex(@"\(""([a-z]+)"", ""[^""]+""\)")]
+    private static partial Regex MiniFontRegex();
+
+    [GeneratedRegex(@"VuStyles = \[[^\]]*\]")]
+    private static partial Regex VuStylesRegex();
 
     [GeneratedRegex(@"\b(Text|Content|ToolTip|Header|Title)=""([^""]*)""")]
     private static partial Regex XamlTextRegex();

@@ -16,6 +16,7 @@ public partial class MainWindow
         var r = new Dictionary<string, object?>();
         await WaitForAsync(() => _vm.Duration > 0 && _vm.Library.Current != null, 8000);
         LibraryController lib = _vm.Library;
+        string albumDir = System.IO.Path.GetDirectoryName(_vm.CurrentPath!)!;
         r["playlist"] = lib.Playlist.Select(p => p.Label).ToArray();
         _vm.SetPaused(false);
         await Task.Delay(800);
@@ -99,6 +100,77 @@ public partial class MainWindow
             ["paused"] = _vm.IsPaused,
             ["af"] = await AfAsync(),
         };
+
+        // --- 1.4.1 ---------------------------------------------------------------------------------------------
+        // 6) Izgledi VU metra i font: "off" miče i mjerenje iz lanca.
+        ShowMiniPlayer();
+        await Task.Delay(800);
+        var vuStyles = new Dictionary<string, object?>();
+        foreach (string style in MiniPlayerSettings.VuStyles)
+        {
+            mini.SetVuStyle(style);
+            await Task.Delay(900);
+            vuStyles[style] = new Dictionary<string, object?>
+            {
+                ["af"] = await AfAsync(),
+                ["level"] = Math.Round(mini.VuLevels.Left, 1),
+            };
+            if (style == "led")
+            {
+                mini.SetFont("digital");
+                await Task.Delay(400);
+                r["ledScreenshot"] = SaveWindowPng("mini_led_digital", mini);
+            }
+        }
+
+        r["vuStyles"] = vuStyles;
+        r["font"] = mini.TimeText.FontFamily.Source;
+        mini.SetVuStyle("bars");
+        mini.SetFont("lcd");
+
+        // 7) Odvojeni equalizeri: glazba Bass, filmovi isključeni.
+        _settings.Equalizer.Enabled = false;
+        _settings.MusicEqualizer.Enabled = true;
+        _settings.MusicEqualizer.Preset = "bass";
+        ((ISettingsHost)this).ApplyPlaybackSettings();
+        mini.BindEqualizer();
+        await Task.Delay(700);
+        r["musicEq"] = new Dictionary<string, object?>
+        {
+            ["musicMode"] = MpvConfig.MusicMode,
+            ["af"] = await AfAsync(),
+            ["panelBoundToMusic"] = ReferenceEquals(mini.Equalizer.Bound, _settings.MusicEqualizer),
+            ["title"] = mini.EqTitle.Text,
+        };
+
+        // 8) Automatsko prebacivanje kad korisnik sam otvori: film → puni player (filmski EQ), glazba → mini player.
+        _diagAutoSwitch = true;
+        string video = System.IO.Path.GetFullPath(System.IO.Path.Combine(albumDir, "..", "..", "ciklus1", "Kratki.Film.2026.mkv"));
+        OpenFiles([video]);
+        await WaitForAsync(() => _vm.Duration > 0 && !_vm.IsLoading && string.Equals(_vm.CurrentPath, video, StringComparison.OrdinalIgnoreCase), 8000);
+        await Task.Delay(800);
+        r["openVideo"] = new Dictionary<string, object?>
+        {
+            ["mainVisible"] = IsVisible, ["miniVisible"] = mini.IsVisible, ["musicMode"] = MpvConfig.MusicMode, ["af"] = await AfAsync(),
+        };
+        string song = System.IO.Path.Combine(albumDir, "02 Druga.flac");
+        OpenFiles([song]);
+        await WaitForAsync(() => _vm.Duration > 0 && !_vm.IsLoading && string.Equals(_vm.CurrentPath, song, StringComparison.OrdinalIgnoreCase), 8000);
+        await Task.Delay(800);
+        r["openMusic"] = new Dictionary<string, object?>
+        {
+            ["mainVisible"] = IsVisible, ["miniVisible"] = mini.IsVisible, ["musicMode"] = MpvConfig.MusicMode, ["af"] = await AfAsync(),
+            ["playlist"] = lib.Playlist.Count,
+        };
+
+        // 9) Položaj: novi mini prozor (kao nakon ponovnog pokretanja) otvara se na zapamćenom mjestu.
+        mini.Left = 210;
+        mini.Top = 160;
+        await Task.Delay(200);
+        var again = new MiniPlayerWindow(_vm, _settings, this);
+        r["position"] = new Dictionary<string, object?> { ["saved"] = new[] { _settings.MiniPlayer.Left, _settings.MiniPlayer.Top }, ["reopened"] = new[] { again.Left, again.Top } };
+        again.AllowClose = true;
+        again.Close();
         return r;
     }
 }

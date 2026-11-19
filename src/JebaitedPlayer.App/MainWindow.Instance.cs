@@ -38,6 +38,11 @@ public partial class MainWindow
             _openMerger.Add(files, DateTime.UtcNow);
             OpenFiles(files);
         }
+        else if (_settings.MiniPlayer.WasOpen && !_options.IsDiagnostics)
+        {
+            // Zatvoren kao mini player: tako se i otvara, na zapamćenom mjestu.
+            ShowMiniPlayer();
+        }
     }
 
     private void OnExternalOpen(IReadOnlyList<string> files)

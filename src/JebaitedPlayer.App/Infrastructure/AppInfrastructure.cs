@@ -314,8 +314,20 @@ public sealed class AppSettings
     /// <summary>Ujednačavanje glasnoće (tiši glasni prizori, razumljiviji dijalog).</summary>
     public bool NormalizeAudio { get; set; }
 
-    /// <summary>Equalizer (ciklus 1): 10 pojaseva, preseti i vlastiti preset.</summary>
+    /// <summary>Equalizer za filmove i serije (ciklus 1): 10 pojaseva, preseti i vlastiti preset.</summary>
     public EqualizerSettings Equalizer { get; set; } = new();
+
+    private EqualizerSettings? _musicEqualizer;
+
+    /// <summary>
+    /// Equalizer za glazbu i radio (1.4.1), odvojen od onog za filmove. Postavke iz 1.3/1.4 ga nemaju:
+    /// tada kreće kao kopija dosadašnjeg equalizera, pa se zvuk nakon nadogradnje ne mijenja.
+    /// </summary>
+    public EqualizerSettings MusicEqualizer
+    {
+        get => _musicEqualizer ??= Equalizer.Clone();
+        set => _musicEqualizer = value;
+    }
 
     /// <summary>Mini Music Player (ciklus 2).</summary>
     public MiniPlayerSettings MiniPlayer { get; set; } = new();
@@ -383,6 +395,7 @@ public sealed class AppSettings
 
         Equalizer ??= new EqualizerSettings();
         Equalizer.Normalize();
+        MusicEqualizer.Normalize();
         MiniPlayer ??= new MiniPlayerSettings();
         MiniPlayer.Normalize();
     }

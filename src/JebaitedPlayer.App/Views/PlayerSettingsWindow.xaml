@@ -140,6 +140,10 @@
 
                         <!-- Equalizer (ciklus 1) -->
                         <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T settings.equalizer}" Margin="0,24,0,2" />
+                        <WrapPanel Margin="0,6,0,0">
+                            <RadioButton x:Name="EqMoviesRadio" GroupName="EqTarget" Content="{loc:T settings.eqForMovies}" Margin="0,0,20,0" />
+                            <RadioButton x:Name="EqMusicRadio" GroupName="EqTarget" Content="{loc:T settings.eqForMusic}" />
+                        </WrapPanel>
                         <views:EqualizerPanel x:Name="EqualizerPanel" />
                         <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.eqHint}" Margin="0,8,0,0" />
 
@@ -218,6 +222,17 @@
                         <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T settings.advanced}" Margin="0,24,0,2" />
                         <CheckBox x:Name="GpuUiBox" Content="{loc:T settings.gpuUi}" />
                         <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.gpuUiHint}" Margin="28,4,0,0" />
+
+                        <!-- 1.4.1: mini player (isto i desnim klikom na mini player) -->
+                        <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T menu.miniPlayer}" Margin="0,24,0,2" />
+                        <TextBlock Text="{loc:T mini.menuFont}" Margin="0,4,0,0" />
+                        <Button x:Name="MiniFontButton" Style="{StaticResource ChoiceButton}" Click="OnMiniFontClick" MinWidth="240" />
+                        <TextBlock Text="{loc:T mini.menuVu}" Margin="0,12,0,0" />
+                        <Button x:Name="MiniVuButton" Style="{StaticResource ChoiceButton}" Click="OnMiniVuClick" MinWidth="240" />
+                        <CheckBox x:Name="MiniAutoSwitchBox" Margin="0,14,0,0">
+                            <TextBlock Text="{loc:T mini.autoSwitch}" TextWrapping="Wrap" />
+                        </CheckBox>
+                        <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.miniHint}" Margin="0,8,0,0" />
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>

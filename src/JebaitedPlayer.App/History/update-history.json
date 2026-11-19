@@ -40,6 +40,63 @@
   },
   "versions": [
     {
+      "version": "1.4.1",
+      "date": "2026-11-19",
+      "notes": {
+        "en": {
+          "summary": "Separate equalizers for films and music, mini player looks and automatic switching.",
+          "features": [
+            "Two equalizers: one for films and series, one for music and radio. The one for what is playing is used automatically. In Settings → Audio you choose which one you are editing, and the mini player shows the one for music.",
+            "Mini player looks: six display fonts and four VU meter styles (bars, LED segments, thin lines with peak, off). Right-click the mini player or go to Settings → Appearance.",
+            "Opening music starts the mini player, and opening a film or series starts the full player. This can be turned off."
+          ],
+          "improvements": [
+            "The mini player always opens where you left it. If you close the player while it is the mini player, it starts as the mini player next time.",
+            "Right-click menu on the mini player: font, VU meter, size, strip, equalizer, playlist, automatic switching and settings."
+          ],
+          "fixes": [],
+          "known": [
+            "The app is not digitally signed yet, so Windows SmartScreen or Smart App Control may warn before the installation.",
+            "The progress window of the installer comes from Velopack and is only in English."
+          ]
+        },
+        "de": {
+          "summary": "Getrennte Equalizer für Filme und Musik, Aussehen des Mini-Players und automatisches Umschalten.",
+          "features": [
+            "Zwei Equalizer: einer für Filme und Serien, einer für Musik und Radio. Verwendet wird automatisch der für das, was gerade läuft. Unter Einstellungen → Audio wählst du, welchen du bearbeitest; der Mini-Player zeigt den für Musik.",
+            "Aussehen des Mini-Players: sechs Anzeigeschriften und vier VU-Meter-Stile (Balken, LED-Segmente, dünne Linien mit Spitze, aus). Per Rechtsklick auf den Mini-Player oder unter Einstellungen → Darstellung.",
+            "Musik öffnet den Mini-Player, ein Film oder eine Serie den vollen Player. Das lässt sich ausschalten."
+          ],
+          "improvements": [
+            "Der Mini-Player öffnet sich immer dort, wo du ihn gelassen hast. Wird der Player als Mini-Player geschlossen, startet er beim nächsten Mal wieder als Mini-Player.",
+            "Rechtsklickmenü am Mini-Player: Schrift, VU-Meter, Größe, Leiste, Equalizer, Wiedergabeliste, automatisches Umschalten und Einstellungen."
+          ],
+          "fixes": [],
+          "known": [
+            "Die App ist noch nicht digital signiert, daher können Windows SmartScreen oder Smart App Control vor der Installation warnen.",
+            "Das Fortschrittsfenster des Installationsprogramms stammt von Velopack und ist nur auf Englisch."
+          ]
+        },
+        "hr": {
+          "summary": "Odvojeni equalizeri za filmove i glazbu, izgled mini playera i automatsko prebacivanje.",
+          "features": [
+            "Dva equalizera: jedan za filmove i serije, drugi za glazbu i radio. Sam se koristi onaj za ono što svira. U Postavke → Zvuk biraš koji uređuješ, a mini player prikazuje onaj za glazbu.",
+            "Izgled mini playera: šest fontova zaslona i četiri izgleda VU metra (trake, LED segmenti, tanke linije s vrhom, isključen). Desni klik na mini player ili Postavke → Izgled.",
+            "Otvaranje glazbe pokreće mini player, a otvaranje filma ili serije puni player. Može se isključiti."
+          ],
+          "improvements": [
+            "Mini player se uvijek otvara gdje si ga ostavio. Ako zatvoriš player dok je mini player, sljedeći put se opet otvara kao mini player.",
+            "Izbornik desnog klika na mini playeru: font, VU metar, veličina, traka, equalizer, popis pjesama, automatsko prebacivanje i postavke."
+          ],
+          "fixes": [],
+          "known": [
+            "Aplikacija još nije digitalno potpisana, pa Windows SmartScreen ili Smart App Control mogu upozoriti prije instalacije.",
+            "Prozor napretka instalacije je Velopackov i samo je na engleskom."
+          ]
+        }
+      }
+    },
+    {
       "version": "1.4.0",
       "date": "2026-11-19",
       "notes": {

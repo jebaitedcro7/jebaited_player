@@ -134,6 +134,12 @@ public partial class MainWindow : ISettingsHost
 
     void ISettingsHost.ApplyWindowSettings() => ApplyWindowSettings();
 
+    void ISettingsHost.ApplyMiniPlayerSettings()
+    {
+        _mini?.ApplyDisplayStyle();
+        RefreshVuFilter();
+    }
+
     /// <summary>M1b: uvezene postavke odmah na sve dijelove playera (isto kao promjene u prozoru postavki).</summary>
     void ISettingsHost.ApplyImportedSettings()
     {
@@ -152,6 +158,8 @@ public partial class MainWindow : ISettingsHost
         _vm.Subtitles.ApplyStyle();
         ((ISettingsHost)this).ApplyPlaybackSettings();
         ApplyWindowSettings();
+        ((ISettingsHost)this).ApplyMiniPlayerSettings();
+        _mini?.BindEqualizer();
         Log.Info("Uvezene postavke primijenjene.");
     }
 

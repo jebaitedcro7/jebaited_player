@@ -46,6 +46,9 @@ internal interface ISettingsHost
     /// <summary>Postavke prozora (npr. iznad ostalih prozora) odmah.</summary>
     void ApplyWindowSettings();
 
+    /// <summary>Font i VU mini playera odmah (1.4.1).</summary>
+    void ApplyMiniPlayerSettings();
+
     /// <summary>Uvezene postavke (M1b) odmah na cijeli player.</summary>
     void ApplyImportedSettings();
 
@@ -135,6 +138,7 @@ public partial class PlayerSettingsWindow : Window
         UpdateSeekStepTexts();
         UpdateAudioTexts();
         EqualizerPanel.Refresh();
+        UpdateMiniTexts();
         UpdateAspectText();
         UpdateHideControlsText();
         UpdateUpdateStatus();
@@ -423,6 +427,33 @@ public partial class PlayerSettingsWindow : Window
         }
     }
 
+    /// <summary>Pokrenuta je glazba umjesto filma ili obrnuto: ploča prikazuje equalizer koji sada svira.</summary>
+    internal void OnMediaKindChanged() => (MpvConfig.MusicMode ? EqMusicRadio : EqMoviesRadio).IsChecked = true;
+
+    // --- 6a. Mini player (1.4.1) ----------------------------------------------------------------------------------
+
+    private void UpdateMiniTexts()
+    {
+        MiniFontButton.Content = Loc.T("miniFont." + _settings.MiniPlayer.Font);
+        MiniVuButton.Content = Loc.T("vu." + _settings.MiniPlayer.VuStyle);
+    }
+
+    private void OnMiniFontClick(object sender, RoutedEventArgs e) =>
+        ShowChoices(MiniFontButton, MiniPlayerSettings.Fonts.Select(f => (Loc.T("miniFont." + f.Id), f.Id == _settings.MiniPlayer.Font, (Action)(() =>
+        {
+            _settings.MiniPlayer.Font = f.Id;
+            UpdateMiniTexts();
+            _host.ApplyMiniPlayerSettings();
+        }))));
+
+    private void OnMiniVuClick(object sender, RoutedEventArgs e) =>
+        ShowChoices(MiniVuButton, MiniPlayerSettings.VuStyles.Select(v => (Loc.T("vu." + v), v == _settings.MiniPlayer.VuStyle, (Action)(() =>
+        {
+            _settings.MiniPlayer.VuStyle = v;
+            UpdateMiniTexts();
+            _host.ApplyMiniPlayerSettings();
+        }))));
+
     // --- 4. Zvuk -------------------------------------------------------------------------------------------------
 
     private void LoadAudio()
@@ -443,7 +474,10 @@ public partial class PlayerSettingsWindow : Window
             UpdateAudioTexts();
         });
         UpdateAudioTexts();
-        EqualizerPanel.Initialize(_settings.Equalizer, _host.ApplyPlaybackSettings);
+        EqualizerPanel.Initialize(MpvConfig.MusicMode ? _settings.MusicEqualizer : _settings.Equalizer, _host.ApplyPlaybackSettings);
+        (MpvConfig.MusicMode ? EqMusicRadio : EqMoviesRadio).IsChecked = true;
+        EqMoviesRadio.Checked += (_, _) => EqualizerPanel.Bind(_settings.Equalizer);
+        EqMusicRadio.Checked += (_, _) => EqualizerPanel.Bind(_settings.MusicEqualizer);
         Closed += (_, _) => EqualizerPanel.Flush();
     }
 
@@ -560,6 +594,11 @@ public partial class PlayerSettingsWindow : Window
         WindowTheme.Changed += syncTheme;
         Closed += (_, _) => WindowTheme.Changed -= syncTheme;
         UpdateHideControlsText();
+
+        MiniAutoSwitchBox.IsChecked = _settings.MiniPlayer.AutoSwitch;
+        MiniAutoSwitchBox.Checked += (_, _) => _settings.MiniPlayer.AutoSwitch = true;
+        MiniAutoSwitchBox.Unchecked += (_, _) => _settings.MiniPlayer.AutoSwitch = false;
+        UpdateMiniTexts();
 
         GpuUiBox.IsChecked = _settings.UiGpuRendering;
         GpuUiBox.Checked += (_, _) => _settings.UiGpuRendering = true;

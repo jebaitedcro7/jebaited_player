@@ -49,6 +49,16 @@ public partial class EqualizerPanel : UserControl
         Refresh();
     }
 
+    /// <summary>Prebaci ploču na drugi equalizer (filmovi ili glazba).</summary>
+    internal void Bind(EqualizerSettings eq)
+    {
+        Flush();
+        _eq = eq;
+        Refresh();
+    }
+
+    internal EqualizerSettings Bound => _eq;
+
     /// <summary>Zatvaranje prozora dok čeka primjena: primijeni odmah.</summary>
     internal void Flush()
     {

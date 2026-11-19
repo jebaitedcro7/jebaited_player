@@ -10,6 +10,20 @@ namespace JebaitedPlayer;
 /// </summary>
 public partial class MainWindow
 {
+    /// <summary>Klik na gumb ▶ u retku popisa postaja (kroz stvarni predložak, kao mišem).</summary>
+    private static bool ClickRadioPlay(RadioWindow radio, int index)
+    {
+        radio.StationList.UpdateLayout();
+        if (radio.StationList.ItemContainerGenerator.ContainerFromIndex(index) is System.Windows.Controls.ContentPresenter cp &&
+            cp.ContentTemplate.FindName("PlayButton", cp) is System.Windows.Controls.Button button)
+        {
+            button.RaiseEvent(new System.Windows.RoutedEventArgs(System.Windows.Controls.Primitives.ButtonBase.ClickEvent));
+            return true;
+        }
+
+        return false;
+    }
+
     private async Task<Dictionary<string, object?>> Settings3UiTestAsync()
     {
         var r = new Dictionary<string, object?>();
@@ -88,9 +102,11 @@ public partial class MainWindow
 
         // 2) Pokreni postaju (do 4 pokušaja, neke postaje ne rade): mini player, uživo, glazbeni EQ, ne ide u povijest.
         RadioRow? playing = null;
-        foreach (RadioRow row in radio.Results.Take(4))
+        int index = 0;
+        foreach (RadioRow row in radio.Results.Take(4).ToList())
         {
-            radio.Play(row);
+            // 1.5.1: klik na gumb ▶ u retku (kao korisnik), ne izravni poziv.
+            r["clickedPlayButton"] = ClickRadioPlay(radio, index++);
             await WaitForAsync(() => _vm.HasMedia && !_vm.IsLoading && _vm.Position > 2 && _vm.CurrentPath == row.Url, 15000);
             if (_vm.HasMedia && _vm.Position > 2 && _vm.CurrentPath == row.Url)
             {
@@ -100,6 +116,11 @@ public partial class MainWindow
         }
 
         await Task.Delay(1500);
+        r["feedback"] = new Dictionary<string, object?>
+        {
+            ["status"] = radio.Status, ["rowPlaying"] = playing?.IsPlaying, ["radioVisible"] = radio.IsVisible,
+            ["playGlyph"] = playing?.PlayGlyph == "",
+        };
         MiniPlayerWindow? mini = _mini;
         r["stream"] = new Dictionary<string, object?>
         {
@@ -136,6 +157,7 @@ public partial class MainWindow
             r["favoriteRemoved"] = _store?.IsRadioFavorite(playing.Url);
         }
 
+        r["radioScreenshotPlaying"] = SaveWindowPng("radio_playing", radio);
         r["historyHasUrls"] = (_store?.Recent(100) ?? []).Any(e => e.Path.StartsWith("http", StringComparison.OrdinalIgnoreCase));
         radio.Close();
         return r;

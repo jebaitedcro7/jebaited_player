@@ -122,7 +122,7 @@ In the same tab you set the automatic search, the encoding of old subtitles and 
 
 ### Radio
 
-- **Ctrl+R**, right-click → **Radio…** or the source label in the mini player: search stations by name, genre and country (free Radio Browser directory), click one to listen, the star keeps it in **Favorites**. Any stream URL (http/https, also .m3u/.pls) works too.
+- **Ctrl+R**, right-click → **Radio…** or the source label in the mini player: search stations by name, genre and country (free Radio Browser directory), press ▶ (or the name) to listen, the star keeps it in **Favorites**. Any stream URL (http/https, also .m3u/.pls) works too.
 - Stations play in the mini player with the music equalizer, marked **RADIO** and **LIVE**, with the current song when the station sends it. Radio does not appear in “Continue watching”.
 
 ### Backup and transfer

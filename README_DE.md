@@ -122,7 +122,7 @@ Im selben Tab stellst du die automatische Suche, die Zeichenkodierung alter Unte
 
 ### Radio
 
-- **Ctrl+R**, Rechtsklick → **Radio …** oder die Quellenanzeige im Mini-Player: Sender nach Name, Genre und Land suchen (kostenloses Verzeichnis Radio Browser), per Klick anhören, der Stern speichert ihn in den **Favoriten**. Auch jede Stream-URL (http/https, auch .m3u/.pls) funktioniert.
+- **Ctrl+R**, Rechtsklick → **Radio …** oder die Quellenanzeige im Mini-Player: Sender nach Name, Genre und Land suchen (kostenloses Verzeichnis Radio Browser), mit ▶ (oder Klick auf den Namen) anhören, der Stern speichert ihn in den **Favoriten**. Auch jede Stream-URL (http/https, auch .m3u/.pls) funktioniert.
 - Sender laufen im Mini-Player mit dem Musik-Equalizer, gekennzeichnet mit **RADIO** und **LIVE**, mit dem aktuellen Titel, wenn der Sender ihn sendet. Radio erscheint nicht unter „Weiterschauen“.
 
 ### Sicherung und Übertragung

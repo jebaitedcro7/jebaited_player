@@ -83,7 +83,10 @@ public partial class MainWindow : IMiniPlayerHost
             return;
         }
 
-        _radio = new RadioWindow(PlayStream, _store) { Owner = owner ?? (IsMiniPlayerActive ? _mini : this) };
+        _radio = new RadioWindow(PlayStream, _store, () => new RadioPlayback(_vm.CurrentPath, _vm.IsLoading, _vm.Position, _vm.ErrorMessage))
+        {
+            Owner = owner ?? (IsMiniPlayerActive ? _mini : this),
+        };
         _radio.Closed += (_, _) => _radio = null;
         _radio.Show();
     }
@@ -121,6 +124,12 @@ public partial class MainWindow : IMiniPlayerHost
         _mini ??= new MiniPlayerWindow(_vm, _settings, this);
         _mini.Show();
         _mini.Activate();
+        if (_radio is { IsLoaded: true } radio && ReferenceEquals(radio.Owner, this))
+        {
+            // Prozor Radio ostaje vidljiv kad se glavni prozor sakrije (1.5.1).
+            radio.Owner = _mini;
+            radio.Activate();
+        }
         RefreshVuFilter();
         Hide();
         UpdateOverlayVisibility();
@@ -129,6 +138,11 @@ public partial class MainWindow : IMiniPlayerHost
 
     void IMiniPlayerHost.ShowFullPlayer()
     {
+        if (_radio is { IsLoaded: true } radio && ReferenceEquals(radio.Owner, _mini))
+        {
+            radio.Owner = this;
+        }
+
         _mini?.Hide();
         RefreshVuFilter();
         Show();

@@ -54,6 +54,9 @@ $st = $r.stream
 Check "V3: stvarni stream svira" ($st.station -and [double]$st.position -gt 2 -and -not $st.paused) "'$($st.station)', $($st.position) s"
 Check "V3: mini player, RADIO, uživo, glazbeni EQ" ($st.miniVisible -and -not $st.mainVisible -and $st.source -eq "RADIO" -and $st.live -match "UŽIVO|LIVE" -and $st.musicMode) "izvor '$($st.source)', '$($st.live)', glazba $($st.musicMode)"
 Check "V3: naslov = postaja (+ pjesma ako je šalje)" ($st.title -and $st.title.StartsWith([string]$st.station)) "'$($st.title)' (icy: '$($st.icy)')"
+$fb = $r.feedback
+Check "1.5.1: gumb ▶ u retku pokreće postaju" ($r.clickedPlayButton -and $st.station) "klik $($r.clickedPlayButton), '$($st.station)'"
+Check "1.5.1: natpis Svira, zeleni redak, prozor Radio ostaje" ($fb.status -match "Svira|Playing" -and $fb.rowPlaying -and $fb.playGlyph -and $fb.radioVisible) "'$($fb.status)', redak $($fb.rowPlaying), vidljiv $($fb.radioVisible)"
 Check "V3: stream nije u popisu ni povijesti" (-not $st.libraryCurrent -and -not $r.historyHasUrls) "popis '$($st.libraryCurrent)', povijest s URL-om $($r.historyHasUrls)"
 Check "V3: favorit" ([int]$r.favorite.rows -ge 1 -and $r.favorite.inDb -and $r.favorite.star -and -not $r.favoriteRemoved) "redaka $($r.favorite.rows), u bazi $($r.favorite.inDb), uklonjen $(-not $r.favoriteRemoved)"
 Check "V3: kriv URL odbijen, ručni URL svira" (-not $r.badUrl -and $r.manualUrl.accepted -and $r.manualUrl.path -and [double]$r.manualUrl.position -ge 1.5) "kriv $($r.badUrl), ručni $($r.manualUrl.accepted), $($r.manualUrl.position) s"

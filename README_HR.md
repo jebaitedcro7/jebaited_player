@@ -122,7 +122,7 @@ U istoj kartici podešavaš automatsko traženje, kodiranje starih titlova i izg
 
 ### Radio
 
-- **Ctrl+R**, desni klik → **Radio…** ili oznaka izvora u mini playeru: traži postaje po nazivu, žanru i državi (besplatni imenik Radio Browser), klik je pušta, a zvjezdica je sprema u **Favorite**. Radi i bilo koji URL streama (http/https, i .m3u/.pls).
+- **Ctrl+R**, desni klik → **Radio…** ili oznaka izvora u mini playeru: traži postaje po nazivu, žanru i državi (besplatni imenik Radio Browser), ▶ (ili klik na naziv) je pušta, a zvjezdica je sprema u **Favorite**. Radi i bilo koji URL streama (http/https, i .m3u/.pls).
 - Postaje sviraju u mini playeru s glazbenim equalizerom, označene s **RADIO** i **UŽIVO**, uz trenutnu pjesmu kad je postaja šalje. Radio ne ulazi u „Nastavi gledati”.
 
 ### Kopije i prijenos

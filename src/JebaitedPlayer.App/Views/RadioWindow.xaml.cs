@@ -13,6 +13,22 @@ namespace JebaitedPlayer.Views;
 public sealed class RadioRow(string url, string name, string detail) : ObservableObject
 {
     private bool _isFavorite;
+    private bool _isPlaying;
+
+    /// <summary>Ova postaja upravo svira (zelena, ikona zvučnika).</summary>
+    public bool IsPlaying
+    {
+        get => _isPlaying;
+        set
+        {
+            if (SetField(ref _isPlaying, value))
+            {
+                OnPropertyChanged(nameof(PlayGlyph));
+            }
+        }
+    }
+
+    public string PlayGlyph => IsPlaying ? "\uE767" : "\uE768";
 
     public string Url { get; } = url;
     public string Name { get; } = name;
@@ -33,6 +49,9 @@ public sealed class RadioRow(string url, string name, string detail) : Observabl
     public string StarGlyph => IsFavorite ? "" : "";
 }
 
+/// <summary>Stanje reprodukcije za prozor Radio (koja datoteka, učitava li se, pozicija, greška).</summary>
+internal readonly record struct RadioPlayback(string? Path, bool Loading, double Position, string Error);
+
 /// <summary>
 /// Radio (ciklus 3, V3): pretraga postaja preko Radio Browsera po nazivu, žanru i državi, omiljene postaje u library.db
 /// i ručni URL (http/https; m3u i pls otvara mpv). Pokrenuta postaja ide u mini player s glazbenim equalizerom.
@@ -52,18 +71,30 @@ public partial class RadioWindow : Window
     private IReadOnlyList<RadioCountry>? _countries;
     private string? _tag;
     private RadioCountry? _country;
+    private readonly Func<RadioPlayback> _playback;
+    private readonly System.Windows.Threading.DispatcherTimer _watch;
+    private RadioRow? _started;
+    private long _startedAt;
+
+    /// <summary>Tekst stanja (dijagnostika).</summary>
+    internal string Status => StatusText.Text;
 
     /// <param name="play">Pokreni stream (URL, naziv postaje).</param>
-    internal RadioWindow(Action<string, string> play, WatchStore? store)
+    internal RadioWindow(Action<string, string> play, WatchStore? store, Func<RadioPlayback> playback)
     {
         _play = play;
         _store = store;
+        _playback = playback;
         InitializeComponent();
+        _watch = new System.Windows.Threading.DispatcherTimer(TimeSpan.FromMilliseconds(500),
+            System.Windows.Threading.DispatcherPriority.Background, (_, _) => CheckPlayback(), Dispatcher);
+        _watch.Stop();
         WindowTheme.UseDarkTitleBar(this);
         ResultsTab.Checked += (_, _) => ShowList();
         FavoritesTab.Checked += (_, _) => ShowList();
         Closed += (_, _) =>
         {
+            _watch.Stop();
             _search?.Cancel();
             _client.Dispose();
         };
@@ -217,8 +248,58 @@ public partial class RadioWindow : Window
 
     internal void Play(RadioRow row)
     {
-        StatusText.Text = Loc.T("radio.playing", row.Name);
+        _started = row;
+        _startedAt = Environment.TickCount64;
+        MarkPlaying(null);
+        StatusText.Text = Loc.T("radio.connecting", row.Name);
         _play(row.Url, row.Name);
+        _watch.Start();
+    }
+
+    /// <summary>
+    /// Nakon klika: „Povezujem…” dok stream ne krene, zatim „Svira…” i zelena postaja; ako ne krene u 15 s ili javi grešku,
+    /// poruka da postaja ne radi (mnoge postaje u imeniku povremeno ne rade).
+    /// </summary>
+    private void CheckPlayback()
+    {
+        if (_started is not { } row)
+        {
+            _watch.Stop();
+            return;
+        }
+
+        RadioPlayback s = _playback();
+        if (!string.Equals(s.Path, row.Url, StringComparison.OrdinalIgnoreCase))
+        {
+            if (Environment.TickCount64 - _startedAt > 3000)
+            {
+                MarkPlaying(null);
+                _started = null;
+            }
+
+            return;
+        }
+
+        if (!s.Loading && s.Position > 0.3 && s.Error.Length == 0)
+        {
+            MarkPlaying(row);
+            StatusText.Text = Loc.T("radio.playing", row.Name);
+        }
+        else if (s.Error.Length > 0 || Environment.TickCount64 - _startedAt > 15000)
+        {
+            MarkPlaying(null);
+            StatusText.Text = Loc.T("radio.failed", row.Name);
+            _started = null;
+            Log.Warn("Radio: postaja nije krenula.");
+        }
+    }
+
+    private void MarkPlaying(RadioRow? row)
+    {
+        foreach (RadioRow r in _results.Concat(_favorites))
+        {
+            r.IsPlaying = row is not null && string.Equals(r.Url, row.Url, StringComparison.OrdinalIgnoreCase);
+        }
     }
 
     private void OnPlayUrl(object sender, RoutedEventArgs e) => PlayUrl(UrlBox.Text);

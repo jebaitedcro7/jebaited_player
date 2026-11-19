@@ -40,6 +40,54 @@
   },
   "versions": [
     {
+      "version": "1.5.1",
+      "date": "2026-11-19",
+      "notes": {
+        "en": {
+          "summary": "Radio: a play button and clear feedback.",
+          "features": [],
+          "improvements": [
+            "Radio: every station has a ▶ button (clicking the name works too). The station that is playing is shown in green, and the window says “Connecting…”, “Playing…” or that a station is not working right now, so you can pick another one.",
+            "The Radio window stays open when the mini player opens.",
+            "Version number follows the project rule: the middle number grows with each big upgrade, the last number with each follow-up and is never reset (1.5.0 → 1.5.1)."
+          ],
+          "fixes": [],
+          "known": [
+            "The app is not digitally signed yet, so Windows SmartScreen or Smart App Control may warn before the installation.",
+            "The progress window of the installer comes from Velopack and is only in English."
+          ]
+        },
+        "de": {
+          "summary": "Radio: eine Abspieltaste und klare Rückmeldung.",
+          "features": [],
+          "improvements": [
+            "Radio: Jeder Sender hat eine ▶-Taste (ein Klick auf den Namen funktioniert auch). Der laufende Sender ist grün, und das Fenster zeigt „Verbinde …“, „Läuft …“ oder dass ein Sender gerade nicht funktioniert, damit du einen anderen wählen kannst.",
+            "Das Radiofenster bleibt offen, wenn sich der Mini-Player öffnet.",
+            "Die Versionsnummer folgt der Projektregel: Die mittlere Zahl wächst mit jedem großen Upgrade, die letzte mit jeder Nachbesserung und wird nie zurückgesetzt (1.5.0 → 1.5.1)."
+          ],
+          "fixes": [],
+          "known": [
+            "Die App ist noch nicht digital signiert, daher können Windows SmartScreen oder Smart App Control vor der Installation warnen.",
+            "Das Fortschrittsfenster des Installationsprogramms stammt von Velopack und ist nur auf Englisch."
+          ]
+        },
+        "hr": {
+          "summary": "Radio: gumb za puštanje i jasna poruka.",
+          "features": [],
+          "improvements": [
+            "Radio: svaka postaja ima gumb ▶ (radi i klik na naziv). Postaja koja svira je zelena, a prozor piše „Povezujem…”, „Svira…” ili da postaja trenutačno ne radi, pa možeš odabrati drugu.",
+            "Prozor Radio ostaje otvoren kad se otvori mini player.",
+            "Broj verzije prati pravilo projekta: srednji broj raste sa svakim velikim upgradeom, a zadnji sa svakom doradom i nikad se ne vraća na 0 (1.5.0 → 1.5.1)."
+          ],
+          "fixes": [],
+          "known": [
+            "Aplikacija još nije digitalno potpisana, pa Windows SmartScreen ili Smart App Control mogu upozoriti prije instalacije.",
+            "Prozor napretka instalacije je Velopackov i samo je na engleskom."
+          ]
+        }
+      }
+    },
+    {
       "version": "1.5.0",
       "date": "2026-11-19",
       "notes": {

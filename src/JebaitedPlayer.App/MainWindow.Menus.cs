@@ -17,7 +17,7 @@ public partial class MainWindow
     private void ShowContextMenu()
     {
         var menu = new ContextMenu { PlacementTarget = this, Placement = PlacementMode.MousePoint };
-        menu.Items.Add(Item(Loc.T("menu.openFile"), "Ctrl+O", ShowOpenDialog));
+        menu.Items.Add(Item(Loc.T("menu.openFile"), "Ctrl+O", () => ShowOpenDialog()));
         menu.Items.Add(Item(Loc.T("menu.openFolder"), "Ctrl+Shift+O", ShowOpenFolderDialog));
         menu.Items.Add(Item(Loc.T("menu.playPause"), Loc.T("key.space"), _vm.TogglePause, _vm.HasMedia));
         menu.Items.Add(Item(Loc.T("menu.fullscreen"), "F", () => SetFullscreen(!_vm.IsFullscreen)));
@@ -33,6 +33,7 @@ public partial class MainWindow
             menu.Items.Add(Item(Loc.T("menu.nextEpisode"), "N", _vm.Library.PlayNext));
         }
 
+        menu.Items.Add(Item(Loc.T("menu.miniPlayer"), "Ctrl+M", ShowMiniPlayer));
         menu.Items.Add(Item(_vm.Library.IsCurrentFavorite ? Loc.T("home.removeFavorite") : Loc.T("menu.addFavorite"), "Ctrl+D",
             _vm.Library.ToggleFavorite, _vm.HasMedia));
         menu.Items.Add(new Separator());

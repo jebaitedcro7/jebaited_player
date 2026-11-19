@@ -46,6 +46,29 @@ public sealed class EqualizerSettings
     }
 }
 
+/// <summary>Mini Music Player (ciklus 2, V1): položaj, veličina i izgled se pamte.</summary>
+public sealed class MiniPlayerSettings
+{
+    public const double MinScale = 0.75;
+    public const double MaxScale = 2.5;
+
+    public double? Left { get; set; }
+    public double? Top { get; set; }
+
+    /// <summary>Povećanje (1 = 100 %), mijenja se povlačenjem kuta, Ctrl + kotačić ili Ctrl + / −.</summary>
+    public double Scale { get; set; } = 1;
+
+    /// <summary>Uska traka (dizajn 3) umjesto punog izgleda (dizajn 1).</summary>
+    public bool Compact { get; set; }
+
+    public bool ShowEqualizer { get; set; }
+
+    public bool ShowPlaylist { get; set; }
+
+    public void Normalize() =>
+        Scale = double.IsFinite(Scale) ? Math.Clamp(Math.Round(Scale, 2), MinScale, MaxScale) : 1;
+}
+
 /// <summary>Pojasevi, preseti i mpv/ffmpeg filtar za equalizer.</summary>
 public static class Equalizer
 {

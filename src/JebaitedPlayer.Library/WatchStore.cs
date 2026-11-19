@@ -304,6 +304,25 @@ public sealed class WatchStore : IDisposable
         }
     }
 
+    /// <summary>
+    /// Dosljedna kopija cijele baze u novu datoteku (SQLite backup, uključuje i još nezapisani WAL),
+    /// i dok je player otvoren (ciklus 2, M1a).
+    /// </summary>
+    public void BackupTo(string destinationPath)
+    {
+        lock (_gate)
+        {
+            using var destination = new SqliteConnection(new SqliteConnectionStringBuilder
+            {
+                DataSource = Path.GetFullPath(destinationPath),
+                Mode = SqliteOpenMode.ReadWriteCreate,
+                Pooling = false,
+            }.ToString());
+            destination.Open();
+            _db.BackupDatabase(destination);
+        }
+    }
+
     public void Dispose()
     {
         lock (_gate)

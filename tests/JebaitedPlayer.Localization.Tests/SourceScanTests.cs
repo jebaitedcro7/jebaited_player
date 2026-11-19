@@ -14,6 +14,9 @@ public sealed partial class SourceScanTests
     [
         "jebaited_player", "OpenSubtitles.com", "SubDL.com", "Titlovi.com", "s", "−5 s", "−1 s", "+1 s", "+5 s",
         "1.", "2.", "3.", "4.", "jebaited_cro",
+
+        // Mini player (ciklus 2): brend i Winamp oznake koje se ne prevode (lijevi/desni kanal, equalizer, playlista).
+        "jebaited_player mini", "jebaited_cro · mini", "L", "R", "EQ", "PL",
     ];
 
     // Datoteke u kojima su naša slova dio podataka, ne sučelja (prepoznavanje jezika titlova, testni titl u dijagnostici).

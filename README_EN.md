@@ -110,6 +110,17 @@ In the same tab you set the automatic search, the encoding of old subtitles and 
 - **Audio track:** **B** switches to the next one, or right-click → **Audio** and choose a track (language, format and channels are shown). The choice is remembered per video.
 - **Settings → Audio:** preferred audio language, output device, audio sync (for example for Bluetooth headphones), volume levelling for quiet dialogue and a 10-band equalizer with presets and your own preset.
 
+### Mini player
+
+- Right-click → **Mini player** or **Ctrl+M**: a small Winamp-style window that stays on top. The music keeps playing; **Ctrl+M** takes you back to the full player.
+- Green display with time (click: remaining time) and a real L/R level meter, scrolling artist and title, seek bar, previous / play / pause / stop / next, open, volume. **EQ** and **PL** open the equalizer and the playlist below.
+- The strip button makes it a thin bar; drag the corner, use Ctrl + mouse wheel or Ctrl + / − to make it bigger or smaller. Position and size are remembered.
+- Opening one song plays the whole album (all songs in the folder), one after another without a countdown.
+
+### Backup and transfer
+
+Settings → General → **Backup and transfer**: settings and watch history are copied automatically once a day and before every update (the last 7 are kept on your computer). **Export settings** saves them to a file (without passwords, subtitle-site keys and the window position) and **Import settings** loads them again, also on another computer.
+
 ### App language
 
 <p align="center"><img src="manual/images/en/settings.png" width="640" alt="Settings, Language tab"></p>
@@ -234,6 +245,7 @@ Archives from subtitle sites: ZIP is supported; RAR is not yet.
 | O | Aspect ratio |
 | S / Shift+S | Screenshot (with / without subtitles) |
 | Ctrl+D | Add to / remove from favorites |
+| Ctrl+M | Mini player / back to the full player |
 | Ctrl+Backspace | Restore original subtitle timing |
 | F1 | All shortcuts |
 

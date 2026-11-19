@@ -46,6 +46,12 @@ internal interface ISettingsHost
     /// <summary>Postavke prozora (npr. iznad ostalih prozora) odmah.</summary>
     void ApplyWindowSettings();
 
+    /// <summary>Uvezene postavke (M1b) odmah na cijeli player.</summary>
+    void ApplyImportedSettings();
+
+    /// <summary>Zatvori i ponovno otvori prozor postavki (prikaz uvezenih vrijednosti).</summary>
+    void ReopenSettings(SettingsTab tab);
+
     Task<IReadOnlyList<AudioDeviceInfo>> GetAudioDevicesAsync();
 
     /// <summary>Spremaju li se postavke pri zatvaranju (u dijagnostici ne: testovi nikad ne mijenjaju tvoje postavke).</summary>
@@ -128,11 +134,12 @@ public partial class PlayerSettingsWindow : Window
     {
         UpdateSeekStepTexts();
         UpdateAudioTexts();
-        UpdateEqPresetText();
+        EqualizerPanel.Refresh();
         UpdateAspectText();
         UpdateHideControlsText();
         UpdateUpdateStatus();
         UpdateShellStatus();
+        UpdateBackupStatus();
         UpdateWhatsNew();
         AboutVersionText.Text = Loc.T("settings.aboutVersion", _updates.CurrentVersion);
         _subtitlesPanel.RefreshTexts();
@@ -168,6 +175,7 @@ public partial class PlayerSettingsWindow : Window
 
         UpdateFolderText();
         UpdateShellStatus();
+        UpdateBackupStatus();
     }
 
     private void SetResumeMode(string mode)
@@ -288,6 +296,133 @@ public partial class PlayerSettingsWindow : Window
         UpdateShellStatus();
     }
 
+    // --- 1a. Kopije, izvoz i uvoz postavki (ciklus 2, M1a i M1b) --------------------------------------------------
+
+    private void UpdateBackupStatus()
+    {
+        BackupInfo? last = SettingsBackup.List(AppPaths.DataDir).FirstOrDefault();
+        BackupStatusText.Text = last is null
+            ? Loc.T("settings.backupNone", SettingsBackup.Keep)
+            : Loc.T("settings.backupStatus", SettingsBackup.Keep, last.Created.ToLocalTime().ToString("g", Loc.Culture));
+    }
+
+    private void OnOpenBackups(object sender, RoutedEventArgs e)
+    {
+        string dir = SettingsBackup.BackupsDir(AppPaths.DataDir);
+        try
+        {
+            Directory.CreateDirectory(dir);
+            Process.Start(new ProcessStartInfo(dir) { UseShellExecute = true });
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or System.ComponentModel.Win32Exception)
+        {
+            Log.Warn($"Mapa s kopijama nije otvorena: {ex.Message}");
+        }
+    }
+
+    private void OnExportSettings(object sender, RoutedEventArgs e)
+    {
+        var dialog = new Microsoft.Win32.SaveFileDialog
+        {
+            FileName = SettingsTransfer.DefaultFileName(DateTime.Now),
+            DefaultExt = ".json",
+            Filter = Loc.T("settings.settingsFileFilter") + "|*.json",
+            InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+        };
+        if (dialog.ShowDialog(this) == true)
+        {
+            ExportTo(dialog.FileName);
+        }
+    }
+
+    /// <summary>Izvoz u datoteku (gumb, dijagnostika). Vraća je li uspio.</summary>
+    internal bool ExportTo(string path)
+    {
+        try
+        {
+            File.WriteAllText(path, SettingsTransfer.Export(_settings, _updates.CurrentVersion, DateTime.UtcNow));
+            Log.Info("Postavke izvezene.");
+            ShowTransferMessage(Loc.T("settings.exportDone", Path.GetFileName(path)), MessageBoxImage.Information);
+            return true;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            Log.Warn($"Izvoz postavki nije uspio: {ex.Message}");
+            ShowTransferMessage(Loc.T("settings.transferFailed", ex.Message), MessageBoxImage.Warning);
+            return false;
+        }
+    }
+
+    private void OnImportSettings(object sender, RoutedEventArgs e)
+    {
+        var dialog = new Microsoft.Win32.OpenFileDialog
+        {
+            Filter = Loc.T("settings.settingsFileFilter") + "|*.json",
+            InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+        };
+        if (dialog.ShowDialog(this) == true)
+        {
+            ImportFrom(dialog.FileName, confirm: true);
+        }
+    }
+
+    /// <summary>
+    /// Uvoz: provjeri datoteku, pitaj, napravi kopiju trenutnih postavki, prepiši ih, primijeni odmah i ponovno
+    /// otvori prozor. Neispravna datoteka ne mijenja ništa. Vraća je li uvezeno.
+    /// </summary>
+    internal bool ImportFrom(string path, bool confirm)
+    {
+        AppSettings imported;
+        try
+        {
+            imported = SettingsTransfer.Read(File.ReadAllText(path));
+        }
+        catch (Exception ex) when (ex is InvalidDataException or IOException or UnauthorizedAccessException)
+        {
+            Log.Warn($"Uvoz postavki odbijen: {ex.Message}");
+            ShowTransferMessage(Loc.T("settings.importInvalid"), MessageBoxImage.Warning);
+            return false;
+        }
+
+        if (confirm && MessageBox.Show(this, Loc.T("settings.importConfirm", Path.GetFileName(path)), Loc.T("settings.importSettings"),
+                MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+        {
+            return false;
+        }
+
+        if (_host.PersistSettings || Environment.GetEnvironmentVariable("JEBAITED_DATA_DIR") is { Length: > 0 })
+        {
+            try
+            {
+                _settings.Save();
+                SettingsBackup.Create(AppPaths.DataDir, store: null, "import", DateTime.UtcNow);
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                Log.Warn($"Kopija prije uvoza nije napravljena: {ex.Message}");
+            }
+        }
+
+        SettingsTransfer.ApplyTo(_settings, imported);
+        _host.ApplyImportedSettings();
+        Log.Info("Postavke uvezene.");
+        _host.ReopenSettings(SettingsTab.General);
+        return true;
+    }
+
+    /// <summary>Poruka o izvozu ili uvozu (u dijagnostici samo u log, bez prozora koji čeka klik).</summary>
+    private void ShowTransferMessage(string text, MessageBoxImage icon)
+    {
+        if (_host.PersistSettings)
+        {
+            MessageBox.Show(this, text, Loc.T("settings.backupSection"), MessageBoxButton.OK, icon);
+        }
+        else
+        {
+            Log.Info("Dijagnostika, poruka: " + text);
+        }
+    }
+
     // --- 4. Zvuk -------------------------------------------------------------------------------------------------
 
     private void LoadAudio()
@@ -308,165 +443,9 @@ public partial class PlayerSettingsWindow : Window
             UpdateAudioTexts();
         });
         UpdateAudioTexts();
-        LoadEqualizer();
+        EqualizerPanel.Initialize(_settings.Equalizer, _host.ApplyPlaybackSettings);
+        Closed += (_, _) => EqualizerPanel.Flush();
     }
-
-    // --- 4a. Equalizer (ciklus 1) --------------------------------------------------------------------------------
-
-    private readonly List<(Slider Slider, TextBlock Value)> _eqBands = [];
-    private (Slider Slider, TextBlock Value) _eqPreamp;
-    private DispatcherTimer? _eqApplyTimer;
-    private bool _eqUpdating;
-
-    private EqualizerSettings Eq => _settings.Equalizer;
-
-    private void LoadEqualizer()
-    {
-        _eqPreamp = AddEqColumn(Loc.T("settings.eqPreamp"), Eq.Preamp, isPreamp: true);
-        EqBands.Children.Add(new Border { Width = 1, Margin = new Thickness(6, 0, 10, 22), Background = (Brush)FindResource("MenuBorderBrush") });
-        for (int i = 0; i < Equalizer.BandCount; i++)
-        {
-            _eqBands.Add(AddEqColumn(Equalizer.FrequencyLabel(Equalizer.Frequencies[i]), Eq.Gains[i], isPreamp: false, band: i));
-        }
-
-        EqEnabledBox.IsChecked = Eq.Enabled;
-        EqEnabledBox.Checked += (_, _) => SetEqEnabled(true);
-        EqEnabledBox.Unchecked += (_, _) => SetEqEnabled(false);
-
-        // Klizači šalju puno promjena dok se povlače: mpv dobije novi filtar tek kad povlačenje stane (bez pucketanja).
-        _eqApplyTimer = new DispatcherTimer(TimeSpan.FromMilliseconds(150), DispatcherPriority.Normal, (_, _) =>
-        {
-            _eqApplyTimer!.Stop();
-            _host.ApplyPlaybackSettings();
-        }, Dispatcher);
-        _eqApplyTimer.Stop();
-        Closed += (_, _) =>
-        {
-            if (_eqApplyTimer.IsEnabled)
-            {
-                _eqApplyTimer.Stop();
-                _host.ApplyPlaybackSettings();
-            }
-        };
-
-        UpdateEqualizerView();
-    }
-
-    private (Slider Slider, TextBlock Value) AddEqColumn(string label, double value, bool isPreamp, int band = -1)
-    {
-        var valueText = new TextBlock { FontSize = 11, HorizontalAlignment = HorizontalAlignment.Center, Margin = new Thickness(0, 0, 0, 4) };
-        valueText.SetResourceReference(TextBlock.ForegroundProperty, "TextSecondaryBrush");
-        var slider = new Slider { Style = (Style)FindResource("EqSlider"), Height = 132, Value = value };
-        slider.ValueChanged += (_, e) =>
-        {
-            valueText.Text = Db(e.NewValue);
-            if (_eqUpdating || _loading)
-            {
-                return;
-            }
-
-            if (isPreamp)
-            {
-                Eq.Preamp = Equalizer.Clamp(e.NewValue);
-            }
-            else
-            {
-                SetEqBand(band, e.NewValue);
-            }
-
-            ScheduleEqApply();
-        };
-        valueText.Text = Db(value);
-        var column = new StackPanel { Width = isPreamp ? 46 : 40 };
-        column.Children.Add(valueText);
-        column.Children.Add(slider);
-        column.Children.Add(new TextBlock { Text = label, FontSize = 11, HorizontalAlignment = HorizontalAlignment.Center, Margin = new Thickness(0, 6, 0, 0) });
-        EqBands.Children.Add(column);
-        return (slider, valueText);
-    }
-
-    /// <summary>Pomicanje pojasa: od ugrađenog preseta nastaje vlastiti (polazi od vrijednosti tog preseta).</summary>
-    private void SetEqBand(int band, double value)
-    {
-        if (Eq.Preset != Equalizer.Custom)
-        {
-            Eq.CustomGains = Eq.Gains;
-            Eq.Preset = Equalizer.Custom;
-            UpdateEqPresetText();
-        }
-
-        Eq.CustomGains[band] = Equalizer.Clamp(value);
-    }
-
-    private void SetEqEnabled(bool enabled)
-    {
-        if (_loading)
-        {
-            return;
-        }
-
-        Eq.Enabled = enabled;
-        UpdateEqualizerView();
-        _host.ApplyPlaybackSettings();
-    }
-
-    private void ScheduleEqApply()
-    {
-        if (!Eq.Enabled || _eqApplyTimer is null)
-        {
-            return;
-        }
-
-        _eqApplyTimer.Stop();
-        _eqApplyTimer.Start();
-    }
-
-    private void OnEqPresetClick(object sender, RoutedEventArgs e)
-    {
-        var choices = Equalizer.Presets
-            .Select(p => (Loc.T("eq." + p.Id), p.Id == Eq.Preset, (Action)(() => ChooseEqPreset(p.Id))))
-            .Append((Loc.T("eq.custom"), Eq.Preset == Equalizer.Custom, () => ChooseEqPreset(Equalizer.Custom)));
-        ShowChoices(EqPresetButton, choices);
-    }
-
-    private void ChooseEqPreset(string id)
-    {
-        Eq.Preset = id;
-        UpdateEqualizerView();
-        if (Eq.Enabled)
-        {
-            _host.ApplyPlaybackSettings();
-        }
-    }
-
-    /// <summary>Vrati na Flat i 0 dB pojačanja (vlastiti preset ostaje zapamćen pod „Vlastiti”).</summary>
-    private void OnEqReset(object sender, RoutedEventArgs e)
-    {
-        Eq.Preamp = 0;
-        ChooseEqPreset("flat");
-    }
-
-    private void UpdateEqualizerView()
-    {
-        _eqUpdating = true;
-        double[] gains = Eq.Gains;
-        for (int i = 0; i < _eqBands.Count; i++)
-        {
-            _eqBands[i].Slider.Value = gains[i];
-            _eqBands[i].Value.Text = Db(gains[i]);
-        }
-
-        _eqPreamp.Slider.Value = Eq.Preamp;
-        _eqPreamp.Value.Text = Db(Eq.Preamp);
-        _eqUpdating = false;
-        EqPanel.IsEnabled = Eq.Enabled;
-        EqPanel.Opacity = Eq.Enabled ? 1 : 0.45;
-        UpdateEqPresetText();
-    }
-
-    private void UpdateEqPresetText() => EqPresetButton.Content = Loc.T("eq." + Eq.Preset);
-
-    private static string Db(double value) => Math.Abs(value) < 0.05 ? "0" : value.ToString("+0.#;−0.#", Loc.Culture);
 
     private void UpdateAudioTexts()
     {

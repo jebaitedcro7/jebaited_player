@@ -4,6 +4,29 @@ Sve važnije promjene jebaited_playera. Oblik: [Keep a Changelog](https://keepac
 
 Drugi jezici: [English](CHANGELOG.md) · [Deutsch](CHANGELOG_DE.md). Ista povijest je i u playeru (klik na broj verzije na početnom ekranu). Ova datoteka nastaje iz `src/JebaitedPlayer.App/History/update-history.json`.
 
+## [1.4.0] - 2026-11-19
+
+Mini music player, automatske kopije te izvoz i uvoz postavki.
+
+### Novo
+
+- Mini player (izbornik desnog klika ili Ctrl+M): mali prozor u Winamp stilu, u jebaited_cro izgledu, uvijek iznad ostalih prozora. Ima zeleni zaslon s vremenom i stvarnim mjeračem razine (L/D), pomični izvođač i naslov s bitrateom, traku za premotavanje, prethodna, pokreni, pauza, zaustavi, sljedeća, otvori i glasnoću te equalizer i popis pjesama koji se otvaraju ispod. Može se smanjiti u usku traku, a veličina se mijenja povlačenjem kuta, Ctrl + kotačićem miša ili Ctrl + / −. Glazba svira dalje kad se prebaciš, a Ctrl+M te vraća natrag.
+- Automatske kopije: postavke i povijest gledanja kopiraju se jednom dnevno i prije svake nadogradnje. Zadnjih 7 kopija ostaje na tvom računalu (Postavke → Općenito → Kopije i prijenos).
+- Izvoz i uvoz postavki: spremi postavke u datoteku i učitaj ih ponovno, i na drugom računalu. Lozinke, ključevi za stranice s titlovima i položaj prozora se ne izvoze. Prije uvoza trenutne postavke se kopiraju, a kriva datoteka se odbija bez ikakve promjene.
+
+### Poboljšano
+
+- Otvaranje jedne pjesme pušta cijeli album (sve pjesme iz te mape), a sljedeća pjesma kreće odmah, bez odbrojavanja.
+- Glazba više ne puni „Nastavi gledati” na početnom ekranu.
+- Equalizer radi isto u postavkama i u mini playeru.
+
+### Poznati problemi
+
+- Aplikacija još nije digitalno potpisana, pa Windows SmartScreen ili Smart App Control mogu upozoriti prije instalacije.
+- Prozor napretka instalacije je Velopackov i samo je na engleskom.
+
+Izdanje: [v1.4.0](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v1.4.0) · Promjene od [v1.3.0...v1.4.0](https://github.com/jebaitedcro7/jebaited_player/compare/v1.3.0...v1.4.0)
+
 ## [1.3.0] - 2026-11-19
 
 Equalizer, pouzdan status „Pogledano” i lokalna dijagnostika.

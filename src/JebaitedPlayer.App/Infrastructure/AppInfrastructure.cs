@@ -317,6 +317,9 @@ public sealed class AppSettings
     /// <summary>Equalizer (ciklus 1): 10 pojaseva, preseti i vlastiti preset.</summary>
     public EqualizerSettings Equalizer { get; set; } = new();
 
+    /// <summary>Mini Music Player (ciklus 2).</summary>
+    public MiniPlayerSettings MiniPlayer { get; set; } = new();
+
     /// <summary>Hardversko dekodiranje (grafička kartica).</summary>
     public bool HardwareDecoding { get; set; } = true;
 
@@ -380,6 +383,8 @@ public sealed class AppSettings
 
         Equalizer ??= new EqualizerSettings();
         Equalizer.Normalize();
+        MiniPlayer ??= new MiniPlayerSettings();
+        MiniPlayer.Normalize();
     }
 
     public SubtitleStyleSettings SubtitleStyle { get; set; } = new();

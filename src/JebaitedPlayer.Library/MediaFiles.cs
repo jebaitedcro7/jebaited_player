@@ -211,6 +211,31 @@ public static partial class MediaScanner
         return new ScanResult(Sort(videos.Count > 0 ? videos : audio), skipped, truncated);
     }
 
+    /// <summary>Ciklus 2 (mini player): ostale pjesme iz iste mape (album), da se otvaranjem jedne pjesme svira cijeli album.</summary>
+    public static IReadOnlyList<string> SiblingAudio(string file)
+    {
+        string? dir = Path.GetDirectoryName(file);
+        if (dir is null)
+        {
+            return [file];
+        }
+
+        try
+        {
+            var files = Directory.EnumerateFiles(dir).Where(IsAudio).ToList();
+            if (!files.Contains(file, StringComparer.OrdinalIgnoreCase))
+            {
+                files.Add(file);
+            }
+
+            return Sort(files);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            return [file];
+        }
+    }
+
     /// <summary>Ostale epizode iz iste mape (za "sljedeću epizodu" kad se otvori jedna datoteka).</summary>
     public static IReadOnlyList<string> SiblingVideos(string file)
     {

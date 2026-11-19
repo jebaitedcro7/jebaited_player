@@ -116,8 +116,22 @@ internal static class MpvConfig
             parts.Add(NormalizeGraph);
         }
 
-        return parts.Count == 0 ? string.Empty : $"lavfi=[{string.Join(',', parts)}]";
+        string filter = parts.Count == 0 ? string.Empty : $"lavfi=[{string.Join(',', parts)}]";
+        if (VuMeter)
+        {
+            filter = (filter.Length > 0 ? filter + "," : string.Empty) + VuMeterFilter;
+        }
+
+        return filter;
     }
+
+    /// <summary>
+    /// Mini player (ciklus 2): mjerenje razine zvuka za VU metar, samo dok je mini player otvoren.
+    /// Razina se čita iz "af-metadata/vu" (RMS po kanalu, dB); na kraju lanca, pa pokazuje i učinak equalizera.
+    /// </summary>
+    public const string VuMeterFilter = "@vu:lavfi=[astats=metadata=1:reset=1]";
+
+    public static bool VuMeter { get; set; }
 
     /// <summary>Opcije koje mijenja kvaliteta slike ("balanced" = zadane vrijednosti mpv-a).</summary>
     private static readonly string[] QualityOptionNames =

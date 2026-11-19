@@ -4,6 +4,29 @@ All notable changes to jebaited_player. Format: [Keep a Changelog](https://keepa
 
 Other languages: [Deutsch](CHANGELOG_DE.md) · [Hrvatski](CHANGELOG_HR.md). The same history is included in the player (click the version number on the home screen). This file is generated from `src/JebaitedPlayer.App/History/update-history.json`.
 
+## [1.4.0] - 2026-11-19
+
+Mini music player, automatic backups and settings export and import.
+
+### Added
+
+- Mini player (right-click menu or Ctrl+M): a small Winamp-style window in the jebaited_cro look that stays on top. It has a green display with the time and a real level meter (L/R), the scrolling artist and title with the bitrate, a seek bar, previous, play, pause, stop, next, open and volume, plus an equalizer and a playlist that open below. It shrinks to a thin strip, and you can make it bigger or smaller by dragging the corner, with Ctrl + mouse wheel or with Ctrl + / −. The music keeps playing when you switch, and Ctrl+M takes you back.
+- Automatic backups: your settings and watch history are copied once a day and before every update. The last 7 copies are kept on your computer (Settings → General → Backup and transfer).
+- Export and import settings: save your settings to a file and load them again, also on another computer. Passwords, keys for subtitle sites and the window position are not exported. Your current settings are backed up before an import, and a wrong file is rejected without changing anything.
+
+### Improved
+
+- Opening one song plays the whole album (all songs in that folder), and the next song starts right away, without a countdown.
+- Music no longer fills “Continue watching” on the home screen.
+- The equalizer works the same in the settings and in the mini player.
+
+### Known issues
+
+- The app is not digitally signed yet, so Windows SmartScreen or Smart App Control may warn before the installation.
+- The progress window of the installer comes from Velopack and is only in English.
+
+Release: [v1.4.0](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v1.4.0) · Changes since [v1.3.0...v1.4.0](https://github.com/jebaitedcro7/jebaited_player/compare/v1.3.0...v1.4.0)
+
 ## [1.3.0] - 2026-11-19
 
 Equalizer, a reliable “Watched” status and local diagnostics.

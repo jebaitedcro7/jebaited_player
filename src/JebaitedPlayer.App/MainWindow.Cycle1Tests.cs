@@ -31,13 +31,13 @@ public partial class MainWindow
         ShowPlayerSettings(SettingsTab.Audio);
         await Task.Delay(700);
         PlayerSettingsWindow w = _playerSettingsWindow!;
-        List<StackPanel> columns = w.EqBands.Children.OfType<StackPanel>().ToList();
+        List<StackPanel> columns = w.EqualizerPanel.Bands.Children.OfType<StackPanel>().ToList();
         r["columns"] = columns.Count;
         r["labels"] = columns.Select(c => (c.Children[2] as TextBlock)?.Text).ToArray();
-        r["panelEnabledBefore"] = w.EqPanel.IsEnabled;
-        w.EqEnabledBox.IsChecked = true;
+        r["panelEnabledBefore"] = w.EqualizerPanel.Panel.IsEnabled;
+        w.EqualizerPanel.EnabledBox.IsChecked = true;
         await Task.Delay(800);
-        r["panelEnabledAfter"] = w.EqPanel.IsEnabled;
+        r["panelEnabledAfter"] = w.EqualizerPanel.Panel.IsEnabled;
         r["afFlat"] = await AfAsync();
         double t0 = await MpvDoubleAsync("time-pos") ?? 0;
         ((Slider)columns[1].Children[1]).Value = 6;
@@ -46,7 +46,7 @@ public partial class MainWindow
         r["slider"] = new Dictionary<string, object?>
         {
             ["preset"] = _settings.Equalizer.Preset,
-            ["presetButton"] = w.EqPresetButton.Content?.ToString(),
+            ["presetButton"] = w.EqualizerPanel.PresetButton.Content?.ToString(),
             ["af"] = await AfAsync(),
             ["advanced"] = Math.Round(t1 - t0, 2),
             ["paused"] = _vm.IsPaused,
@@ -246,8 +246,21 @@ public partial class MainWindow
             return null;
         }
 
+        // Pozadina prozora nije dio sadržaja: nacrtaj je ispod, da snimka izgleda kao na zaslonu.
         var bmp = new RenderTargetBitmap((int)root.ActualWidth, (int)root.ActualHeight, 96, 96, PixelFormats.Pbgra32);
-        bmp.Render(root);
+        var visual = new DrawingVisual();
+        using (DrawingContext dc = visual.RenderOpen())
+        {
+            var bounds = new Rect(0, 0, root.ActualWidth, root.ActualHeight);
+            dc.DrawRectangle((window ?? this).Background, null, bounds);
+            dc.DrawRectangle(new VisualBrush(root)
+            {
+                Stretch = Stretch.None, AlignmentX = AlignmentX.Left, AlignmentY = AlignmentY.Top,
+                ViewboxUnits = BrushMappingMode.Absolute, Viewbox = bounds,
+            }, null, bounds);
+        }
+
+        bmp.Render(visual);
         string file = Path.Combine(Path.GetDirectoryName(outFile)!, name + ".png");
         var encoder = new PngBitmapEncoder();
         encoder.Frames.Add(BitmapFrame.Create(bmp));

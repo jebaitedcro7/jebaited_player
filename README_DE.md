@@ -110,6 +110,17 @@ Im selben Tab stellst du die automatische Suche, die Zeichenkodierung alter Unte
 - **Audiospur:** **B** wechselt zur nächsten, oder Rechtsklick → **Audio** und eine Spur wählen (Sprache, Format und Kanäle werden angezeigt). Die Wahl wird pro Video gespeichert.
 - **Einstellungen → Audio:** bevorzugte Audiosprache, Ausgabegerät, Audio-Synchronisierung (z. B. für Bluetooth-Kopfhörer), Lautstärkeausgleich für leise Dialoge und ein 10-Band-Equalizer mit Voreinstellungen und eigener Einstellung.
 
+### Mini-Player
+
+- Rechtsklick → **Mini-Player** oder **Ctrl+M**: ein kleines Fenster im Winamp-Stil, das im Vordergrund bleibt. Die Musik läuft weiter; **Ctrl+M** führt zurück zum vollen Player.
+- Grüne Anzeige mit Zeit (Klick: Restzeit) und echter L/R-Pegelanzeige, laufender Interpret und Titel, Suchleiste, Zurück / Abspielen / Pause / Stopp / Weiter, Öffnen, Lautstärke. **EQ** und **PL** öffnen darunter Equalizer und Wiedergabeliste.
+- Die Leisten-Taste macht daraus eine schmale Leiste; Ecke ziehen, Ctrl + Mausrad oder Ctrl + / − ändert die Größe. Position und Größe werden gespeichert.
+- Ein einzelnes Lied spielt das ganze Album (alle Lieder im Ordner) nacheinander ohne Countdown.
+
+### Sicherung und Übertragung
+
+Einstellungen → Allgemein → **Sicherung und Übertragung**: Einstellungen und Wiedergabeverlauf werden einmal täglich und vor jedem Update automatisch kopiert (die letzten 7 bleiben auf deinem Computer). **Einstellungen exportieren** speichert sie in einer Datei (ohne Passwörter, Schlüssel für Untertitelseiten und Fensterposition), **Einstellungen importieren** lädt sie wieder, auch auf einem anderen Computer.
+
 ### Sprache der App
 
 <p align="center"><img src="manual/images/de/settings.png" width="640" alt="Einstellungen, Tab Sprache"></p>
@@ -234,6 +245,7 @@ Archive von Untertitelseiten: ZIP wird unterstützt, RAR noch nicht.
 | O | Seitenverhältnis |
 | S / Shift+S | Screenshot (mit / ohne Untertitel) |
 | Ctrl+D | Zu Favoriten hinzufügen / entfernen |
+| Ctrl+M | Mini-Player / zurück zum vollen Player |
 | Ctrl+Backspace | Ursprüngliche Untertitel-Synchronisation wiederherstellen |
 | F1 | Alle Tastenkürzel |
 

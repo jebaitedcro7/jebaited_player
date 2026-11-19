@@ -134,6 +134,41 @@ public partial class MainWindow : ISettingsHost
 
     void ISettingsHost.ApplyWindowSettings() => ApplyWindowSettings();
 
+    /// <summary>M1b: uvezene postavke odmah na sve dijelove playera (isto kao promjene u prozoru postavki).</summary>
+    void ISettingsHost.ApplyImportedSettings()
+    {
+        WindowTheme.Apply(_settings.Theme);
+        if (!_options.IsDiagnostics && _settings.Language is { Length: > 0 } language)
+        {
+            Loc.SetLanguage(language);
+        }
+
+        _vm.Volume = _settings.Volume;
+        _vm.IsMuted = _settings.Muted;
+        _vm.Library.AutoPlayNext = _settings.AutoPlayNext;
+        _vm.Library.UpNextDelaySeconds = _settings.UpNextSeconds;
+        _vm.Library.ResumeMode = _settings.ResumeMode;
+        _vm.Subtitles.ApplyLanguagePriority();
+        _vm.Subtitles.ApplyStyle();
+        ((ISettingsHost)this).ApplyPlaybackSettings();
+        ApplyWindowSettings();
+        Log.Info("Uvezene postavke primijenjene.");
+    }
+
+    /// <summary>Prozor postavki se nakon uvoza ponovno otvara, da pokaže uvezene vrijednosti.</summary>
+    void ISettingsHost.ReopenSettings(SettingsTab tab)
+    {
+        if (_playerSettingsWindow is { } w)
+        {
+            w.Closed += (_, _) => Dispatcher.BeginInvoke(() => ShowPlayerSettings(tab));
+            w.Close();
+        }
+        else
+        {
+            ShowPlayerSettings(tab);
+        }
+    }
+
     bool ISettingsHost.PersistSettings => !_options.IsDiagnostics;
 
     /// <summary>Izlazni uređaji zvuka: iz otvorenog mpv-a ili iz kratkotrajnog (bez videa, odmah se zatvara).</summary>

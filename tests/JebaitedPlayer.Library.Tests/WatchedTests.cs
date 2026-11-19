@@ -182,3 +182,29 @@ public sealed class WatchedTests
         Assert.AreEqual(1, c.Fraction, 1e-9);
     }
 }
+
+/// <summary>Ciklus 2 (mini player): jedna pjesma otvara cijeli album iz iste mape.</summary>
+[TestClass]
+public sealed class AlbumTests
+{
+    [TestMethod]
+    public void Opening_one_song_gives_the_whole_album_in_order()
+    {
+        string dir = Path.Combine(Path.GetTempPath(), "jp-album-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(dir);
+        try
+        {
+            foreach (string f in new[] { "02 Drugi.flac", "10 Deseti.mp3", "01 Prvi.mp3", "cover.jpg", "video.mkv", "03 Treci.m4a" })
+            {
+                File.WriteAllText(Path.Combine(dir, f), "x");
+            }
+
+            IReadOnlyList<string> album = MediaScanner.SiblingAudio(Path.Combine(dir, "02 Drugi.flac"));
+            CollectionAssert.AreEqual(new[] { "01 Prvi.mp3", "02 Drugi.flac", "03 Treci.m4a", "10 Deseti.mp3" }, album.Select(Path.GetFileName).ToArray());
+        }
+        finally
+        {
+            Directory.Delete(dir, recursive: true);
+        }
+    }
+}

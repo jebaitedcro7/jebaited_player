@@ -79,6 +79,8 @@ public partial class MainWindow : Window
             Log.Error("Baza povijesti nije otvorena (nastavak gledanja neće raditi)", ex);
         }
 
+        StartDailyBackup(options);
+
         _vm = new PlayerViewModel(settings, _store);
 
         InitializeComponent();
@@ -393,6 +395,7 @@ public partial class MainWindow : Window
 
         _closing = true;
         ReleaseInstance();
+        CloseMiniPlayer();
         _uiTimer.Stop();
         _vm.Library.SaveCurrentPosition();
         if (!_options.IsDiagnostics)
@@ -644,7 +647,7 @@ public partial class MainWindow : Window
         }
     }
 
-    private void ShowOpenDialog()
+    private void ShowOpenDialog(Window? owner = null)
     {
         var dialog = new Microsoft.Win32.OpenFileDialog
         {
@@ -653,7 +656,7 @@ public partial class MainWindow : Window
             Filter = MediaFormats.DialogFilter,
         };
 
-        if (dialog.ShowDialog(this) == true)
+        if (dialog.ShowDialog(owner ?? this) == true)
         {
             OpenFiles(dialog.FileNames);
         }
@@ -869,6 +872,13 @@ public partial class MainWindow : Window
     {
         bool handled = true;
         bool ctrlOrAlt = (mods & (ModifierKeys.Control | ModifierKeys.Alt)) != 0;
+
+        // Ciklus 2: Ctrl+M prebacuje između punog playera i mini playera (M bez Ctrl ostaje utišavanje).
+        if (key == Key.M && mods == ModifierKeys.Control)
+        {
+            ToggleMiniPlayer();
+            return true;
+        }
 
         // Dok je otvorena kartica (nastavak gledanja / sljedeća epizoda), Enter i ostale tipke odgovaraju njoj.
         LibraryController library = _vm.Library;

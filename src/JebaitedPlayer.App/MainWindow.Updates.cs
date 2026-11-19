@@ -1,5 +1,6 @@
 using System.Windows.Threading;
 using JebaitedPlayer.Infrastructure;
+using JebaitedPlayer.Library;
 using JebaitedPlayer.Services;
 
 namespace JebaitedPlayer;
@@ -92,6 +93,49 @@ public partial class MainWindow
     private void ApplyUpdateOnExit()
     {
         _updateTimer?.Stop();
+        if (_updates?.ReadyVersion is { } version && BackupsAllowed(_options))
+        {
+            // M1a: kopija postavki i povijesti prije svake nadogradnje (baza je već zatvorena, pa se kopira datoteka).
+            try
+            {
+                SettingsBackup.Create(AppPaths.DataDir, store: null, "update-" + version, DateTime.UtcNow);
+                Log.Info($"Kopija postavki prije nadogradnje na {version} napravljena.");
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Kopija postavki prije nadogradnje", ex);
+            }
+        }
+
         _updates?.ApplyOnExit(_restartAfterUpdate);
+    }
+
+    /// <summary>Automatske kopije: uvijek u normalnom radu; u dijagnostici samo s testnom mapom podataka (nikad tvoji podaci).</summary>
+    private static bool BackupsAllowed(StartupOptions options) =>
+        !options.IsDiagnostics || Environment.GetEnvironmentVariable("JEBAITED_DATA_DIR") is { Length: > 0 };
+
+    /// <summary>M1a: pri pokretanju, u pozadini, jednom dnevno.</summary>
+    private void StartDailyBackup(StartupOptions options)
+    {
+        if (!BackupsAllowed(options))
+        {
+            return;
+        }
+
+        WatchStore? store = options.IsDiagnostics ? null : _store; // dijagnostika ima privremenu bazu: kopira se baza iz testne mape
+        _ = Task.Run(() =>
+        {
+            try
+            {
+                if (SettingsBackup.CreateIfDue(AppPaths.DataDir, store, DateTime.UtcNow) is { } b)
+                {
+                    Log.Info($"Dnevna kopija postavki i povijesti: {Path.GetFileName(b.Folder)}");
+                }
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ObjectDisposedException or Microsoft.Data.Sqlite.SqliteException)
+            {
+                Log.Warn($"Dnevna kopija postavki nije napravljena: {ex.Message}");
+            }
+        });
     }
 }

@@ -287,7 +287,11 @@ public sealed class LibraryController : ObservableObject
         else if (files.Count == 1)
         {
             MediaInfo info = MediaNameParser.Parse(files[0]);
-            paths = info.IsEpisode ? (await Task.Run(() => EpisodeNeighbours(files[0]))).ToList() : [files[0]];
+            // Ciklus 2: jedna pjesma otvara cijeli album (ostale pjesme iz iste mape).
+            bool audio = MediaScanner.IsAudio(files[0]);
+            paths = info.IsEpisode ? (await Task.Run(() => EpisodeNeighbours(files[0]))).ToList()
+                : audio ? (await Task.Run(() => MediaScanner.SiblingAudio(files[0]))).ToList()
+                : [files[0]];
             start = files[0];
             _playlistTitleKey = null;
             title = info.IsEpisode ? info.Title : Path.GetFileName(Path.GetDirectoryName(files[0])) ?? string.Empty;
@@ -323,8 +327,9 @@ public sealed class LibraryController : ObservableObject
         WatchEntry? entry = Safe(() => _store?.Get(item.Path));
         bool resume = entry is { Watched: false } e && e.Position >= MinResumeSeconds &&
                       (e.Duration <= 0 || e.Position < e.Duration - 20);
-        if (ResumeMode == "start")
+        if (ResumeMode == "start" || MediaScanner.IsAudio(item.Path))
         {
+            // Pjesma uvijek kreće od početka (ciklus 2, mini player).
             resume = false;
         }
 
@@ -510,12 +515,13 @@ public sealed class LibraryController : ObservableObject
             return;
         }
 
-        IReadOnlyList<WatchEntry> entries = Safe(() => _store.Recent(20)) ?? [];
+        IReadOnlyList<WatchEntry> entries = Safe(() => _store.Recent(100)) ?? [];
         bool anyFavorites = (Safe(() => _store.Favorites()) ?? []).Count > 0;
         Recent.Clear();
 
         // S omiljenima povijest je kraća, da se na početnom ekranu odmah vidi i jedno i drugo.
-        foreach (WatchEntry e in entries.Where(e => File.Exists(e.Path)).Take(anyFavorites ? 5 : 8))
+        // Glazba ne puni „Nastavi gledati” (album od 12 pjesama bi istisnuo filmove i serije).
+        foreach (WatchEntry e in entries.Where(e => !MediaScanner.IsAudio(e.Path) && File.Exists(e.Path)).Take(anyFavorites ? 5 : 8))
         {
             MediaInfo info = MediaNameParser.Parse(e.Path);
             string detail = e.Watched ? Loc.T("history.watched")
@@ -754,6 +760,13 @@ public sealed class LibraryController : ObservableObject
     {
         // Kraj videa ne znači da je pogledan (M6b): status dolazi iz stvarno odgledanog dijela.
         SaveCurrentPosition();
+
+        // Ciklus 2: glazba ide odmah na sljedeću pjesmu, bez kartice i odbrojavanja (kao u svakom music playeru).
+        if (Current is { } current && MediaScanner.IsAudio(current.Path) && Neighbour(+1) is { } nextSong)
+        {
+            PlayItem(nextSong);
+            return;
+        }
 
         if (Neighbour(+1) is { } next)
         {

@@ -110,6 +110,17 @@ U istoj kartici podešavaš automatsko traženje, kodiranje starih titlova i izg
 - **Audio traka:** **B** prebacuje na sljedeću, ili desni klik → **Audio** i odaberi traku (prikazani su jezik, format i kanali). Izbor se pamti po videu.
 - **Postavke → Zvuk:** željeni jezik zvuka, izlazni uređaj, sinkronizacija zvuka (npr. za Bluetooth slušalice), ujednačavanje glasnoće za tihi dijalog i equalizer s 10 pojaseva, presetima i vlastitim presetom.
 
+### Mini player
+
+- Desni klik → **Mini player** ili **Ctrl+M**: mali prozor u Winamp stilu, uvijek iznad ostalih. Glazba svira dalje; **Ctrl+M** vraća na puni player.
+- Zeleni zaslon s vremenom (klik: preostalo vrijeme) i stvarnim mjeračem razine L/D, pomični izvođač i naslov, traka za premotavanje, prethodna / pokreni / pauza / zaustavi / sljedeća, otvori, glasnoća. **EQ** i **PL** ispod otvaraju equalizer i popis pjesama.
+- Gumb za traku pretvara ga u usku traku; povlačenje kuta, Ctrl + kotačić miša ili Ctrl + / − mijenja veličinu. Položaj i veličina se pamte.
+- Otvaranje jedne pjesme pušta cijeli album (sve pjesme iz mape) jednu za drugom, bez odbrojavanja.
+
+### Kopije i prijenos
+
+Postavke → Općenito → **Kopije i prijenos**: postavke i povijest gledanja automatski se kopiraju jednom dnevno i prije svake nadogradnje (zadnjih 7 ostaje na tvom računalu). **Izvezi postavke** sprema ih u datoteku (bez lozinki, ključeva za stranice s titlovima i položaja prozora), a **Uvezi postavke** ih ponovno učitava, i na drugom računalu.
+
 ### Jezik aplikacije
 
 <p align="center"><img src="manual/images/hr/settings.png" width="640" alt="Postavke, kartica Jezik"></p>
@@ -234,6 +245,7 @@ Arhive sa stranica s titlovima: ZIP je podržan, RAR još nije.
 | O | Omjer slike |
 | S / Shift+S | Snimka zaslona (s titlovima / bez) |
 | Ctrl+D | Dodaj u omiljene / ukloni |
+| Ctrl+M | Mini player / natrag na puni player |
 | Ctrl+Backspace | Vrati originalnu sinkronizaciju titlova |
 | F1 | Svi prečaci |
 

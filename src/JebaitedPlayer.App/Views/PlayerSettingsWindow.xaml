@@ -78,6 +78,16 @@
                         </WrapPanel>
                         <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.setDefaultHint}" />
                         <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.singleInstanceHint}" Margin="0,6,0,0" />
+
+                        <!-- Ciklus 2: automatske kopije (M1a), izvoz i uvoz postavki (M1b) -->
+                        <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T settings.backupSection}" Margin="0,24,0,2" />
+                        <TextBlock x:Name="BackupStatusText" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" />
+                        <WrapPanel Margin="0,8,0,0">
+                            <Button Style="{StaticResource SecondaryButton}" Content="{loc:T settings.exportSettings}" Click="OnExportSettings" />
+                            <Button Style="{StaticResource SecondaryButton}" Content="{loc:T settings.importSettings}" Click="OnImportSettings" />
+                            <Button Style="{StaticResource SecondaryButton}" Content="{loc:T settings.openBackups}" Click="OnOpenBackups" />
+                        </WrapPanel>
+                        <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.transferHint}" />
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
@@ -130,16 +140,7 @@
 
                         <!-- Equalizer (ciklus 1) -->
                         <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T settings.equalizer}" Margin="0,24,0,2" />
-                        <CheckBox x:Name="EqEnabledBox" Content="{loc:T settings.eqEnable}" Margin="0,4,0,0" />
-                        <StackPanel x:Name="EqPanel" Margin="0,10,0,0">
-                            <WrapPanel>
-                                <TextBlock Text="{loc:T settings.eqPreset}" VerticalAlignment="Center" Margin="0,0,12,0" />
-                                <Button x:Name="EqPresetButton" Style="{StaticResource ChoiceButton}" Click="OnEqPresetClick" MinWidth="170" />
-                                <Button x:Name="EqResetButton" Style="{StaticResource SecondaryButton}" Content="{loc:T settings.reset}"
-                                        Click="OnEqReset" Margin="12,0,0,0" VerticalAlignment="Center" />
-                            </WrapPanel>
-                            <StackPanel x:Name="EqBands" Orientation="Horizontal" Margin="0,14,0,0" HorizontalAlignment="Left" />
-                        </StackPanel>
+                        <views:EqualizerPanel x:Name="EqualizerPanel" />
                         <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.eqHint}" Margin="0,8,0,0" />
 
                         <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T settings.audioTrack}" Margin="0,24,0,2" />

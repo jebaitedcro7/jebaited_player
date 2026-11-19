@@ -4,6 +4,29 @@ Alle wichtigen Änderungen an jebaited_player. Format: [Keep a Changelog](https:
 
 Andere Sprachen: [English](CHANGELOG.md) · [Hrvatski](CHANGELOG_HR.md). Derselbe Verlauf ist im Player enthalten (Klick auf die Versionsnummer auf dem Startbildschirm). Diese Datei wird aus `src/JebaitedPlayer.App/History/update-history.json` erzeugt.
 
+## [1.4.0] - 2026-11-19
+
+Mini-Musikplayer, automatische Sicherungen sowie Export und Import der Einstellungen.
+
+### Neu
+
+- Mini-Player (Rechtsklickmenü oder Ctrl+M): ein kleines Fenster im Winamp-Stil im jebaited_cro-Look, das im Vordergrund bleibt. Es hat eine grüne Anzeige mit Zeit und echter Pegelanzeige (L/R), laufendem Interpreten und Titel mit Bitrate, Suchleiste, Zurück, Abspielen, Pause, Stopp, Weiter, Öffnen und Lautstärke sowie einen Equalizer und eine Wiedergabeliste, die sich darunter öffnen. Er lässt sich zu einer schmalen Leiste verkleinern, und seine Größe ändert sich durch Ziehen an der Ecke, mit Ctrl + Mausrad oder mit Ctrl + / −. Die Musik läuft beim Umschalten weiter, Ctrl+M führt zurück.
+- Automatische Sicherungen: Einstellungen und Wiedergabeverlauf werden einmal täglich und vor jedem Update kopiert. Die letzten 7 Kopien bleiben auf deinem Computer (Einstellungen → Allgemein → Sicherung und Übertragung).
+- Einstellungen exportieren und importieren: Speichere deine Einstellungen in einer Datei und lade sie wieder, auch auf einem anderen Computer. Passwörter, Schlüssel für Untertitelseiten und die Fensterposition werden nicht exportiert. Vor einem Import werden die aktuellen Einstellungen gesichert, und eine falsche Datei wird abgelehnt, ohne etwas zu ändern.
+
+### Verbessert
+
+- Ein einzelnes Lied öffnet das ganze Album (alle Lieder in diesem Ordner), und das nächste Lied startet sofort, ohne Countdown.
+- Musik füllt „Weiterschauen“ auf dem Startbildschirm nicht mehr.
+- Der Equalizer funktioniert in den Einstellungen und im Mini-Player gleich.
+
+### Bekannte Probleme
+
+- Die App ist noch nicht digital signiert, daher können Windows SmartScreen oder Smart App Control vor der Installation warnen.
+- Das Fortschrittsfenster des Installationsprogramms stammt von Velopack und ist nur auf Englisch.
+
+Release: [v1.4.0](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v1.4.0) · Änderungen seit [v1.3.0...v1.4.0](https://github.com/jebaitedcro7/jebaited_player/compare/v1.3.0...v1.4.0)
+
 ## [1.3.0] - 2026-11-19
 
 Equalizer, ein zuverlässiger Status „Angesehen“ und lokale Diagnose.

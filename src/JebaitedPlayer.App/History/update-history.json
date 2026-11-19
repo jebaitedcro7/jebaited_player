@@ -40,6 +40,66 @@
   },
   "versions": [
     {
+      "version": "1.4.0",
+      "date": "2026-11-19",
+      "notes": {
+        "en": {
+          "summary": "Mini music player, automatic backups and settings export and import.",
+          "features": [
+            "Mini player (right-click menu or Ctrl+M): a small Winamp-style window in the jebaited_cro look that stays on top. It has a green display with the time and a real level meter (L/R), the scrolling artist and title with the bitrate, a seek bar, previous, play, pause, stop, next, open and volume, plus an equalizer and a playlist that open below. It shrinks to a thin strip, and you can make it bigger or smaller by dragging the corner, with Ctrl + mouse wheel or with Ctrl + / −. The music keeps playing when you switch, and Ctrl+M takes you back.",
+            "Automatic backups: your settings and watch history are copied once a day and before every update. The last 7 copies are kept on your computer (Settings → General → Backup and transfer).",
+            "Export and import settings: save your settings to a file and load them again, also on another computer. Passwords, keys for subtitle sites and the window position are not exported. Your current settings are backed up before an import, and a wrong file is rejected without changing anything."
+          ],
+          "improvements": [
+            "Opening one song plays the whole album (all songs in that folder), and the next song starts right away, without a countdown.",
+            "Music no longer fills “Continue watching” on the home screen.",
+            "The equalizer works the same in the settings and in the mini player."
+          ],
+          "fixes": [],
+          "known": [
+            "The app is not digitally signed yet, so Windows SmartScreen or Smart App Control may warn before the installation.",
+            "The progress window of the installer comes from Velopack and is only in English."
+          ]
+        },
+        "de": {
+          "summary": "Mini-Musikplayer, automatische Sicherungen sowie Export und Import der Einstellungen.",
+          "features": [
+            "Mini-Player (Rechtsklickmenü oder Ctrl+M): ein kleines Fenster im Winamp-Stil im jebaited_cro-Look, das im Vordergrund bleibt. Es hat eine grüne Anzeige mit Zeit und echter Pegelanzeige (L/R), laufendem Interpreten und Titel mit Bitrate, Suchleiste, Zurück, Abspielen, Pause, Stopp, Weiter, Öffnen und Lautstärke sowie einen Equalizer und eine Wiedergabeliste, die sich darunter öffnen. Er lässt sich zu einer schmalen Leiste verkleinern, und seine Größe ändert sich durch Ziehen an der Ecke, mit Ctrl + Mausrad oder mit Ctrl + / −. Die Musik läuft beim Umschalten weiter, Ctrl+M führt zurück.",
+            "Automatische Sicherungen: Einstellungen und Wiedergabeverlauf werden einmal täglich und vor jedem Update kopiert. Die letzten 7 Kopien bleiben auf deinem Computer (Einstellungen → Allgemein → Sicherung und Übertragung).",
+            "Einstellungen exportieren und importieren: Speichere deine Einstellungen in einer Datei und lade sie wieder, auch auf einem anderen Computer. Passwörter, Schlüssel für Untertitelseiten und die Fensterposition werden nicht exportiert. Vor einem Import werden die aktuellen Einstellungen gesichert, und eine falsche Datei wird abgelehnt, ohne etwas zu ändern."
+          ],
+          "improvements": [
+            "Ein einzelnes Lied öffnet das ganze Album (alle Lieder in diesem Ordner), und das nächste Lied startet sofort, ohne Countdown.",
+            "Musik füllt „Weiterschauen“ auf dem Startbildschirm nicht mehr.",
+            "Der Equalizer funktioniert in den Einstellungen und im Mini-Player gleich."
+          ],
+          "fixes": [],
+          "known": [
+            "Die App ist noch nicht digital signiert, daher können Windows SmartScreen oder Smart App Control vor der Installation warnen.",
+            "Das Fortschrittsfenster des Installationsprogramms stammt von Velopack und ist nur auf Englisch."
+          ]
+        },
+        "hr": {
+          "summary": "Mini music player, automatske kopije te izvoz i uvoz postavki.",
+          "features": [
+            "Mini player (izbornik desnog klika ili Ctrl+M): mali prozor u Winamp stilu, u jebaited_cro izgledu, uvijek iznad ostalih prozora. Ima zeleni zaslon s vremenom i stvarnim mjeračem razine (L/D), pomični izvođač i naslov s bitrateom, traku za premotavanje, prethodna, pokreni, pauza, zaustavi, sljedeća, otvori i glasnoću te equalizer i popis pjesama koji se otvaraju ispod. Može se smanjiti u usku traku, a veličina se mijenja povlačenjem kuta, Ctrl + kotačićem miša ili Ctrl + / −. Glazba svira dalje kad se prebaciš, a Ctrl+M te vraća natrag.",
+            "Automatske kopije: postavke i povijest gledanja kopiraju se jednom dnevno i prije svake nadogradnje. Zadnjih 7 kopija ostaje na tvom računalu (Postavke → Općenito → Kopije i prijenos).",
+            "Izvoz i uvoz postavki: spremi postavke u datoteku i učitaj ih ponovno, i na drugom računalu. Lozinke, ključevi za stranice s titlovima i položaj prozora se ne izvoze. Prije uvoza trenutne postavke se kopiraju, a kriva datoteka se odbija bez ikakve promjene."
+          ],
+          "improvements": [
+            "Otvaranje jedne pjesme pušta cijeli album (sve pjesme iz te mape), a sljedeća pjesma kreće odmah, bez odbrojavanja.",
+            "Glazba više ne puni „Nastavi gledati” na početnom ekranu.",
+            "Equalizer radi isto u postavkama i u mini playeru."
+          ],
+          "fixes": [],
+          "known": [
+            "Aplikacija još nije digitalno potpisana, pa Windows SmartScreen ili Smart App Control mogu upozoriti prije instalacije.",
+            "Prozor napretka instalacije je Velopackov i samo je na engleskom."
+          ]
+        }
+      }
+    },
+    {
       "version": "1.3.0",
       "date": "2026-11-19",
       "notes": {

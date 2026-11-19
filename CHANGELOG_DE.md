@@ -4,6 +4,28 @@ Alle wichtigen Änderungen an jebaited_player. Format: [Keep a Changelog](https:
 
 Andere Sprachen: [English](CHANGELOG.md) · [Hrvatski](CHANGELOG_HR.md). Derselbe Verlauf ist im Player enthalten (Klick auf die Versionsnummer auf dem Startbildschirm). Diese Datei wird aus `src/JebaitedPlayer.App/History/update-history.json` erzeugt.
 
+## [1.5.0] - 2026-11-19
+
+Radio sowie Speichern, Verwerfen und Standard in den Einstellungen.
+
+### Neu
+
+- Radio (Ctrl+R, Rechtsklickmenü oder die Quellenanzeige im Mini-Player): Suche unter zehntausenden Sendern nach Name, Genre und Land im kostenlosen Verzeichnis Radio Browser, speichere Favoriten mit dem Stern oder spiele eine beliebige Stream-URL. Sender laufen im Mini-Player mit dem Musik-Equalizer, gekennzeichnet mit RADIO und LIVE, mit dem aktuellen Titel, wenn der Sender ihn sendet.
+- Einstellungen: Speichern behält die Änderungen, Änderungen verwerfen kehrt zum letzten Speichern zurück, und eine Anzeige zeigt, ob es nicht gespeicherte Änderungen gibt.
+- Standard …: den aktuellen Tab oder alle Einstellungen auf die Standardwerte zurücksetzen. Sprache, Schlüssel und Passwörter, Lautstärke und Fensterpositionen bleiben.
+
+### Verbessert
+
+- Radiosender erscheinen nicht unter „Weiterschauen“.
+- Die Datenschutzerklärung beschreibt das Radioverzeichnis.
+
+### Bekannte Probleme
+
+- Die App ist noch nicht digital signiert, daher können Windows SmartScreen oder Smart App Control vor der Installation warnen.
+- Das Fortschrittsfenster des Installationsprogramms stammt von Velopack und ist nur auf Englisch.
+
+Release: [v1.5.0](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v1.5.0) · Änderungen seit [v1.4.1...v1.5.0](https://github.com/jebaitedcro7/jebaited_player/compare/v1.4.1...v1.5.0)
+
 ## [1.4.1] - 2026-11-19
 
 Getrennte Equalizer für Filme und Musik, Aussehen des Mini-Players und automatisches Umschalten.

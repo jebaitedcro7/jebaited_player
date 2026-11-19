@@ -23,7 +23,7 @@ public partial class MainWindow : ISettingsHost
     /// <summary>Postavke na zadanoj kartici; ako su već otvorene, samo prijeđe na tu karticu.</summary>
     private void ShowPlayerSettings() => ShowPlayerSettings(SettingsTab.General);
 
-    private void ShowPlayerSettings(SettingsTab tab)
+    private void ShowPlayerSettings(SettingsTab tab, string? savedSnapshot = null)
     {
         if (_playerSettingsWindow is { IsLoaded: true })
         {
@@ -32,7 +32,10 @@ public partial class MainWindow : ISettingsHost
             return;
         }
 
-        _playerSettingsWindow = new PlayerSettingsWindow(_settings, _vm, Updates, this, tab) { Owner = this };
+        _playerSettingsWindow = new PlayerSettingsWindow(_settings, _vm, Updates, this, tab, savedSnapshot)
+        {
+            Owner = IsVisible ? this : _mini ?? (Window)this,
+        };
         _playerSettingsWindow.Closed += (_, _) =>
         {
             _playerSettingsWindow = null;
@@ -164,16 +167,16 @@ public partial class MainWindow : ISettingsHost
     }
 
     /// <summary>Prozor postavki se nakon uvoza ponovno otvara, da pokaže uvezene vrijednosti.</summary>
-    void ISettingsHost.ReopenSettings(SettingsTab tab)
+    void ISettingsHost.ReopenSettings(SettingsTab tab, string? snapshot)
     {
         if (_playerSettingsWindow is { } w)
         {
-            w.Closed += (_, _) => Dispatcher.BeginInvoke(() => ShowPlayerSettings(tab));
+            w.Closed += (_, _) => Dispatcher.BeginInvoke(() => ShowPlayerSettings(tab, snapshot));
             w.Close();
         }
         else
         {
-            ShowPlayerSettings(tab);
+            ShowPlayerSettings(tab, snapshot);
         }
     }
 

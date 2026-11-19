@@ -53,7 +53,8 @@ internal interface ISettingsHost
     void ApplyImportedSettings();
 
     /// <summary>Zatvori i ponovno otvori prozor postavki (prikaz uvezenih vrijednosti).</summary>
-    void ReopenSettings(SettingsTab tab);
+    /// <param name="snapshot">Stanje zadnjeg spremanja (radna kopija se nastavlja u novom prozoru).</param>
+    void ReopenSettings(SettingsTab tab, string? snapshot = null);
 
     Task<IReadOnlyList<AudioDeviceInfo>> GetAudioDevicesAsync();
 
@@ -92,7 +93,8 @@ public partial class PlayerSettingsWindow : Window
     private IReadOnlyList<AudioDeviceInfo> _audioDevices = [];
     private bool _loading = true;
 
-    internal PlayerSettingsWindow(AppSettings settings, PlayerViewModel vm, UpdateService updates, ISettingsHost host, SettingsTab tab)
+    internal PlayerSettingsWindow(AppSettings settings, PlayerViewModel vm, UpdateService updates, ISettingsHost host, SettingsTab tab,
+        string? savedSnapshot = null)
     {
         _settings = settings;
         _vm = vm;
@@ -117,9 +119,15 @@ public partial class PlayerSettingsWindow : Window
         _loading = false;
 
         this.OnLanguageChanged(RefreshTexts);
+        _savedSnapshot = savedSnapshot ?? SettingsWorkingCopy.Snapshot(_settings);
+        _savedComparable = SettingsWorkingCopy.ComparableSnapshot(_savedSnapshot);
+        _dirtyTimer = new DispatcherTimer(TimeSpan.FromMilliseconds(400), DispatcherPriority.Background, (_, _) => UpdateSaveState(), Dispatcher);
+        UpdateSaveState();
         Closed += (_, _) =>
         {
-            if (_host.PersistSettings)
+            _dirtyTimer.Stop();
+            // Zatvaranje i dalje sprema (pitanje Spremi / Odbaci / Odustani dolazi s M3b); ponovno otvaranje ne sprema.
+            if (_host.PersistSettings && !_reopening)
             {
                 _settings.Save();
             }
@@ -300,6 +308,101 @@ public partial class PlayerSettingsWindow : Window
         UpdateShellStatus();
     }
 
+    // --- Ciklus 3: Spremi, Odbaci promjene (M2a) i Zadano (M2b) ----------------------------------------------------
+
+    private string _savedSnapshot = string.Empty;
+    private DispatcherTimer _dirtyTimer = null!;
+    private bool _reopening;
+
+    private string _savedComparable = string.Empty;
+
+    internal bool IsDirty => SettingsWorkingCopy.Comparable(_settings) != _savedComparable;
+
+    private void UpdateSaveState()
+    {
+        bool dirty = IsDirty;
+        SaveButton.IsEnabled = dirty;
+        DiscardButton.IsEnabled = dirty;
+        SaveStatusText.Text = Loc.T(dirty ? "settings.unsaved" : "settings.allSaved");
+    }
+
+    /// <summary>Spremi: trajno na disk (u dijagnostici samo s testnom mapom podataka) i nova točka za „Odbaci promjene”.</summary>
+    internal void SaveNow()
+    {
+        EqualizerPanel.Flush();
+        if (_host.PersistSettings || Environment.GetEnvironmentVariable("JEBAITED_DATA_DIR") is { Length: > 0 })
+        {
+            _settings.Save();
+        }
+
+        _savedSnapshot = SettingsWorkingCopy.Snapshot(_settings);
+        _savedComparable = SettingsWorkingCopy.ComparableSnapshot(_savedSnapshot);
+        UpdateSaveState();
+        Log.Info("Postavke spremljene (gumb Spremi).");
+    }
+
+    /// <summary>Odbaci promjene: vrati stanje zadnjeg spremanja i primijeni ga odmah.</summary>
+    internal void DiscardChanges()
+    {
+        EqualizerPanel.Flush();
+        SettingsWorkingCopy.Revert(_settings, _savedSnapshot);
+        _host.ApplyImportedSettings();
+        Log.Info("Promjene postavki odbačene.");
+        Reopen(SelectedTab);
+    }
+
+    /// <summary>Zadano za karticu (ključ iz <see cref="SettingsDefaults.Tabs"/>) ili za sve (null).</summary>
+    internal void ResetDefaults(string? tab, bool confirm)
+    {
+        string question = tab is null ? Loc.T("settings.defaultsConfirmAll") : Loc.T("settings.defaultsConfirmTab", TabTitle(SelectedTab));
+        if (confirm && MessageBox.Show(this, question, Loc.T("settings.defaults"), MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+        {
+            return;
+        }
+
+        EqualizerPanel.Flush();
+        SettingsDefaults.Reset(_settings, tab);
+        _host.ApplyImportedSettings();
+        Log.Info($"Zadane postavke: {tab ?? "sve"}.");
+        Reopen(SelectedTab);
+    }
+
+    private void Reopen(SettingsTab tab)
+    {
+        _reopening = true;
+        _host.ReopenSettings(tab, _savedSnapshot);
+    }
+
+    internal static string? DefaultsKey(SettingsTab tab) => tab switch
+    {
+        SettingsTab.General => "general",
+        SettingsTab.Subtitles => "subtitles",
+        SettingsTab.Audio => "audio",
+        SettingsTab.Video => "video",
+        SettingsTab.Appearance => "appearance",
+        SettingsTab.Updates => "updates",
+        _ => null,
+    };
+
+    private string TabTitle(SettingsTab tab) => (Tabs.Items[(int)tab] as TabItem)?.Header?.ToString() ?? tab.ToString();
+
+    private void OnSave(object sender, RoutedEventArgs e) => SaveNow();
+
+    private void OnDiscard(object sender, RoutedEventArgs e) => DiscardChanges();
+
+    private void OnDefaults(object sender, RoutedEventArgs e)
+    {
+        string? key = DefaultsKey(SelectedTab);
+        var menu = new ContextMenu { PlacementTarget = DefaultsButton, Placement = PlacementMode.Top };
+        var thisTab = new MenuItem { Header = Loc.T("settings.defaultsThisTab", TabTitle(SelectedTab)), IsEnabled = key is not null };
+        thisTab.Click += (_, _) => ResetDefaults(key, confirm: true);
+        var all = new MenuItem { Header = Loc.T("settings.defaultsAll") };
+        all.Click += (_, _) => ResetDefaults(null, confirm: true);
+        menu.Items.Add(thisTab);
+        menu.Items.Add(all);
+        menu.IsOpen = true;
+    }
+
     // --- 1a. Kopije, izvoz i uvoz postavki (ciklus 2, M1a i M1b) --------------------------------------------------
 
     private void UpdateBackupStatus()
@@ -410,7 +513,7 @@ public partial class PlayerSettingsWindow : Window
         SettingsTransfer.ApplyTo(_settings, imported);
         _host.ApplyImportedSettings();
         Log.Info("Postavke uvezene.");
-        _host.ReopenSettings(SettingsTab.General);
+        Reopen(SettingsTab.General);
         return true;
     }
 

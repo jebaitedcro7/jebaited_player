@@ -253,3 +253,121 @@ public static class SettingsTransfer
         }
     }
 }
+
+/// <summary>
+/// Ciklus 3, M2a: radna kopija postavki u prozoru postavki. Promjene vrijede odmah; „Spremi” ih trajno sprema,
+/// a „Odbaci promjene” vraća stanje zadnjeg spremanja. Glasnoća, položaji prozora i mini playera nisu „postavke”
+/// koje se odbacuju (mijenjaju se i izvan prozora postavki).
+/// </summary>
+public static class SettingsWorkingCopy
+{
+    private static readonly string[] Volatile =
+    [
+        nameof(AppSettings.Volume), nameof(AppSettings.Muted), nameof(AppSettings.WindowLeft), nameof(AppSettings.WindowTop),
+        nameof(AppSettings.WindowWidth), nameof(AppSettings.WindowHeight), nameof(AppSettings.WindowMaximized),
+    ];
+
+    private static readonly string[] VolatileMini =
+    [
+        nameof(MiniPlayerSettings.Left), nameof(MiniPlayerSettings.Top), nameof(MiniPlayerSettings.Scale), nameof(MiniPlayerSettings.Compact),
+        nameof(MiniPlayerSettings.ShowEqualizer), nameof(MiniPlayerSettings.ShowPlaylist), nameof(MiniPlayerSettings.WasOpen),
+    ];
+
+    /// <summary>Cijelo stanje (za vraćanje).</summary>
+    public static string Snapshot(AppSettings s) => JsonSerializer.Serialize(s);
+
+    /// <summary>Usporedivo stanje: bez glasnoće i položaja (za „nespremljene promjene”).</summary>
+    public static string Comparable(AppSettings s)
+    {
+        JsonObject o = JsonSerializer.SerializeToNode(s)!.AsObject();
+        foreach (string name in Volatile)
+        {
+            o.Remove(name);
+        }
+
+        if (o[nameof(AppSettings.MiniPlayer)] is JsonObject mini)
+        {
+            foreach (string name in VolatileMini)
+            {
+                mini.Remove(name);
+            }
+        }
+
+        // Ključevi i lozinke se uređuju u vlastitom prozoru (izvori titlova) i ne odbacuju se ovdje.
+        if (o[nameof(AppSettings.Online)] is JsonObject online)
+        {
+            foreach (string key in online.Select(p => p.Key).Where(SettingsTransfer.IsSecret).ToList())
+            {
+                online.Remove(key);
+            }
+        }
+
+        return o.ToJsonString();
+    }
+
+    public static string ComparableSnapshot(string snapshot) => Comparable(JsonSerializer.Deserialize<AppSettings>(snapshot)!);
+
+    public static bool IsDirty(AppSettings current, string snapshot) => Comparable(current) != ComparableSnapshot(snapshot);
+
+    /// <summary>Vrati stanje iz snimke (u isti objekt), a glasnoću, položaje i ključeve ostavi kakvi su sada.</summary>
+    public static void Revert(AppSettings current, string snapshot)
+    {
+        AppSettings saved = JsonSerializer.Deserialize<AppSettings>(snapshot)!;
+        saved.Normalize();
+        saved.Volume = current.Volume;
+        saved.Muted = current.Muted;
+        MiniPlayerSettings now = current.MiniPlayer;
+        (saved.MiniPlayer.Left, saved.MiniPlayer.Top, saved.MiniPlayer.Scale) = (now.Left, now.Top, now.Scale);
+        (saved.MiniPlayer.Compact, saved.MiniPlayer.ShowEqualizer, saved.MiniPlayer.ShowPlaylist, saved.MiniPlayer.WasOpen) =
+            (now.Compact, now.ShowEqualizer, now.ShowPlaylist, now.WasOpen);
+        SettingsTransfer.ApplyTo(current, saved);
+    }
+}
+
+/// <summary>
+/// Ciklus 3, M2b: zadane vrijednosti za jednu karticu postavki ili za sve. Nikad se ne diraju jezik, ključevi i
+/// lozinke, glasnoća te položaji prozora i mini playera. Kao i ostale promjene, trajno vrijedi tek na „Spremi”.
+/// </summary>
+public static class SettingsDefaults
+{
+    /// <summary>Kartice koje imaju zadane vrijednosti (Jezik i O aplikaciji nemaju).</summary>
+    public static readonly IReadOnlyList<string> Tabs = ["general", "subtitles", "audio", "video", "appearance", "updates"];
+
+    public static void Reset(AppSettings s, string? tab)
+    {
+        var d = new AppSettings();
+        foreach (string t in tab is null ? Tabs : [tab])
+        {
+            switch (t)
+            {
+                case "general":
+                    (s.ResumeMode, s.SeekStepSeconds, s.OpenFullscreen, s.OnTopWhilePlaying) = (d.ResumeMode, d.SeekStepSeconds, d.OpenFullscreen, d.OnTopWhilePlaying);
+                    (s.AutoPlayNext, s.UpNextSeconds, s.ScreenshotFolder) = (d.AutoPlayNext, d.UpNextSeconds, d.ScreenshotFolder);
+                    break;
+                case "subtitles":
+                    s.SubtitleLanguages = AppSettings.DefaultSubtitleLanguages(s.Language ?? "en");
+                    (s.AutoLoadSubtitles, s.AutoSyncSubtitles, s.SubtitleCodePage) = (d.AutoLoadSubtitles, d.AutoSyncSubtitles, d.SubtitleCodePage);
+                    s.SubtitleStyle = new SubtitleStyleSettings();
+                    (s.Online.AutoSearch, s.Online.SaveNextToVideo) = (d.Online.AutoSearch, d.Online.SaveNextToVideo);
+                    (s.Online.OpenSubtitlesEnabled, s.Online.SubDlEnabled, s.Online.TitloviEnabled) =
+                        (d.Online.OpenSubtitlesEnabled, d.Online.SubDlEnabled, d.Online.TitloviEnabled);
+                    break;
+                case "audio":
+                    (s.NormalizeAudio, s.AudioLanguage, s.AudioDevice, s.AudioDelayMs) = (d.NormalizeAudio, d.AudioLanguage, d.AudioDevice, d.AudioDelayMs);
+                    s.Equalizer = new EqualizerSettings();
+                    s.MusicEqualizer = new EqualizerSettings();
+                    break;
+                case "video":
+                    (s.HardwareDecoding, s.VideoQuality, s.DefaultAspect, s.HdrPassthrough) = (d.HardwareDecoding, d.VideoQuality, d.DefaultAspect, d.HdrPassthrough);
+                    break;
+                case "appearance":
+                    (s.Theme, s.ControlsHideSeconds, s.UiGpuRendering) = (d.Theme, d.ControlsHideSeconds, d.UiGpuRendering);
+                    (s.MiniPlayer.Font, s.MiniPlayer.VuStyle, s.MiniPlayer.AutoSwitch) = (d.MiniPlayer.Font, d.MiniPlayer.VuStyle, d.MiniPlayer.AutoSwitch);
+                    break;
+                case "updates":
+                    s.AutoUpdate = d.AutoUpdate;
+                    break;
+            }
+        }
+    }
+}

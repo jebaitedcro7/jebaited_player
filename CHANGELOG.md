@@ -4,6 +4,28 @@ All notable changes to jebaited_player. Format: [Keep a Changelog](https://keepa
 
 Other languages: [Deutsch](CHANGELOG_DE.md) · [Hrvatski](CHANGELOG_HR.md). The same history is included in the player (click the version number on the home screen). This file is generated from `src/JebaitedPlayer.App/History/update-history.json`.
 
+## [1.5.0] - 2026-11-19
+
+Radio, and Save, Discard and Default in the settings.
+
+### Added
+
+- Radio (Ctrl+R, the right-click menu or the source label in the mini player): search tens of thousands of stations by name, genre and country in the free Radio Browser directory, keep favorites with the star, or play any stream URL. Stations play in the mini player with the music equalizer, marked RADIO and LIVE, with the current song when the station sends it.
+- Settings: Save keeps your changes, Discard changes goes back to the last save, and a label shows whether there are unsaved changes.
+- Default…: set the current tab or all settings back to their default values. Language, keys and passwords, volume and window positions stay.
+
+### Improved
+
+- Radio stations are not added to “Continue watching”.
+- The privacy statement describes the radio directory.
+
+### Known issues
+
+- The app is not digitally signed yet, so Windows SmartScreen or Smart App Control may warn before the installation.
+- The progress window of the installer comes from Velopack and is only in English.
+
+Release: [v1.5.0](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v1.5.0) · Changes since [v1.4.1...v1.5.0](https://github.com/jebaitedcro7/jebaited_player/compare/v1.4.1...v1.5.0)
+
 ## [1.4.1] - 2026-11-19
 
 Separate equalizers for films and music, mini player looks and automatic switching.

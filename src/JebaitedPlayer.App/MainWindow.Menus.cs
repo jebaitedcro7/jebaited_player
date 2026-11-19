@@ -34,6 +34,7 @@ public partial class MainWindow
         }
 
         menu.Items.Add(Item(Loc.T("menu.miniPlayer"), "Ctrl+M", ShowMiniPlayer));
+        menu.Items.Add(Item(Loc.T("menu.radio"), "Ctrl+R", () => ShowRadio()));
         menu.Items.Add(Item(_vm.Library.IsCurrentFavorite ? Loc.T("home.removeFavorite") : Loc.T("menu.addFavorite"), "Ctrl+D",
             _vm.Library.ToggleFavorite, _vm.HasMedia));
         menu.Items.Add(new Separator());

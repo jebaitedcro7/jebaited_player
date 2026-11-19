@@ -120,9 +120,16 @@ In the same tab you set the automatic search, the encoding of old subtitles and 
 - Right-click the mini player (or Settings → Appearance) for six display fonts and four VU meter styles (bars, LED segments, thin lines with peak, off).
 - Films and series have their own equalizer, music and radio their own (Settings → Audio: choose which one to edit).
 
+### Radio
+
+- **Ctrl+R**, right-click → **Radio…** or the source label in the mini player: search stations by name, genre and country (free Radio Browser directory), click one to listen, the star keeps it in **Favorites**. Any stream URL (http/https, also .m3u/.pls) works too.
+- Stations play in the mini player with the music equalizer, marked **RADIO** and **LIVE**, with the current song when the station sends it. Radio does not appear in “Continue watching”.
+
 ### Backup and transfer
 
 Settings → General → **Backup and transfer**: settings and watch history are copied automatically once a day and before every update (the last 7 are kept on your computer). **Export settings** saves them to a file (without passwords, subtitle-site keys and the window position) and **Import settings** loads them again, also on another computer.
+
+**Save**, **Discard changes** and **Default…** at the bottom of the settings: changes apply right away, Save keeps them, Discard changes goes back to the last save, and Default… sets the current tab or all settings back to their defaults (language, keys, volume and window positions stay).
 
 ### App language
 
@@ -249,6 +256,7 @@ Archives from subtitle sites: ZIP is supported; RAR is not yet.
 | S / Shift+S | Screenshot (with / without subtitles) |
 | Ctrl+D | Add to / remove from favorites |
 | Ctrl+M | Mini player / back to the full player |
+| Ctrl+R | Radio |
 | Ctrl+Backspace | Restore original subtitle timing |
 | F1 | All shortcuts |
 

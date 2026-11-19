@@ -208,3 +208,39 @@ public sealed class AlbumTests
         }
     }
 }
+
+/// <summary>Ciklus 3: omiljene radio postaje (shema 5).</summary>
+[TestClass]
+public sealed class RadioFavoriteTests
+{
+    [TestMethod]
+    public void Favorites_are_added_listed_by_name_and_removed()
+    {
+        string db = Path.Combine(Path.GetTempPath(), $"jp-radio-{Guid.NewGuid():N}.db");
+        try
+        {
+            using (var store = new WatchStore(db))
+            {
+                store.AddRadioFavorite("https://b.example/live", "Zeta FM", "Croatia · MP3 128 kbps");
+                store.AddRadioFavorite("https://a.example/live", "alfa radio", null);
+                store.AddRadioFavorite("https://b.example/live", "Zeta FM", "Croatia · AAC 64 kbps");
+                CollectionAssert.AreEqual(new[] { "alfa radio", "Zeta FM" }, store.RadioFavorites().Select(f => f.Name).ToArray());
+                Assert.AreEqual("Croatia · AAC 64 kbps", store.RadioFavorites()[1].Detail);
+                Assert.IsTrue(store.IsRadioFavorite("https://a.example/live"));
+                store.RemoveRadioFavorite("https://a.example/live");
+                Assert.IsFalse(store.IsRadioFavorite("https://a.example/live"));
+            }
+
+            using var reopened = new WatchStore(db);
+            Assert.AreEqual(1, reopened.RadioFavorites().Count, "Favoriti ostaju nakon zatvaranja.");
+        }
+        finally
+        {
+            Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools();
+            foreach (string f in new[] { db, db + "-wal", db + "-shm" })
+            {
+                try { File.Delete(f); } catch (IOException) { }
+            }
+        }
+    }
+}

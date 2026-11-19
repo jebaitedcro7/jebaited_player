@@ -70,6 +70,33 @@ public partial class MainWindow : IMiniPlayerHost
 
     internal bool IsMiniPlayerActive => _mini is { IsVisible: true };
 
+    private RadioWindow? _radio;
+
+    internal RadioWindow? RadioWindowForTests => _radio;
+
+    /// <summary>Radio (ciklus 3): prozor s postajama, uz mini player ili puni player.</summary>
+    internal void ShowRadio(Window? owner = null)
+    {
+        if (_radio is { IsLoaded: true })
+        {
+            _radio.Activate();
+            return;
+        }
+
+        _radio = new RadioWindow(PlayStream, _store) { Owner = owner ?? (IsMiniPlayerActive ? _mini : this) };
+        _radio.Closed += (_, _) => _radio = null;
+        _radio.Show();
+    }
+
+    /// <summary>Pokreni internetski stream (radio): mimo popisa i povijesti gledanja, kao glazba (mini player, glazbeni EQ).</summary>
+    internal void PlayStream(string url, string name)
+    {
+        _userOpenPending = true;
+        _vm.Library.DetachForStream();
+        _vm.Load(url, startPaused: false, displayTitle: name);
+        Log.Info("Radio: postaja pokrenuta.");
+    }
+
     internal MiniPlayerWindow? MiniPlayer => _mini;
 
     internal void ToggleMiniPlayer()
@@ -125,6 +152,8 @@ public partial class MainWindow : IMiniPlayerHost
     void IMiniPlayerHost.RefreshAudioFilters() => RefreshVuFilter();
 
     void IMiniPlayerHost.ShowSettings() => ShowPlayerSettings(SettingsTab.Appearance);
+
+    void IMiniPlayerHost.ShowRadio(Window owner) => ShowRadio(owner);
 
     /// <summary>Zatvaranje playera: mini prozor se zatvara s njim.</summary>
     private void CloseMiniPlayer()

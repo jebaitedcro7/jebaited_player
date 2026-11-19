@@ -4,6 +4,28 @@ Sve važnije promjene jebaited_playera. Oblik: [Keep a Changelog](https://keepac
 
 Drugi jezici: [English](CHANGELOG.md) · [Deutsch](CHANGELOG_DE.md). Ista povijest je i u playeru (klik na broj verzije na početnom ekranu). Ova datoteka nastaje iz `src/JebaitedPlayer.App/History/update-history.json`.
 
+## [1.5.0] - 2026-11-19
+
+Radio te Spremi, Odbaci i Zadano u postavkama.
+
+### Novo
+
+- Radio (Ctrl+R, izbornik desnog klika ili oznaka izvora u mini playeru): traži među desecima tisuća postaja po nazivu, žanru i državi u besplatnom imeniku Radio Browser, spremi favorite zvjezdicom ili pusti bilo koji URL streama. Postaje sviraju u mini playeru s glazbenim equalizerom, označene s RADIO i UŽIVO, uz trenutnu pjesmu kad je postaja šalje.
+- Postavke: Spremi zadržava promjene, Odbaci promjene vraća zadnje spremanje, a natpis pokazuje ima li nespremljenih promjena.
+- Zadano…: vrati trenutnu karticu ili sve postavke na zadane vrijednosti. Jezik, ključevi i lozinke, glasnoća i položaji prozora ostaju.
+
+### Poboljšano
+
+- Radio postaje ne ulaze u „Nastavi gledati”.
+- Izjava o privatnosti opisuje imenik radija.
+
+### Poznati problemi
+
+- Aplikacija još nije digitalno potpisana, pa Windows SmartScreen ili Smart App Control mogu upozoriti prije instalacije.
+- Prozor napretka instalacije je Velopackov i samo je na engleskom.
+
+Izdanje: [v1.5.0](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v1.5.0) · Promjene od [v1.4.1...v1.5.0](https://github.com/jebaitedcro7/jebaited_player/compare/v1.4.1...v1.5.0)
+
 ## [1.4.1] - 2026-11-19
 
 Odvojeni equalizeri za filmove i glazbu, izgled mini playera i automatsko prebacivanje.

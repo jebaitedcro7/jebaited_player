@@ -882,6 +882,13 @@ public partial class MainWindow : Window
             return true;
         }
 
+        // Ciklus 3: Ctrl+R otvara radio.
+        if (key == Key.R && mods == ModifierKeys.Control)
+        {
+            ShowRadio();
+            return true;
+        }
+
         // Dok je otvorena kartica (nastavak gledanja / sljedeća epizoda), Enter i ostale tipke odgovaraju njoj.
         LibraryController library = _vm.Library;
         if (library.HasResumeOffer && key is Key.Enter or Key.Space or Key.Home or Key.Back)

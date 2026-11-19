@@ -14,10 +14,17 @@
     <DockPanel>
         <DockPanel DockPanel.Dock="Bottom" LastChildFill="False" Margin="0">
             <Border DockPanel.Dock="Top" Height="1" Background="{DynamicResource MenuBorderBrush}" />
-            <TextBlock DockPanel.Dock="Left" Style="{StaticResource HintText}" Text="{loc:T settings.savedHint}"
-                       VerticalAlignment="Center" Margin="22,0,0,0" />
+            <!-- Ciklus 3: radna kopija (M2a) i zadane vrijednosti (M2b). -->
+            <TextBlock x:Name="SaveStatusText" DockPanel.Dock="Left" Style="{StaticResource HintText}" VerticalAlignment="Center" Margin="22,0,0,0"
+                       ToolTip="{loc:T settings.savedHint}" />
             <Button DockPanel.Dock="Right" Style="{StaticResource SecondaryButton}" Content="{loc:T common.close}" Click="OnClose"
-                    Margin="0,12,22,12" />
+                    Margin="6,12,22,12" />
+            <Button x:Name="SaveButton" DockPanel.Dock="Right" Style="{StaticResource AccentButton}" Content="{loc:T settings.save}" Click="OnSave"
+                    Margin="6,12,0,12" />
+            <Button x:Name="DiscardButton" DockPanel.Dock="Right" Style="{StaticResource SecondaryButton}" Content="{loc:T settings.discard}"
+                    Click="OnDiscard" Margin="6,12,0,12" />
+            <Button x:Name="DefaultsButton" DockPanel.Dock="Right" Style="{StaticResource SecondaryButton}" Content="{loc:T settings.defaults}"
+                    Click="OnDefaults" Margin="0,12,0,12" />
         </DockPanel>
 
         <TabControl x:Name="Tabs" Style="{StaticResource SettingsTabs}">

@@ -112,8 +112,9 @@
                             </Canvas>
                         </Border>
                         <DockPanel Margin="0,9,0,0">
-                            <Border DockPanel.Dock="Left" Background="#1F3324" CornerRadius="8" Padding="7,1" VerticalAlignment="Center">
-                                <TextBlock Text="{loc:T mini.sourceLocal}" FontSize="10" Foreground="{StaticResource LcdText}" />
+                            <Border DockPanel.Dock="Left" Background="#1F3324" CornerRadius="8" Padding="7,1" VerticalAlignment="Center"
+                                    Cursor="Hand" ToolTip="{loc:T menu.radio}" MouseLeftButtonDown="OnSourceClick">
+                                <TextBlock x:Name="SourceText" Text="{loc:T mini.sourceLocal}" FontSize="10" Foreground="{StaticResource LcdText}" />
                             </Border>
                             <TextBlock x:Name="RemainingText" DockPanel.Dock="Right" Width="46" TextAlignment="Right" VerticalAlignment="Center"
                                        Foreground="{DynamicResource TextSecondaryBrush}" />

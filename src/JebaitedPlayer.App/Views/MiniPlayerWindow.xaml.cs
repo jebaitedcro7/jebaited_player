@@ -32,6 +32,8 @@ internal interface IMiniPlayerHost
     void RefreshAudioFilters();
 
     void ShowSettings();
+
+    void ShowRadio(Window owner);
 }
 
 /// <summary>
@@ -205,6 +207,7 @@ public partial class MiniPlayerWindow : Window
         menu.Items.Add(Check(Loc.T("mini.playlist"), m.ShowPlaylist && !m.Compact, () => { m.Compact = false; SetPanels(m.ShowEqualizer, !m.ShowPlaylist); }));
         menu.Items.Add(Check(Loc.T("mini.autoSwitch"), m.AutoSwitch, () => m.AutoSwitch = !m.AutoSwitch));
         menu.Items.Add(new Separator());
+        menu.Items.Add(Check(Loc.T("menu.radio"), false, () => _host.ShowRadio(this)));
         menu.Items.Add(Check(Loc.T("mini.settings"), false, _host.ShowSettings));
         menu.Items.Add(Check(Loc.T("mini.fullPlayer"), false, _host.ShowFullPlayer));
         menu.Items.Add(Check(Loc.T("mini.close"), false, _host.ClosePlayer));
@@ -437,8 +440,9 @@ public partial class MiniPlayerWindow : Window
     /// <summary>Svakih 250 ms: vrijeme, traka, tipka play/pauza, glasnoća; naslov i kvaliteta svake sekunde.</summary>
     internal void Tick()
     {
-        bool has = _vm.HasMedia && _vm.Duration > 0;
-        double position = has ? _vm.Position : 0;
+        bool stream = _vm.HasMedia && IsStream(_vm.CurrentPath);
+        bool has = _vm.HasMedia && _vm.Duration > 0 && !stream;
+        double position = has || stream ? _vm.Position : 0;
         double duration = has ? _vm.Duration : 0;
         double left = Math.Max(0, duration - position);
         TimeText.Text = _showRemaining && has ? "-" + Short(left) : Short(position);
@@ -452,6 +456,15 @@ public partial class MiniPlayerWindow : Window
 
         CompactProgress.Value = has ? position / duration : 0;
         CompactTime.Text = has ? $"{Short(position)} / {Short(duration)}" : string.Empty;
+        SourceText.Text = Loc.T(stream ? "mini.sourceRadio" : "mini.sourceLocal");
+        if (stream)
+        {
+            // Radio uživo: vrijeme slušanja, bez premotavanja i bez preostalog vremena.
+            TimeText.Text = Short(position);
+            RemainingText.Text = Loc.T("mini.live");
+            SeekSlider.IsEnabled = false;
+            CompactTime.Text = $"{Short(position)} · {Loc.T("mini.live")}";
+        }
         CompactPlayPause.Content = has && !_vm.IsPaused ? "" : "";
         string muteGlyph = _vm.IsMuted || _vm.Volume <= 0 ? "" : "";
         MuteButton.Content = muteGlyph;
@@ -463,7 +476,7 @@ public partial class MiniPlayerWindow : Window
             _updatingVolume = false;
         }
 
-        if (!has)
+        if (!has && !stream)
         {
             SetMarquee(_vm.HasMedia ? string.Empty : Loc.T("mini.empty"));
         }
@@ -476,15 +489,30 @@ public partial class MiniPlayerWindow : Window
     /// <summary>„Izvođač — Naslov  ···  320 kbps · 48 kHz” iz oznaka datoteke (mpv).</summary>
     private async Task UpdateTitleAsync()
     {
-        (string? artist, string? title, string? bitrate, string? rate) = await Task.Run(() => (
+        bool stream = IsStream(_vm.CurrentPath);
+        (string? artist, string? title, string? bitrate, string? rate, string? icy) = await Task.Run(() => (
             _host.GetMpvProperty("metadata/by-key/Artist"),
             _host.GetMpvProperty("media-title"),
             _host.GetMpvProperty("audio-bitrate"),
-            _host.GetMpvProperty("audio-params/samplerate")));
-        string name = title is { Length: > 0 } t ? t : System.IO.Path.GetFileNameWithoutExtension(_vm.CurrentPath ?? string.Empty);
-        if (artist is { Length: > 0 } a && !name.Contains(a, StringComparison.OrdinalIgnoreCase))
+            _host.GetMpvProperty("audio-params/samplerate"),
+            stream ? _host.GetMpvProperty("metadata/by-key/icy-title") : null));
+        string name;
+        if (stream)
         {
-            name = a + " — " + name;
+            // Radio: „Postaja — trenutna pjesma” (ICY oznaka streama, ako je postaja šalje).
+            name = _vm.Title is { Length: > 0 } station ? station : title ?? string.Empty;
+            if (icy is { Length: > 0 } song && !name.Contains(song, StringComparison.OrdinalIgnoreCase))
+            {
+                name += " — " + song;
+            }
+        }
+        else
+        {
+            name = title is { Length: > 0 } t ? t : System.IO.Path.GetFileNameWithoutExtension(_vm.CurrentPath ?? string.Empty);
+            if (artist is { Length: > 0 } a && !name.Contains(a, StringComparison.OrdinalIgnoreCase))
+            {
+                name = a + " — " + name;
+            }
         }
 
         var quality = new List<string>();
@@ -587,4 +615,13 @@ public partial class MiniPlayerWindow : Window
         double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out double db) && double.IsFinite(db) ? db : VuFloorDb;
 
     private static string Short(double seconds) => TimeFormat.Format(seconds, seconds >= 3600);
+
+    private static bool IsStream(string? path) =>
+        path is not null && (path.StartsWith("http://", StringComparison.OrdinalIgnoreCase) || path.StartsWith("https://", StringComparison.OrdinalIgnoreCase));
+
+    private void OnSourceClick(object sender, MouseButtonEventArgs e)
+    {
+        e.Handled = true;
+        _host.ShowRadio(this);
+    }
 }

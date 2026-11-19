@@ -120,9 +120,16 @@ Im selben Tab stellst du die automatische Suche, die Zeichenkodierung alter Unte
 - Rechtsklick auf den Mini-Player (oder Einstellungen → Darstellung): sechs Anzeigeschriften und vier VU-Meter-Stile (Balken, LED-Segmente, dünne Linien mit Spitze, aus).
 - Filme und Serien haben einen eigenen Equalizer, Musik und Radio einen eigenen (Einstellungen → Audio: wählen, welcher bearbeitet wird).
 
+### Radio
+
+- **Ctrl+R**, Rechtsklick → **Radio …** oder die Quellenanzeige im Mini-Player: Sender nach Name, Genre und Land suchen (kostenloses Verzeichnis Radio Browser), per Klick anhören, der Stern speichert ihn in den **Favoriten**. Auch jede Stream-URL (http/https, auch .m3u/.pls) funktioniert.
+- Sender laufen im Mini-Player mit dem Musik-Equalizer, gekennzeichnet mit **RADIO** und **LIVE**, mit dem aktuellen Titel, wenn der Sender ihn sendet. Radio erscheint nicht unter „Weiterschauen“.
+
 ### Sicherung und Übertragung
 
 Einstellungen → Allgemein → **Sicherung und Übertragung**: Einstellungen und Wiedergabeverlauf werden einmal täglich und vor jedem Update automatisch kopiert (die letzten 7 bleiben auf deinem Computer). **Einstellungen exportieren** speichert sie in einer Datei (ohne Passwörter, Schlüssel für Untertitelseiten und Fensterposition), **Einstellungen importieren** lädt sie wieder, auch auf einem anderen Computer.
+
+**Speichern**, **Änderungen verwerfen** und **Standard …** unten in den Einstellungen: Änderungen gelten sofort, Speichern behält sie, Änderungen verwerfen kehrt zum letzten Speichern zurück, und Standard … setzt den aktuellen Tab oder alle Einstellungen zurück (Sprache, Schlüssel, Lautstärke und Fensterpositionen bleiben).
 
 ### Sprache der App
 
@@ -249,6 +256,7 @@ Archive von Untertitelseiten: ZIP wird unterstützt, RAR noch nicht.
 | S / Shift+S | Screenshot (mit / ohne Untertitel) |
 | Ctrl+D | Zu Favoriten hinzufügen / entfernen |
 | Ctrl+M | Mini-Player / zurück zum vollen Player |
+| Ctrl+R | Radio |
 | Ctrl+Backspace | Ursprüngliche Untertitel-Synchronisation wiederherstellen |
 | F1 | Alle Tastenkürzel |
 

@@ -346,6 +346,20 @@ public sealed class LibraryController : ObservableObject
         _vm.Load(item.Path, startPaused: resume, item.Info.DisplayTitle);
     }
 
+    /// <summary>Radio (ciklus 3): stream nije dio popisa ni povijesti; trenutna stavka se spremi i otpusti.</summary>
+    public void DetachForStream()
+    {
+        SaveCurrentPosition();
+        ResumeOffer = null;
+        UpNext = null;
+        foreach (PlaylistItem p in Playlist)
+        {
+            p.IsCurrent = false;
+        }
+
+        Current = null;
+    }
+
     public void PlayNext()
     {
         if (Neighbour(+1) is { } next)
@@ -442,7 +456,8 @@ public sealed class LibraryController : ObservableObject
     public void SaveCurrentPosition()
     {
         _lastSave = Environment.TickCount64;
-        if (_store is null || _vm.CurrentPath is not { } path || !_vm.HasMedia || _vm.IsLoading || ResumeOffer != null)
+        if (_store is null || _vm.CurrentPath is not { } path || !_vm.HasMedia || _vm.IsLoading || ResumeOffer != null ||
+            path.StartsWith("http://", StringComparison.OrdinalIgnoreCase) || path.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
         {
             return;
         }
@@ -730,6 +745,13 @@ public sealed class LibraryController : ObservableObject
 
         _pendingResumePath = null;
         _pendingResumePosition = null;
+        if (path.StartsWith("http://", StringComparison.OrdinalIgnoreCase) || path.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+        {
+            // Radio i ostali streamovi ne idu u povijest gledanja.
+            _coverage = null;
+            _coveragePath = null;
+            return;
+        }
 
         MediaInfo info = Current is { } c && string.Equals(c.Path, path, StringComparison.OrdinalIgnoreCase)
             ? c.Info

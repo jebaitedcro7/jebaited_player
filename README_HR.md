@@ -120,9 +120,16 @@ U istoj kartici podešavaš automatsko traženje, kodiranje starih titlova i izg
 - Desni klik na mini player (ili Postavke → Izgled): šest fontova zaslona i četiri izgleda VU metra (trake, LED segmenti, tanke linije s vrhom, isključen).
 - Filmovi i serije imaju svoj equalizer, a glazba i radio svoj (Postavke → Zvuk: biraš koji uređuješ).
 
+### Radio
+
+- **Ctrl+R**, desni klik → **Radio…** ili oznaka izvora u mini playeru: traži postaje po nazivu, žanru i državi (besplatni imenik Radio Browser), klik je pušta, a zvjezdica je sprema u **Favorite**. Radi i bilo koji URL streama (http/https, i .m3u/.pls).
+- Postaje sviraju u mini playeru s glazbenim equalizerom, označene s **RADIO** i **UŽIVO**, uz trenutnu pjesmu kad je postaja šalje. Radio ne ulazi u „Nastavi gledati”.
+
 ### Kopije i prijenos
 
 Postavke → Općenito → **Kopije i prijenos**: postavke i povijest gledanja automatski se kopiraju jednom dnevno i prije svake nadogradnje (zadnjih 7 ostaje na tvom računalu). **Izvezi postavke** sprema ih u datoteku (bez lozinki, ključeva za stranice s titlovima i položaja prozora), a **Uvezi postavke** ih ponovno učitava, i na drugom računalu.
+
+**Spremi**, **Odbaci promjene** i **Zadano…** na dnu postavki: promjene vrijede odmah, Spremi ih zadržava, Odbaci promjene vraća zadnje spremanje, a Zadano… vraća trenutnu karticu ili sve postavke na zadano (jezik, ključevi, glasnoća i položaji prozora ostaju).
 
 ### Jezik aplikacije
 
@@ -249,6 +256,7 @@ Arhive sa stranica s titlovima: ZIP je podržan, RAR još nije.
 | S / Shift+S | Snimka zaslona (s titlovima / bez) |
 | Ctrl+D | Dodaj u omiljene / ukloni |
 | Ctrl+M | Mini player / natrag na puni player |
+| Ctrl+R | Radio |
 | Ctrl+Backspace | Vrati originalnu sinkronizaciju titlova |
 | F1 | Svi prečaci |
 

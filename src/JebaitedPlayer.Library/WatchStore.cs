@@ -38,6 +38,9 @@ public sealed record Favorite(string Path, string Title, string Kind, DateTime A
     public bool IsSeries => Kind == "series";
 }
 
+/// <summary>Omiljena radio postaja (ciklus 3).</summary>
+public sealed record RadioFavorite(string Url, string Name, string? Detail, DateTime Added);
+
 /// <summary>Zapamćena audio traka za jedan video (mpv ID i jezik, za slučaj da se redoslijed traka promijeni).</summary>
 public sealed record AudioState(long TrackId, string? Language);
 
@@ -304,6 +307,54 @@ public sealed class WatchStore : IDisposable
         }
     }
 
+    // --- Ciklus 3: omiljene radio postaje ---------------------------------------------------------------------------
+
+    public IReadOnlyList<RadioFavorite> RadioFavorites()
+    {
+        lock (_gate)
+        {
+            using SqliteCommand cmd = Command("SELECT url, name, detail, added FROM radio_favorites ORDER BY name COLLATE NOCASE");
+            using SqliteDataReader r = cmd.ExecuteReader();
+            var list = new List<RadioFavorite>();
+            while (r.Read())
+            {
+                list.Add(new RadioFavorite(r.GetString(0), r.GetString(1), r.IsDBNull(2) ? null : r.GetString(2),
+                    DateTime.Parse(r.GetString(3), CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind)));
+            }
+
+            return list;
+        }
+    }
+
+    public bool IsRadioFavorite(string url)
+    {
+        lock (_gate)
+        {
+            using SqliteCommand cmd = Command("SELECT 1 FROM radio_favorites WHERE url = $url", ("$url", url));
+            return cmd.ExecuteScalar() != null;
+        }
+    }
+
+    public void AddRadioFavorite(string url, string name, string? detail)
+    {
+        lock (_gate)
+        {
+            using SqliteCommand cmd = Command(
+                "INSERT OR REPLACE INTO radio_favorites (url, name, detail, added) VALUES ($url, $name, $detail, $now)",
+                ("$url", url), ("$name", name), ("$detail", detail), ("$now", Now()));
+            cmd.ExecuteNonQuery();
+        }
+    }
+
+    public void RemoveRadioFavorite(string url)
+    {
+        lock (_gate)
+        {
+            using SqliteCommand cmd = Command("DELETE FROM radio_favorites WHERE url = $url", ("$url", url));
+            cmd.ExecuteNonQuery();
+        }
+    }
+
     /// <summary>
     /// Dosljedna kopija cijele baze u novu datoteku (SQLite backup, uključuje i još nezapisani WAL),
     /// i dok je player otvoren (ciklus 2, M1a).
@@ -376,7 +427,13 @@ public sealed class WatchStore : IDisposable
             Execute("ALTER TABLE media ADD COLUMN coverage TEXT");
         }
 
-        Execute("INSERT OR REPLACE INTO meta (key, value) VALUES ('schema_version', '4')");
+        // Verzija 5 (ciklus 3): omiljene radio postaje.
+        Execute(
+            """
+            CREATE TABLE IF NOT EXISTS radio_favorites (
+                url TEXT PRIMARY KEY, name TEXT NOT NULL, detail TEXT, added TEXT NOT NULL)
+            """);
+        Execute("INSERT OR REPLACE INTO meta (key, value) VALUES ('schema_version', '5')");
     }
 
     private bool ColumnExists(string table, string column)

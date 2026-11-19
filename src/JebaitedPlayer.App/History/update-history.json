@@ -40,6 +40,63 @@
   },
   "versions": [
     {
+      "version": "1.5.0",
+      "date": "2026-11-19",
+      "notes": {
+        "en": {
+          "summary": "Radio, and Save, Discard and Default in the settings.",
+          "features": [
+            "Radio (Ctrl+R, the right-click menu or the source label in the mini player): search tens of thousands of stations by name, genre and country in the free Radio Browser directory, keep favorites with the star, or play any stream URL. Stations play in the mini player with the music equalizer, marked RADIO and LIVE, with the current song when the station sends it.",
+            "Settings: Save keeps your changes, Discard changes goes back to the last save, and a label shows whether there are unsaved changes.",
+            "Default…: set the current tab or all settings back to their default values. Language, keys and passwords, volume and window positions stay."
+          ],
+          "improvements": [
+            "Radio stations are not added to “Continue watching”.",
+            "The privacy statement describes the radio directory."
+          ],
+          "fixes": [],
+          "known": [
+            "The app is not digitally signed yet, so Windows SmartScreen or Smart App Control may warn before the installation.",
+            "The progress window of the installer comes from Velopack and is only in English."
+          ]
+        },
+        "de": {
+          "summary": "Radio sowie Speichern, Verwerfen und Standard in den Einstellungen.",
+          "features": [
+            "Radio (Ctrl+R, Rechtsklickmenü oder die Quellenanzeige im Mini-Player): Suche unter zehntausenden Sendern nach Name, Genre und Land im kostenlosen Verzeichnis Radio Browser, speichere Favoriten mit dem Stern oder spiele eine beliebige Stream-URL. Sender laufen im Mini-Player mit dem Musik-Equalizer, gekennzeichnet mit RADIO und LIVE, mit dem aktuellen Titel, wenn der Sender ihn sendet.",
+            "Einstellungen: Speichern behält die Änderungen, Änderungen verwerfen kehrt zum letzten Speichern zurück, und eine Anzeige zeigt, ob es nicht gespeicherte Änderungen gibt.",
+            "Standard …: den aktuellen Tab oder alle Einstellungen auf die Standardwerte zurücksetzen. Sprache, Schlüssel und Passwörter, Lautstärke und Fensterpositionen bleiben."
+          ],
+          "improvements": [
+            "Radiosender erscheinen nicht unter „Weiterschauen“.",
+            "Die Datenschutzerklärung beschreibt das Radioverzeichnis."
+          ],
+          "fixes": [],
+          "known": [
+            "Die App ist noch nicht digital signiert, daher können Windows SmartScreen oder Smart App Control vor der Installation warnen.",
+            "Das Fortschrittsfenster des Installationsprogramms stammt von Velopack und ist nur auf Englisch."
+          ]
+        },
+        "hr": {
+          "summary": "Radio te Spremi, Odbaci i Zadano u postavkama.",
+          "features": [
+            "Radio (Ctrl+R, izbornik desnog klika ili oznaka izvora u mini playeru): traži među desecima tisuća postaja po nazivu, žanru i državi u besplatnom imeniku Radio Browser, spremi favorite zvjezdicom ili pusti bilo koji URL streama. Postaje sviraju u mini playeru s glazbenim equalizerom, označene s RADIO i UŽIVO, uz trenutnu pjesmu kad je postaja šalje.",
+            "Postavke: Spremi zadržava promjene, Odbaci promjene vraća zadnje spremanje, a natpis pokazuje ima li nespremljenih promjena.",
+            "Zadano…: vrati trenutnu karticu ili sve postavke na zadane vrijednosti. Jezik, ključevi i lozinke, glasnoća i položaji prozora ostaju."
+          ],
+          "improvements": [
+            "Radio postaje ne ulaze u „Nastavi gledati”.",
+            "Izjava o privatnosti opisuje imenik radija."
+          ],
+          "fixes": [],
+          "known": [
+            "Aplikacija još nije digitalno potpisana, pa Windows SmartScreen ili Smart App Control mogu upozoriti prije instalacije.",
+            "Prozor napretka instalacije je Velopackov i samo je na engleskom."
+          ]
+        }
+      }
+    },
+    {
       "version": "1.4.1",
       "date": "2026-11-19",
       "notes": {

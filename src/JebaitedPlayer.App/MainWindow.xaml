@@ -103,8 +103,13 @@
                                                     Command="{Binding DataContext.Library.OpenRecentCommand, RelativeSource={RelativeSource AncestorType=Window}}">
                                                 <StackPanel>
                                                     <TextBlock Text="{Binding Title}" FontSize="14" TextTrimming="CharacterEllipsis" />
-                                                    <TextBlock Text="{Binding Detail}" FontSize="12" Margin="0,2,0,0"
-                                                               Foreground="{DynamicResource TextSecondaryBrush}" />
+                                                    <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                                                        <TextBlock x:Name="WatchedIcon" FontFamily="{DynamicResource IconFont}" Text="&#xE73E;" FontSize="11"
+                                                                   Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" Margin="0,0,5,0"
+                                                                   Visibility="Collapsed" />
+                                                        <TextBlock x:Name="DetailText" Text="{Binding Detail}" FontSize="12"
+                                                                   Foreground="{DynamicResource TextSecondaryBrush}" />
+                                                    </StackPanel>
                                                     <ProgressBar Style="{StaticResource ThinProgress}" Value="{Binding Progress}" Margin="0,6,0,0" />
                                                 </StackPanel>
                                             </Button>
@@ -113,6 +118,13 @@
                                                     CommandParameter="{Binding}"
                                                     Command="{Binding DataContext.Library.RemoveRecentCommand, RelativeSource={RelativeSource AncestorType=Window}}" />
                                         </Grid>
+                                        <!-- Ciklus 1 (M6b): pogledano = kvačica, zeleni natpis i puna zelena traka. -->
+                                        <DataTemplate.Triggers>
+                                            <DataTrigger Binding="{Binding Watched}" Value="True">
+                                                <Setter TargetName="WatchedIcon" Property="Visibility" Value="Visible" />
+                                                <Setter TargetName="DetailText" Property="Foreground" Value="{DynamicResource AccentBrush}" />
+                                            </DataTrigger>
+                                        </DataTemplate.Triggers>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
@@ -257,7 +269,7 @@
                                                    VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" />
                                         <TextBlock x:Name="Label" Grid.Column="1" Text="{Binding Label}" FontSize="13"
                                                    TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
-                                        <TextBlock Grid.Column="2" Text="{Binding ProgressText}" FontSize="11" Margin="8,0,0,0"
+                                        <TextBlock x:Name="ProgressLabel" Grid.Column="2" Text="{Binding ProgressText}" FontSize="11" Margin="8,0,0,0"
                                                    Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center" />
                                         <ProgressBar x:Name="Bar" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"
                                                      Style="{StaticResource ThinProgress}" Value="{Binding Progress}" Margin="0,5,0,0" />
@@ -267,9 +279,11 @@
                                     <DataTrigger Binding="{Binding Progress}" Value="0">
                                         <Setter TargetName="Bar" Property="Visibility" Value="Collapsed" />
                                     </DataTrigger>
+                                    <!-- Ciklus 1 (M6b): pogledano = zelena kvačica, zeleni natpis i puna zelena traka. -->
                                     <DataTrigger Binding="{Binding Watched}" Value="True">
                                         <Setter TargetName="StateIcon" Property="Text" Value="&#xE73E;" />
-                                        <Setter TargetName="Bar" Property="Visibility" Value="Collapsed" />
+                                        <Setter TargetName="StateIcon" Property="Foreground" Value="{DynamicResource AccentBrush}" />
+                                        <Setter TargetName="ProgressLabel" Property="Foreground" Value="{DynamicResource AccentBrush}" />
                                         <Setter TargetName="Label" Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding IsCurrent}" Value="True">

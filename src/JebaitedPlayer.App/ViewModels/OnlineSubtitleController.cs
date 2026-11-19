@@ -289,12 +289,12 @@ public sealed class OnlineSubtitleController : ObservableObject
         catch (OperationCanceledException)
         {
             // Otvoren je drugi video dok je trajala provjera (analiza govora se prekida): to nije greška.
-            Log.Info("Automatska pretraga titlova prekinuta (otvoren je drugi video).");
+            Log.Subtitles.Info("Automatska pretraga titlova prekinuta (otvoren je drugi video).");
         }
         catch (Exception ex)
         {
             // Automatska pretraga nikad ne smije srušiti player.
-            Log.Error("Automatska pretraga titlova", ex);
+            Log.Subtitles.Error("Automatska pretraga titlova", ex);
         }
     }
 
@@ -329,7 +329,7 @@ public sealed class OnlineSubtitleController : ObservableObject
                 catch (Exception ex) when (ex is ProviderException or HttpRequestException or IOException or TaskCanceledException
                                                or System.Text.Json.JsonException)
                 {
-                    Log.Warn($"Preuzimanje za provjeru nije uspjelo ({c.Provider}): {ex.Message}");
+                    Log.Subtitles.Warn($"Preuzimanje za provjeru nije uspjelo ({c.Provider}): {ex.Message}");
                     continue;
                 }
 
@@ -340,7 +340,7 @@ public sealed class OnlineSubtitleController : ObservableObject
                 }
                 catch (InvalidDataException ex)
                 {
-                    Log.Warn($"Preuzeti titl nije čitljiv ({c.Provider}/{c.DownloadReference}): {ex.Message}");
+                    Log.Subtitles.Warn($"Preuzeti titl nije čitljiv ({c.Provider}/{c.DownloadReference}): {ex.Message}");
                     continue;
                 }
 
@@ -349,7 +349,7 @@ public sealed class OnlineSubtitleController : ObservableObject
                     return true;
                 }
 
-                Log.Info($"Provjera prema govoru {c.Provider}/{c.DownloadReference} ({c.DisplayName}): {r?.Verdict.ToString() ?? "nije moguća"} {r?.Detail}");
+                Log.Subtitles.Info($"Provjera prema govoru {c.Provider}/{c.DownloadReference} ({c.DisplayName}): {r?.Verdict.ToString() ?? "nije moguća"} {r?.Detail}");
                 bool accept = r is { IsUsable: true } || (c.Confidence == MatchConfidence.Sure && r?.Verdict != SyncVerdict.Mismatch);
                 if (accept)
                 {
@@ -402,7 +402,7 @@ public sealed class OnlineSubtitleController : ObservableObject
                 p.Ok ? $"{p.Provider}: {p.Count}{(p.FromCache ? $" ({Loc.T("online.cached")})" : string.Empty)}" : $"{p.Provider}: {p.Error}"));
             int found = outcome.Candidates.Count;
             SetStatus(() => found == 0 ? Loc.T("online.noResults") : Loc.T("online.found", CountText(found)));
-            Log.Info($"Pretraga titlova '{query.Title}': {ProviderStatus}");
+            Log.Subtitles.Info($"Pretraga titlova '{query.Title}': {ProviderStatus}");
             return outcome;
         }
         finally
@@ -428,14 +428,14 @@ public sealed class OnlineSubtitleController : ObservableObject
             string text = $"{SubtitleLanguage.DisplayName(candidate.Language)} ({candidate.Provider}, {ConfidenceText(candidate.Confidence)})";
             SetStatus(() => Loc.T("online.loaded", Path.GetFileName(path)));
             Message?.Invoke(auto ? Loc.T("online.downloadedText", text) : Loc.T("online.loadedText", text));
-            Log.Info($"Preuzeti titlovi {candidate.Provider}/{candidate.DownloadReference}{(_service.LastDownloadFromCache ? " (iz predmemorije, bez trošenja limita)" : string.Empty)} → {path}");
+            Log.Subtitles.Info($"Preuzeti titlovi {candidate.Provider}/{candidate.DownloadReference}{(_service.LastDownloadFromCache ? " (iz predmemorije, bez trošenja limita)" : string.Empty)} → {path}");
         }
         catch (Exception ex) when (ex is ProviderException or HttpRequestException or IOException or UnauthorizedAccessException
                                        or TaskCanceledException or System.Text.Json.JsonException)
         {
             SetStatus(() => Loc.T("online.downloadFailed", ex.Message));
             Message?.Invoke(Status);
-            Log.Warn(Status);
+            Log.Subtitles.Warn(Status);
         }
         finally
         {
@@ -492,7 +492,7 @@ public sealed class OnlineSubtitleController : ObservableObject
             }
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
             {
-                Log.Warn($"Titlovi se ne mogu spremiti u {folder}: {ex.Message}");
+                Log.Subtitles.Warn($"Titlovi se ne mogu spremiti u {folder}: {ex.Message}");
             }
         }
 

@@ -108,7 +108,7 @@ In the same tab you set the automatic search, the encoding of old subtitles and 
 
 - **Volume:** ↑ / ↓, the mouse wheel or the slider; **M** mutes.
 - **Audio track:** **B** switches to the next one, or right-click → **Audio** and choose a track (language, format and channels are shown). The choice is remembered per video.
-- **Settings → Audio:** preferred audio language, output device, audio sync (for example for Bluetooth headphones) and volume levelling for quiet dialogue.
+- **Settings → Audio:** preferred audio language, output device, audio sync (for example for Bluetooth headphones), volume levelling for quiet dialogue and a 10-band equalizer with presets and your own preset.
 
 ### App language
 
@@ -137,7 +137,7 @@ Settings are split into tabs. Every change applies right away (also to the video
 | General | Resuming a started video (ask / resume / from the beginning), arrow-key seek step, open videos in full screen, keep the player on top, series (next episode, countdown), screenshot folder, “Open with” and the default player |
 | Language | App language |
 | Subtitles | Subtitle languages and their order, automatic loading and searching, sources on the internet, encoding of old subtitles, look, synchronization |
-| Audio | Volume, volume levelling, preferred audio language, output device, audio sync |
+| Audio | Volume, volume levelling, equalizer, preferred audio language, output device, audio sync |
 | Video | Picture quality, hardware decoding, default aspect ratio, HDR |
 | Appearance | Dark / light theme, how long the controls stay visible, rendering the interface on the GPU |
 | Updates | Version, check now, automatic download, what is new, update history |

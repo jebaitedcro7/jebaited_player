@@ -72,6 +72,13 @@ public sealed partial class SourceScanTests
             }
         }
 
+        // Equalizer (ciklus 1): naziv preseta je "eq." + id iz popisa preseta u Equalizer.cs.
+        string equalizer = File.ReadAllText(Path.Combine(Root, "src", "JebaitedPlayer.App", "Infrastructure", "Equalizer.cs"));
+        foreach (Match preset in EqualizerPresetRegex().Matches(equalizer))
+        {
+            used.Add("eq." + preset.Groups[1].Value);
+        }
+
         string[] unused = LanguageFileTests.Simple(english)
             .Concat(LanguageFileTests.PluralBases(english))
             .Where(k => !used.Contains(k))
@@ -189,10 +196,13 @@ public sealed partial class SourceScanTests
     [GeneratedRegex(@"""([A-Za-z]+)""")]
     private static partial Regex QuotedWordRegex();
 
+    [GeneratedRegex(@"\(""([a-z]+)"", \[")]
+    private static partial Regex EqualizerPresetRegex();
+
     [GeneratedRegex(@"\b(Text|Content|ToolTip|Header|Title)=""([^""]*)""")]
     private static partial Regex XamlTextRegex();
 
-    [GeneratedRegex(@"\bLog\.(Info|Warn|Error|Debug)\(|LogManual\(|Log\.Init|LogMessage\?\.Invoke|Console\.Write|Detail = |throw new ArgumentException|LastAutoResult = |_pendingLog|RunHook\(|string channels = |InvalidDataException\(""(Nepoznat|Neispravna|Analiza)")]
+    [GeneratedRegex(@"\bLog\.(?:(?:Playback|Subtitles|Ui|Stability|Updates|Usage)\.)?(Info|Warn|Error|Debug)\(|LogManual\(|Log\.Init|LogMessage\?\.Invoke|Console\.Write|Detail = |throw new ArgumentException|LastAutoResult = |_pendingLog|RunHook\(|string channels = |InvalidDataException\(""(Nepoznat|Neispravna|Analiza)")]
     private static partial Regex LogRegex();
 
     [GeneratedRegex(@"\$?@?""(?:[^""\\]|\\.)*""")]

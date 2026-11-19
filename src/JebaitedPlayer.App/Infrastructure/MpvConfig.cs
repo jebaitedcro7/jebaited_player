@@ -82,6 +82,7 @@ internal static class MpvConfig
         ("sub-start", MpvFormat.Double),
         ("aid", MpvFormat.String),
         ("speed", MpvFormat.Double),
+        ("paused-for-cache", MpvFormat.Flag),
     ];
 
     // Nazivi nekih opcija razlikuju se među verzijama mpv-a; stvarne nazive otkrivamo pri pokretanju.
@@ -94,7 +95,29 @@ internal static class MpvConfig
     // --- UPGRADE 3: zvuk i slika iz postavki -----------------------------------------------------------------------
 
     /// <summary>Ujednačavanje glasnoće (dynaudnorm): tiši glasni prizori, glasniji dijalog; bez rezanja vrhova.</summary>
-    public const string NormalizeFilter = "lavfi=[dynaudnorm=f=250:g=15:p=0.9:m=8]";
+    public const string NormalizeGraph = "dynaudnorm=f=250:g=15:p=0.9:m=8";
+
+    public const string NormalizeFilter = $"lavfi=[{NormalizeGraph}]";
+
+    /// <summary>
+    /// Cijeli audio filtar (mpv "af"): prvo equalizer, zatim ujednačavanje glasnoće, u jednom lavfi grafu.
+    /// Prazno = bez filtara (zvuk točno kao u datoteci).
+    /// </summary>
+    public static string AudioFilter(AppSettings s)
+    {
+        var parts = new List<string>();
+        if (Equalizer.BuildFilters(s.Equalizer) is { } eq)
+        {
+            parts.Add(eq);
+        }
+
+        if (s.NormalizeAudio)
+        {
+            parts.Add(NormalizeGraph);
+        }
+
+        return parts.Count == 0 ? string.Empty : $"lavfi=[{string.Join(',', parts)}]";
+    }
 
     /// <summary>Opcije koje mijenja kvaliteta slike ("balanced" = zadane vrijednosti mpv-a).</summary>
     private static readonly string[] QualityOptionNames =
@@ -176,9 +199,10 @@ internal static class MpvConfig
             yield return ("audio-delay", F(s.AudioDelayMs / 1000.0));
         }
 
-        if (s.NormalizeAudio || includeDefaults)
+        string audioFilter = AudioFilter(s);
+        if (audioFilter.Length > 0 || includeDefaults)
         {
-            yield return ("af", s.NormalizeAudio ? NormalizeFilter : string.Empty);
+            yield return ("af", audioFilter);
         }
 
         if (s.HdrPassthrough || includeDefaults)

@@ -108,7 +108,7 @@ U istoj kartici podešavaš automatsko traženje, kodiranje starih titlova i izg
 
 - **Glasnoća:** ↑ / ↓, kotačić miša ili klizač; **M** isključuje zvuk.
 - **Audio traka:** **B** prebacuje na sljedeću, ili desni klik → **Audio** i odaberi traku (prikazani su jezik, format i kanali). Izbor se pamti po videu.
-- **Postavke → Zvuk:** željeni jezik zvuka, izlazni uređaj, sinkronizacija zvuka (npr. za Bluetooth slušalice) i ujednačavanje glasnoće za tihi dijalog.
+- **Postavke → Zvuk:** željeni jezik zvuka, izlazni uređaj, sinkronizacija zvuka (npr. za Bluetooth slušalice), ujednačavanje glasnoće za tihi dijalog i equalizer s 10 pojaseva, presetima i vlastitim presetom.
 
 ### Jezik aplikacije
 
@@ -137,7 +137,7 @@ Postavke su podijeljene u kartice. Svaka promjena vrijedi odmah (i za video koji
 | Općenito | Nastavak započetog videa (pitaj / nastavi / od početka), korak premotavanja strelicama, otvaranje videa u cijelom zaslonu, player iznad ostalih prozora, serije (sljedeća epizoda, odbrojavanje), mapa za snimke zaslona, „Otvori pomoću” i zadani player |
 | Jezik | Jezik aplikacije |
 | Titlovi | Jezici titlova i njihov redoslijed, automatsko učitavanje i traženje, izvori na internetu, kodiranje starih titlova, izgled, sinkronizacija |
-| Zvuk | Glasnoća, ujednačavanje glasnoće, željeni jezik zvuka, izlazni uređaj, sinkronizacija zvuka |
+| Zvuk | Glasnoća, ujednačavanje glasnoće, equalizer, željeni jezik zvuka, izlazni uređaj, sinkronizacija zvuka |
 | Slika | Kvaliteta slike, hardversko dekodiranje, zadani omjer slike, HDR |
 | Izgled | Tamna / svijetla tema, koliko dugo su kontrole vidljive, iscrtavanje sučelja preko GPU-a |
 | Nadogradnje | Verzija, provjeri sada, automatsko preuzimanje, što je novo, povijest nadogradnji |

@@ -13,9 +13,16 @@ public sealed record WatchEntry(
     bool Watched,
     DateTime? LastPlayed,
     int PlayCount,
-    string? Hash)
+    string? Hash,
+    string? Coverage = null)
 {
     public double Progress => Duration > 0 ? Math.Clamp(Position / Duration, 0, 1) : 0;
+
+    /// <summary>
+    /// Traka napretka na karticama: puna kad je video pogledan, inače stvarno odgledani dio
+    /// (premotani dio se ne vidi kao odgledan). Zapis bez pokrivenosti (prije 1.3.0) pokazuje poziciju.
+    /// </summary>
+    public double WatchedProgress => Watched ? 1 : WatchCoverage.Parse(Coverage)?.Fraction ?? Progress;
 }
 
 /// <summary>Zapamćeni titlovi i sinkronizacija za jedan video.</summary>
@@ -41,7 +48,7 @@ public sealed record AudioState(long TrackId, string? Language);
 public sealed class WatchStore : IDisposable
 {
     private const string SelectMedia =
-        "SELECT path, title, season, episode, duration, position, watched, last_played, play_count, hash FROM media";
+        "SELECT path, title, season, episode, duration, position, watched, last_played, play_count, hash, coverage FROM media";
 
     private readonly SqliteConnection _db;
     private readonly object _gate = new();
@@ -104,23 +111,31 @@ public sealed class WatchStore : IDisposable
         }
     }
 
-    public void SavePosition(string path, double position, double duration, bool watched)
+    /// <summary>
+    /// Spremi poziciju tijekom gledanja. Status „pogledano” se ovdje može samo uključiti, nikad isključiti
+    /// (ciklus 1, M6a): ponovno otvaranje pogledanog videa ne briše zelenu traku. Isključuje ga samo <see cref="SetWatched"/>.
+    /// </summary>
+    /// <param name="coverage">Stvarno odgledani dijelovi (<see cref="WatchCoverage.ToText"/>); null = ostaje spremljeno.</param>
+    public void SavePosition(string path, double position, double duration, bool watched, string? coverage = null)
     {
         lock (_gate)
         {
             using SqliteCommand cmd = Command(
                 """
-                INSERT INTO media (path, duration, position, watched, last_played)
-                VALUES ($path, $duration, $position, $watched, $now)
+                INSERT INTO media (path, duration, position, watched, last_played, coverage)
+                VALUES ($path, $duration, $position, $watched, $now, $coverage)
                 ON CONFLICT(path) DO UPDATE SET
                     duration = excluded.duration, position = excluded.position,
-                    watched = excluded.watched, last_played = excluded.last_played
+                    watched = MAX(media.watched, excluded.watched), last_played = excluded.last_played,
+                    coverage = COALESCE(excluded.coverage, media.coverage)
                 """,
-                ("$path", path), ("$duration", duration), ("$position", position), ("$watched", watched ? 1 : 0), ("$now", Now()));
+                ("$path", path), ("$duration", duration), ("$position", position), ("$watched", watched ? 1 : 0), ("$now", Now()),
+                ("$coverage", coverage));
             cmd.ExecuteNonQuery();
         }
     }
 
+    /// <summary>Ručno označi kao pogledano ili nepogledano. Nepogledano briše i zapamćeni odgledani dio.</summary>
     public void SetWatched(string path, bool watched)
     {
         lock (_gate)
@@ -128,7 +143,8 @@ public sealed class WatchStore : IDisposable
             using SqliteCommand cmd = Command(
                 """
                 INSERT INTO media (path, watched, position) VALUES ($path, $watched, 0)
-                ON CONFLICT(path) DO UPDATE SET watched = excluded.watched, position = 0
+                ON CONFLICT(path) DO UPDATE SET watched = excluded.watched, position = 0,
+                    coverage = CASE WHEN excluded.watched = 0 THEN NULL ELSE media.coverage END
                 """,
                 ("$path", path), ("$watched", watched ? 1 : 0));
             cmd.ExecuteNonQuery();
@@ -335,7 +351,13 @@ public sealed class WatchStore : IDisposable
             Execute("ALTER TABLE subtitle_state ADD COLUMN time_map TEXT");
         }
 
-        Execute("INSERT OR REPLACE INTO meta (key, value) VALUES ('schema_version', '3')");
+        // Verzija 4 (ciklus 1, M6b): stvarno odgledani dijelovi videa. Postojeći zapisi ostaju bez nje (vidi WatchCoverage.FromEntry).
+        if (!ColumnExists("media", "coverage"))
+        {
+            Execute("ALTER TABLE media ADD COLUMN coverage TEXT");
+        }
+
+        Execute("INSERT OR REPLACE INTO meta (key, value) VALUES ('schema_version', '4')");
     }
 
     private bool ColumnExists(string table, string column)
@@ -378,7 +400,8 @@ public sealed class WatchStore : IDisposable
         r.GetInt64(6) != 0,
         r.IsDBNull(7) ? null : DateTime.Parse(r.GetString(7), CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind),
         r.GetInt32(8),
-        r.IsDBNull(9) ? null : r.GetString(9));
+        r.IsDBNull(9) ? null : r.GetString(9),
+        r.IsDBNull(10) ? null : r.GetString(10));
 
     private static string Now() => DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture);
 }

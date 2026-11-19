@@ -50,7 +50,7 @@ public sealed class UpdateService
         }
         catch (Exception ex)
         {
-            Log.Warn($"Nadogradnje nisu dostupne: {ex.Message}");
+            Log.Updates.Warn($"Nadogradnje nisu dostupne: {ex.Message}");
         }
 
         _ready = Safe(() => _manager?.UpdatePendingRestart);
@@ -114,11 +114,11 @@ public sealed class UpdateService
                 return ReadyVersion;
             }
 
-            Log.Info($"Nadogradnja: dostupna verzija {info.TargetFullRelease.Version} (trenutna {CurrentVersion}), preuzimam.");
+            Log.Updates.Info($"Nadogradnja: dostupna verzija {info.TargetFullRelease.Version} (trenutna {CurrentVersion}), preuzimam.");
             SetState(UpdateState.Downloading);
             await _manager.DownloadUpdatesAsync(info, null, ct).ConfigureAwait(false);
             _ready = info.TargetFullRelease;
-            Log.Info($"Nadogradnja: verzija {_ready.Version} preuzeta, instalira se pri zatvaranju playera.");
+            Log.Updates.Info($"Nadogradnja: verzija {_ready.Version} preuzeta, instalira se pri zatvaranju playera.");
             SetState(UpdateState.Ready);
             return ReadyVersion;
         }
@@ -129,7 +129,7 @@ public sealed class UpdateService
         }
         catch (Exception ex)
         {
-            Log.Warn($"Nadogradnja: provjera nije uspjela ({ex.GetType().Name}: {ex.Message})");
+            Log.Updates.Warn($"Nadogradnja: provjera nije uspjela ({ex.GetType().Name}: {ex.Message})");
             SetState(_ready != null ? UpdateState.Ready : UpdateState.Failed);
             return ReadyVersion;
         }
@@ -154,12 +154,12 @@ public sealed class UpdateService
         try
         {
             _manager.WaitExitThenApplyUpdates(_ready, silent: true, restart: restart);
-            Log.Info($"Nadogradnja na {_ready.Version} pokrenuta (nakon zatvaranja{(restart ? ", uz ponovno pokretanje" : string.Empty)}).");
+            Log.Updates.Info($"Nadogradnja na {_ready.Version} pokrenuta (nakon zatvaranja{(restart ? ", uz ponovno pokretanje" : string.Empty)}).");
             return true;
         }
         catch (Exception ex)
         {
-            Log.Error("Nadogradnja pri zatvaranju", ex);
+            Log.Updates.Error("Nadogradnja pri zatvaranju", ex);
             return false;
         }
     }

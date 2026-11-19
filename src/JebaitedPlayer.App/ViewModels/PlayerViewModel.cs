@@ -1,3 +1,4 @@
+using JebaitedPlayer.Diagnostics;
 using System.Globalization;
 using System.Windows.Input;
 using JebaitedPlayer.Infrastructure;
@@ -354,6 +355,7 @@ public sealed class PlayerViewModel : ObservableObject
             return;
         }
 
+        DiagLog.Info(LogCat.Usage, "seek.relative", nameof(PlayerViewModel), "Seek", ("delta", seconds), ("from", Math.Round(Position, 1)));
         _player.CommandAsync("seek", F(seconds), "relative");
         ShowOsd(seconds > 0 ? $"+{seconds:0} s" : $"−{-seconds:0} s", 700);
     }
@@ -365,6 +367,7 @@ public sealed class PlayerViewModel : ObservableObject
             return;
         }
 
+        DiagLog.Info(LogCat.Usage, "seek.absolute", nameof(PlayerViewModel), "Seek", ("to", Math.Round(seconds, 1)), ("from", Math.Round(Position, 1)));
         _player.CommandAsync("seek", F(seconds), exact ? "absolute+exact" : "absolute");
         Position = seconds;
         _ignorePositionUntil = Environment.TickCount64 + 500;
@@ -382,6 +385,7 @@ public sealed class PlayerViewModel : ObservableObject
         long now = Environment.TickCount64;
         if (final)
         {
+            DiagLog.Info(LogCat.Usage, "seek.scrub", nameof(PlayerViewModel), "Seek by dragging", ("to", Math.Round(seconds, 1)));
             _player.CommandAsync("seek", F(seconds), "absolute+exact");
             _ignorePositionUntil = now + 700;
         }
@@ -522,7 +526,7 @@ public sealed class PlayerViewModel : ObservableObject
 
         IsLoading = false;
         ErrorMessage = Loc.T("error.cannotPlay", e.ErrorText ?? Loc.T("error.unknown"));
-        Log.Warn($"Reprodukcija nije uspjela: {e.ErrorText}");
+        Log.Playback.Error($"Reprodukcija nije uspjela: {e.ErrorText}");
         LoadFailed?.Invoke(this, EventArgs.Empty);
     }
 

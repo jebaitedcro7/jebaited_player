@@ -4,6 +4,31 @@ Sve važnije promjene jebaited_playera. Oblik: [Keep a Changelog](https://keepac
 
 Drugi jezici: [English](CHANGELOG.md) · [Deutsch](CHANGELOG_DE.md). Ista povijest je i u playeru (klik na broj verzije na početnom ekranu). Ova datoteka nastaje iz `src/JebaitedPlayer.App/History/update-history.json`.
 
+## [1.3.0] - 2026-11-19
+
+Equalizer, pouzdan status „Pogledano” i lokalna dijagnostika.
+
+### Novo
+
+- Equalizer u Postavke → Zvuk: 10 pojaseva i pojačanje, preseti (Ravno, Rock, Pop, Jazz, Klasika, Elektronika, Jači basovi, Jači visoki tonovi, Vokal i dijalog) i tvoj vlastiti preset (Vlastiti). Promjene se čuju odmah, bez prekida reprodukcije, a radi zajedno s ujednačavanjem glasnoće. Tijekom gledanja je i u izborniku Audio.
+- Dijagnostika / Logovi (Postavke → O aplikaciji): player lokalno bilježi greške, rušenja i probleme s reprodukcijom, da ih je lakše pronaći i popraviti. Zapis možeš pregledati, filtrirati i izvesti kao ZIP (nazivi datoteka mogu biti anonimizirani). Ništa se nikamo ne šalje, a stari zapisi se sami brišu.
+
+### Poboljšano
+
+- „Pogledano” sada znači stvarno pogledano: odgledano je barem 80 % videa. Preskakanje ili skok na kraj više ne označava video pogledanim, a isti dio gledan dvaput broji se jednom.
+- Pogledani videi na početnom ekranu i u popisu epizoda imaju zelenu kvačicu, natpis „Pogledano” i punu zelenu traku.
+
+### Ispravljeno
+
+- Ponovno otvaranje pogledane epizode ili filma i ranije zatvaranje više ne briše zelenu traku ni status „Pogledano”. Mijenja ga samo „Označi kao pogledano / nepogledano” u popisu epizoda.
+
+### Poznati problemi
+
+- Aplikacija još nije digitalno potpisana, pa Windows SmartScreen ili Smart App Control mogu upozoriti prije instalacije.
+- Prozor napretka instalacije je Velopackov i samo je na engleskom.
+
+Izdanje: [v1.3.0](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v1.3.0) · Promjene od [v1.2.0...v1.3.0](https://github.com/jebaitedcro7/jebaited_player/compare/v1.2.0...v1.3.0)
+
 ## [1.2.0] - 2026-11-17
 
 Kontrole playera, postavke u karticama i povijest nadogradnji.

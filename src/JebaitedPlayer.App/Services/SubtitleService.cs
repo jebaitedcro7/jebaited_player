@@ -1,3 +1,4 @@
+using JebaitedPlayer.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
 using JebaitedPlayer.Infrastructure;
@@ -35,6 +36,29 @@ public static class SubtitleService
     private static readonly UTF8Encoding Utf8WithBom = new(encoderShouldEmitUTF8Identifier: true);
 
     public static PreparedSubtitle Prepare(string path, string? videoPath, double? videoFps, int? forcedCodePage = null)
+    {
+        try
+        {
+            PreparedSubtitle p = PrepareCore(path, videoPath, videoFps, forcedCodePage);
+            DiagLog.Info(LogCat.Subtitle, "subtitle.loaded", "SubtitleService", "Subtitle prepared",
+                ("file", Redactor.FileName(path)), ("format", p.Format), ("encoding", p.EncodingName), ("lang", p.Language),
+                ("cues", p.CueCount), ("forcedCodePage", forcedCodePage));
+            if (p.EncodingName is { } enc && (enc.Contains("1250", StringComparison.Ordinal) || enc.Contains("Windows", StringComparison.OrdinalIgnoreCase)))
+            {
+                DiagLog.Debug(LogCat.Subtitle, "subtitle.encoding", "SubtitleService", "Non-UTF8 encoding detected", ("encoding", enc));
+            }
+
+            return p;
+        }
+        catch (Exception ex)
+        {
+            DiagLog.Error(LogCat.Subtitle, "subtitle.load.failed", "SubtitleService", "Subtitle not loaded: " + ex.Message, ex,
+                ("file", Redactor.FileName(path)), ("forcedCodePage", forcedCodePage));
+            throw;
+        }
+    }
+
+    private static PreparedSubtitle PrepareCore(string path, string? videoPath, double? videoFps, int? forcedCodePage)
     {
         var info = new FileInfo(path);
         if (!info.Exists)

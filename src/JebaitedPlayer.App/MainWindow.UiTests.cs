@@ -32,6 +32,8 @@ public partial class MainWindow
                     "home" => await HomeUiTestAsync(fullscreen: false),
                     "home-fullscreen" => await HomeUiTestAsync(fullscreen: true),
                     "settings" => await SettingsUiTestAsync(),
+                    "equalizer" => await EqualizerUiTestAsync(),
+                    "watched" => await WatchedUiTestAsync(),
                     _ => new Dictionary<string, object?> { ["error"] = "nepoznat scenarij " + scenario },
                 };
             }

@@ -4,6 +4,31 @@ Alle wichtigen Änderungen an jebaited_player. Format: [Keep a Changelog](https:
 
 Andere Sprachen: [English](CHANGELOG.md) · [Hrvatski](CHANGELOG_HR.md). Derselbe Verlauf ist im Player enthalten (Klick auf die Versionsnummer auf dem Startbildschirm). Diese Datei wird aus `src/JebaitedPlayer.App/History/update-history.json` erzeugt.
 
+## [1.3.0] - 2026-11-19
+
+Equalizer, ein zuverlässiger Status „Angesehen“ und lokale Diagnose.
+
+### Neu
+
+- Equalizer unter Einstellungen → Audio: 10 Bänder und Vorverstärkung, Voreinstellungen (Neutral, Rock, Pop, Jazz, Klassik, Elektronisch, Mehr Bass, Mehr Höhen, Gesang und Dialog) und eine eigene Einstellung (Eigene). Änderungen sind sofort hörbar, ohne die Wiedergabe zu unterbrechen, und er funktioniert zusammen mit dem Lautstärkeausgleich. Beim Anschauen ist er auch im Audio-Menü.
+- Diagnose / Protokolle (Einstellungen → Info): Der Player führt ein lokales Protokoll über Fehler, Abstürze und Wiedergabeprobleme, damit sie gefunden und behoben werden können. Es lässt sich ansehen, filtern und als ZIP exportieren (Dateinamen können anonymisiert werden). Nichts wird irgendwohin gesendet, alte Protokolle werden automatisch gelöscht.
+
+### Verbessert
+
+- „Angesehen“ heißt jetzt wirklich angesehen: Mindestens 80 % des Videos wurden tatsächlich abgespielt. Überspringen oder ein Sprung ans Ende markiert ein Video nicht mehr als angesehen, und derselbe Teil zählt nur einmal.
+- Angesehene Videos zeigen auf dem Startbildschirm und in der Episodenliste ein grünes Häkchen, „Angesehen“ und einen vollen grünen Balken.
+
+### Behoben
+
+- Wird eine angesehene Episode oder ein Film erneut geöffnet und früher geschlossen, verschwinden der grüne Balken und der Status „Angesehen“ nicht mehr. Nur „Als angesehen / nicht angesehen markieren“ in der Episodenliste ändert ihn.
+
+### Bekannte Probleme
+
+- Die App ist noch nicht digital signiert, daher können Windows SmartScreen oder Smart App Control vor der Installation warnen.
+- Das Fortschrittsfenster des Installationsprogramms stammt von Velopack und ist nur auf Englisch.
+
+Release: [v1.3.0](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v1.3.0) · Änderungen seit [v1.2.0...v1.3.0](https://github.com/jebaitedcro7/jebaited_player/compare/v1.2.0...v1.3.0)
+
 ## [1.2.0] - 2026-11-17
 
 Player-Steuerung, Einstellungen in Tabs und der Update-Verlauf.

@@ -17,6 +17,7 @@ public partial class MainWindow : ISettingsHost
 {
     private PlayerSettingsWindow? _playerSettingsWindow;
     private UpdateHistoryWindow? _historyWindow;
+    private DiagnosticsLogWindow? _logsWindow;
     private bool _fullscreenOnLoad;
 
     /// <summary>Postavke na zadanoj kartici; ako su već otvorene, samo prijeđe na tu karticu.</summary>
@@ -106,6 +107,19 @@ public partial class MainWindow : ISettingsHost
     void ISettingsHost.RestartForUpdate() => RestartForUpdate();
 
     void ISettingsHost.ShowUpdateHistory() => ShowUpdateHistory();
+
+    void ISettingsHost.ShowLogs()
+    {
+        if (_logsWindow is { IsLoaded: true })
+        {
+            _logsWindow.Activate();
+            return;
+        }
+
+        _logsWindow = new DiagnosticsLogWindow { Owner = _playerSettingsWindow ?? (Window)this };
+        _logsWindow.Closed += (_, _) => _logsWindow = null;
+        _logsWindow.Show();
+    }
 
     void ISettingsHost.ApplyPlaybackSettings()
     {

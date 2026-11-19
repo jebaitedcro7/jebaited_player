@@ -4,6 +4,31 @@ All notable changes to jebaited_player. Format: [Keep a Changelog](https://keepa
 
 Other languages: [Deutsch](CHANGELOG_DE.md) · [Hrvatski](CHANGELOG_HR.md). The same history is included in the player (click the version number on the home screen). This file is generated from `src/JebaitedPlayer.App/History/update-history.json`.
 
+## [1.3.0] - 2026-11-19
+
+Equalizer, a reliable “Watched” status and local diagnostics.
+
+### Added
+
+- Equalizer under Settings → Audio: 10 bands and a preamp, presets (Flat, Rock, Pop, Jazz, Classical, Electronic, Bass boost, Treble boost, Vocals and dialogue) and your own preset (Custom). Changes are heard right away without interrupting playback, and it works together with volume levelling. While watching, it is also in the Audio menu.
+- Diagnostics / Logs (Settings → About): the player keeps a local log of errors, crashes and playback problems, so they can be found and fixed. You can view and filter it and export it as a ZIP (file names can be anonymized). Nothing is sent anywhere, and old logs are deleted automatically.
+
+### Improved
+
+- “Watched” now means really watched: at least 80% of the video was actually played. Skipping or jumping to the end no longer marks a video as watched, and watching the same part twice is counted once.
+- Watched videos show a green check, “Watched” and a full green bar on the home screen and in the episode list.
+
+### Fixed
+
+- Reopening a watched episode or film and closing it early no longer removes the green bar and the “Watched” status. Only “Mark as watched / unwatched” in the episode list changes it.
+
+### Known issues
+
+- The app is not digitally signed yet, so Windows SmartScreen or Smart App Control may warn before the installation.
+- The progress window of the installer comes from Velopack and is only in English.
+
+Release: [v1.3.0](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v1.3.0) · Changes since [v1.2.0...v1.3.0](https://github.com/jebaitedcro7/jebaited_player/compare/v1.2.0...v1.3.0)
+
 ## [1.2.0] - 2026-11-17
 
 Player controls, settings in tabs and the update history.

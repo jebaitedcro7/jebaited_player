@@ -128,6 +128,20 @@
                         </CheckBox>
                         <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.normalizeHint}" Margin="28,4,0,0" />
 
+                        <!-- Equalizer (ciklus 1) -->
+                        <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T settings.equalizer}" Margin="0,24,0,2" />
+                        <CheckBox x:Name="EqEnabledBox" Content="{loc:T settings.eqEnable}" Margin="0,4,0,0" />
+                        <StackPanel x:Name="EqPanel" Margin="0,10,0,0">
+                            <WrapPanel>
+                                <TextBlock Text="{loc:T settings.eqPreset}" VerticalAlignment="Center" Margin="0,0,12,0" />
+                                <Button x:Name="EqPresetButton" Style="{StaticResource ChoiceButton}" Click="OnEqPresetClick" MinWidth="170" />
+                                <Button x:Name="EqResetButton" Style="{StaticResource SecondaryButton}" Content="{loc:T settings.reset}"
+                                        Click="OnEqReset" Margin="12,0,0,0" VerticalAlignment="Center" />
+                            </WrapPanel>
+                            <StackPanel x:Name="EqBands" Orientation="Horizontal" Margin="0,14,0,0" HorizontalAlignment="Left" />
+                        </StackPanel>
+                        <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.eqHint}" Margin="0,8,0,0" />
+
                         <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T settings.audioTrack}" Margin="0,24,0,2" />
                         <TextBlock Text="{loc:T settings.audioLanguage}" Margin="0,4,0,0" />
                         <Button x:Name="AudioLanguageButton" Style="{StaticResource ChoiceButton}" Click="OnAudioLanguageClick" />
@@ -266,6 +280,7 @@
                         <WrapPanel Margin="0,6,0,0">
                             <Button Style="{StaticResource SecondaryButton}" Content="{loc:T settings.manual}" Click="OnManual" />
                             <Button Style="{StaticResource SecondaryButton}" Content="{loc:T settings.viewHistory}" Click="OnViewHistory" />
+                            <Button Style="{StaticResource SecondaryButton}" Content="{loc:T settings.viewLogs}" Click="OnViewLogs" />
                         </WrapPanel>
                         <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.manualHint}" />
 

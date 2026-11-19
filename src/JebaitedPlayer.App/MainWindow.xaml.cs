@@ -47,6 +47,8 @@ public partial class MainWindow : Window
     private bool _overlayVisible;
     private bool _contextMenuOpen;
     private bool _closing;
+    private PlayerEventTracker? _events;
+    private HealthMonitor? _health;
     private bool _closeConfirmed;
 
     private WindowState _restoreState = WindowState.Normal;
@@ -403,6 +405,10 @@ public partial class MainWindow : Window
         _cards?.Hide();
         Hide();
 
+        _events?.Detach();
+        _health?.Dispose();
+        _health = null;
+        Log.Info("Player closing");
         MpvPlayer? player = _player;
         _player = null;
         if (player != null)
@@ -428,6 +434,8 @@ public partial class MainWindow : Window
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
+        _health = new HealthMonitor(Dispatcher, () => _vm.HasMedia && !_vm.IsPaused);
+        _health.Start();
         _overlay = new ControlsOverlay(_vm) { Owner = this };
         _overlay.UserActivity += (_, _) => RegisterActivity();
         _overlay.FilesDropped += (_, files) => OpenFiles(files);
@@ -547,6 +555,7 @@ public partial class MainWindow : Window
         player.VideoReconfig += (_, _) => Video.DisableVideoChildren();
         player.FileLoaded += (_, _) => Video.DisableVideoChildren();
         _vm.Attach(player);
+        _events = new PlayerEventTracker(player, _vm);
         _player = player;
         initWatch.Stop();
         _diag?.OnPlayerCreated(initWatch.Elapsed.TotalMilliseconds);
@@ -586,7 +595,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            Log.Error("Pokretanje mpv-a", ex);
+            Log.Stability.Error("Pokretanje mpv-a", ex);
             MessageBox.Show(this, Loc.T("error.engineStart", ex.Message),
                 "jebaited_player", MessageBoxButton.OK, MessageBoxImage.Error);
             return;

@@ -1,0 +1,65 @@
+<Window x:Class="JebaitedPlayer.Views.DiagnosticsLogWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:JebaitedPlayer.Infrastructure"
+        Title="{loc:T logs.title}"
+        Width="900" Height="680" MinWidth="640" MinHeight="460" ShowInTaskbar="False"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource WindowBackgroundBrush}"
+        Foreground="{DynamicResource TextPrimaryBrush}"
+        FontFamily="{DynamicResource UiFont}" FontSize="13" UseLayoutRounding="True">
+
+    <!-- Lokalni pregled dnevnika (logger): sažetak, filtri, najčešći problemi, sesije i izvoz u ZIP. Ništa se ne šalje nikamo. -->
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Top" Margin="24,16,24,6">
+            <TextBlock Text="{loc:T logs.title}" FontSize="22" FontWeight="SemiBold" />
+            <TextBlock Text="{loc:T logs.hint}" Margin="0,4,0,0" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" />
+            <TextBlock x:Name="SummaryText" Margin="0,10,0,0" TextWrapping="Wrap" LineHeight="20" />
+        </StackPanel>
+
+        <DockPanel DockPanel.Dock="Bottom" LastChildFill="False" Margin="24,0,24,14">
+            <Border DockPanel.Dock="Top" Height="1" Background="{DynamicResource MenuBorderBrush}" Margin="0,0,0,12" />
+            <Button DockPanel.Dock="Right" Style="{StaticResource SecondaryButton}" Content="{loc:T common.close}" Click="OnCloseClick" Margin="0" />
+            <Button DockPanel.Dock="Left" Style="{StaticResource SecondaryButton}" Content="{loc:T logs.export}" Click="OnExportClick" Margin="0,0,8,0" />
+            <CheckBox x:Name="AnonymizeBox" DockPanel.Dock="Left" Content="{loc:T logs.anonymize}" IsChecked="True" VerticalAlignment="Center" Margin="0,0,16,0" />
+            <Button DockPanel.Dock="Left" Style="{StaticResource LinkButton}" Content="{loc:T logs.openFolder}" Click="OnOpenFolderClick" VerticalAlignment="Center" />
+        </DockPanel>
+
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="24,6,24,6">
+            <RadioButton x:Name="ViewEvents" Content="{loc:T logs.view.events}" IsChecked="True" GroupName="LogView" Margin="0,0,16,0" Checked="OnViewChanged" />
+            <RadioButton x:Name="ViewProblems" Content="{loc:T logs.view.problems}" GroupName="LogView" Margin="0,0,16,0" Checked="OnViewChanged" />
+            <RadioButton x:Name="ViewSessions" Content="{loc:T logs.view.sessions}" GroupName="LogView" Checked="OnViewChanged" />
+        </StackPanel>
+
+        <WrapPanel x:Name="FilterPanel" DockPanel.Dock="Top" Margin="24,0,24,8">
+            <TextBlock Text="{loc:T logs.filter.date}" VerticalAlignment="Center" Margin="0,0,6,0" />
+            <ComboBox x:Name="DateFilter" Width="120" Margin="0,0,14,0" SelectionChanged="OnDateChanged" />
+            <TextBlock Text="{loc:T logs.filter.session}" VerticalAlignment="Center" Margin="0,0,6,0" />
+            <ComboBox x:Name="SessionFilter" Width="190" Margin="0,0,14,0" SelectionChanged="OnFilterChanged" />
+            <TextBlock Text="{loc:T logs.filter.level}" VerticalAlignment="Center" Margin="0,0,6,0" />
+            <ComboBox x:Name="LevelFilter" Width="110" Margin="0,0,14,0" SelectionChanged="OnFilterChanged" />
+            <TextBlock Text="{loc:T logs.filter.category}" VerticalAlignment="Center" Margin="0,0,6,0" />
+            <ComboBox x:Name="CategoryFilter" Width="120" SelectionChanged="OnFilterChanged" />
+        </WrapPanel>
+
+        <Border DockPanel.Dock="Bottom" Margin="24,8,24,10" MinHeight="64" MaxHeight="150" BorderThickness="1"
+                BorderBrush="{DynamicResource MenuBorderBrush}" Padding="8,6">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <TextBlock x:Name="DetailText" TextWrapping="Wrap" FontFamily="Consolas" FontSize="12"
+                           Foreground="{DynamicResource TextSecondaryBrush}" />
+            </ScrollViewer>
+        </Border>
+
+        <ListBox x:Name="Rows" Margin="24,0,24,0" BorderThickness="1" BorderBrush="{DynamicResource MenuBorderBrush}"
+                 Background="Transparent" Foreground="{DynamicResource TextPrimaryBrush}"
+                 VirtualizingPanel.IsVirtualizing="True" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 SelectionChanged="OnRowSelected">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Text}" Foreground="{Binding Brush}" FontFamily="Consolas" FontSize="12"
+                               TextWrapping="Wrap" Margin="0,1" />
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </DockPanel>
+</Window>

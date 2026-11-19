@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using JebaitedPlayer.Diagnostics;
 
 namespace JebaitedPlayer.Infrastructure;
 
@@ -59,13 +60,20 @@ public static class AppPaths
         ?? "0.0.0";
 }
 
-/// <summary>Jednostavan log u %LOCALAPPDATA%\jebaited_player\logs\app.log. Siguran za više dretvi.</summary>
+/// <summary>
+/// Sučelje za zapisivanje. Dok traje sesija playera (<see cref="StartSession"/>) sve ide u lokalni logger
+/// (JebaitedPlayer.Diagnostics, logs\GGGG\MM\GGGG-MM-DD\*.log). Izvan sesije (install/uninstall hookovi, uvoz podataka)
+/// piše se u kratki logspp.log. Siguran za više dretvi; nikad ne baca iznimku.
+/// </summary>
 public static class Log
 {
     private static readonly object Gate = new();
     private static string? _path;
 
-    public static string? FilePath => _path;
+    /// <summary>Datoteka koju korisnik može otvoriti kad se dogodi greška (današnji errors.log ili app.log).</summary>
+    public static string? FilePath => DiagLog.Current is { } d
+        ? Path.Combine(d.DayDir(DateTime.Now), "errors.log")
+        : _path;
 
     public static void Init()
     {
@@ -73,7 +81,7 @@ public static class Log
         {
             Directory.CreateDirectory(AppPaths.LogsDir);
             _path = Path.Combine(AppPaths.LogsDir, "app.log");
-            if (File.Exists(_path) && new FileInfo(_path).Length > 2_000_000)
+            if (File.Exists(_path) && new FileInfo(_path).Length > 500_000)
             {
                 File.Delete(_path);
             }
@@ -86,17 +94,92 @@ public static class Log
         Info($"--- jebaited_player {AppPaths.Version} pokrenut ---");
     }
 
-    public static void Info(string message) => Write("INFO", message);
+    /// <summary>Pokreće logger sesije (samo glavni proces playera; kraj sesije je <see cref="EndSession"/>).</summary>
+    public static void StartSession()
+    {
+        try
+        {
+            DiagLog.Start(AppPaths.LogsDir, AppPaths.Version);
+        }
+        catch (Exception)
+        {
+            // Logger nikad ne smije spriječiti start playera.
+        }
+    }
 
-    public static void Warn(string message) => Write("WARN", message);
+    public static void EndSession() => DiagLog.Stop();
 
-    public static void Error(string message, Exception? ex = null) =>
-        Write("ERROR", ex is null ? message : $"{message}: {ex}");
+    public static void EndSessionCrashed() => DiagLog.Abort();
 
-    public static void Mpv(string prefix, string level, string text) =>
-        Write("MPV-" + level.ToUpperInvariant(), $"[{prefix}] {text}");
+    public static void Info(string message) => Write(LogLevel.Info, "INFO", message, null);
 
-    private static void Write(string level, string message)
+    public static void Warn(string message) => Write(LogLevel.Warning, "WARN", message, null);
+
+    public static void Error(string message, Exception? ex = null) => Write(LogLevel.Error, "ERROR", message, ex);
+
+    public static LogChannel Playback => new(LogCat.Playback);
+
+    public static LogChannel Subtitles => new(LogCat.Subtitle);
+
+    public static LogChannel Ui => new(LogCat.Ui);
+
+    public static LogChannel Stability => new(LogCat.Stability);
+
+    public static LogChannel Updates => new(LogCat.Update);
+
+    public static LogChannel Usage => new(LogCat.Usage);
+
+    /// <summary>mpv poruke (razina warn i više): kategorija i vrsta prema modulu i tekstu, da se greške zvuka, slike i titlova razlikuju.</summary>
+    public static void Mpv(string prefix, string level, string text)
+    {
+        LogLevel lvl = level.ToLowerInvariant() switch
+        {
+            "fatal" => LogLevel.Critical,
+            "error" => LogLevel.Error,
+            "warn" => LogLevel.Warning,
+            "info" => LogLevel.Info,
+            _ => LogLevel.Debug,
+        };
+        if (DiagLog.Current is { } d)
+        {
+            (string cat, string type) = ClassifyMpv(prefix, text);
+            d.Log(lvl, cat, type, "mpv:" + prefix, text);
+        }
+        else
+        {
+            WriteFile("MPV-" + level.ToUpperInvariant(), $"[{prefix}] {text}");
+        }
+    }
+
+    internal static (string Category, string Type) ClassifyMpv(string prefix, string text)
+    {
+        string p = prefix.ToLowerInvariant();
+        string t = text.ToLowerInvariant();
+        string cat = p is "ad" or "ao" or "af" || p.StartsWith("ffmpeg/audio", StringComparison.Ordinal) ? LogCat.Audio
+            : p is "vd" or "vo" or "vf" or "gpu" or "d3d11" or "libplacebo" || p.StartsWith("ffmpeg/video", StringComparison.Ordinal) ? LogCat.Video
+            : p is "sub" or "ass" or "osd/ass" || t.Contains("subtitle", StringComparison.Ordinal) ? LogCat.Subtitle
+            : LogCat.Playback;
+        string type = t.Contains("desync", StringComparison.Ordinal) || t.Contains("av sync", StringComparison.Ordinal) ? "avsync"
+            : t.Contains("error while decoding", StringComparison.Ordinal) || t.Contains("decode", StringComparison.Ordinal) && t.Contains("fail", StringComparison.Ordinal) ? "decode"
+            : t.Contains("failed to open", StringComparison.Ordinal) || t.Contains("cannot open", StringComparison.Ordinal) || t.Contains("no such file", StringComparison.Ordinal) ? "open"
+            : t.Contains("unsupported", StringComparison.Ordinal) || t.Contains("codec", StringComparison.Ordinal) || t.Contains("format", StringComparison.Ordinal) ? "format"
+            : t.Contains("dropping", StringComparison.Ordinal) || t.Contains("too slow", StringComparison.Ordinal) || t.Contains("underrun", StringComparison.Ordinal) ? "performance"
+            : "message";
+        return (cat, $"mpv.{cat}.{type}");
+    }
+
+    private static void Write(LogLevel level, string label, string message, Exception? ex)
+    {
+        if (DiagLog.Current is { } d)
+        {
+            d.Log(level, LogCat.App, "app." + label.ToLowerInvariant(), "Log", message, ex);
+            return;
+        }
+
+        WriteFile(label, ex is null ? message : $"{message}: {ex}");
+    }
+
+    private static void WriteFile(string level, string message)
     {
         string? path = _path;
         if (path is null)
@@ -104,7 +187,7 @@ public static class Log
             return;
         }
 
-        string line = $"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)} {level} {message}{Environment.NewLine}";
+        string line = $"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture)} {level} {Redactor.Clean(message)}{Environment.NewLine}";
         lock (Gate)
         {
             try
@@ -115,6 +198,28 @@ public static class Log
             {
                 // Log nikad ne smije srušiti aplikaciju.
             }
+        }
+    }
+}
+
+/// <summary>Zapisi jedne kategorije (npr. <c>Log.Subtitles.Warn(...)</c>); isto sučelje kao <see cref="Log"/>.</summary>
+public readonly struct LogChannel(string category)
+{
+    public void Info(string message) => Write(LogLevel.Info, message, null);
+
+    public void Warn(string message) => Write(LogLevel.Warning, message, null);
+
+    public void Error(string message, Exception? ex = null) => Write(LogLevel.Error, message, ex);
+
+    private void Write(LogLevel level, string message, Exception? ex)
+    {
+        if (DiagLog.Current is { } d)
+        {
+            d.Log(level, category, $"{category}.{level.ToString().ToLowerInvariant()}", "Log", message, ex);
+        }
+        else
+        {
+            Log.Info(message);
         }
     }
 }
@@ -209,6 +314,9 @@ public sealed class AppSettings
     /// <summary>Ujednačavanje glasnoće (tiši glasni prizori, razumljiviji dijalog).</summary>
     public bool NormalizeAudio { get; set; }
 
+    /// <summary>Equalizer (ciklus 1): 10 pojaseva, preseti i vlastiti preset.</summary>
+    public EqualizerSettings Equalizer { get; set; } = new();
+
     /// <summary>Hardversko dekodiranje (grafička kartica).</summary>
     public bool HardwareDecoding { get; set; } = true;
 
@@ -269,6 +377,9 @@ public sealed class AppSettings
         {
             DefaultAspect = "auto";
         }
+
+        Equalizer ??= new EqualizerSettings();
+        Equalizer.Normalize();
     }
 
     public SubtitleStyleSettings SubtitleStyle { get; set; } = new();
@@ -283,6 +394,7 @@ public sealed class AppSettings
             {
                 AppSettings loaded = JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(AppPaths.SettingsFile)) ?? new AppSettings();
                 loaded.Normalize();
+                loaded.RememberForDiff();
                 return loaded;
             }
         }
@@ -294,6 +406,64 @@ public sealed class AppSettings
         return new AppSettings { IsNew = true };
     }
 
+    private Dictionary<string, string>? _lastSaved;
+
+    private static readonly string[] SkipInDiff = ["Window", "Folder", "Key", "Pass", "User", "Secret", "Token", "Path"];
+
+    /// <summary>Zapamti stanje postavki da se pri spremanju zabilježi samo što se promijenilo (bez putanja, ključeva i položaja prozora).</summary>
+    internal void RememberForDiff() => _lastSaved = Flatten();
+
+    private Dictionary<string, string> Flatten()
+    {
+        var result = new Dictionary<string, string>();
+        try
+        {
+            using var doc = JsonDocument.Parse(JsonSerializer.Serialize(this, JsonOptions));
+            Walk(doc.RootElement, string.Empty, result);
+        }
+        catch (Exception)
+        {
+            // Samo dijagnostika.
+        }
+
+        return result;
+    }
+
+    private static void Walk(JsonElement e, string prefix, Dictionary<string, string> into)
+    {
+        if (e.ValueKind == JsonValueKind.Object)
+        {
+            foreach (JsonProperty p in e.EnumerateObject())
+            {
+                if (!SkipInDiff.Any(s => p.Name.Contains(s, StringComparison.OrdinalIgnoreCase)))
+                {
+                    Walk(p.Value, prefix.Length == 0 ? p.Name : prefix + "." + p.Name, into);
+                }
+            }
+        }
+        else
+        {
+            into[prefix] = e.ToString();
+        }
+    }
+
+    private void LogChanges()
+    {
+        Dictionary<string, string> now = Flatten();
+        if (_lastSaved is { } before)
+        {
+            foreach ((string key, string value) in now)
+            {
+                if (!before.TryGetValue(key, out string? old) || old != value)
+                {
+                    DiagLog.Info(LogCat.Usage, "prefs.changed", "AppSettings", "Setting changed", ("name", key), ("from", old), ("to", value));
+                }
+            }
+        }
+
+        _lastSaved = now;
+    }
+
     public void Save()
     {
         try
@@ -302,6 +472,7 @@ public sealed class AppSettings
             string tmp = AppPaths.SettingsFile + ".tmp";
             File.WriteAllText(tmp, JsonSerializer.Serialize(this, JsonOptions));
             File.Move(tmp, AppPaths.SettingsFile, overwrite: true);
+            LogChanges();
         }
         catch (Exception ex)
         {
@@ -430,6 +601,9 @@ public sealed class StartupOptions
     /// </summary>
     public string? DiagKeys { get; private set; }
 
+    /// <summary>Test loggera: upiši kontrolirane događaje svih razina (bez pravog crasha).</summary>
+    public bool DiagLogInject { get; private set; }
+
     /// <summary>
     /// Test sučelja stvarnim mišem (UPGRADE 3): "timeline" (klik i povlačenje po traci), "home" (tipka Home, skrivanje
     /// s kontrolama, nastavak gledanja), "home-fullscreen" (isto u cijelom zaslonu). Pomiče pravi kursor.
@@ -541,6 +715,9 @@ public sealed class StartupOptions
                     break;
                 case "--diag-screenshot-folder" when i + 1 < args.Length:
                     o.DiagScreenshotFolder = args[++i];
+                    break;
+                case "--diag-log-inject":
+                    o.DiagLogInject = true;
                     break;
                 case "--diag-keys" when i + 1 < args.Length:
                     o.DiagKeys = args[++i];

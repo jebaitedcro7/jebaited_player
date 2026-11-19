@@ -213,7 +213,7 @@ public sealed class AutoSyncController : ObservableObject
 
             LastResult = r;
             LastTrackKey = track.Key;
-            Log.Info($"Sinkronizacija prema govoru ({Path.GetFileName(prepared.OriginalPath)}): {r.Verdict}, brzina {r.Speed:0.000000}, " +
+            Log.Subtitles.Info($"Sinkronizacija prema govoru ({Path.GetFileName(prepared.OriginalPath)}): {r.Verdict}, brzina {r.Speed:0.000000}, " +
                      $"pomak {r.Offset:0.000} s, dokaz {r.Evidence:0.000}, z {r.FinalScore:0.0}, {r.Detail}, poravnanje {LastAlignMs} ms" +
                      (r.IsPiecewise ? "; dijelovi: " + DescribeSegments(r) : string.Empty));
             Apply(r, track, before, beforeMap, manual);
@@ -225,7 +225,7 @@ public sealed class AutoSyncController : ObservableObject
         {
             string error = ex.Message;
             SetStatus(() => Loc.T("autosync.analysisFailed", error));
-            Log.Warn(Status);
+            Log.Subtitles.Warn(Status);
             if (manual)
             {
                 Message?.Invoke(Status);

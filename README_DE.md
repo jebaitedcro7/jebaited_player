@@ -108,7 +108,7 @@ Im selben Tab stellst du die automatische Suche, die Zeichenkodierung alter Unte
 
 - **Lautstärke:** ↑ / ↓, Mausrad oder Schieberegler; **M** schaltet den Ton aus.
 - **Audiospur:** **B** wechselt zur nächsten, oder Rechtsklick → **Audio** und eine Spur wählen (Sprache, Format und Kanäle werden angezeigt). Die Wahl wird pro Video gespeichert.
-- **Einstellungen → Audio:** bevorzugte Audiosprache, Ausgabegerät, Audio-Synchronisierung (z. B. für Bluetooth-Kopfhörer) und Lautstärkeausgleich für leise Dialoge.
+- **Einstellungen → Audio:** bevorzugte Audiosprache, Ausgabegerät, Audio-Synchronisierung (z. B. für Bluetooth-Kopfhörer), Lautstärkeausgleich für leise Dialoge und ein 10-Band-Equalizer mit Voreinstellungen und eigener Einstellung.
 
 ### Sprache der App
 
@@ -137,7 +137,7 @@ Die Einstellungen sind in Tabs aufgeteilt. Jede Änderung gilt sofort (auch für
 | Allgemein | Fortsetzen eines begonnenen Videos (fragen / fortsetzen / von vorne), Sprungweite der Pfeiltasten, Videos im Vollbild öffnen, Player im Vordergrund halten, Serien (nächste Folge, Countdown), Screenshot-Ordner, „Öffnen mit“ und Standard-Player |
 | Sprache | Sprache der App |
 | Untertitel | Untertitelsprachen und ihre Reihenfolge, automatisches Laden und Suchen, Quellen im Internet, Zeichenkodierung alter Untertitel, Aussehen, Synchronisierung |
-| Audio | Lautstärke, Lautstärkeausgleich, bevorzugte Audiosprache, Ausgabegerät, Audio-Synchronisierung |
+| Audio | Lautstärke, Lautstärkeausgleich, Equalizer, bevorzugte Audiosprache, Ausgabegerät, Audio-Synchronisierung |
 | Video | Bildqualität, Hardware-Dekodierung, Standard-Seitenverhältnis, HDR |
 | Darstellung | Dunkles / helles Design, wie lange die Steuerung sichtbar bleibt, Oberfläche über die GPU darstellen |
 | Updates | Version, jetzt prüfen, automatischer Download, Neuerungen, Update-Verlauf |

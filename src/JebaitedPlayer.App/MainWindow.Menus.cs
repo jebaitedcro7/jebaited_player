@@ -89,6 +89,9 @@ public partial class MainWindow
             items.Add(new Separator());
             items.Add(Item(Loc.T("menu.nextAudio"), "B", extras.CycleAudio));
         }
+
+        items.Add(new Separator());
+        items.Add(Item(Loc.T("menu.equalizer"), null, () => ShowPlayerSettings(SettingsTab.Audio), isChecked: _settings.Equalizer.Enabled));
     }
 
     private void AddSpeedItems(ItemCollection items)

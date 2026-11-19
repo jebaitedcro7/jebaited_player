@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Threading;
+using JebaitedPlayer.Diagnostics;
 using JebaitedPlayer.Infrastructure;
 
 namespace JebaitedPlayer;
@@ -23,13 +24,26 @@ public partial class App : Application
     {
         base.OnStartup(e);
         Log.Init();
+        Log.StartSession();
+        UiEvents.Install();
+        SessionEnding += (_, args) =>
+        {
+            DiagLog.Info(LogCat.App, "session.windows_ending", "App", "Windows is ending the session", ("reason", args.ReasonSessionEnding));
+        };
 
         DispatcherUnhandledException += OnDispatcherUnhandledException;
         AppDomain.CurrentDomain.UnhandledException += (_, args) =>
-            Log.Error("Neobrađena greška", args.ExceptionObject as Exception);
+        {
+            DiagLog.Critical(LogCat.Stability, "crash.unhandled", "AppDomain", "Unhandled exception (process is terminating)",
+                args.ExceptionObject as Exception, ("terminating", args.IsTerminating));
+            if (args.IsTerminating)
+            {
+                Log.EndSessionCrashed();
+            }
+        };
         TaskScheduler.UnobservedTaskException += (_, args) =>
         {
-            Log.Error("Neobrađena greška u zadatku", args.Exception);
+            DiagLog.Error(LogCat.Stability, "task.unobserved", "TaskScheduler", "Unobserved task exception", args.Exception);
             args.SetObserved();
         };
 
@@ -90,6 +104,13 @@ public partial class App : Application
         }
 
         window.Show();
+        if (options.DiagLogInject)
+        {
+            DiagLog.Info(LogCat.Ui, "test.info", "App", "Controlled test event (INFO)");
+            DiagLog.Warn(LogCat.Subtitle, "test.warning", "App", "Controlled test event (WARNING)");
+            DiagLog.Error(LogCat.Video, "test.error", "App", "Controlled test event (ERROR)", new InvalidOperationException("controlled test exception"));
+            DiagLog.Critical(LogCat.Stability, "test.critical", "App", "Controlled test event (CRITICAL)");
+        }
     }
 
     /// <summary>
@@ -114,9 +135,15 @@ public partial class App : Application
         ShellIntegration.RefreshTextsInBackground();
     }
 
+    protected override void OnExit(ExitEventArgs e)
+    {
+        base.OnExit(e);
+        Log.EndSession();
+    }
+
     private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
     {
-        Log.Error("Neobrađena greška u sučelju", e.Exception);
+        DiagLog.Error(LogCat.Ui, "ui.exception", "Dispatcher", "Unhandled UI exception", e.Exception);
         MessageBox.Show(
             Loc.T("error.unexpected", e.Exception.Message, Log.FilePath),
             "jebaited_player", MessageBoxButton.OK, MessageBoxImage.Warning);

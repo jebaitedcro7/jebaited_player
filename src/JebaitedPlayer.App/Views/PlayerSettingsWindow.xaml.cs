@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
+using System.Windows.Threading;
 using JebaitedPlayer.Infrastructure;
 using JebaitedPlayer.Services;
 using JebaitedPlayer.Subtitles;
@@ -36,6 +37,8 @@ internal interface ISettingsHost
     void RestartForUpdate();
 
     void ShowUpdateHistory();
+
+    void ShowLogs();
 
     /// <summary>Postavke zvuka i slike odmah na video (ako je otvoren).</summary>
     void ApplyPlaybackSettings();
@@ -125,6 +128,7 @@ public partial class PlayerSettingsWindow : Window
     {
         UpdateSeekStepTexts();
         UpdateAudioTexts();
+        UpdateEqPresetText();
         UpdateAspectText();
         UpdateHideControlsText();
         UpdateUpdateStatus();
@@ -304,7 +308,165 @@ public partial class PlayerSettingsWindow : Window
             UpdateAudioTexts();
         });
         UpdateAudioTexts();
+        LoadEqualizer();
     }
+
+    // --- 4a. Equalizer (ciklus 1) --------------------------------------------------------------------------------
+
+    private readonly List<(Slider Slider, TextBlock Value)> _eqBands = [];
+    private (Slider Slider, TextBlock Value) _eqPreamp;
+    private DispatcherTimer? _eqApplyTimer;
+    private bool _eqUpdating;
+
+    private EqualizerSettings Eq => _settings.Equalizer;
+
+    private void LoadEqualizer()
+    {
+        _eqPreamp = AddEqColumn(Loc.T("settings.eqPreamp"), Eq.Preamp, isPreamp: true);
+        EqBands.Children.Add(new Border { Width = 1, Margin = new Thickness(6, 0, 10, 22), Background = (Brush)FindResource("MenuBorderBrush") });
+        for (int i = 0; i < Equalizer.BandCount; i++)
+        {
+            _eqBands.Add(AddEqColumn(Equalizer.FrequencyLabel(Equalizer.Frequencies[i]), Eq.Gains[i], isPreamp: false, band: i));
+        }
+
+        EqEnabledBox.IsChecked = Eq.Enabled;
+        EqEnabledBox.Checked += (_, _) => SetEqEnabled(true);
+        EqEnabledBox.Unchecked += (_, _) => SetEqEnabled(false);
+
+        // Klizači šalju puno promjena dok se povlače: mpv dobije novi filtar tek kad povlačenje stane (bez pucketanja).
+        _eqApplyTimer = new DispatcherTimer(TimeSpan.FromMilliseconds(150), DispatcherPriority.Normal, (_, _) =>
+        {
+            _eqApplyTimer!.Stop();
+            _host.ApplyPlaybackSettings();
+        }, Dispatcher);
+        _eqApplyTimer.Stop();
+        Closed += (_, _) =>
+        {
+            if (_eqApplyTimer.IsEnabled)
+            {
+                _eqApplyTimer.Stop();
+                _host.ApplyPlaybackSettings();
+            }
+        };
+
+        UpdateEqualizerView();
+    }
+
+    private (Slider Slider, TextBlock Value) AddEqColumn(string label, double value, bool isPreamp, int band = -1)
+    {
+        var valueText = new TextBlock { FontSize = 11, HorizontalAlignment = HorizontalAlignment.Center, Margin = new Thickness(0, 0, 0, 4) };
+        valueText.SetResourceReference(TextBlock.ForegroundProperty, "TextSecondaryBrush");
+        var slider = new Slider { Style = (Style)FindResource("EqSlider"), Height = 132, Value = value };
+        slider.ValueChanged += (_, e) =>
+        {
+            valueText.Text = Db(e.NewValue);
+            if (_eqUpdating || _loading)
+            {
+                return;
+            }
+
+            if (isPreamp)
+            {
+                Eq.Preamp = Equalizer.Clamp(e.NewValue);
+            }
+            else
+            {
+                SetEqBand(band, e.NewValue);
+            }
+
+            ScheduleEqApply();
+        };
+        valueText.Text = Db(value);
+        var column = new StackPanel { Width = isPreamp ? 46 : 40 };
+        column.Children.Add(valueText);
+        column.Children.Add(slider);
+        column.Children.Add(new TextBlock { Text = label, FontSize = 11, HorizontalAlignment = HorizontalAlignment.Center, Margin = new Thickness(0, 6, 0, 0) });
+        EqBands.Children.Add(column);
+        return (slider, valueText);
+    }
+
+    /// <summary>Pomicanje pojasa: od ugrađenog preseta nastaje vlastiti (polazi od vrijednosti tog preseta).</summary>
+    private void SetEqBand(int band, double value)
+    {
+        if (Eq.Preset != Equalizer.Custom)
+        {
+            Eq.CustomGains = Eq.Gains;
+            Eq.Preset = Equalizer.Custom;
+            UpdateEqPresetText();
+        }
+
+        Eq.CustomGains[band] = Equalizer.Clamp(value);
+    }
+
+    private void SetEqEnabled(bool enabled)
+    {
+        if (_loading)
+        {
+            return;
+        }
+
+        Eq.Enabled = enabled;
+        UpdateEqualizerView();
+        _host.ApplyPlaybackSettings();
+    }
+
+    private void ScheduleEqApply()
+    {
+        if (!Eq.Enabled || _eqApplyTimer is null)
+        {
+            return;
+        }
+
+        _eqApplyTimer.Stop();
+        _eqApplyTimer.Start();
+    }
+
+    private void OnEqPresetClick(object sender, RoutedEventArgs e)
+    {
+        var choices = Equalizer.Presets
+            .Select(p => (Loc.T("eq." + p.Id), p.Id == Eq.Preset, (Action)(() => ChooseEqPreset(p.Id))))
+            .Append((Loc.T("eq.custom"), Eq.Preset == Equalizer.Custom, () => ChooseEqPreset(Equalizer.Custom)));
+        ShowChoices(EqPresetButton, choices);
+    }
+
+    private void ChooseEqPreset(string id)
+    {
+        Eq.Preset = id;
+        UpdateEqualizerView();
+        if (Eq.Enabled)
+        {
+            _host.ApplyPlaybackSettings();
+        }
+    }
+
+    /// <summary>Vrati na Flat i 0 dB pojačanja (vlastiti preset ostaje zapamćen pod „Vlastiti”).</summary>
+    private void OnEqReset(object sender, RoutedEventArgs e)
+    {
+        Eq.Preamp = 0;
+        ChooseEqPreset("flat");
+    }
+
+    private void UpdateEqualizerView()
+    {
+        _eqUpdating = true;
+        double[] gains = Eq.Gains;
+        for (int i = 0; i < _eqBands.Count; i++)
+        {
+            _eqBands[i].Slider.Value = gains[i];
+            _eqBands[i].Value.Text = Db(gains[i]);
+        }
+
+        _eqPreamp.Slider.Value = Eq.Preamp;
+        _eqPreamp.Value.Text = Db(Eq.Preamp);
+        _eqUpdating = false;
+        EqPanel.IsEnabled = Eq.Enabled;
+        EqPanel.Opacity = Eq.Enabled ? 1 : 0.45;
+        UpdateEqPresetText();
+    }
+
+    private void UpdateEqPresetText() => EqPresetButton.Content = Loc.T("eq." + Eq.Preset);
+
+    private static string Db(double value) => Math.Abs(value) < 0.05 ? "0" : value.ToString("+0.#;−0.#", Loc.Culture);
 
     private void UpdateAudioTexts()
     {
@@ -510,6 +672,8 @@ public partial class PlayerSettingsWindow : Window
     }
 
     private void OnViewHistory(object sender, RoutedEventArgs e) => _host.ShowUpdateHistory();
+
+    private void OnViewLogs(object sender, RoutedEventArgs e) => _host.ShowLogs();
 
     private void OnGitHubReleases(object sender, RoutedEventArgs e) => OpenUrl(UpdateHistory.Repository + "/releases");
 

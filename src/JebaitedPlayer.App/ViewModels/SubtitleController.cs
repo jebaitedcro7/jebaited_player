@@ -604,7 +604,7 @@ public sealed class SubtitleController(AppSettings settings) : ObservableObject
         }
         catch (Exception ex) when (ex is Microsoft.Data.Sqlite.SqliteException or InvalidOperationException)
         {
-            Log.Warn($"Stanje titlova nije spremljeno: {ex.Message}");
+            Log.Subtitles.Warn($"Stanje titlova nije spremljeno: {ex.Message}");
         }
     }
 
@@ -658,7 +658,7 @@ public sealed class SubtitleController(AppSettings settings) : ObservableObject
         {
             if (Interlocked.Exchange(ref _pendingLog, null) is { } line)
             {
-                Log.Info(line);
+                Log.Subtitles.Info(line);
             }
         });
         _logTimer.Change(1000, Timeout.Infinite);
@@ -776,7 +776,7 @@ public sealed class SubtitleController(AppSettings settings) : ObservableObject
 
         SubtitleService.SaveSynced(prepared, Timing, targetPath, _videoFps, TimeMap);
         Message?.Invoke(Loc.T("subs.saved", Path.GetFileName(targetPath)));
-        Log.Info($"Spremljeni sinkronizirani titlovi: {targetPath} ({TimingSummary})");
+        Log.Subtitles.Info($"Spremljeni sinkronizirani titlovi: {targetPath} ({TimingSummary})");
     }
 
     public void ApplyLanguagePriority() => _player?.SetPropertyAsync("slang", MpvConfig.LanguagePriority(settings));
@@ -819,7 +819,7 @@ public sealed class SubtitleController(AppSettings settings) : ObservableObject
             }
             catch (Exception ex) when (ex is Microsoft.Data.Sqlite.SqliteException or InvalidOperationException)
             {
-                Log.Warn($"Stanje titlova nije pročitano: {ex.Message}");
+                Log.Subtitles.Warn($"Stanje titlova nije pročitano: {ex.Message}");
             }
         }
 
@@ -847,7 +847,7 @@ public sealed class SubtitleController(AppSettings settings) : ObservableObject
             }
 
             string parts = SubtitleTimeMap.Parse(state.TimeMap) is { } restoredMap ? $", po dijelovima: {restoredMap.Segments.Count}" : string.Empty;
-            Log.Info($"Vraćeni zapamćeni titlovi ({state.Choice}, pomak {state.DelayMs} ms, brzina {state.Speed}{parts})");
+            Log.Subtitles.Info($"Vraćeni zapamćeni titlovi ({state.Choice}, pomak {state.DelayMs} ms, brzina {state.Speed}{parts})");
         }
 
         if (e.TrackListJson != null)
@@ -900,7 +900,7 @@ public sealed class SubtitleController(AppSettings settings) : ObservableObject
         }
         catch (Exception ex)
         {
-            Log.Error("Učitavanje titlova", ex);
+            Log.Subtitles.Error("Učitavanje titlova", ex);
             return;
         }
 
@@ -948,7 +948,7 @@ public sealed class SubtitleController(AppSettings settings) : ObservableObject
 
         foreach (var failed in results.Where(r => r.Error != null))
         {
-            Log.Warn($"Titlovi nisu učitani: {failed.Path}: {failed.Error}");
+            Log.Subtitles.Warn($"Titlovi nisu učitani: {failed.Path}: {failed.Error}");
             Message?.Invoke(Loc.T("subs.loadFailed", Path.GetFileName(failed.Path), failed.Error));
         }
 
@@ -956,7 +956,7 @@ public sealed class SubtitleController(AppSettings settings) : ObservableObject
         {
             string details = select.IsBitmap ? SubtitleFormats.DisplayName(select.Format) : $"{SubtitleFormats.DisplayName(select.Format)}, {select.EncodingName}";
             Message?.Invoke(Loc.T("subs.loaded", SubtitleLanguage.DisplayName(select.Language), Path.GetFileName(select.OriginalPath), details));
-            Log.Info($"Titlovi odabrani: {select.OriginalPath} ({details}, jezik {select.Language ?? "?"}, {select.CueCount} redaka)");
+            Log.Subtitles.Info($"Titlovi odabrani: {select.OriginalPath} ({details}, jezik {select.Language ?? "?"}, {select.CueCount} redaka)");
         }
     }
 
@@ -1097,7 +1097,7 @@ public sealed class SubtitleController(AppSettings settings) : ObservableObject
         }
         catch (JsonException ex)
         {
-            Log.Warn($"track-list nije moguće pročitati: {ex.Message}");
+            Log.Subtitles.Warn($"track-list nije moguće pročitati: {ex.Message}");
             return;
         }
 
@@ -1213,7 +1213,7 @@ public sealed class SubtitleController(AppSettings settings) : ObservableObject
 
             if (task.Exception is { } ex)
             {
-                Log.Warn($"Ispravljeni titlovi nisu pripremljeni: {ex.InnerException?.Message}");
+                Log.Subtitles.Warn($"Ispravljeni titlovi nisu pripremljeni: {ex.InnerException?.Message}");
                 Message?.Invoke(Loc.T("subs.mappedFailed", ex.InnerException?.Message));
                 return;
             }

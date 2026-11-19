@@ -61,15 +61,15 @@ public sealed class PlaylistItem(string path, MediaInfo info) : ObservableObject
     {
         _entry = entry;
         Watched = entry?.Watched ?? false;
-        Progress = Watched ? 1 : entry?.Progress ?? 0;
+        Progress = entry?.WatchedProgress ?? 0;
         ProgressText = Watched ? Loc.T("playlist.watched")
             : entry is { Position: >= 30, Duration: > 0 } e ? $"{TimeFormat.Format(e.Position, e.Duration >= 3600)} / {TimeFormat.Format(e.Duration, e.Duration >= 3600)}"
             : string.Empty;
     }
 }
 
-/// <summary>Stavka "Nastavi gledati" na početnom ekranu.</summary>
-public sealed record RecentItem(string Path, string Title, string Detail, double Progress);
+/// <summary>Stavka "Nastavi gledati" na početnom ekranu (pogledano: natpis i puna zelena traka).</summary>
+public sealed record RecentItem(string Path, string Title, string Detail, double Progress, bool Watched = false);
 
 /// <summary>Omiljeni film ili serija na početnom ekranu.</summary>
 public sealed record FavoriteItem(string Path, string Title, string Detail, bool IsSeries)
@@ -83,8 +83,15 @@ public sealed record FavoriteItem(string Path, string Title, string Detail, bool
 public sealed class LibraryController : ObservableObject
 {
     private const double MinResumeSeconds = 30;
-    private const double WatchedFraction = 0.95;
+    private const double EndFraction = 0.95;
     private static readonly TimeSpan SaveInterval = TimeSpan.FromSeconds(5);
+
+    // Ciklus 1 (M6): stvarno odgledani dijelovi trenutnog videa. Premotavanje se ne broji.
+    private WatchCoverage? _coverage;
+    private string? _coveragePath;
+    private bool _coverageWasWatched;
+    private double _trackPosition;
+    private long _trackTick;
 
     private readonly PlayerViewModel _vm;
     private readonly WatchStore? _store;
@@ -407,6 +414,7 @@ public sealed class LibraryController : ObservableObject
     public void OnTick()
     {
         long now = Environment.TickCount64;
+        TrackPlayback(now);
         if (UpNext != null && AutoPlayNext)
         {
             int remaining = (int)Math.Ceiling((_upNextDeadline - now) / 1000.0);
@@ -441,12 +449,58 @@ public sealed class LibraryController : ObservableObject
             return;
         }
 
-        bool watched = _vm.EofReached || position >= duration * WatchedFraction;
-        Safe(() => _store.SavePosition(path, watched ? 0 : position, duration, watched));
+        // M6b: pogledano samo uz stvarno odgledano vrijeme (premotavanje do kraja se ne broji).
+        // M6a: već pogledan video ostaje pogledan i kad se ponovo otvori i zatvori ranije (baza ga ne može poništiti).
+        WatchCoverage? coverage = string.Equals(_coveragePath, path, StringComparison.OrdinalIgnoreCase) ? _coverage : null;
+        bool watched = (coverage != null && _coverageWasWatched) || coverage?.IsWatched == true;
+        bool atEnd = _vm.EofReached || position >= duration * EndFraction;
+        double saved = watched && atEnd ? 0 : position;
+        string? coverageText = coverage?.ToText();
+        Safe(() => _store.SavePosition(path, saved, duration, watched, coverageText));
         if (Current is { } item && string.Equals(item.Path, path, StringComparison.OrdinalIgnoreCase))
         {
-            item.Apply(new WatchEntry(path, null, null, null, duration, watched ? 0 : position, watched, null, 0, null));
+            item.Apply(Safe(() => _store.Get(path)) ??
+                       new WatchEntry(path, null, null, null, duration, saved, watched, null, 0, null, coverageText));
         }
+    }
+
+    /// <summary>
+    /// Svakih 200 ms: dio odgledan od zadnjeg poziva broji se samo ako je pozicija napredovala koliko i stvarno vrijeme
+    /// (uz brzinu reprodukcije). Skok premotavanja, pauza i kartica „Nastaviti gledanje?” se ne broje.
+    /// </summary>
+    private void TrackPlayback(long now)
+    {
+        if (_coverage is null || !_vm.HasMedia || _vm.IsLoading ||
+            !string.Equals(_vm.CurrentPath, _coveragePath, StringComparison.OrdinalIgnoreCase))
+        {
+            _trackTick = 0;
+            return;
+        }
+
+        double position = _vm.Position;
+        if (_trackTick != 0 && !_vm.IsPaused && ResumeOffer is null)
+        {
+            double elapsed = (now - _trackTick) / 1000.0;
+            double advanced = position - _trackPosition;
+            double expected = elapsed * Math.Max(0.25, _vm.Extras.Speed);
+            if (advanced > 0 && advanced <= expected * 1.5 + 0.75)
+            {
+                _coverage.AddPlayed(_trackPosition, position, _vm.Duration);
+            }
+        }
+
+        _trackPosition = position;
+        _trackTick = now;
+    }
+
+    /// <summary>Novi video: učitaj što je od njega već stvarno odgledano.</summary>
+    private void StartTracking(string path)
+    {
+        WatchEntry? entry = Safe(() => _store?.Get(path));
+        _coverage = WatchCoverage.FromEntry(entry);
+        _coveragePath = path;
+        _coverageWasWatched = entry?.Watched ?? false;
+        _trackTick = 0;
     }
 
     public void RefreshRecent()
@@ -468,7 +522,7 @@ public sealed class LibraryController : ObservableObject
                 : e.Position >= MinResumeSeconds && e.Duration > 0
                     ? Loc.T("history.stoppedAt", TimeFormat.Format(e.Position, e.Duration >= 3600), TimeFormat.Format(e.Duration, e.Duration >= 3600))
                     : Loc.T("history.started");
-            Recent.Add(new RecentItem(e.Path, info.DisplayTitle, detail, e.Watched ? 1 : e.Progress));
+            Recent.Add(new RecentItem(e.Path, info.DisplayTitle, detail, e.WatchedProgress, e.Watched));
         }
 
         OnPropertyChanged(nameof(HasRecent));
@@ -569,6 +623,16 @@ public sealed class LibraryController : ObservableObject
     {
         bool watched = !item.Watched;
         Safe(() => _store?.SetWatched(item.Path, watched));
+        if (string.Equals(item.Path, _coveragePath, StringComparison.OrdinalIgnoreCase))
+        {
+            // Ručna oznaka vrijedi i za video koji se upravo gleda (nepogledano počinje brojati ispočetka).
+            _coverageWasWatched = watched;
+            if (!watched)
+            {
+                _coverage?.Clear();
+            }
+        }
+
         item.Apply(Safe(() => _store?.Get(item.Path)));
         Message?.Invoke(watched ? Loc.T("notice.markedWatched", item.Label) : Loc.T("notice.markedUnwatched", item.Label));
     }
@@ -665,6 +729,7 @@ public sealed class LibraryController : ObservableObject
             ? c.Info
             : MediaNameParser.Parse(path);
         Safe(() => _store?.RegisterPlay(path, info.Title, info.Season, info.Episode));
+        StartTracking(path);
         UpdateCurrentFavorite();
 
         if (_store != null && File.Exists(path))
@@ -687,11 +752,8 @@ public sealed class LibraryController : ObservableObject
 
     private void OnEndReached()
     {
+        // Kraj videa ne znači da je pogledan (M6b): status dolazi iz stvarno odgledanog dijela.
         SaveCurrentPosition();
-        if (Current is { } item)
-        {
-            item.Apply(new WatchEntry(item.Path, null, null, null, 1, 0, true, null, 0, null));
-        }
 
         if (Neighbour(+1) is { } next)
         {

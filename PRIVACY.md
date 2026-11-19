@@ -19,6 +19,7 @@ The player connects to other systems only in these cases:
 
 - Keys and passwords for subtitle sites are stored **encrypted** with Windows DPAPI (only your Windows account can read them) and are sent only to the site they belong to.
 - Synchronizing subtitles to the speech is done **locally**; the audio never leaves your computer.
+- Diagnostic logs (what the player did and any errors, with file names but no full paths, no subtitle text and no keys or passwords) are written only to your computer, are limited in size (about 50 MB) and age (14 days, 30 days for errors), and are never sent anywhere. You can view them under Settings → About → Diagnostics / Logs, export them to a ZIP yourself, or delete the `logs` folder at any time.
 - When you click “Set as default player”, the player adds itself to “Open with” for your Windows user (HKCU). “Remove from ‘Open with’” and uninstalling remove these entries again. Nothing else in Windows is changed.
 - The privacy policies of the services above apply to the data they receive: [GitHub](https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement), [OpenSubtitles](https://www.opensubtitles.com/en/privacy), [SubDL](https://subdl.com), [Titlovi.com](https://titlovi.com).
 
@@ -34,7 +35,7 @@ Der Player verbindet sich nur:
 - **mit den Untertitelseiten, die du einrichtest** (OpenSubtitles.com, SubDL.com, Titlovi.com): Titel, Jahr, Staffel und Folge aus dem Dateinamen, deine Untertitelsprachen, bei OpenSubtitles auch Hash und Größe der Datei sowie deine Zugangsdaten für die jeweilige Seite. Abschalten: Einstellungen → Untertitel → „Im Internet suchen …“; jede Seite einzeln in „Untertitelquellen (Schlüssel)“.
 - **mit Webseiten, deren Link du anklickst** (dein Browser öffnet sie).
 
-Schlüssel und Passwörter werden mit Windows DPAPI verschlüsselt gespeichert. Die Synchronisierung zur Sprache läuft lokal; der Ton verlässt deinen Computer nicht.
+Schlüssel und Passwörter werden mit Windows DPAPI verschlüsselt gespeichert. Die Synchronisierung zur Sprache läuft lokal; der Ton verlässt deinen Computer nicht. Diagnoseprotokolle (Aktionen und Fehler, mit Dateinamen, aber ohne vollständige Pfade, Untertiteltext, Schlüssel oder Passwörter) bleiben nur auf deinem Computer, sind in Größe (ca. 50 MB) und Alter (14 Tage, Fehler 30 Tage) begrenzt und werden nie gesendet; Ansicht und ZIP-Export unter Einstellungen → Info → Diagnose / Protokolle.
 
 ## Hrvatski
 
@@ -46,4 +47,4 @@ Player se spaja samo:
 - **na stranice s titlovima koje postaviš** (OpenSubtitles.com, SubDL.com, Titlovi.com): naslov, godina, sezona i epizoda iz naziva datoteke, tvoji jezici titlova, za OpenSubtitles i otisak (hash) i veličina datoteke te podaci za prijavu na tu stranicu. Isključivanje: Postavke → Titlovi → „Traži titlove na internetu …”; svaka stranica posebno u „Izvori titlova (ključevi)”.
 - **na stranice čiju poveznicu klikneš** (otvara ih tvoj preglednik).
 
-Ključevi i lozinke spremaju se kriptirano (Windows DPAPI). Sinkronizacija prema govoru radi lokalno; zvuk ne napušta tvoje računalo.
+Ključevi i lozinke spremaju se kriptirano (Windows DPAPI). Sinkronizacija prema govoru radi lokalno; zvuk ne napušta tvoje računalo. Dijagnostički logovi (radnje i greške, s nazivima datoteka, ali bez punih putanja, teksta titlova, ključeva i lozinki) ostaju samo na tvom računalu, ograničeni su veličinom (oko 50 MB) i starošću (14 dana, greške 30 dana) i nikad se nikamo ne šalju; pregled i izvoz u ZIP: Postavke → O aplikaciji → Dijagnostika / Logovi.

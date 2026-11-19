@@ -45,6 +45,7 @@
     <ProjectReference Include="..\JebaitedPlayer.Localization\JebaitedPlayer.Localization.csproj" />
     <ProjectReference Include="..\JebaitedPlayer.Mpv\JebaitedPlayer.Mpv.csproj" />
     <ProjectReference Include="..\JebaitedPlayer.Subtitles\JebaitedPlayer.Subtitles.csproj" />
+    <ProjectReference Include="..\JebaitedPlayer.Diagnostics\JebaitedPlayer.Diagnostics.csproj" />
     <ProjectReference Include="..\JebaitedPlayer.Library\JebaitedPlayer.Library.csproj" />
     <ProjectReference Include="..\JebaitedPlayer.Online\JebaitedPlayer.Online.csproj" />
     <ProjectReference Include="..\JebaitedPlayer.Sync\JebaitedPlayer.Sync.csproj" />

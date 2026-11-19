@@ -225,7 +225,7 @@ public sealed class PlaybackExtrasController(AppSettings settings, PlayerViewMod
         if (track != null && !track.IsSelected)
         {
             _player.SetPropertyAsync("aid", track.Id.ToString(CultureInfo.InvariantCulture));
-            Log.Info($"Vraćena zapamćena audio traka: {track.DisplayName}");
+            Log.Playback.Info($"Vraćena zapamćena audio traka: {track.DisplayName}");
         }
     }
 
@@ -255,7 +255,7 @@ public sealed class PlaybackExtrasController(AppSettings settings, PlayerViewMod
         }
         catch (JsonException ex)
         {
-            Log.Warn($"Audio trake nije moguće pročitati: {ex.Message}");
+            Log.Playback.Warn($"Audio trake nije moguće pročitati: {ex.Message}");
             return;
         }
 
@@ -349,7 +349,7 @@ public sealed class PlaybackExtrasController(AppSettings settings, PlayerViewMod
             {
                 LastScreenshot = path;
                 Message?.Invoke(Loc.T("notice.screenshotSaved", Path.GetFileName(path)));
-                Log.Info($"Snimka zaslona: {path}");
+                Log.Playback.Info($"Snimka zaslona: {path}");
                 return path;
             }
         }
@@ -405,7 +405,7 @@ public sealed class PlaybackExtrasController(AppSettings settings, PlayerViewMod
         }
         catch (Exception ex) when (ex is Microsoft.Data.Sqlite.SqliteException or InvalidOperationException)
         {
-            Log.Warn($"Baza: {ex.Message}");
+            Log.Playback.Warn($"Baza: {ex.Message}");
             return default;
         }
     }

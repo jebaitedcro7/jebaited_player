@@ -7,10 +7,22 @@ using JebaitedPlayer.Mpv;
 
 namespace JebaitedPlayer.ViewModels;
 
+/// <summary>Radio postaja (URL streama i naziv za prikaz).</summary>
+public sealed record StreamInfo(string Url, string Title);
+
 /// <summary>Stanje reprodukcije za glavni prozor i sloj s kontrolama.</summary>
 public sealed class PlayerViewModel : ObservableObject
 {
+    // R1: radio uživo ne treba velik cache. Zadano mpv čuva do 150 MiB unaprijed i 50 MiB unatrag, pa je pauziran
+    // stream skupljao zvuk u RAM, a „početak” streama bio je trenutak uključenja postaje.
+    private const string StreamMaxBytes = "4MiB";
+    private const string StreamMaxBackBytes = "1MiB";
+    private const string DefaultMaxBytes = "150MiB";
+    private const string DefaultMaxBackBytes = "50MiB";
+
     private MpvPlayer? _player;
+    private bool _streamCache;
+    private StreamInfo? _stoppedStream;
     private bool _hasMedia;
     private bool _isAudioOnly;
     private bool _isLoading;
@@ -84,6 +96,21 @@ public sealed class PlayerViewModel : ObservableObject
     public string? CurrentPath { get; private set; }
 
     public bool EofReached => _eofReached;
+
+    /// <summary>Internetski stream (radio): http ili https adresa.</summary>
+    public static bool IsStreamPath(string? path) =>
+        path is not null && (path.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+                             path.StartsWith("https://", StringComparison.OrdinalIgnoreCase));
+
+    /// <summary>Svira (ili se spaja) radio uživo: bez premotavanja, a Play nakon pauze ponovno spaja stream.</summary>
+    public bool IsLiveStream => HasMedia && IsStreamPath(CurrentPath);
+
+    /// <summary>Postaja zaustavljena tipkom Stop (R1). Play je ponovno spaja uživo; brišu je novo učitavanje i Home.</summary>
+    public StreamInfo? StoppedStream
+    {
+        get => _stoppedStream;
+        private set => SetField(ref _stoppedStream, value);
+    }
 
     /// <summary>Na početnom ekranu: prikaži popis prečaca (inače "Nastavi gledati").</summary>
     public bool ShowWelcomeShortcuts
@@ -274,6 +301,7 @@ public sealed class PlayerViewModel : ObservableObject
     public void Attach(MpvPlayer player)
     {
         _player = player;
+        _streamCache = false; // novi mpv ima zadani cache (R1)
         player.PropertyChanged += OnMpvPropertyChanged;
         player.FileLoaded += OnFileLoaded;
         player.EndFile += OnEndFile;
@@ -292,6 +320,8 @@ public sealed class PlayerViewModel : ObservableObject
         }
 
         LoadStarting?.Invoke(this, path);
+        StoppedStream = null;
+        ApplyStreamCache(IsStreamPath(path));
         ErrorMessage = string.Empty;
         Notice = string.Empty;
         IsLoading = true;
@@ -312,10 +342,99 @@ public sealed class PlayerViewModel : ObservableObject
     public void SetPaused(bool paused) => _player?.SetPropertyAsync("pause", paused);
 
     /// <summary>
+    /// R1: za stream samo mali cache (štedi RAM, a pauziran stream ne skuplja zvuk). Obične datoteke dobivaju
+    /// natrag zadane vrijednosti mpv-a (aplikacija ih inače ne mijenja). Postavlja se prije <c>loadfile</c>.
+    /// </summary>
+    private void ApplyStreamCache(bool stream)
+    {
+        if (_player is null || stream == _streamCache)
+        {
+            return;
+        }
+
+        _streamCache = stream;
+        _player.SetPropertyAsync("demuxer-max-bytes", stream ? StreamMaxBytes : DefaultMaxBytes);
+        _player.SetPropertyAsync("demuxer-max-back-bytes", stream ? StreamMaxBackBytes : DefaultMaxBackBytes);
+    }
+
+    /// <summary>
+    /// Tipka Stop (mini player). Datoteka ostaje učitana, na početku i pauzirana (kao u Winampu).
+    /// Radio (R1) se stvarno zaustavlja: veza se zatvara, a postaja se pamti da je Play ponovno spoji uživo.
+    /// Prije je i radio išao „na početak”, a to je u mpv cacheu trenutak uključenja postaje, pa je svirala ista pjesma.
+    /// </summary>
+    public void StopPlayback()
+    {
+        if (_player is null || !HasMedia)
+        {
+            return;
+        }
+
+        if (IsLiveStream)
+        {
+            var station = new StreamInfo(CurrentPath!, _titleOverride ?? Title);
+            DiagLog.Info(LogCat.Usage, "stream.stop", nameof(PlayerViewModel), "Stream stopped", ("position", Math.Round(Position, 1)));
+            StopCore();
+            StoppedStream = station;
+            return;
+        }
+
+        SetPaused(true);
+        SeekAbsolute(0, exact: true);
+    }
+
+    /// <summary>Tipka Play: nastavi. Radio (R1) se nakon Stopa, pauze ili prekida veze ponovno spaja uživo.</summary>
+    public void Play()
+    {
+        if (!HasMedia)
+        {
+            ResumeStoppedStream();
+            return;
+        }
+
+        if (IsLiveStream)
+        {
+            if (IsPaused || _eofReached)
+            {
+                ReconnectStream();
+            }
+
+            return;
+        }
+
+        SetPaused(false);
+    }
+
+    /// <summary>Ponovno spoji postaju zaustavljenu tipkom Stop. Vraća false ako takve postaje nema.</summary>
+    public bool ResumeStoppedStream()
+    {
+        if (_player is null || StoppedStream is not { } station)
+        {
+            return false;
+        }
+
+        DiagLog.Info(LogCat.Usage, "stream.resume", nameof(PlayerViewModel), "Stream reconnected after stop");
+        Load(station.Url, startPaused: false, station.Title);
+        return true;
+    }
+
+    /// <summary>Pauziran ili prekinut radio: nova veza (uživo) umjesto nastavka iz cachea.</summary>
+    private void ReconnectStream()
+    {
+        DiagLog.Info(LogCat.Usage, "stream.reconnect", nameof(PlayerViewModel), "Stream reconnected", ("paused", IsPaused), ("ended", _eofReached));
+        Load(CurrentPath!, startPaused: false, _titleOverride ?? Title);
+    }
+
+    /// <summary>
     /// Zatvori trenutni video i vrati se na početni ekran (tipka Home). mpv ostaje pokrenut (sljedeće otvaranje je odmah).
     /// Poziciju prije toga sprema <see cref="LibraryController.LeaveToHome"/>.
     /// </summary>
     public void Stop()
+    {
+        StoppedStream = null;
+        StopCore();
+    }
+
+    private void StopCore()
     {
         if (_player is null || !HasMedia)
         {
@@ -336,8 +455,21 @@ public sealed class PlayerViewModel : ObservableObject
 
     public void TogglePause()
     {
-        if (_player is null || !HasMedia)
+        if (_player is null)
         {
+            return;
+        }
+
+        if (!HasMedia)
+        {
+            ResumeStoppedStream();
+            return;
+        }
+
+        if (IsLiveStream && (IsPaused || _eofReached))
+        {
+            // R1: radio se ne nastavlja iz cachea (zakašnjelo ili ispočetka), nego se ponovno spaja uživo.
+            ReconnectStream();
             return;
         }
 
@@ -354,7 +486,8 @@ public sealed class PlayerViewModel : ObservableObject
 
     public void SeekRelative(double seconds)
     {
-        if (_player is null || !HasMedia)
+        // R1: radio uživo se ne premotava (inače strelice skaču po cacheu, a Home na trenutak uključenja).
+        if (_player is null || !HasMedia || IsLiveStream)
         {
             return;
         }
@@ -366,7 +499,7 @@ public sealed class PlayerViewModel : ObservableObject
 
     public void SeekAbsolute(double seconds, bool exact = false)
     {
-        if (_player is null || !HasMedia)
+        if (_player is null || !HasMedia || IsLiveStream)
         {
             return;
         }
@@ -380,7 +513,7 @@ public sealed class PlayerViewModel : ObservableObject
     /// <summary>Povlačenje po vremenskoj traci: tijekom povlačenja brzo (ključni kadrovi), na kraju precizno.</summary>
     public void ScrubTo(double seconds, bool final)
     {
-        if (_player is null || !HasMedia)
+        if (_player is null || !HasMedia || IsLiveStream)
         {
             return;
         }

@@ -32,6 +32,8 @@ Du brauchst Windows 10 oder 11 (64 Bit). Sonst muss nichts installiert werden (D
 
 **Portable Version:** `JebaitedPlayer-win-Portable.zip` irgendwo entpacken und `jebaited_player.exe` starten. Sie ändert nichts in Windows (kein Eintrag unter „Öffnen mit“); Updates funktionieren auch hier.
 
+**Microsoft Store:** jebaited_player gibt es auch im [Microsoft Store](https://apps.microsoft.com/detail/9NP4GF0Q40JL). Die Store-Version funktioniert mit Smart App Control, wird über den Store aktualisiert und kann ein oder zwei Versionen hinter GitHub liegen.
+
 ---
 
 ## A. Schnellstart
@@ -108,7 +110,7 @@ Im selben Tab stellst du die automatische Suche, die Zeichenkodierung alter Unte
 
 - **Lautstärke:** ↑ / ↓, Mausrad oder Schieberegler; **M** schaltet den Ton aus.
 - **Audiospur:** **B** wechselt zur nächsten, oder Rechtsklick → **Audio** und eine Spur wählen (Sprache, Format und Kanäle werden angezeigt). Die Wahl wird pro Video gespeichert.
-- **Einstellungen → Audio:** bevorzugte Audiosprache, Ausgabegerät, Audio-Synchronisierung (z. B. für Bluetooth-Kopfhörer), Lautstärkeausgleich für leise Dialoge und ein 10-Band-Equalizer mit Voreinstellungen und eigener Einstellung.
+- **Einstellungen → Audio:** bevorzugte Audiosprache, Ausgabegerät (auch eine eigene **Ausgabe für Musik und Radio**, z. B. ein virtuelles Kabel für Discord), Audio-Synchronisierung (z. B. für Bluetooth-Kopfhörer), Lautstärkeausgleich für leise Dialoge und ein 10-Band-Equalizer mit Voreinstellungen und eigener Einstellung.
 
 ### Mini-Player
 
@@ -124,6 +126,7 @@ Im selben Tab stellst du die automatische Suche, die Zeichenkodierung alter Unte
 
 - **Ctrl+R**, Rechtsklick → **Radio …** oder die Quellenanzeige im Mini-Player: Sender nach Name, Genre und Land suchen (kostenloses Verzeichnis Radio Browser), mit ▶ (oder Klick auf den Namen) anhören, der Stern speichert ihn in den **Favoriten**. Auch jede Stream-URL (http/https, auch .m3u/.pls) funktioniert.
 - Sender laufen im Mini-Player mit dem Musik-Equalizer, gekennzeichnet mit **RADIO** und **LIVE**, mit dem aktuellen Titel, wenn der Sender ihn sendet. Radio erscheint nicht unter „Weiterschauen“.
+- **Stopp** hält den Sender wirklich an (er bleibt im Mini-Player angezeigt); **Wiedergabe** oder Leertaste verbindet neu, live. Pause → Wiedergabe geht ebenfalls live weiter, und Live-Radio lässt sich nicht zurückspulen.
 
 ### Sicherung und Übertragung
 
@@ -151,14 +154,14 @@ Mit dem Schalter unten links auf dem Startbildschirm (Mond = dunkel, Sonne = hel
 
 ### Einstellungen
 
-Die Einstellungen sind in Tabs aufgeteilt. Jede Änderung gilt sofort (auch für das laufende Video) und wird gespeichert.
+Die Einstellungen sind in Tabs aufgeteilt. Jede Änderung gilt sofort (auch für das laufende Video). **Speichern** behält sie, **Änderungen verwerfen** geht zum zuletzt gespeicherten Stand zurück, und beim Schließen mit ungespeicherten Änderungen kommt die Frage: Speichern, Änderungen verwerfen oder Abbrechen.
 
 | Tab | Was du einstellst |
 |---|---|
 | Allgemein | Fortsetzen eines begonnenen Videos (fragen / fortsetzen / von vorne), Sprungweite der Pfeiltasten, Videos im Vollbild öffnen, Player im Vordergrund halten, Serien (nächste Folge, Countdown), Screenshot-Ordner, „Öffnen mit“ und Standard-Player |
 | Sprache | Sprache der App |
 | Untertitel | Untertitelsprachen und ihre Reihenfolge, automatisches Laden und Suchen, Quellen im Internet, Zeichenkodierung alter Untertitel, Aussehen, Synchronisierung |
-| Audio | Lautstärke, Lautstärkeausgleich, Equalizer, bevorzugte Audiosprache, Ausgabegerät, Audio-Synchronisierung |
+| Audio | Lautstärke, Lautstärkeausgleich, Equalizer, bevorzugte Audiosprache, Ausgabegerät, Ausgabe für Musik und Radio, Audio-Synchronisierung |
 | Video | Bildqualität, Hardware-Dekodierung, Standard-Seitenverhältnis, HDR |
 | Darstellung | Dunkles / helles Design, wie lange die Steuerung sichtbar bleibt, Oberfläche über die GPU darstellen |
 | Updates | Version, jetzt prüfen, automatischer Download, Neuerungen, Update-Verlauf |
@@ -264,7 +267,9 @@ Archive von Untertitelseiten: ZIP wird unterstützt, RAR noch nicht.
 
 Der Player prüft 20 Sekunden nach dem Start und danach alle 12 Stunden auf GitHub, ob es eine neue Version gibt, lädt sie im Hintergrund herunter und **installiert sie beim Schließen des Players** — beim Anschauen wird nichts unterbrochen. Unter Einstellungen → Updates siehst du die Version, kannst sofort prüfen oder den automatischen Download abschalten.
 
-Einstellungen (auch Sprache und Design), Verlauf, Schlüssel und Zwischenspeicher liegen in `%LOCALAPPDATA%\jebaited_player`, getrennt vom Programm, und bleiben bei Updates und Neuinstallationen erhalten.
+Einstellungen (auch Sprache und Design), Verlauf, Schlüssel und Zwischenspeicher liegen in `%LOCALAPPDATA%\jebaited_player`, getrennt vom Programm, und bleiben bei Updates und Neuinstallationen erhalten. Falls die Einstellungsdatei einmal beschädigt ist, wird sie beiseitegelegt (`settings.corrupt-….json`) und die Einstellungen kommen aus der letzten automatischen Sicherung zurück.
+
+Die Microsoft-Store-Version speichert ihre Daten in `%LOCALAPPDATA%\Packages\jebaitedplayer.jebaitedplayer_5g6w8vrmj8ate\LocalState\jebaited_player` und wird über den Store aktualisiert.
 
 ### Problemlösung
 

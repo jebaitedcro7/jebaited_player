@@ -987,7 +987,8 @@ public partial class MainWindow : Window
     {
         if (!_vm.HasMedia)
         {
-            return false;
+            // R1: razmak / medijska tipka ponovno spaja radio zaustavljen tipkom Stop.
+            return key is Key.Space or Key.K or Key.MediaPlayPause && _vm.ResumeStoppedStream();
         }
 
         bool ctrl = mods.HasFlag(ModifierKeys.Control);

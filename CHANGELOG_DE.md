@@ -1,8 +1,33 @@
 # Änderungsprotokoll
 
-Alle wichtigen Änderungen an jebaited_player. Format: [Keep a Changelog](https://keepachangelog.com/de/1.1.0/); Versionen nach [Semantic Versioning](https://semver.org/lang/de/) (MAJOR = große Änderungen, die die Kompatibilität betreffen können, MINOR = neue Funktionen, PATCH = Fehlerbehebungen und kleine Verbesserungen).
+Alle wichtigen Änderungen an jebaited_player. Format: [Keep a Changelog](https://keepachangelog.com/de/1.1.0/); Versionsnummern: Die erste Zahl ändert sich nur bei großen Meilensteinen (zum Beispiel neue Plattformen), die zweite wächst mit jedem Upgrade-Zyklus mit neuen Funktionen, und die letzte zählt Korrekturen und wird nie zurückgesetzt (seit 1.6.3; frühere Versionen folgten [Semantic Versioning](https://semver.org/lang/de/)).
 
 Andere Sprachen: [English](CHANGELOG.md) · [Hrvatski](CHANGELOG_HR.md). Derselbe Verlauf ist im Player enthalten (Klick auf die Versionsnummer auf dem Startbildschirm). Diese Datei wird aus `src/JebaitedPlayer.App/History/update-history.json` erzeugt.
+
+## [1.6.3] - 2026-11-20
+
+Zyklus 4: Radio nach Stopp wieder live, geschützte Einstellungen, Rückfrage bei ungespeicherten Änderungen und eigene Ausgabe für Musik.
+
+### Neu
+
+- Einstellungen → Audio → „Ausgabe für Musik und Radio“: Musik, Radio und der Mini-Player können über eine andere Ausgabe laufen als Filme (zum Beispiel ein virtuelles Kabel für Discord). Standardmäßig ist es dieselbe Ausgabe wie für Filme.
+- Beim Schließen der Einstellungen mit ungespeicherten Änderungen kommt jetzt die Frage: Speichern, Änderungen verwerfen oder Abbrechen (das Fenster bleibt offen).
+
+### Verbessert
+
+- Einstellungen überstehen Updates und Beschädigungen: Eine beschädigte Einstellungsdatei wird beiseitegelegt (settings.corrupt-….json) und die Einstellungen kommen aus der letzten automatischen Sicherung zurück, mit einer Meldung. Eine Einstellungsdatei, die nicht gelesen werden kann, wird nie überschrieben, und Einstellungen einer neueren Version bleiben erhalten.
+- Live-Radio braucht viel weniger Speicher: Es wird nur noch ein kleiner Puffer gehalten statt bis zu 200 MB.
+
+### Behoben
+
+- Radio: Nach Stopp (oder Pause) und Wiedergabe spielte ein Sender immer dasselbe Lied, ab dem Moment, in dem er eingeschaltet wurde. Stopp hält den Sender jetzt wirklich an, und Wiedergabe verbindet neu, live; der angehaltene Sender bleibt im Mini-Player angezeigt. Leertaste, Medientaste und Wiedergabe nach einem Verbindungsabbruch verbinden ebenfalls live neu, und Live-Radio lässt sich nicht mehr versehentlich zurückspulen.
+
+### Bekannte Probleme
+
+- Die App ist noch nicht digital signiert, daher können Windows SmartScreen oder Smart App Control vor der Installation warnen.
+- Das Fortschrittsfenster des Installationsprogramms stammt von Velopack und ist nur auf Englisch.
+
+Release: [v1.6.3](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v1.6.3) · Änderungen seit [v1.5.2...v1.6.3](https://github.com/jebaitedcro7/jebaited_player/compare/v1.5.2...v1.6.3)
 
 ## [1.5.2] - 2026-11-19
 

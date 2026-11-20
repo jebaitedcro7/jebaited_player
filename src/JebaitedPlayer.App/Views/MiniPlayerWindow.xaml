@@ -130,9 +130,9 @@
                                   FontFamily="Consolas" FontSize="12" Content="EQ" ToolTip="{loc:T mini.equalizer}" Click="OnPanelsChanged" />
                     <StackPanel Orientation="Horizontal">
                         <Button Style="{StaticResource MiniButton}" Content="&#xE892;" ToolTip="{loc:T mini.previous}" Click="OnPrevious" />
-                        <Button Style="{StaticResource MiniButton}" Content="&#xE768;" ToolTip="{loc:T mini.play}" Click="OnPlay" />
-                        <Button Style="{StaticResource MiniButton}" Content="&#xE769;" ToolTip="{loc:T mini.pause}" Click="OnPause" />
-                        <Button Style="{StaticResource MiniButton}" Content="&#xE71A;" ToolTip="{loc:T mini.stop}" Click="OnStop" />
+                        <Button x:Name="PlayButton" Style="{StaticResource MiniButton}" Content="&#xE768;" ToolTip="{loc:T mini.play}" Click="OnPlay" />
+                        <Button x:Name="PauseButton" Style="{StaticResource MiniButton}" Content="&#xE769;" ToolTip="{loc:T mini.pause}" Click="OnPause" />
+                        <Button x:Name="StopButton" Style="{StaticResource MiniButton}" Content="&#xE71A;" ToolTip="{loc:T mini.stop}" Click="OnStop" />
                         <Button Style="{StaticResource MiniButton}" Content="&#xE893;" ToolTip="{loc:T mini.next}" Click="OnNext" />
                         <Button Style="{StaticResource MiniButton}" Content="&#xE838;" ToolTip="{loc:T mini.open}" Click="OnOpen" />
                         <Button x:Name="MuteButton" Style="{StaticResource MiniIcon}" Content="&#xE767;" Margin="6,0,0,0" ToolTip="{loc:T mini.mute}" Click="OnMute" />

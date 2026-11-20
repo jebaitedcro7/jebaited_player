@@ -104,6 +104,13 @@ public partial class App : Application
         }
 
         window.Show();
+        if (settings.LoadReport is { } report && !options.IsDiagnostics)
+        {
+            // M3a: oštećene postavke su popravljene (ili ostavljene netaknute); korisnik to mora znati.
+            window.Dispatcher.BeginInvoke(() => MessageBox.Show(window, report.Describe(), "jebaited_player",
+                MessageBoxButton.OK, MessageBoxImage.Warning), DispatcherPriority.ApplicationIdle);
+        }
+
         if (options.DiagLogInject)
         {
             DiagLog.Info(LogCat.Ui, "test.info", "App", "Controlled test event (INFO)");

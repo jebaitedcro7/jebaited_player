@@ -39,6 +39,11 @@ public partial class MainWindow
                     "settings3" => await Settings3UiTestAsync(),
                     "radio" => await RadioUiTestAsync(),
                     "radiocold" => await RadioColdUiTestAsync(),
+                    "radiostop" => await RadioStopUiTestAsync(),
+                    "radiodrop" => await RadioDropUiTestAsync(),
+                    "settings4" => await Settings4UiTestAsync(),
+                    "unsaved" => await UnsavedUiTestAsync(),
+                    "musicdevice" => await MusicDeviceUiTestAsync(),
                     _ => new Dictionary<string, object?> { ["error"] = "nepoznat scenarij " + scenario },
                 };
             }

@@ -1,9 +1,11 @@
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 using System.Windows.Threading;
+using JebaitedPlayer.Diagnostics;
 using JebaitedPlayer.Infrastructure;
 using JebaitedPlayer.Services;
 using JebaitedPlayer.Subtitles;
@@ -60,6 +62,9 @@ internal interface ISettingsHost
 
     /// <summary>Spremaju li se postavke pri zatvaranju (u dijagnostici ne: testovi nikad ne mijenjaju tvoje postavke).</summary>
     bool PersistSettings { get; }
+
+    /// <summary>Player se gasi (M3b: postavke se tada ne pitaju, nego spremaju kao i prije).</summary>
+    bool IsClosingPlayer { get; }
 }
 
 /// <summary>
@@ -123,10 +128,12 @@ public partial class PlayerSettingsWindow : Window
         _savedComparable = SettingsWorkingCopy.ComparableSnapshot(_savedSnapshot);
         _dirtyTimer = new DispatcherTimer(TimeSpan.FromMilliseconds(400), DispatcherPriority.Background, (_, _) => UpdateSaveState(), Dispatcher);
         UpdateSaveState();
+        Closing += OnClosingWindow;
         Closed += (_, _) =>
         {
             _dirtyTimer.Stop();
-            // Zatvaranje i dalje sprema (pitanje Spremi / Odbaci / Odustani dolazi s M3b); ponovno otvaranje ne sprema.
+            // Zatvaranje sprema (nakon pitanja iz M3b to je spremljeno ili vraćeno stanje, uz glasnoću i položaje);
+            // ponovno otvaranje ne sprema.
             if (_host.PersistSettings && !_reopening)
             {
                 _settings.Save();
@@ -373,6 +380,49 @@ public partial class PlayerSettingsWindow : Window
         _host.ReopenSettings(tab, _savedSnapshot);
     }
 
+    /// <summary>Dijagnostika (M3b): odgovor na pitanje bez prozora; inače se pita korisnika.</summary>
+    internal Func<UnsavedChoice>? AskUnsavedOverride { get; set; }
+
+    /// <summary>Zadnji odgovor na pitanje o nespremljenim promjenama (dijagnostika).</summary>
+    internal UnsavedChoice? LastUnsavedChoice { get; private set; }
+
+    /// <summary>
+    /// M3b: zatvaranje (×, Alt+F4, gumb Zatvori) s nespremljenim promjenama pita Spremi / Odbaci / Odustani.
+    /// Ne pita pri ponovnom otvaranju (Odbaci, Zadano, uvoz), pri gašenju playera (tada se sprema kao prije)
+    /// ni u dijagnostici bez testnog odgovora (testovi drugih dijelova ne smiju čekati na prozor).
+    /// </summary>
+    private void OnClosingWindow(object? sender, CancelEventArgs e)
+    {
+        if (_reopening || _host.IsClosingPlayer || (!_host.PersistSettings && AskUnsavedOverride is null))
+        {
+            return;
+        }
+
+        EqualizerPanel.Flush();
+        if (!IsDirty)
+        {
+            return;
+        }
+
+        UnsavedChoice choice = AskUnsavedOverride?.Invoke() ?? UnsavedChangesWindow.Ask(this);
+        LastUnsavedChoice = choice;
+        DiagLog.Info(LogCat.Usage, "prefs.unsaved", nameof(PlayerSettingsWindow), "Unsaved settings on close", ("choice", choice.ToString()));
+        switch (choice)
+        {
+            case UnsavedChoice.Save:
+                SaveNow();
+                break;
+            case UnsavedChoice.Discard:
+                SettingsWorkingCopy.Revert(_settings, _savedSnapshot);
+                _host.ApplyImportedSettings();
+                Log.Info("Promjene postavki odbačene pri zatvaranju.");
+                break;
+            default:
+                e.Cancel = true;
+                break;
+        }
+    }
+
     internal static string? DefaultsKey(SettingsTab tab) => tab switch
     {
         SettingsTab.General => "general",
@@ -590,10 +640,15 @@ public partial class PlayerSettingsWindow : Window
             ? SubtitleLanguage.DisplayName(lang)
             : Loc.T("settings.audioLanguageDefault");
         AudioDelayText.Text = Loc.T("settings.milliseconds", _settings.AudioDelayMs.ToString("+0;−0;0", Loc.Culture));
-        AudioDeviceButton.Content = _settings.AudioDevice == "auto"
-            ? Loc.T("settings.audioDeviceDefault")
-            : _audioDevices.FirstOrDefault(d => d.Name == _settings.AudioDevice)?.Description ?? _settings.AudioDevice;
+        AudioDeviceButton.Content = DeviceText(_settings.AudioDevice);
+        MusicAudioDeviceButton.Content = _settings.MusicAudioDevice.Length == 0
+            ? Loc.T("settings.musicAudioDeviceSame")
+            : DeviceText(_settings.MusicAudioDevice);
     }
+
+    private string DeviceText(string name) => name == "auto"
+        ? Loc.T("settings.audioDeviceDefault")
+        : _audioDevices.FirstOrDefault(d => d.Name == name)?.Description ?? name;
 
     private async Task LoadAudioDevicesAsync()
     {
@@ -639,6 +694,25 @@ public partial class PlayerSettingsWindow : Window
     private void SetAudioDevice(string name) => ChangePlayback(() =>
     {
         _settings.AudioDevice = name;
+        UpdateAudioTexts();
+    });
+
+    /// <summary>V4: izlaz za glazbu, radio i mini player (npr. virtualni kabel prema Discordu).</summary>
+    private void OnMusicAudioDeviceClick(object sender, RoutedEventArgs e)
+    {
+        var choices = new List<(string, bool, Action)>
+        {
+            (Loc.T("settings.musicAudioDeviceSame"), _settings.MusicAudioDevice.Length == 0, () => SetMusicAudioDevice(string.Empty)),
+            (Loc.T("settings.audioDeviceDefault"), _settings.MusicAudioDevice == "auto", () => SetMusicAudioDevice("auto")),
+        };
+        choices.AddRange(_audioDevices.Where(d => d.Name != "auto")
+            .Select(d => (d.Description, d.Name == _settings.MusicAudioDevice, (Action)(() => SetMusicAudioDevice(d.Name)))));
+        ShowChoices(MusicAudioDeviceButton, choices);
+    }
+
+    internal void SetMusicAudioDevice(string name) => ChangePlayback(() =>
+    {
+        _settings.MusicAudioDevice = name;
         UpdateAudioTexts();
     });
 

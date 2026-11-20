@@ -130,7 +130,7 @@ public partial class MainWindow : ISettingsHost
         {
             MpvConfig.ApplyPlaybackLive(player, _settings);
             Log.Info($"Postavke zvuka i slike primijenjene: hwdec={_settings.HardwareDecoding}, kvaliteta={_settings.VideoQuality}, " +
-                     $"alang={_settings.AudioLanguage ?? "-"}, uređaj={_settings.AudioDevice}, kašnjenje={_settings.AudioDelayMs} ms, " +
+                     $"alang={_settings.AudioLanguage ?? "-"}, uređaj={_settings.OutputDevice(MpvConfig.MusicMode)}, kašnjenje={_settings.AudioDelayMs} ms, " +
                      $"ujednačavanje={_settings.NormalizeAudio}, HDR={_settings.HdrPassthrough}");
         }
     }
@@ -181,6 +181,8 @@ public partial class MainWindow : ISettingsHost
     }
 
     bool ISettingsHost.PersistSettings => !_options.IsDiagnostics;
+
+    bool ISettingsHost.IsClosingPlayer => _closing;
 
     /// <summary>Izlazni uređaji zvuka: iz otvorenog mpv-a ili iz kratkotrajnog (bez videa, odmah se zatvara).</summary>
     async Task<IReadOnlyList<AudioDeviceInfo>> ISettingsHost.GetAudioDevicesAsync()

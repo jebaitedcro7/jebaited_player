@@ -354,6 +354,7 @@ public static class SettingsDefaults
                     break;
                 case "audio":
                     (s.NormalizeAudio, s.AudioLanguage, s.AudioDevice, s.AudioDelayMs) = (d.NormalizeAudio, d.AudioLanguage, d.AudioDevice, d.AudioDelayMs);
+                    s.MusicAudioDevice = d.MusicAudioDevice;
                     s.Equalizer = new EqualizerSettings();
                     s.MusicEqualizer = new EqualizerSettings();
                     break;

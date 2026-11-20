@@ -26,6 +26,8 @@ Each manual has three parts: **Quick Start**, **Basic Guide** and **Advanced Gui
 
 [Latest release](https://github.com/jebaitedcro7/jebaited_player/releases/latest) → **`JebaitedPlayer-win-Setup.exe`** (Windows 10/11, 64-bit, no administrator rights needed). A portable ZIP is in the same release.
 
+Also in the **[Microsoft Store](https://apps.microsoft.com/detail/9NP4GF0Q40JL)** (works with Smart App Control; updated by the Store, can be a version or two behind GitHub).
+
 The interface is available in English, Deutsch, Hrvatski, Bosanski, Srpski (latinica) and Slovenščina; you choose the language on first start and can change it any time in Settings.
 
 The releases are **not code signed yet**, so Windows SmartScreen may warn and Smart App Control may block the installer. Please do not turn Smart App Control off; see the [code signing policy](CODE_SIGNING.md) for the plan (free code signing for open source by SignPath Foundation).

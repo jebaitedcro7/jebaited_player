@@ -1,8 +1,33 @@
 # Changelog
 
-All notable changes to jebaited_player. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [Semantic Versioning](https://semver.org/) (MAJOR = big changes that may break compatibility, MINOR = new features, PATCH = bug fixes and small improvements).
+All notable changes to jebaited_player. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); version numbers: the first number changes only for big milestones (for example new platforms), the second grows with every upgrade cycle with new features, and the last one counts fixes and is never reset (since 1.6.3; earlier versions followed [Semantic Versioning](https://semver.org/)).
 
 Other languages: [Deutsch](CHANGELOG_DE.md) · [Hrvatski](CHANGELOG_HR.md). The same history is included in the player (click the version number on the home screen). This file is generated from `src/JebaitedPlayer.App/History/update-history.json`.
+
+## [1.6.3] - 2026-11-20
+
+Cycle 4: live radio after Stop, protected settings, a question for unsaved changes and a separate output for music.
+
+### Added
+
+- Settings → Audio → “Output for music and radio”: music, radio and the mini player can play on a different output than movies (for example a virtual cable for Discord). By default it is the same output as for movies.
+- Closing the settings with unsaved changes now asks: Save, Discard changes or Cancel (the window stays open).
+
+### Improved
+
+- Settings survive updates and damage: a damaged settings file is kept aside (settings.corrupt-….json) and your settings come back from the latest automatic backup, with a message. A settings file that cannot be read is never overwritten, and settings written by a newer version are kept.
+- Live radio uses much less memory: only a small buffer is kept instead of up to 200 MB.
+
+### Fixed
+
+- Radio: after Stop (or Pause) and Play, a station always played the same song, from the moment it was first tuned in. Stop now really stops the station and Play connects again, live; the stopped station stays shown in the mini player. Space, the media key and Play after a dropped connection also reconnect live, and live radio can no longer be rewound by accident.
+
+### Known issues
+
+- The app is not digitally signed yet, so Windows SmartScreen or Smart App Control may warn before the installation.
+- The progress window of the installer comes from Velopack and is only in English.
+
+Release: [v1.6.3](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v1.6.3) · Changes since [v1.5.2...v1.6.3](https://github.com/jebaitedcro7/jebaited_player/compare/v1.5.2...v1.6.3)
 
 ## [1.5.2] - 2026-11-19
 

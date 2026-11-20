@@ -1,8 +1,33 @@
 # Povijest promjena
 
-Sve važnije promjene jebaited_playera. Oblik: [Keep a Changelog](https://keepachangelog.com/hr/1.1.0/); verzije po [Semantic Versioning](https://semver.org/lang/hr/) (MAJOR = velike promjene koje mogu utjecati na kompatibilnost, MINOR = nove funkcionalnosti, PATCH = popravci i manja poboljšanja).
+Sve važnije promjene jebaited_playera. Oblik: [Keep a Changelog](https://keepachangelog.com/hr/1.1.0/); brojevi verzija: prvi broj se mijenja samo za velike prekretnice (npr. nove platforme), drugi raste sa svakim ciklusom nadogradnji s novim funkcijama, a zadnji broji popravke i nikad se ne vraća na 0 (od 1.6.3; ranije verzije slijedile su [Semantic Versioning](https://semver.org/lang/hr/)).
 
 Drugi jezici: [English](CHANGELOG.md) · [Deutsch](CHANGELOG_DE.md). Ista povijest je i u playeru (klik na broj verzije na početnom ekranu). Ova datoteka nastaje iz `src/JebaitedPlayer.App/History/update-history.json`.
+
+## [1.6.3] - 2026-11-20
+
+Ciklus 4: radio nakon Stopa opet uživo, zaštićene postavke, pitanje za nespremljene promjene i zaseban izlaz za glazbu.
+
+### Novo
+
+- Postavke → Zvuk → „Izlaz za glazbu i radio”: glazba, radio i mini player mogu svirati na drugom izlazu nego filmovi (npr. na virtualnom kabelu za Discord). Zadano je isti izlaz kao za filmove.
+- Zatvaranje postavki s nespremljenim promjenama sada pita: Spremi, Odbaci promjene ili Odustani (prozor ostaje otvoren).
+
+### Poboljšano
+
+- Postavke preživljavaju nadogradnje i oštećenja: oštećena datoteka postavki ostaje sačuvana sa strane (settings.corrupt-….json), a postavke se vraćaju iz zadnje automatske kopije, uz poruku. Datoteka postavki koja se ne može pročitati nikad se ne prepisuje, a postavke iz novije verzije ostaju.
+- Radio uživo troši puno manje memorije: čuva se samo mali međuspremnik umjesto do 200 MB.
+
+### Ispravljeno
+
+- Radio: nakon Stopa (ili pauze) i Playa postaja je uvijek svirala istu pjesmu, od trenutka kad je bila uključena. Stop sada stvarno zaustavlja postaju, a Play je ponovno spaja, uživo; zaustavljena postaja ostaje prikazana u mini playeru. Razmak, medijska tipka i Play nakon prekida veze također spajaju ponovno uživo, a radio uživo se više ne može slučajno premotati.
+
+### Poznati problemi
+
+- Aplikacija još nije digitalno potpisana, pa Windows SmartScreen ili Smart App Control mogu upozoriti prije instalacije.
+- Prozor napretka instalacije je Velopackov i samo je na engleskom.
+
+Izdanje: [v1.6.3](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v1.6.3) · Promjene od [v1.5.2...v1.6.3](https://github.com/jebaitedcro7/jebaited_player/compare/v1.5.2...v1.6.3)
 
 ## [1.5.2] - 2026-11-19
 

@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Reflection;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using JebaitedPlayer.Diagnostics;
 
@@ -224,10 +225,59 @@ public readonly struct LogChannel(string category)
     }
 }
 
+/// <summary>M3a: što se dogodilo s oštećenom ili nečitljivom datotekom postavki pri pokretanju.</summary>
+public enum SettingsLoadOutcome
+{
+    /// <summary>Datoteka je bila oštećena; postavke su vraćene iz automatske kopije (M1a).</summary>
+    RestoredFromBackup,
+
+    /// <summary>Datoteka je bila oštećena, a ispravne kopije nema; vrijede zadane postavke.</summary>
+    ResetToDefaults,
+
+    /// <summary>Datoteka se sada ne može pročitati (zaključana, prava); vrijede zadane i datoteka se ne prepisuje.</summary>
+    Unreadable,
+}
+
+/// <summary>M3a: izvještaj za poruku korisniku (oštećena datoteka ostaje sačuvana pod <see cref="CorruptFile"/>).</summary>
+public sealed record SettingsLoadReport(SettingsLoadOutcome Outcome, string? CorruptFile, DateTime? BackupCreatedUtc, string Error)
+{
+    /// <summary>Poruka korisniku na jeziku sučelja.</summary>
+    public string Describe() => Outcome switch
+    {
+        SettingsLoadOutcome.RestoredFromBackup => Loc.T("settings.damagedRestored",
+            BackupCreatedUtc?.ToLocalTime().ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture) ?? "?", Path.GetFileName(CorruptFile ?? string.Empty)),
+        SettingsLoadOutcome.ResetToDefaults => Loc.T("settings.damagedReset", Path.GetFileName(CorruptFile ?? string.Empty)),
+        _ => Loc.T("settings.unreadable", Error),
+    };
+}
+
 /// <summary>Postavke koje se pamte između pokretanja (od M3 prelaze u SQLite).</summary>
 public sealed class AppSettings
 {
     private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
+
+    /// <summary>Oblik datoteke settings.json (M3a). 1 = datoteke bez oznake (do 1.5.x), 2 = od 1.6.3.</summary>
+    public const int CurrentSettingsVersion = 2;
+
+    /// <summary>Datoteka iz koje su postavke učitane (i u koju se spremaju).</summary>
+    private string? _file;
+
+    /// <summary>Postojeća datoteka nije pročitana (zaključana, prava): ova sesija je ne smije prepisati zadanim vrijednostima.</summary>
+    private bool _doNotOverwrite;
+
+    /// <summary>
+    /// M3a: oblik datoteke. Stare datoteke ga nemaju (= 1) i pri učitavanju prolaze kroz migraciju; spremanje
+    /// zapisuje trenutni oblik. Datoteka iz novije verzije zadržava svoj (veći) broj.
+    /// </summary>
+    public int SettingsVersion { get; set; } = CurrentSettingsVersion;
+
+    /// <summary>M3a: nepoznata polja (npr. iz novije verzije playera) ostaju u datoteci i nakon spremanja.</summary>
+    [JsonExtensionData]
+    public Dictionary<string, JsonElement>? UnknownFields { get; set; }
+
+    /// <summary>M3a: oštećena ili nečitljiva datoteka pri pokretanju (za poruku korisniku); null = sve u redu.</summary>
+    [JsonIgnore]
+    public SettingsLoadReport? LoadReport { get; private set; }
 
     public double Volume { get; set; } = 100;
     public bool Muted { get; set; }
@@ -307,6 +357,15 @@ public sealed class AppSettings
 
     /// <summary>Izlazni uređaj zvuka (mpv "audio-device"); "auto" = zadani uređaj sustava.</summary>
     public string AudioDevice { get; set; } = "auto";
+
+    /// <summary>
+    /// Ciklus 4 (V4, priprema za Discord): zaseban izlaz za glazbu, radio i mini player, npr. virtualni kabel prema
+    /// Discordu, dok filmovi ostaju na zvučnicima. Prazno = isti uređaj kao <see cref="AudioDevice"/>.
+    /// </summary>
+    public string MusicAudioDevice { get; set; } = string.Empty;
+
+    /// <summary>Uređaj za trenutnu vrstu sadržaja (glazba i radio ili filmovi).</summary>
+    public string OutputDevice(bool music) => music && MusicAudioDevice.Length > 0 ? MusicAudioDevice : AudioDevice;
 
     /// <summary>Pomak zvuka u ms (pozitivno = zvuk kasnije), npr. za Bluetooth slušalice.</summary>
     public double AudioDelayMs { get; set; }
@@ -388,6 +447,8 @@ public sealed class AppSettings
             AudioDevice = "auto";
         }
 
+        MusicAudioDevice = MusicAudioDevice?.Trim() ?? string.Empty;
+
         if (string.IsNullOrWhiteSpace(DefaultAspect))
         {
             DefaultAspect = "auto";
@@ -404,24 +465,134 @@ public sealed class AppSettings
 
     public OnlineSettings Online { get; set; } = new();
 
-    public static AppSettings Load()
+    public static AppSettings Load() => Load(AppPaths.DataDir, DateTime.UtcNow);
+
+    /// <summary>
+    /// M3a: učitavanje koje nikad ne gubi postavke. Prije je oštećena datoteka tiho dala zadane vrijednosti, a prvo
+    /// spremanje ju je prepisalo. Sada se oštećena datoteka premjesti u settings.corrupt-&lt;vrijeme&gt;.json i postavke se
+    /// vrate iz najnovije ispravne automatske kopije (M1a). Datoteka koja se ne može pročitati ostaje netaknuta.
+    /// <paramref name="recover"/> = false: samo čitanje (npr. jezik za registraciju u Windowsu), bez premještanja.
+    /// </summary>
+    internal static AppSettings Load(string dataDir, DateTime nowUtc, bool recover = true)
     {
-        try
+        string file = Path.Combine(dataDir, "settings.json");
+        if (!File.Exists(file))
         {
-            if (File.Exists(AppPaths.SettingsFile))
-            {
-                AppSettings loaded = JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(AppPaths.SettingsFile)) ?? new AppSettings();
-                loaded.Normalize();
-                loaded.RememberForDiff();
-                return loaded;
-            }
-        }
-        catch (Exception ex)
-        {
-            Log.Warn($"Postavke nisu učitane, koriste se zadane: {ex.Message}");
+            return new AppSettings { IsNew = true, _file = file };
         }
 
-        return new AppSettings { IsNew = true };
+        string json;
+        try
+        {
+            json = File.ReadAllText(file);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            Log.Warn($"Postavke se ne mogu pročitati, vrijede zadane, a datoteka se ne prepisuje: {ex.Message}");
+            return new AppSettings
+            {
+                _file = file, _doNotOverwrite = true, LoadReport = new SettingsLoadReport(SettingsLoadOutcome.Unreadable, null, null, ex.Message),
+            };
+        }
+
+        try
+        {
+            AppSettings loaded = Parse(json);
+            loaded._file = file;
+            return loaded;
+        }
+        catch (InvalidDataException ex)
+        {
+            return recover
+                ? RecoverDamaged(dataDir, file, nowUtc, ex.Message)
+                : new AppSettings { _file = file, _doNotOverwrite = true };
+        }
+    }
+
+    /// <summary>Settings.json → postavke (uz migraciju starog oblika). Sve što nisu ispravne postavke baca <see cref="InvalidDataException"/>.</summary>
+    internal static AppSettings Parse(string json)
+    {
+        JsonObject root;
+        try
+        {
+            root = JsonNode.Parse(json) as JsonObject ?? throw new InvalidDataException("Settings are not a JSON object.");
+        }
+        catch (JsonException ex)
+        {
+            throw new InvalidDataException("Invalid JSON: " + ex.Message, ex);
+        }
+
+        int version = root[nameof(SettingsVersion)] is JsonValue v && v.TryGetValue(out int n) ? n : 1;
+
+        // Migracije oblika idu ovdje, od najstarijeg prema novijem. 1 → 2 ne mijenja polja (dodaje samo oznaku
+        // oblika); nove vrijednosti iz novijih verzija dobivaju zadano iz inicijalizatora, a neispravne ispravlja Normalize.
+        AppSettings settings;
+        try
+        {
+            settings = root.Deserialize<AppSettings>() ?? throw new InvalidDataException("Empty settings.");
+        }
+        catch (JsonException ex)
+        {
+            throw new InvalidDataException("Invalid settings: " + ex.Message, ex);
+        }
+
+        settings.SettingsVersion = Math.Max(version, CurrentSettingsVersion);
+        settings.Normalize();
+        settings.RememberForDiff();
+        return settings;
+    }
+
+    private static AppSettings RecoverDamaged(string dataDir, string file, DateTime nowUtc, string error)
+    {
+        string corrupt = Path.Combine(dataDir, $"settings.corrupt-{nowUtc.ToString("yyyyMMdd-HHmmss", CultureInfo.InvariantCulture)}.json");
+        if (File.Exists(corrupt))
+        {
+            corrupt = corrupt[..^5] + "-" + Guid.NewGuid().ToString("N")[..6] + ".json";
+        }
+
+        try
+        {
+            File.Move(file, corrupt);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            Log.Warn($"Oštećene postavke se ne mogu premjestiti, vrijede zadane, a datoteka se ne prepisuje: {ex.Message}");
+            return new AppSettings
+            {
+                _file = file, _doNotOverwrite = true, LoadReport = new SettingsLoadReport(SettingsLoadOutcome.Unreadable, null, null, error),
+            };
+        }
+
+        DiagLog.Warn(LogCat.Stability, "prefs.damaged", nameof(AppSettings), "Settings file damaged", ("error", error), ("keptAs", Path.GetFileName(corrupt)));
+        foreach (BackupInfo backup in SettingsBackup.List(dataDir))
+        {
+            string copy = Path.Combine(backup.Folder, "settings.json");
+            if (!File.Exists(copy))
+            {
+                continue;
+            }
+
+            try
+            {
+                string json = File.ReadAllText(copy);
+                AppSettings restored = Parse(json);
+                File.WriteAllText(file, json);
+                restored._file = file;
+                restored.LoadReport = new SettingsLoadReport(SettingsLoadOutcome.RestoredFromBackup, corrupt, backup.Created, error);
+                Log.Warn($"Postavke su bile oštećene ({error}); vraćene su iz kopije {Path.GetFileName(backup.Folder)}, a oštećena datoteka je sačuvana kao {Path.GetFileName(corrupt)}.");
+                return restored;
+            }
+            catch (Exception ex) when (ex is InvalidDataException or IOException or UnauthorizedAccessException)
+            {
+                Log.Warn($"Kopija postavki {Path.GetFileName(backup.Folder)} nije upotrebljiva: {ex.Message}");
+            }
+        }
+
+        Log.Warn($"Postavke su bile oštećene ({error}), a ispravne kopije nema: vrijede zadane. Oštećena datoteka: {Path.GetFileName(corrupt)}.");
+        return new AppSettings
+        {
+            IsNew = true, _file = file, LoadReport = new SettingsLoadReport(SettingsLoadOutcome.ResetToDefaults, corrupt, null, error),
+        };
     }
 
     private Dictionary<string, string>? _lastSaved;
@@ -484,12 +655,20 @@ public sealed class AppSettings
 
     public void Save()
     {
+        if (_doNotOverwrite)
+        {
+            // M3a: postojeća datoteka nije pročitana; zadane vrijednosti ove sesije je ne smiju prepisati.
+            Log.Warn("Postavke se ne spremaju: postojeća datoteka nije pročitana pri pokretanju.");
+            return;
+        }
+
+        string file = _file ?? AppPaths.SettingsFile;
         try
         {
-            Directory.CreateDirectory(AppPaths.DataDir);
-            string tmp = AppPaths.SettingsFile + ".tmp";
+            Directory.CreateDirectory(Path.GetDirectoryName(file)!);
+            string tmp = file + ".tmp";
             File.WriteAllText(tmp, JsonSerializer.Serialize(this, JsonOptions));
-            File.Move(tmp, AppPaths.SettingsFile, overwrite: true);
+            File.Move(tmp, file, overwrite: true);
             LogChanges();
         }
         catch (Exception ex)

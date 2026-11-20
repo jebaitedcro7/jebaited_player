@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Input;
 using JebaitedPlayer.Infrastructure;
 using JebaitedPlayer.Library;
+using JebaitedPlayer.ViewModels;
 using JebaitedPlayer.Views;
 
 namespace JebaitedPlayer;
@@ -21,9 +22,7 @@ public partial class MainWindow : IMiniPlayerHost
     private bool _diagAutoSwitch;
 
     /// <summary>Glazba (datoteka ili internetski stream) ili video.</summary>
-    internal static bool IsMusic(string path) =>
-        MediaScanner.IsAudio(path) || path.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
-        path.StartsWith("https://", StringComparison.OrdinalIgnoreCase);
+    internal static bool IsMusic(string path) => MediaScanner.IsAudio(path) || PlayerViewModel.IsStreamPath(path);
 
     /// <summary>
     /// Prije svakog učitavanja: equalizer za glazbu ili za filmove (1.4.1) i, ako je korisnik sam otvorio datoteku,

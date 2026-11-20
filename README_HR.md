@@ -32,6 +32,8 @@ Treba ti Windows 10 ili 11 (64-bitni). Ništa drugo nije potrebno instalirati (o
 
 **Prijenosna verzija:** `JebaitedPlayer-win-Portable.zip` raspakiraj bilo gdje i pokreni `jebaited_player.exe`. Ne mijenja ništa u Windowsu (nema „Otvori pomoću”), a nadogradnje rade i u njoj.
 
+**Microsoft Store:** jebaited_player je i u [Microsoft Storeu](https://apps.microsoft.com/detail/9NP4GF0Q40JL). Store inačica radi uz Smart App Control, nadograđuje se kroz Store i može biti verziju-dvije iza GitHuba.
+
 ---
 
 ## A. Brzi početak
@@ -108,7 +110,7 @@ U istoj kartici podešavaš automatsko traženje, kodiranje starih titlova i izg
 
 - **Glasnoća:** ↑ / ↓, kotačić miša ili klizač; **M** isključuje zvuk.
 - **Audio traka:** **B** prebacuje na sljedeću, ili desni klik → **Audio** i odaberi traku (prikazani su jezik, format i kanali). Izbor se pamti po videu.
-- **Postavke → Zvuk:** željeni jezik zvuka, izlazni uređaj, sinkronizacija zvuka (npr. za Bluetooth slušalice), ujednačavanje glasnoće za tihi dijalog i equalizer s 10 pojaseva, presetima i vlastitim presetom.
+- **Postavke → Zvuk:** željeni jezik zvuka, izlazni uređaj (i zaseban **izlaz za glazbu i radio**, npr. virtualni kabel za Discord), sinkronizacija zvuka (npr. za Bluetooth slušalice), ujednačavanje glasnoće za tihi dijalog i equalizer s 10 pojaseva, presetima i vlastitim presetom.
 
 ### Mini player
 
@@ -124,6 +126,7 @@ U istoj kartici podešavaš automatsko traženje, kodiranje starih titlova i izg
 
 - **Ctrl+R**, desni klik → **Radio…** ili oznaka izvora u mini playeru: traži postaje po nazivu, žanru i državi (besplatni imenik Radio Browser), ▶ (ili klik na naziv) je pušta, a zvjezdica je sprema u **Favorite**. Radi i bilo koji URL streama (http/https, i .m3u/.pls).
 - Postaje sviraju u mini playeru s glazbenim equalizerom, označene s **RADIO** i **UŽIVO**, uz trenutnu pjesmu kad je postaja šalje. Radio ne ulazi u „Nastavi gledati”.
+- **Stop** stvarno zaustavlja postaju (ostaje prikazana u mini playeru); **Play** ili razmak je ponovno spajaju, uživo. I Pauza → Play nastavlja uživo, a radio uživo se ne premotava.
 
 ### Kopije i prijenos
 
@@ -151,14 +154,14 @@ Prekidačem dolje lijevo na glavnom ekranu (mjesec = tamna, sunce = svijetla) il
 
 ### Postavke
 
-Postavke su podijeljene u kartice. Svaka promjena vrijedi odmah (i za video koji se reproducira) i sprema se.
+Postavke su podijeljene u kartice. Svaka promjena vrijedi odmah (i za video koji se reproducira). **Spremi** je zadržava, **Odbaci promjene** vraća zadnje spremljeno stanje, a zatvaranje prozora s nespremljenim promjenama pita: Spremi, Odbaci promjene ili Odustani.
 
 | Kartica | Što podešavaš |
 |---|---|
 | Općenito | Nastavak započetog videa (pitaj / nastavi / od početka), korak premotavanja strelicama, otvaranje videa u cijelom zaslonu, player iznad ostalih prozora, serije (sljedeća epizoda, odbrojavanje), mapa za snimke zaslona, „Otvori pomoću” i zadani player |
 | Jezik | Jezik aplikacije |
 | Titlovi | Jezici titlova i njihov redoslijed, automatsko učitavanje i traženje, izvori na internetu, kodiranje starih titlova, izgled, sinkronizacija |
-| Zvuk | Glasnoća, ujednačavanje glasnoće, equalizer, željeni jezik zvuka, izlazni uređaj, sinkronizacija zvuka |
+| Zvuk | Glasnoća, ujednačavanje glasnoće, equalizer, željeni jezik zvuka, izlazni uređaj, izlaz za glazbu i radio, sinkronizacija zvuka |
 | Slika | Kvaliteta slike, hardversko dekodiranje, zadani omjer slike, HDR |
 | Izgled | Tamna / svijetla tema, koliko dugo su kontrole vidljive, iscrtavanje sučelja preko GPU-a |
 | Nadogradnje | Verzija, provjeri sada, automatsko preuzimanje, što je novo, povijest nadogradnji |
@@ -264,7 +267,9 @@ Arhive sa stranica s titlovima: ZIP je podržan, RAR još nije.
 
 Player 20 sekundi nakon pokretanja i zatim svakih 12 sati provjeri na GitHubu ima li nove verzije, preuzme je u pozadini i **instalira kad ga zatvoriš** — ništa se ne prekida usred gledanja. U Postavke → Nadogradnje vidiš verziju, možeš provjeriti odmah ili isključiti automatsko preuzimanje.
 
-Postavke (i jezik i tema), povijest gledanja, ključevi i predmemorija su u `%LOCALAPPDATA%\jebaited_player`, odvojeno od programa, pa ih nadogradnja ni ponovna instalacija ne diraju.
+Postavke (i jezik i tema), povijest gledanja, ključevi i predmemorija su u `%LOCALAPPDATA%\jebaited_player`, odvojeno od programa, pa ih nadogradnja ni ponovna instalacija ne diraju. Ako se datoteka postavki ikad ošteti, ostaje sačuvana sa strane (`settings.corrupt-….json`), a postavke se vraćaju iz zadnje automatske kopije.
+
+Store inačica čuva podatke u `%LOCALAPPDATA%\Packages\jebaitedplayer.jebaitedplayer_5g6w8vrmj8ate\LocalState\jebaited_player` i nadograđuje se kroz Store.
 
 ### Rješavanje najčešćih problema
 

@@ -206,9 +206,11 @@ internal static class MpvConfig
             yield return ("alang", string.Empty);
         }
 
-        if (s.AudioDevice != "auto" || includeDefaults)
+        // V4: glazba i radio mogu imati svoj izlaz (npr. virtualni kabel za Discord).
+        string device = s.OutputDevice(MusicMode);
+        if (device != "auto" || includeDefaults)
         {
-            yield return ("audio-device", s.AudioDevice);
+            yield return ("audio-device", device);
         }
 
         if (Math.Abs(s.AudioDelayMs) > 0.5 || includeDefaults)

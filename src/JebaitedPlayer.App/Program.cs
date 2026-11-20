@@ -167,7 +167,8 @@ internal static class Program
             if (command == "register")
             {
                 string exe = Environment.ProcessPath ?? throw new InvalidOperationException("Putanja exe-a nije poznata.");
-                Loc.SetLanguage(AppSettings.Load().Language);
+                // Samo čitanje jezika: oštećene postavke popravlja tek pokretanje playera (uz poruku korisniku).
+                Loc.SetLanguage(AppSettings.Load(AppPaths.DataDir, DateTime.UtcNow, recover: false).Language);
                 int types = ShellIntegration.Register(exe, root);
                 Log.Info($"Registracija u Windowsu: {types} vrsta datoteka ({exe})");
             }

@@ -457,7 +457,7 @@ public sealed class LibraryController : ObservableObject
     {
         _lastSave = Environment.TickCount64;
         if (_store is null || _vm.CurrentPath is not { } path || !_vm.HasMedia || _vm.IsLoading || ResumeOffer != null ||
-            path.StartsWith("http://", StringComparison.OrdinalIgnoreCase) || path.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+            PlayerViewModel.IsStreamPath(path))
         {
             return;
         }
@@ -745,7 +745,7 @@ public sealed class LibraryController : ObservableObject
 
         _pendingResumePath = null;
         _pendingResumePosition = null;
-        if (path.StartsWith("http://", StringComparison.OrdinalIgnoreCase) || path.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+        if (PlayerViewModel.IsStreamPath(path))
         {
             // Radio i ostali streamovi ne idu u povijest gledanja.
             _coverage = null;

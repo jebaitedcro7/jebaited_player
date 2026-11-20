@@ -17,7 +17,7 @@
             <!-- Ciklus 3: radna kopija (M2a) i zadane vrijednosti (M2b). -->
             <TextBlock x:Name="SaveStatusText" DockPanel.Dock="Left" Style="{StaticResource HintText}" VerticalAlignment="Center" Margin="22,0,0,0"
                        ToolTip="{loc:T settings.savedHint}" />
-            <Button DockPanel.Dock="Right" Style="{StaticResource SecondaryButton}" Content="{loc:T common.close}" Click="OnClose"
+            <Button x:Name="CloseButton" DockPanel.Dock="Right" Style="{StaticResource SecondaryButton}" Content="{loc:T common.close}" Click="OnClose"
                     Margin="6,12,22,12" />
             <Button x:Name="SaveButton" DockPanel.Dock="Right" Style="{StaticResource AccentButton}" Content="{loc:T settings.save}" Click="OnSave"
                     Margin="6,12,0,12" />
@@ -162,6 +162,11 @@
                         <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T settings.audioDevice}" Margin="0,24,0,2" />
                         <Button x:Name="AudioDeviceButton" Style="{StaticResource ChoiceButton}" Click="OnAudioDeviceClick" MinWidth="320" />
                         <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.audioDeviceHint}" Margin="0,6,0,0" />
+
+                        <!-- V4 (ciklus 4): glazba, radio i mini player na zasebnom izlazu, npr. virtualni kabel prema Discordu. -->
+                        <TextBlock Text="{loc:T settings.musicAudioDevice}" Margin="0,14,0,0" />
+                        <Button x:Name="MusicAudioDeviceButton" Style="{StaticResource ChoiceButton}" Click="OnMusicAudioDeviceClick" MinWidth="320" />
+                        <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.musicAudioDeviceHint}" TextWrapping="Wrap" Margin="0,6,0,0" />
 
                         <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T settings.audioDelay}" Margin="0,24,0,2" />
                         <Grid Margin="0,6,0,0" Width="520" HorizontalAlignment="Left">

@@ -368,9 +368,10 @@ public partial class MiniPlayerWindow : Window
 
     private void OnPlay(object sender, RoutedEventArgs e)
     {
-        if (_vm.HasMedia)
+        if (_vm.HasMedia || _vm.StoppedStream != null)
         {
-            _vm.SetPaused(false);
+            // Radio (R1) se ponovno spaja uživo, a datoteka samo nastavlja.
+            _vm.Play();
         }
         else if (_vm.Library.Playlist.FirstOrDefault() is { } first)
         {
@@ -382,11 +383,18 @@ public partial class MiniPlayerWindow : Window
         }
     }
 
-    private void OnPause(object sender, RoutedEventArgs e) => _vm.TogglePause();
+    private void OnPause(object sender, RoutedEventArgs e)
+    {
+        // Pauza dok ništa ne svira ne pokreće zaustavljenu postaju (to radi Play).
+        if (_vm.HasMedia)
+        {
+            _vm.TogglePause();
+        }
+    }
 
     private void OnPlayPause(object sender, RoutedEventArgs e)
     {
-        if (_vm.HasMedia)
+        if (_vm.HasMedia || _vm.StoppedStream != null)
         {
             _vm.TogglePause();
         }
@@ -396,15 +404,11 @@ public partial class MiniPlayerWindow : Window
         }
     }
 
-    /// <summary>Stop kao u Winampu: pjesma ostaje učitana, na početku i pauzirana.</summary>
-    private void OnStop(object sender, RoutedEventArgs e)
-    {
-        if (_vm.HasMedia)
-        {
-            _vm.SetPaused(true);
-            _vm.SeekAbsolute(0, exact: true);
-        }
-    }
+    /// <summary>
+    /// Stop kao u Winampu: pjesma ostaje učitana, na početku i pauzirana. Radio (R1) se stvarno zaustavlja,
+    /// a Play ga ponovno spaja uživo (prije je „početak” streama bio trenutak uključenja postaje).
+    /// </summary>
+    private void OnStop(object sender, RoutedEventArgs e) => _vm.StopPlayback();
 
     private void OnOpen(object sender, RoutedEventArgs e) => _host.ShowOpenDialog(this);
 
@@ -440,7 +444,8 @@ public partial class MiniPlayerWindow : Window
     /// <summary>Svakih 250 ms: vrijeme, traka, tipka play/pauza, glasnoća; naslov i kvaliteta svake sekunde.</summary>
     internal void Tick()
     {
-        bool stream = _vm.HasMedia && IsStream(_vm.CurrentPath);
+        bool stream = _vm.IsLiveStream;
+        StreamInfo? stopped = _vm.HasMedia ? null : _vm.StoppedStream;
         bool has = _vm.HasMedia && _vm.Duration > 0 && !stream;
         double position = has || stream ? _vm.Position : 0;
         double duration = has ? _vm.Duration : 0;
@@ -456,7 +461,7 @@ public partial class MiniPlayerWindow : Window
 
         CompactProgress.Value = has ? position / duration : 0;
         CompactTime.Text = has ? $"{Short(position)} / {Short(duration)}" : string.Empty;
-        SourceText.Text = Loc.T(stream ? "mini.sourceRadio" : "mini.sourceLocal");
+        SourceText.Text = Loc.T(stream || stopped != null ? "mini.sourceRadio" : "mini.sourceLocal");
         if (stream)
         {
             // Radio uživo: vrijeme slušanja, bez premotavanja i bez preostalog vremena.
@@ -464,6 +469,12 @@ public partial class MiniPlayerWindow : Window
             RemainingText.Text = Loc.T("mini.live");
             SeekSlider.IsEnabled = false;
             CompactTime.Text = $"{Short(position)} · {Loc.T("mini.live")}";
+        }
+        else if (stopped != null)
+        {
+            // R1: postaja zaustavljena tipkom Stop ostaje prikazana u naslovu; Play je ponovno spaja uživo.
+            // (Polje preostalog vremena je preusko za „ZAUSTAVLJENO”, pa ostaje prazno.)
+            CompactTime.Text = Loc.T("mini.stopped");
         }
         CompactPlayPause.Content = has && !_vm.IsPaused ? "" : "";
         string muteGlyph = _vm.IsMuted || _vm.Volume <= 0 ? "" : "";
@@ -476,7 +487,11 @@ public partial class MiniPlayerWindow : Window
             _updatingVolume = false;
         }
 
-        if (!has && !stream)
+        if (stopped != null)
+        {
+            SetMarquee($"{stopped.Title}  ···  {Loc.T("mini.stopped")}");
+        }
+        else if (!has && !stream)
         {
             SetMarquee(_vm.HasMedia ? string.Empty : Loc.T("mini.empty"));
         }
@@ -489,7 +504,7 @@ public partial class MiniPlayerWindow : Window
     /// <summary>„Izvođač — Naslov  ···  320 kbps · 48 kHz” iz oznaka datoteke (mpv).</summary>
     private async Task UpdateTitleAsync()
     {
-        bool stream = IsStream(_vm.CurrentPath);
+        bool stream = PlayerViewModel.IsStreamPath(_vm.CurrentPath);
         (string? artist, string? title, string? bitrate, string? rate, string? icy) = await Task.Run(() => (
             _host.GetMpvProperty("metadata/by-key/Artist"),
             _host.GetMpvProperty("media-title"),
@@ -615,9 +630,6 @@ public partial class MiniPlayerWindow : Window
         double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out double db) && double.IsFinite(db) ? db : VuFloorDb;
 
     private static string Short(double seconds) => TimeFormat.Format(seconds, seconds >= 3600);
-
-    private static bool IsStream(string? path) =>
-        path is not null && (path.StartsWith("http://", StringComparison.OrdinalIgnoreCase) || path.StartsWith("https://", StringComparison.OrdinalIgnoreCase));
 
     private void OnSourceClick(object sender, MouseButtonEventArgs e)
     {

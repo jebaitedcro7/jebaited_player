@@ -101,11 +101,17 @@ $u = $r2.update
 Check "Nova verzija radi i nema dalje nadogradnje" ($u.current -eq "0.99.1" -and -not $u.ready -and $u.state -eq "UpToDate" -and $r2.hasMedia) `
     ("trenutna {0}, stanje {1}, video reproduciran: {2}" -f $u.current, $u.state, $r2.hasMedia)
 
-$hashAfter = Get-ChildItem $data -Recurse -File | Sort-Object FullName | Where-Object { $_.FullName -notmatch '\\logs\\|\\cache\\(shaders|speech|subtitles|search|downloads)\\' } |
+# Automatske kopije (M1a, ciklus 2: pri pokretanju i prije nadogradnje) su nove datoteke po pravilu, pa se ne uspoređuju.
+$hashAfter = Get-ChildItem $data -Recurse -File | Sort-Object FullName | Where-Object { $_.FullName -notmatch '\\logs\\|\\cache\\(shaders|speech|subtitles|search|downloads)\\|\\backups\\' } |
     ForEach-Object { "{0} {1}" -f $_.FullName.Substring($data.Length), (Get-FileHash $_.FullName).Hash }
 $same = (Compare-Object $hashBefore $hashAfter | Measure-Object).Count -eq 0
 Check "Postavke i podaci ostaju" ($same -and $u.settingsVolume -eq 37 -and $u.dataDir -eq $data) `
     ("isti sadržaj: {0}; glasnoća iz postavki nakon nadogradnje: {1}; mapa podataka: {2}" -f $same, $u.settingsVolume, $u.dataDir)
+
+# M1a / M3a: prije nadogradnje nastaje kopija postavki, jednaka postavkama prije nadogradnje.
+$updateBackup = Get-ChildItem (Join-Path $data "backups") -Directory -ErrorAction SilentlyContinue | Where-Object Name -like "*_update-0.99.1" | Select-Object -First 1
+$backupSame = $updateBackup -and (Get-FileHash (Join-Path $updateBackup.FullName "settings.json")).Hash -eq (Get-FileHash (Join-Path $data "settings.json")).Hash
+Check "Kopija postavki prije nadogradnje" ([bool]$backupSame) ("kopija: {0}" -f $(if ($updateBackup) { $updateBackup.Name } else { "nema" }))
 
 $results | Format-Table -AutoSize -Wrap
 $failed = @($results | Where-Object Rezultat -ne "OK").Count

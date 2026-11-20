@@ -32,6 +32,8 @@ You need Windows 10 or 11 (64-bit). Nothing else has to be installed (download s
 
 **Portable version:** unzip `JebaitedPlayer-win-Portable.zip` anywhere and run `jebaited_player.exe`. It does not change anything in Windows (no “Open with” entry); updates work in it too.
 
+**Microsoft Store:** jebaited_player is also in the [Microsoft Store](https://apps.microsoft.com/detail/9NP4GF0Q40JL). The Store version works with Smart App Control, is updated by the Store and can be a version or two behind GitHub.
+
 ---
 
 ## A. Quick Start
@@ -108,7 +110,7 @@ In the same tab you set the automatic search, the encoding of old subtitles and 
 
 - **Volume:** ↑ / ↓, the mouse wheel or the slider; **M** mutes.
 - **Audio track:** **B** switches to the next one, or right-click → **Audio** and choose a track (language, format and channels are shown). The choice is remembered per video.
-- **Settings → Audio:** preferred audio language, output device, audio sync (for example for Bluetooth headphones), volume levelling for quiet dialogue and a 10-band equalizer with presets and your own preset.
+- **Settings → Audio:** preferred audio language, output device (also a separate **output for music and radio**, for example a virtual cable for Discord), audio sync (for example for Bluetooth headphones), volume levelling for quiet dialogue and a 10-band equalizer with presets and your own preset.
 
 ### Mini player
 
@@ -124,6 +126,7 @@ In the same tab you set the automatic search, the encoding of old subtitles and 
 
 - **Ctrl+R**, right-click → **Radio…** or the source label in the mini player: search stations by name, genre and country (free Radio Browser directory), press ▶ (or the name) to listen, the star keeps it in **Favorites**. Any stream URL (http/https, also .m3u/.pls) works too.
 - Stations play in the mini player with the music equalizer, marked **RADIO** and **LIVE**, with the current song when the station sends it. Radio does not appear in “Continue watching”.
+- **Stop** really stops the station (it stays shown in the mini player); **Play** or Space connects again, live. Pause → Play also continues live, and live radio cannot be rewound.
 
 ### Backup and transfer
 
@@ -151,14 +154,14 @@ Use the switch at the bottom left of the main screen (moon = dark, sun = light) 
 
 ### Settings
 
-Settings are split into tabs. Every change applies right away (also to the video that is playing) and is saved.
+Settings are split into tabs. Every change applies right away (also to the video that is playing). **Save** keeps it, **Discard changes** goes back to the last saved state, and closing the window with unsaved changes asks: Save, Discard changes or Cancel.
 
 | Tab | What you set |
 |---|---|
 | General | Resuming a started video (ask / resume / from the beginning), arrow-key seek step, open videos in full screen, keep the player on top, series (next episode, countdown), screenshot folder, “Open with” and the default player |
 | Language | App language |
 | Subtitles | Subtitle languages and their order, automatic loading and searching, sources on the internet, encoding of old subtitles, look, synchronization |
-| Audio | Volume, volume levelling, equalizer, preferred audio language, output device, audio sync |
+| Audio | Volume, volume levelling, equalizer, preferred audio language, output device, output for music and radio, audio sync |
 | Video | Picture quality, hardware decoding, default aspect ratio, HDR |
 | Appearance | Dark / light theme, how long the controls stay visible, rendering the interface on the GPU |
 | Updates | Version, check now, automatic download, what is new, update history |
@@ -264,7 +267,9 @@ Archives from subtitle sites: ZIP is supported; RAR is not yet.
 
 The player checks GitHub for a new version 20 seconds after it starts and every 12 hours, downloads it in the background and **installs it when you close the player** — nothing is interrupted while you watch. Settings → Updates shows the version and lets you check now or switch off automatic downloads.
 
-Settings (including language and theme), watch history, keys and caches are stored in `%LOCALAPPDATA%\jebaited_player`, separately from the program, so updates and reinstalls keep them.
+Settings (including language and theme), watch history, keys and caches are stored in `%LOCALAPPDATA%\jebaited_player`, separately from the program, so updates and reinstalls keep them. If the settings file is ever damaged, it is kept aside (`settings.corrupt-….json`) and your settings come back from the latest automatic backup.
+
+The Microsoft Store version keeps its data in `%LOCALAPPDATA%\Packages\jebaitedplayer.jebaitedplayer_5g6w8vrmj8ate\LocalState\jebaited_player` and is updated by the Store.
 
 ### Troubleshooting
 

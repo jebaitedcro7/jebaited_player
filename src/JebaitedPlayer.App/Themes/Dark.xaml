@@ -20,6 +20,8 @@
 
     <!-- Poluprozirna podloga popisa na početnom ekranu (preko svemirske pozadine). -->
     <SolidColorBrush x:Key="HomeCardBrush" Color="#8C0B101B" />
+    <!-- N4: zatamnjenje preko vlastite slike pozadine (kartice i tekst ostaju čitljivi). -->
+    <SolidColorBrush x:Key="HomeImageDimBrush" Color="#73060912" />
 
     <!-- Sjaj iza loga na početnom ekranu i u odabiru jezika. -->
     <RadialGradientBrush x:Key="LogoGlowBrush">

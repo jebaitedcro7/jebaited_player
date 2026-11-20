@@ -4,6 +4,27 @@ All notable changes to jebaited_player. Format: [Keep a Changelog](https://keepa
 
 Other languages: [Deutsch](CHANGELOG_DE.md) · [Hrvatski](CHANGELOG_HR.md). The same history is included in the player (click the version number on the home screen). This file is generated from `src/JebaitedPlayer.App/History/update-history.json`.
 
+## [1.7.4] - 2026-11-21
+
+Cycle 5: Spotify remote control, “Up next” on the home screen and your own home screen background.
+
+### Added
+
+- Spotify (Ctrl+Shift+S, or the source label in the mini player): sign in with your own free Spotify developer app (a guide is in the window), see the song with its cover, play, pause, skip, seek, set the volume, play your playlists and saved songs, search and choose the device. The music plays in your Spotify app; while Spotify is the source, the mini player buttons control it. Controlling playback needs Spotify Premium.
+- “Up next” on the home screen: the next episode of a series you are watching appears by itself (also across seasons), you can add any video (right-click the video or a “Continue watching” item), change the order with ▲ ▼ and remove items with ×. An item disappears once it is watched.
+- Settings → Appearance → Home screen background: the default space background or your own picture (Fill, Fit or Center), with a preview. The picture is not copied; if it is moved or deleted, the space background comes back.
+
+### Improved
+
+- A big background picture is loaded in the background and only at screen size, so it does not slow down the start.
+
+### Known issues
+
+- The app is not digitally signed yet, so Windows SmartScreen or Smart App Control may warn before the installation.
+- The progress window of the installer comes from Velopack and is only in English.
+
+Release: [v1.7.4](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v1.7.4) · Changes since [v1.6.3...v1.7.4](https://github.com/jebaitedcro7/jebaited_player/compare/v1.6.3...v1.7.4)
+
 ## [1.6.3] - 2026-11-20
 
 Cycle 4: live radio after Stop, protected settings, a question for unsaved changes and a separate output for music.

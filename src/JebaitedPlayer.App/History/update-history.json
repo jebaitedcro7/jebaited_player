@@ -40,6 +40,60 @@
   },
   "versions": [
     {
+      "version": "1.7.4",
+      "date": "2026-11-21",
+      "notes": {
+        "en": {
+          "summary": "Cycle 5: Spotify remote control, “Up next” on the home screen and your own home screen background.",
+          "features": [
+            "Spotify (Ctrl+Shift+S, or the source label in the mini player): sign in with your own free Spotify developer app (a guide is in the window), see the song with its cover, play, pause, skip, seek, set the volume, play your playlists and saved songs, search and choose the device. The music plays in your Spotify app; while Spotify is the source, the mini player buttons control it. Controlling playback needs Spotify Premium.",
+            "“Up next” on the home screen: the next episode of a series you are watching appears by itself (also across seasons), you can add any video (right-click the video or a “Continue watching” item), change the order with ▲ ▼ and remove items with ×. An item disappears once it is watched.",
+            "Settings → Appearance → Home screen background: the default space background or your own picture (Fill, Fit or Center), with a preview. The picture is not copied; if it is moved or deleted, the space background comes back."
+          ],
+          "improvements": [
+            "A big background picture is loaded in the background and only at screen size, so it does not slow down the start."
+          ],
+          "fixes": [],
+          "known": [
+            "The app is not digitally signed yet, so Windows SmartScreen or Smart App Control may warn before the installation.",
+            "The progress window of the installer comes from Velopack and is only in English."
+          ]
+        },
+        "de": {
+          "summary": "Zyklus 5: Spotify-Fernbedienung, „Als Nächstes“ auf dem Startbildschirm und eigener Hintergrund.",
+          "features": [
+            "Spotify (Strg+Umschalt+S oder die Quellenanzeige im Mini-Player): Anmeldung mit deiner eigenen kostenlosen Spotify-Entwickler-App (Anleitung im Fenster), Song mit Cover, Wiedergabe, Pause, Weiter, Spulen, Lautstärke, deine Playlists und gespeicherten Songs, Suche und Geräteauswahl. Die Musik läuft in deiner Spotify-App; solange Spotify die Quelle ist, steuern die Tasten des Mini-Players Spotify. Zum Steuern braucht man Spotify Premium.",
+            "„Als Nächstes“ auf dem Startbildschirm: Die nächste Folge einer Serie, die du schaust, erscheint von selbst (auch über Staffeln hinweg). Du kannst jedes Video hinzufügen (Rechtsklick auf das Video oder einen Eintrag in „Weiterschauen“), die Reihenfolge mit ▲ ▼ ändern und Einträge mit × entfernen. Ein Eintrag verschwindet, sobald er angesehen ist.",
+            "Einstellungen → Darstellung → Hintergrund des Startbildschirms: Standard (Weltraum) oder ein eigenes Bild (Füllen, Einpassen oder Zentriert) mit Vorschau. Das Bild wird nicht kopiert; wird es verschoben oder gelöscht, kommt der Weltraum-Hintergrund zurück."
+          ],
+          "improvements": [
+            "Ein großes Hintergrundbild wird im Hintergrund und nur in Bildschirmgröße geladen, daher verlangsamt es den Start nicht."
+          ],
+          "fixes": [],
+          "known": [
+            "Die App ist noch nicht digital signiert, daher können Windows SmartScreen oder Smart App Control vor der Installation warnen.",
+            "Das Fortschrittsfenster des Installationsprogramms stammt von Velopack und ist nur auf Englisch."
+          ]
+        },
+        "hr": {
+          "summary": "Ciklus 5: Spotify daljinski, „Sljedeće za gledanje” na početnom ekranu i vlastita pozadina.",
+          "features": [
+            "Spotify (Ctrl+Shift+S ili oznaka izvora u mini playeru): prijava sa svojom besplatnom Spotify developer aplikacijom (vodič je u prozoru), pjesma s omotom, play, pauza, sljedeća, premotavanje, glasnoća, tvoje playliste i spremljene pjesme, pretraga i izbor uređaja. Glazba svira u tvojoj Spotify aplikaciji; dok je Spotify izvor, tipke mini playera upravljaju njime. Za upravljanje treba Spotify Premium.",
+            "„Sljedeće za gledanje” na početnom ekranu: sljedeća epizoda serije koju gledaš pojavi se sama (i preko granice sezone), možeš dodati bilo koji video (desni klik na video ili na stavku „Nastavi gledati”), redoslijed mijenjaš s ▲ ▼, a × uklanja. Stavka nestaje kad je pogledaš.",
+            "Postavke → Izgled → Pozadina početnog ekrana: zadana (svemir) ili vlastita slika (Ispuni, Prilagodi ili Sredina), s pregledom. Slika se ne kopira; ako je premjestiš ili obrišeš, vraća se svemirska pozadina."
+          ],
+          "improvements": [
+            "Velika slika pozadine učitava se u pozadini i samo u veličini zaslona, pa ne usporava pokretanje."
+          ],
+          "fixes": [],
+          "known": [
+            "Aplikacija još nije digitalno potpisana, pa Windows SmartScreen ili Smart App Control mogu upozoriti prije instalacije.",
+            "Prozor napretka instalacije je Velopackov i samo je na engleskom."
+          ]
+        }
+      }
+    },
+    {
       "version": "1.6.3",
       "date": "2026-11-20",
       "notes": {

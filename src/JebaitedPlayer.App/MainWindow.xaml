@@ -32,14 +32,21 @@
             </Grid>
 
             <!-- Početni ekran. -->
-            <Grid x:Name="WelcomePanel" Background="{DynamicResource PanelBackgroundBrush}" SizeChanged="OnWelcomeSizeChanged">
+            <Grid x:Name="WelcomePanel" Background="{DynamicResource PanelBackgroundBrush}" SizeChanged="OnWelcomeSizeChanged" ClipToBounds="True">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
                 <!-- Diskretna svemirska pozadina (crta se jednom, bez animacija). -->
-                <controls:SpaceBackground Grid.RowSpan="2" />
+                <controls:SpaceBackground x:Name="HomeSpace" Grid.RowSpan="2" />
+
+                <!-- N4 (ciklus 5): vlastita slika umjesto svemira i blago zatamnjenje, da kartice ostanu čitljive. -->
+                <Image x:Name="HomeBackgroundImage" Grid.RowSpan="2" Visibility="Collapsed" Stretch="UniformToFill"
+                       HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False"
+                       RenderOptions.BitmapScalingMode="HighQuality" />
+                <Border x:Name="HomeBackgroundDim" Grid.RowSpan="2" Visibility="Collapsed" Background="{DynamicResource HomeImageDimBrush}"
+                        IsHitTestVisible="False" />
 
                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
                     <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="24,20,24,16">
@@ -100,7 +107,15 @@
                                                 <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
                                             <Button Style="{StaticResource ListRowButton}" CommandParameter="{Binding}"
+                                                    Tag="{Binding DataContext.Library, RelativeSource={RelativeSource AncestorType=Window}}"
                                                     Command="{Binding DataContext.Library.OpenRecentCommand, RelativeSource={RelativeSource AncestorType=Window}}">
+                                                <!-- N2: desni klik → Dodaj u Sljedeće za gledanje. -->
+                                                <Button.ContextMenu>
+                                                    <ContextMenu>
+                                                        <MenuItem Header="{loc:T menu.addWatchNext}" CommandParameter="{Binding}"
+                                                                  Command="{Binding PlacementTarget.Tag.AddRecentToWatchNextCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                                                    </ContextMenu>
+                                                </Button.ContextMenu>
                                                 <StackPanel>
                                                     <TextBlock Text="{Binding Title}" FontSize="14" TextTrimming="CharacterEllipsis" />
                                                     <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
@@ -123,6 +138,66 @@
                                             <DataTrigger Binding="{Binding Watched}" Value="True">
                                                 <Setter TargetName="WatchedIcon" Property="Visibility" Value="Visible" />
                                                 <Setter TargetName="DetailText" Property="Foreground" Value="{DynamicResource AccentBrush}" />
+                                            </DataTrigger>
+                                        </DataTemplate.Triggers>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                        </Border>
+
+                        <!-- N2 (ciklus 5): Sljedeće za gledanje (automatski sljedeća epizoda i ručno dodano; ▲ ▼ redoslijed, × ukloni). -->
+                        <Border x:Name="WatchNextCard" Width="520" Margin="14,12,14,0" VerticalAlignment="Top" Background="{DynamicResource HomeCardBrush}"
+                                CornerRadius="10" Padding="6,10,6,6"
+                                Visibility="{Binding Library.HasWatchNext, Converter={StaticResource BoolToVisibility}}">
+                        <StackPanel>
+                            <TextBlock Text="{loc:T home.watchNext}" FontSize="15" FontWeight="SemiBold" Margin="10,0,0,6" />
+                            <ItemsControl x:Name="WatchNextList" ItemsSource="{Binding Library.WatchNext}" Focusable="False">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <Button x:Name="OpenButton" Style="{StaticResource ListRowButton}" CommandParameter="{Binding}"
+                                                    Command="{Binding DataContext.Library.OpenWatchNextCommand, RelativeSource={RelativeSource AncestorType=Window}}">
+                                                <DockPanel>
+                                                    <TextBlock x:Name="KindIcon" DockPanel.Dock="Left" Text="&#xE768;" FontFamily="{DynamicResource IconFont}"
+                                                               FontSize="14" Margin="0,3,12,0" VerticalAlignment="Top"
+                                                               Foreground="{DynamicResource AccentBrush}" />
+                                                    <StackPanel>
+                                                        <TextBlock Text="{Binding Title}" FontSize="14" TextTrimming="CharacterEllipsis" />
+                                                        <TextBlock Text="{Binding Detail}" FontSize="12" Margin="0,2,0,0" TextTrimming="CharacterEllipsis"
+                                                                   Foreground="{DynamicResource TextSecondaryBrush}" />
+                                                    </StackPanel>
+                                                </DockPanel>
+                                            </Button>
+                                            <Button x:Name="UpButton" Grid.Column="1" Style="{StaticResource IconButton}" Content="&#xE70E;" FontSize="11"
+                                                    Width="28" Height="32" VerticalAlignment="Center" ToolTip="{loc:T home.watchNextUp}"
+                                                    CommandParameter="{Binding}"
+                                                    Command="{Binding DataContext.Library.MoveWatchNextUpCommand, RelativeSource={RelativeSource AncestorType=Window}}" />
+                                            <Button x:Name="DownButton" Grid.Column="2" Style="{StaticResource IconButton}" Content="&#xE70D;" FontSize="11"
+                                                    Width="28" Height="32" VerticalAlignment="Center" ToolTip="{loc:T home.watchNextDown}"
+                                                    CommandParameter="{Binding}"
+                                                    Command="{Binding DataContext.Library.MoveWatchNextDownCommand, RelativeSource={RelativeSource AncestorType=Window}}" />
+                                            <Button x:Name="RemoveButton" Grid.Column="3" Style="{StaticResource IconButton}" Content="&#xE711;" FontSize="12"
+                                                    Width="32" Height="32" VerticalAlignment="Center" ToolTip="{loc:T home.watchNextRemove}"
+                                                    CommandParameter="{Binding}"
+                                                    Command="{Binding DataContext.Library.RemoveWatchNextCommand, RelativeSource={RelativeSource AncestorType=Window}}" />
+                                        </Grid>
+                                        <DataTemplate.Triggers>
+                                            <DataTrigger Binding="{Binding IsAuto}" Value="False">
+                                                <Setter TargetName="KindIcon" Property="Text" Value="&#xE710;" />
+                                                <Setter TargetName="KindIcon" Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsFirst}" Value="True">
+                                                <Setter TargetName="UpButton" Property="IsEnabled" Value="False" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsLast}" Value="True">
+                                                <Setter TargetName="DownButton" Property="IsEnabled" Value="False" />
                                             </DataTrigger>
                                         </DataTemplate.Triggers>
                                     </DataTemplate>

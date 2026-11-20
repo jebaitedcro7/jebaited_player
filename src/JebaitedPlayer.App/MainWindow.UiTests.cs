@@ -44,6 +44,9 @@ public partial class MainWindow
                     "settings4" => await Settings4UiTestAsync(),
                     "unsaved" => await UnsavedUiTestAsync(),
                     "musicdevice" => await MusicDeviceUiTestAsync(),
+                    "homebg" => await HomeBackgroundUiTestAsync(),
+                    "watchnext" => await WatchNextUiTestAsync(),
+                    "spotify" => await SpotifyUiTestAsync(),
                     _ => new Dictionary<string, object?> { ["error"] = "nepoznat scenarij " + scenario },
                 };
             }

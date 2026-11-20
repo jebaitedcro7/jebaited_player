@@ -128,6 +128,13 @@ Im selben Tab stellst du die automatische Suche, die Zeichenkodierung alter Unte
 - Sender laufen im Mini-Player mit dem Musik-Equalizer, gekennzeichnet mit **RADIO** und **LIVE**, mit dem aktuellen Titel, wenn der Sender ihn sendet. Radio erscheint nicht unter „Weiterschauen“.
 - **Stopp** hält den Sender wirklich an (er bleibt im Mini-Player angezeigt); **Wiedergabe** oder Leertaste verbindet neu, live. Pause → Wiedergabe geht ebenfalls live weiter, und Live-Radio lässt sich nicht zurückspulen.
 
+### Spotify
+
+- **Strg+Umschalt+S**, Rechtsklick → **Spotify …** oder die Quellenanzeige im Mini-Player. jebaited_player ist eine Fernbedienung für deine Spotify-App: Die Musik läuft in Spotify (Computer, Handy oder Lautsprecher), der Player zeigt den Song mit Cover und steuert ihn. Zum Steuern braucht man **Spotify Premium**.
+- Spotify erlaubt höchstens 5 Nutzer pro Entwickler-App, daher verbindest du dich mit **deiner eigenen kostenlosen App**: Das Fenster zeigt die Schritte (App auf developer.spotify.com erstellen, die angezeigte Weiterleitungs-URI eintragen, Client ID einfügen), dann **Bei Spotify anmelden** im Browser.
+- Wiedergabe, Pause, Weiter, Spulen und Lautstärke, deine **Playlists**, **gespeicherten Songs**, **Suche** und **Geräteauswahl**. Solange Spotify die Quelle ist, zeigt der Mini-Player **SPOTIFY** und seine Tasten steuern Spotify; eine Datei oder ein Sender schaltet zurück.
+- Spotify-Ton läuft nie durch den Player (kein Equalizer) und wird nirgendwohin weitergeleitet.
+
 ### Sicherung und Übertragung
 
 Einstellungen → Allgemein → **Sicherung und Übertragung**: Einstellungen und Wiedergabeverlauf werden einmal täglich und vor jedem Update automatisch kopiert (die letzten 7 bleiben auf deinem Computer). **Einstellungen exportieren** speichert sie in einer Datei (ohne Passwörter, Schlüssel für Untertitelseiten und Fensterposition), **Einstellungen importieren** lädt sie wieder, auch auf einem anderen Computer.
@@ -151,6 +158,7 @@ Mit dem Schalter unten links auf dem Startbildschirm (Mond = dunkel, Sonne = hel
 - Die Position wird alle paar Sekunden, beim Pausieren, beim Klick auf **Startseite** und beim Schließen des Players gespeichert.
 - **Weiterschauen** zeigt die letzten Videos (× entfernt eines aus dem Verlauf).
 - **Favoriten:** Ctrl+D fügt einen Film oder die ganze Serie der aktuellen Folge hinzu; × auf dem Startbildschirm entfernt ihn.
+- **Als Nächstes:** Die nächste Folge einer Serie, die du schaust, erscheint von selbst (auch über Staffeln hinweg); Rechtsklick auf ein Video oder einen Eintrag in „Weiterschauen“ → **Zu „Als Nächstes“ hinzufügen**; ▲ ▼ ändern die Reihenfolge, × entfernt. Ein Eintrag verschwindet, sobald er angesehen ist.
 
 ### Einstellungen
 
@@ -163,7 +171,7 @@ Die Einstellungen sind in Tabs aufgeteilt. Jede Änderung gilt sofort (auch für
 | Untertitel | Untertitelsprachen und ihre Reihenfolge, automatisches Laden und Suchen, Quellen im Internet, Zeichenkodierung alter Untertitel, Aussehen, Synchronisierung |
 | Audio | Lautstärke, Lautstärkeausgleich, Equalizer, bevorzugte Audiosprache, Ausgabegerät, Ausgabe für Musik und Radio, Audio-Synchronisierung |
 | Video | Bildqualität, Hardware-Dekodierung, Standard-Seitenverhältnis, HDR |
-| Darstellung | Dunkles / helles Design, wie lange die Steuerung sichtbar bleibt, Oberfläche über die GPU darstellen |
+| Darstellung | Dunkles / helles Design, Hintergrund des Startbildschirms (Standard oder eigenes Bild: Füllen, Einpassen, Zentriert), wie lange die Steuerung sichtbar bleibt, Oberfläche über die GPU darstellen |
 | Updates | Version, jetzt prüfen, automatischer Download, Neuerungen, Update-Verlauf |
 | Info | Version, Lizenz, verwendete Technologien, Handbuch, Datenschutz, Richtlinie zur Code-Signierung |
 
@@ -260,6 +268,7 @@ Archive von Untertitelseiten: ZIP wird unterstützt, RAR noch nicht.
 | Ctrl+D | Zu Favoriten hinzufügen / entfernen |
 | Ctrl+M | Mini-Player / zurück zum vollen Player |
 | Ctrl+R | Radio |
+| Ctrl+Shift+S | Spotify |
 | Ctrl+Backspace | Ursprüngliche Untertitel-Synchronisation wiederherstellen |
 | F1 | Alle Tastenkürzel |
 

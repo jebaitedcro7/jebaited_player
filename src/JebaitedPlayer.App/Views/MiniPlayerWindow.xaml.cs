@@ -34,6 +34,12 @@ internal interface IMiniPlayerHost
     void ShowSettings();
 
     void ShowRadio(Window owner);
+
+    /// <summary>Ciklus 5, V8: Spotify daljinski (prozor).</summary>
+    void ShowSpotify(Window owner);
+
+    /// <summary>Ciklus 5, V8: stanje i upravljanje Spotifyjem (dok je on izvor, tipke mini playera upravljaju njime).</summary>
+    JebaitedPlayer.Services.SpotifyRemote Spotify { get; }
 }
 
 /// <summary>
@@ -362,12 +368,43 @@ public partial class MiniPlayerWindow : Window
 
     // --- Reprodukcija -------------------------------------------------------------------------------------------
 
-    private void OnPrevious(object sender, RoutedEventArgs e) => _vm.Library.PlayPrevious();
+    /// <summary>V8: Spotify je izvor (pušten iz prozora Spotify), pa tipke upravljaju njime dok se ne pusti nešto lokalno.</summary>
+    private bool SpotifyMode => _host.Spotify.IsActiveSource;
 
-    private void OnNext(object sender, RoutedEventArgs e) => _vm.Library.PlayNext();
+    private void OnPrevious(object sender, RoutedEventArgs e)
+    {
+        if (SpotifyMode)
+        {
+            _ = _host.Spotify.PreviousAsync();
+            return;
+        }
+
+        _vm.Library.PlayPrevious();
+    }
+
+    private void OnNext(object sender, RoutedEventArgs e)
+    {
+        if (SpotifyMode)
+        {
+            _ = _host.Spotify.NextAsync();
+            return;
+        }
+
+        _vm.Library.PlayNext();
+    }
 
     private void OnPlay(object sender, RoutedEventArgs e)
     {
+        if (SpotifyMode)
+        {
+            if (_host.Spotify.State is not { IsPlaying: true })
+            {
+                _ = _host.Spotify.TogglePlayAsync();
+            }
+
+            return;
+        }
+
         if (_vm.HasMedia || _vm.StoppedStream != null)
         {
             // Radio (R1) se ponovno spaja uživo, a datoteka samo nastavlja.
@@ -385,6 +422,12 @@ public partial class MiniPlayerWindow : Window
 
     private void OnPause(object sender, RoutedEventArgs e)
     {
+        if (SpotifyMode)
+        {
+            _ = _host.Spotify.TogglePlayAsync();
+            return;
+        }
+
         // Pauza dok ništa ne svira ne pokreće zaustavljenu postaju (to radi Play).
         if (_vm.HasMedia)
         {
@@ -394,6 +437,12 @@ public partial class MiniPlayerWindow : Window
 
     private void OnPlayPause(object sender, RoutedEventArgs e)
     {
+        if (SpotifyMode)
+        {
+            _ = _host.Spotify.TogglePlayAsync();
+            return;
+        }
+
         if (_vm.HasMedia || _vm.StoppedStream != null)
         {
             _vm.TogglePause();
@@ -408,7 +457,16 @@ public partial class MiniPlayerWindow : Window
     /// Stop kao u Winampu: pjesma ostaje učitana, na početku i pauzirana. Radio (R1) se stvarno zaustavlja,
     /// a Play ga ponovno spaja uživo (prije je „početak” streama bio trenutak uključenja postaje).
     /// </summary>
-    private void OnStop(object sender, RoutedEventArgs e) => _vm.StopPlayback();
+    private void OnStop(object sender, RoutedEventArgs e)
+    {
+        if (SpotifyMode)
+        {
+            _ = _host.Spotify.PauseAsync();
+            return;
+        }
+
+        _vm.StopPlayback();
+    }
 
     private void OnOpen(object sender, RoutedEventArgs e) => _host.ShowOpenDialog(this);
 
@@ -442,8 +500,31 @@ public partial class MiniPlayerWindow : Window
     }
 
     /// <summary>Svakih 250 ms: vrijeme, traka, tipka play/pauza, glasnoća; naslov i kvaliteta svake sekunde.</summary>
+    private bool _spotifyConsumer;
+
     internal void Tick()
     {
+        // V8: dok je Spotify izvor i mini player vidljiv, stanje se osvježava (inače nema mreže ni timera).
+        bool spotify = SpotifyMode;
+        if ((spotify && IsVisible) != _spotifyConsumer)
+        {
+            _spotifyConsumer = !_spotifyConsumer;
+            if (_spotifyConsumer)
+            {
+                _host.Spotify.AddConsumer();
+            }
+            else
+            {
+                _host.Spotify.RemoveConsumer();
+            }
+        }
+
+        if (spotify)
+        {
+            TickSpotify();
+            return;
+        }
+
         bool stream = _vm.IsLiveStream;
         StreamInfo? stopped = _vm.HasMedia ? null : _vm.StoppedStream;
         bool has = _vm.HasMedia && _vm.Duration > 0 && !stream;
@@ -631,9 +712,38 @@ public partial class MiniPlayerWindow : Window
 
     private static string Short(double seconds) => TimeFormat.Format(seconds, seconds >= 3600);
 
+    /// <summary>V8: Spotify kao izvor — pjesma, izvođač, vrijeme i oznaka SPOTIFY (tipke idu Spotifyju).</summary>
+    private void TickSpotify()
+    {
+        JebaitedPlayer.Online.SpotifyPlayback? s = _host.Spotify.State;
+        double position = (s?.ProgressMs ?? 0) / 1000.0;
+        double duration = (s?.DurationMs ?? 0) / 1000.0;
+        SourceText.Text = Loc.T("mini.sourceSpotify");
+        TimeText.Text = _showRemaining && duration > 0 ? "-" + Short(Math.Max(0, duration - position)) : Short(position);
+        RemainingText.Text = duration > 0 ? "-" + Short(Math.Max(0, duration - position)) : string.Empty;
+        SeekSlider.IsEnabled = false;
+        SeekSlider.Maximum = Math.Max(1, duration);
+        SeekSlider.Value = Math.Min(position, SeekSlider.Maximum);
+        CompactProgress.Value = duration > 0 ? position / duration : 0;
+        CompactTime.Text = duration > 0 ? $"{Short(position)} / {Short(duration)}" : string.Empty;
+        CompactPlayPause.Content = s is { IsPlaying: true } ? "" : "";
+        string title = s is { Track.Length: > 0 }
+            ? (s.Artists.Length > 0 ? $"{s.Artists} — {s.Track}" : s.Track) + (s.DeviceName is { Length: > 0 } d ? $"  ···  {d}" : string.Empty)
+            : _host.Spotify.Status is { Length: > 0 } status ? status : Loc.T("spotify.nothingPlaying");
+        SetMarquee(title);
+    }
+
+    /// <summary>Klik na oznaku izvora: Radio ili Spotify (ciklus 5).</summary>
     private void OnSourceClick(object sender, MouseButtonEventArgs e)
     {
         e.Handled = true;
-        _host.ShowRadio(this);
+        var menu = new ContextMenu { PlacementTarget = (UIElement)sender, Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom };
+        var radio = new MenuItem { Header = Loc.T("menu.radio") };
+        radio.Click += (_, _) => _host.ShowRadio(this);
+        var spotify = new MenuItem { Header = Loc.T("menu.spotify") };
+        spotify.Click += (_, _) => _host.ShowSpotify(this);
+        menu.Items.Add(radio);
+        menu.Items.Add(spotify);
+        menu.IsOpen = true;
     }
 }

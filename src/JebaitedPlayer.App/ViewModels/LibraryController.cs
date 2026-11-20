@@ -71,6 +71,9 @@ public sealed class PlaylistItem(string path, MediaInfo info) : ObservableObject
 /// <summary>Stavka "Nastavi gledati" na početnom ekranu (pogledano: natpis i puna zelena traka).</summary>
 public sealed record RecentItem(string Path, string Title, string Detail, double Progress, bool Watched = false);
 
+/// <summary>Stavka kartice „Sljedeće za gledanje” (ciklus 5, N2).</summary>
+public sealed record WatchNextItem(string Path, string Title, string Detail, bool IsAuto, bool IsFirst, bool IsLast);
+
 /// <summary>Omiljeni film ili serija na početnom ekranu.</summary>
 public sealed record FavoriteItem(string Path, string Title, string Detail, bool IsSeries)
 {
@@ -123,6 +126,11 @@ public sealed class LibraryController : ObservableObject
         ToggleFavoriteCommand = new RelayCommand(ToggleFavorite);
         OpenFavoriteCommand = new RelayCommand<FavoriteItem>(item => OpenRecentRequested?.Invoke(this, item.Path));
         RemoveFavoriteCommand = new RelayCommand<FavoriteItem>(RemoveFavorite);
+        OpenWatchNextCommand = new RelayCommand<WatchNextItem>(item => OpenRecentRequested?.Invoke(this, item.Path));
+        RemoveWatchNextCommand = new RelayCommand<WatchNextItem>(item => ChangeWatchNext(() => _store?.DismissWatchNext(item.Path)));
+        MoveWatchNextUpCommand = new RelayCommand<WatchNextItem>(item => ChangeWatchNext(() => _store?.MoveWatchNext(item.Path, -1)));
+        MoveWatchNextDownCommand = new RelayCommand<WatchNextItem>(item => ChangeWatchNext(() => _store?.MoveWatchNext(item.Path, +1)));
+        AddRecentToWatchNextCommand = new RelayCommand<RecentItem>(item => AddToWatchNext(item.Path));
 
         vm.MediaLoaded += (_, path) => OnMediaLoaded(path);
         vm.EndReached += (_, _) => OnEndReached();
@@ -157,8 +165,138 @@ public sealed class LibraryController : ObservableObject
 
     public bool HasFavorites => Favorites.Count > 0;
 
+    // --- Ciklus 5, N2: Sljedeće za gledanje ----------------------------------------------------------------------------
+
+    public ObservableCollection<WatchNextItem> WatchNext { get; } = [];
+
+    public bool HasWatchNext => WatchNext.Count > 0;
+
+    public ICommand OpenWatchNextCommand { get; }
+    public ICommand RemoveWatchNextCommand { get; }
+    public ICommand MoveWatchNextUpCommand { get; }
+    public ICommand MoveWatchNextDownCommand { get; }
+    public ICommand AddRecentToWatchNextCommand { get; }
+
+    /// <summary>Najviše toliko serija se provjerava za automatsku sljedeću epizodu (svaka znači čitanje mape).</summary>
+    private const int WatchNextSeriesLimit = 12;
+
+    private int _watchNextVersion;
+
+    /// <summary>Ručno dodavanje (desni klik na video ili na stavku „Nastavi gledati”).</summary>
+    public void AddToWatchNext(string path)
+    {
+        if (_store is null || PlayerViewModel.IsStreamPath(path))
+        {
+            return;
+        }
+
+        MediaInfo info = MediaNameParser.Parse(path);
+        bool added = Safe(() => _store.AddWatchNext(path, info.DisplayTitle, "manual"));
+        Message?.Invoke(added ? Loc.T("notice.watchNextAdded", info.DisplayTitle) : Loc.T("notice.watchNextAlready", info.DisplayTitle));
+        _ = RefreshWatchNextAsync();
+    }
+
+    private void ChangeWatchNext(Action change)
+    {
+        Safe(change);
+        _ = RefreshWatchNextAsync();
+    }
+
+    /// <summary>Osvježi listu: automatske stavke se računaju izvan UI dretve (čitanje mapa serija).</summary>
+    public async Task RefreshWatchNextAsync()
+    {
+        if (_store is null)
+        {
+            return;
+        }
+
+        int version = ++_watchNextVersion;
+        WatchStore store = _store;
+        IReadOnlyList<WatchNextEntry> entries = await Task.Run(() => Safe(() => UpdateWatchNext(store)) ?? []);
+        if (version != _watchNextVersion)
+        {
+            return;
+        }
+
+        WatchNext.Clear();
+        for (int i = 0; i < entries.Count; i++)
+        {
+            WatchNextEntry e = entries[i];
+            WatchNext.Add(new WatchNextItem(e.Path, e.Title, Loc.T(e.IsAuto ? "home.watchNextAuto" : "home.watchNextManual"), e.IsAuto,
+                i == 0, i == entries.Count - 1));
+        }
+
+        OnPropertyChanged(nameof(HasWatchNext));
+        OnPropertyChanged(nameof(HasLibraryContent));
+    }
+
+    /// <summary>
+    /// N2: za svaku seriju čija je zadnja gledana epizoda pogledana predloži sljedeću nepogledanu i nezapočetu epizodu
+    /// (i preko sezone, kao „sljedeća epizoda”). Započeta je već u „Nastavi gledati”. Pogledane stavke i zastarjele
+    /// automatske stavke (serija je otišla dalje) se brišu. Vraća vidljive stavke čije datoteke postoje.
+    /// </summary>
+    internal static IReadOnlyList<WatchNextEntry> UpdateWatchNext(WatchStore store)
+    {
+        var latest = new Dictionary<string, WatchEntry>(StringComparer.Ordinal);
+        foreach (WatchEntry e in store.Recent(200))
+        {
+            MediaInfo info = MediaNameParser.Parse(e.Path);
+            if (!info.IsEpisode || MediaScanner.IsAudio(e.Path))
+            {
+                continue;
+            }
+
+            string key = SeriesKey(e.Path, info);
+            if (!latest.ContainsKey(key) && latest.Count < WatchNextSeriesLimit && File.Exists(e.Path))
+            {
+                latest[key] = e; // Recent je poredan od zadnje gledanog
+            }
+        }
+
+        var candidates = new Dictionary<string, string>(StringComparer.Ordinal);
+        foreach ((string key, WatchEntry e) in latest)
+        {
+            if (!e.Watched)
+            {
+                continue;
+            }
+
+            List<string> episodes = MediaScanner.Sort(EpisodeNeighbours(e.Path)).ToList();
+            int index = episodes.FindIndex(p => string.Equals(p, e.Path, StringComparison.OrdinalIgnoreCase));
+            IReadOnlyDictionary<string, WatchEntry> known = store.GetMany(episodes);
+            string? next = episodes.Skip(index + 1).FirstOrDefault(p =>
+                !(known.TryGetValue(p, out WatchEntry? w) && (w.Watched || w.Position >= MinResumeSeconds)));
+            if (index >= 0 && next is not null)
+            {
+                candidates[key] = next;
+            }
+        }
+
+        foreach (WatchNextEntry item in store.WatchNext())
+        {
+            WatchEntry? entry = store.Get(item.Path);
+            bool watched = entry is { Watched: true };
+            bool stale = item.IsAuto && !(candidates.TryGetValue(SeriesKey(item.Path, MediaNameParser.Parse(item.Path)), out string? c) &&
+                                          string.Equals(c, item.Path, StringComparison.OrdinalIgnoreCase));
+            if (watched || stale)
+            {
+                store.DeleteWatchNext(item.Path);
+            }
+        }
+
+        foreach (string next in candidates.Values)
+        {
+            store.AddWatchNext(next, MediaNameParser.Parse(next).DisplayTitle, "auto");
+        }
+
+        return store.WatchNext().Where(e => File.Exists(e.Path)).ToList();
+    }
+
+    private static string SeriesKey(string path, MediaInfo info) =>
+        MediaNameParser.NormalizeTitle(string.IsNullOrWhiteSpace(info.Title) ? Path.GetFileName(Path.GetDirectoryName(path)) ?? path : info.Title);
+
     /// <summary>Početni ekran ima povijest ili omiljene (tada se prečaci prikazuju tek na klik).</summary>
-    public bool HasLibraryContent => Recent.Count > 0 || Favorites.Count > 0;
+    public bool HasLibraryContent => Recent.Count > 0 || Favorites.Count > 0 || WatchNext.Count > 0;
 
     /// <summary>Je li trenutni film (ili serija trenutne epizode) među omiljenima.</summary>
     public bool IsCurrentFavorite
@@ -548,6 +686,7 @@ public sealed class LibraryController : ObservableObject
 
         OnPropertyChanged(nameof(HasRecent));
         RefreshFavorites();
+        _ = RefreshWatchNextAsync();
     }
 
     public void RefreshFavorites()

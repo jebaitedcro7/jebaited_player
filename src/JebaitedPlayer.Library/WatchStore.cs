@@ -41,6 +41,13 @@ public sealed record Favorite(string Path, string Title, string Kind, DateTime A
 /// <summary>Omiljena radio postaja (ciklus 3).</summary>
 public sealed record RadioFavorite(string Url, string Name, string? Detail, DateTime Added);
 
+/// <summary>Stavka liste „Sljedeće za gledanje” (ciklus 5, N2).</summary>
+/// <param name="Source">"auto" (sljedeća epizoda serije u tijeku) ili "manual" (dodao korisnik).</param>
+public sealed record WatchNextEntry(string Path, string Title, string Source, int Sort, DateTime Added)
+{
+    public bool IsAuto => Source == "auto";
+}
+
 /// <summary>Zapamćena audio traka za jedan video (mpv ID i jezik, za slučaj da se redoslijed traka promijeni).</summary>
 public sealed record AudioState(long TrackId, string? Language);
 
@@ -355,6 +362,99 @@ public sealed class WatchStore : IDisposable
         }
     }
 
+    // --- Ciklus 5, N2: Sljedeće za gledanje --------------------------------------------------------------------------
+
+    /// <summary>Vidljive stavke (bez uklonjenih), po redoslijedu.</summary>
+    public IReadOnlyList<WatchNextEntry> WatchNext()
+    {
+        lock (_gate)
+        {
+            using SqliteCommand cmd = Command("SELECT path, title, source, sort, added FROM watch_next WHERE dismissed = 0 ORDER BY sort, added");
+            using SqliteDataReader r = cmd.ExecuteReader();
+            var list = new List<WatchNextEntry>();
+            while (r.Read())
+            {
+                list.Add(new WatchNextEntry(r.GetString(0), r.GetString(1), r.GetString(2), r.GetInt32(3),
+                    DateTime.Parse(r.GetString(4), CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind)));
+            }
+
+            return list;
+        }
+    }
+
+    /// <summary>
+    /// Dodaj na kraj. Automatska stavka koju je korisnik uklonio se ne vraća; ručno dodavanje je vraća.
+    /// Vraća true ako je stavka sada vidljiva, a prije nije bila.
+    /// </summary>
+    public bool AddWatchNext(string path, string title, string source)
+    {
+        if (source is not ("auto" or "manual"))
+        {
+            throw new ArgumentException("Izvor mora biti 'auto' ili 'manual'.", nameof(source));
+        }
+
+        lock (_gate)
+        {
+            using SqliteCommand existing = Command("SELECT dismissed FROM watch_next WHERE path = $path", ("$path", path));
+            object? dismissed = existing.ExecuteScalar();
+            if (dismissed is not null && (Convert.ToInt64(dismissed, CultureInfo.InvariantCulture) == 0 || source == "auto"))
+            {
+                return false;
+            }
+
+            using SqliteCommand cmd = Command(
+                """
+                INSERT OR REPLACE INTO watch_next (path, title, source, sort, added, dismissed)
+                VALUES ($path, $title, $source, (SELECT COALESCE(MAX(sort), 0) + 1 FROM watch_next), $now, 0)
+                """,
+                ("$path", path), ("$title", title), ("$source", source), ("$now", Now()));
+            cmd.ExecuteNonQuery();
+            return true;
+        }
+    }
+
+    /// <summary>Korisnik je uklonio stavku (×): ostaje zapamćena kao uklonjena, da je automatika ne vrati.</summary>
+    public void DismissWatchNext(string path)
+    {
+        lock (_gate)
+        {
+            using SqliteCommand cmd = Command("UPDATE watch_next SET dismissed = 1 WHERE path = $path", ("$path", path));
+            cmd.ExecuteNonQuery();
+        }
+    }
+
+    /// <summary>Stavka više ne vrijedi (pogledana ili zastarjela automatska): briše se potpuno.</summary>
+    public void DeleteWatchNext(string path)
+    {
+        lock (_gate)
+        {
+            using SqliteCommand cmd = Command("DELETE FROM watch_next WHERE path = $path", ("$path", path));
+            cmd.ExecuteNonQuery();
+        }
+    }
+
+    /// <summary>Pomakni stavku gore (-1) ili dolje (+1) među vidljivima.</summary>
+    public void MoveWatchNext(string path, int direction)
+    {
+        lock (_gate)
+        {
+            List<WatchNextEntry> list = WatchNext().ToList();
+            int i = list.FindIndex(e => string.Equals(e.Path, path, StringComparison.OrdinalIgnoreCase));
+            int j = i + Math.Sign(direction);
+            if (i < 0 || j < 0 || j >= list.Count)
+            {
+                return;
+            }
+
+            (list[i], list[j]) = (list[j], list[i]);
+            for (int k = 0; k < list.Count; k++)
+            {
+                using SqliteCommand cmd = Command("UPDATE watch_next SET sort = $sort WHERE path = $path", ("$sort", k + 1), ("$path", list[k].Path));
+                cmd.ExecuteNonQuery();
+            }
+        }
+    }
+
     /// <summary>
     /// Dosljedna kopija cijele baze u novu datoteku (SQLite backup, uključuje i još nezapisani WAL),
     /// i dok je player otvoren (ciklus 2, M1a).
@@ -433,7 +533,15 @@ public sealed class WatchStore : IDisposable
             CREATE TABLE IF NOT EXISTS radio_favorites (
                 url TEXT PRIMARY KEY, name TEXT NOT NULL, detail TEXT, added TEXT NOT NULL)
             """);
-        Execute("INSERT OR REPLACE INTO meta (key, value) VALUES ('schema_version', '5')");
+        // Verzija 6 (ciklus 5, N2): lista „Sljedeće za gledanje” (uklonjene stavke ostaju zapamćene kao dismissed).
+        Execute(
+            """
+            CREATE TABLE IF NOT EXISTS watch_next (
+                path TEXT PRIMARY KEY COLLATE NOCASE,
+                title TEXT NOT NULL, source TEXT NOT NULL, sort INTEGER NOT NULL, added TEXT NOT NULL,
+                dismissed INTEGER NOT NULL DEFAULT 0)
+            """);
+        Execute("INSERT OR REPLACE INTO meta (key, value) VALUES ('schema_version', '6')");
     }
 
     private bool ColumnExists(string table, string column)

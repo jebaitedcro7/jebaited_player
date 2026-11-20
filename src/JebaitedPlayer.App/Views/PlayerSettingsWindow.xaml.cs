@@ -51,6 +51,9 @@ internal interface ISettingsHost
     /// <summary>Font i VU mini playera odmah (1.4.1).</summary>
     void ApplyMiniPlayerSettings();
 
+    /// <summary>Slika pozadine početnog ekrana odmah (N4).</summary>
+    void ApplyHomeBackground();
+
     /// <summary>Uvezene postavke (M1b) odmah na cijeli player.</summary>
     void ApplyImportedSettings();
 
@@ -780,6 +783,97 @@ public partial class PlayerSettingsWindow : Window
         GpuUiBox.IsChecked = _settings.UiGpuRendering;
         GpuUiBox.Checked += (_, _) => _settings.UiGpuRendering = true;
         GpuUiBox.Unchecked += (_, _) => _settings.UiGpuRendering = false;
+
+        LoadHomeBackground();
+    }
+
+    // --- N4: slika pozadine početnog ekrana ------------------------------------------------------------------------
+
+    private void LoadHomeBackground()
+    {
+        (_settings.HomeBackgroundImage is null ? HomeBgDefault : HomeBgCustom).IsChecked = true;
+        (_settings.HomeBackgroundMode switch { "fit" => HomeBgFit, "center" => HomeBgCenter, _ => HomeBgFill }).IsChecked = true;
+        HomeBgDefault.Checked += (_, _) => SetHomeBackground(null);
+        HomeBgCustom.Checked += (_, _) =>
+        {
+            if (_settings.HomeBackgroundImage is null)
+            {
+                ChooseHomeBackground();
+            }
+        };
+        HomeBgFill.Checked += (_, _) => SetHomeBackgroundMode("fill");
+        HomeBgFit.Checked += (_, _) => SetHomeBackgroundMode("fit");
+        HomeBgCenter.Checked += (_, _) => SetHomeBackgroundMode("center");
+        _ = UpdateHomeBackgroundPreviewAsync();
+    }
+
+    private void OnHomeBgChoose(object sender, RoutedEventArgs e) => ChooseHomeBackground();
+
+    private void ChooseHomeBackground()
+    {
+        var dialog = new Microsoft.Win32.OpenFileDialog
+        {
+            Title = Loc.T("settings.homeBackgroundChoose"),
+            Filter = $"{Loc.T("dialog.images")}|{string.Join(";", HomeBackground.Extensions.Select(x => "*" + x))}",
+            InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures),
+        };
+        if (dialog.ShowDialog(this) == true)
+        {
+            SetHomeBackground(dialog.FileName);
+        }
+        else if (_settings.HomeBackgroundImage is null)
+        {
+            HomeBgDefault.IsChecked = true;
+        }
+    }
+
+    /// <summary>Postavi sliku (putanja) ili zadanu pozadinu (null) i odmah je primijeni na početni ekran.</summary>
+    internal void SetHomeBackground(string? path)
+    {
+        if (_loading || path == _settings.HomeBackgroundImage)
+        {
+            return;
+        }
+
+        _settings.HomeBackgroundImage = path;
+        (path is null ? HomeBgDefault : HomeBgCustom).IsChecked = true;
+        _host.ApplyHomeBackground();
+        _ = UpdateHomeBackgroundPreviewAsync();
+        Log.Info(path is null ? "Pozadina početnog ekrana: zadana." : "Pozadina početnog ekrana: vlastita slika.");
+    }
+
+    internal void SetHomeBackgroundMode(string mode)
+    {
+        if (_loading || mode == _settings.HomeBackgroundMode)
+        {
+            return;
+        }
+
+        _settings.HomeBackgroundMode = mode;
+        _host.ApplyHomeBackground();
+        _ = UpdateHomeBackgroundPreviewAsync();
+    }
+
+    private async Task UpdateHomeBackgroundPreviewAsync()
+    {
+        string? path = _settings.HomeBackgroundImage;
+        bool custom = path is not null;
+        HomeBgFileText.Text = custom ? Path.GetFileName(path) : Loc.T("settings.homeBackgroundNone");
+        HomeBgFileText.ToolTip = path;
+        HomeBgFill.IsEnabled = HomeBgFit.IsEnabled = HomeBgCenter.IsEnabled = custom;
+        System.Windows.Media.Imaging.BitmapSource? image = custom ? await HomeBackground.LoadAsync(path!, 320) : null;
+        if (path != _settings.HomeBackgroundImage)
+        {
+            return;
+        }
+
+        HomeBgPreview.Source = image;
+        HomeBgPreview.Stretch = HomeBackground.ToStretch(_settings.HomeBackgroundMode);
+        HomeBgPreviewDim.Visibility = image is null ? Visibility.Collapsed : Visibility.Visible;
+        if (custom && image is null)
+        {
+            HomeBgFileText.Text = Loc.T("home.backgroundMissing");
+        }
     }
 
     private void SetTheme(string theme)

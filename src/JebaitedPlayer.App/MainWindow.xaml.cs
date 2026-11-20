@@ -356,6 +356,9 @@ public partial class MainWindow : Window
         OpenStartupFiles();
         UpdateOnlineSetupButton();
         OfferOnlineSetupOnFirstRun();
+
+        // N4: vlastita pozadina se učitava tek kad je prozor prikazan, izvan UI dretve (ne usporava pokretanje).
+        _ = ApplyHomeBackgroundAsync();
         if (_options.DiagShow is { } show && _options.Files.Count == 0)
         {
             // Dijagnostika stalno mjeri iscrtavanje (dretva nikad nije "idle"), pa se prozor otvara nakon kratke pauze.
@@ -427,6 +430,7 @@ public partial class MainWindow : Window
             }
         }
 
+        _spotify?.Dispose();
         _store?.Dispose();
         ApplyUpdateOnExit();
         _closeConfirmed = true;
@@ -879,6 +883,13 @@ public partial class MainWindow : Window
         if (key == Key.M && mods == ModifierKeys.Control)
         {
             ToggleMiniPlayer();
+            return true;
+        }
+
+        // Ciklus 5: Ctrl+Shift+S otvara Spotify daljinski.
+        if (key == Key.S && mods == (ModifierKeys.Control | ModifierKeys.Shift))
+        {
+            ShowSpotify();
             return true;
         }
 

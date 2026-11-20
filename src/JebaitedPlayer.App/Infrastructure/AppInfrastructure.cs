@@ -403,6 +403,20 @@ public sealed class AppSettings
     /// <summary>HDR prolaz na HDR zaslon (kad je HDR uključen u Windowsima).</summary>
     public bool HdrPassthrough { get; set; }
 
+    /// <summary>
+    /// V8 (ciklus 5): Client ID korisnikove Spotify aplikacije (developer.spotify.com). Nije tajna (PKCE);
+    /// token prijave je kriptiran u zasebnoj datoteci spotify-auth.dat, nikad u settings.json.
+    /// </summary>
+    public string? SpotifyClientId { get; set; }
+
+    /// <summary>N4 (ciklus 5): slika pozadine početnog ekrana (samo putanja, slika se ne kopira); prazno = svemir.</summary>
+    public string? HomeBackgroundImage { get; set; }
+
+    /// <summary>N4: "fill" (ispuni, zadano), "fit" (prilagodi) ili "center" (sredina).</summary>
+    public string HomeBackgroundMode { get; set; } = "fill";
+
+    public static readonly IReadOnlyList<string> HomeBackgroundModes = ["fill", "fit", "center"];
+
     /// <summary>Koliko sekundi bez pomicanja miša kontrole (i Home) ostaju vidljive.</summary>
     public double ControlsHideSeconds { get; set; } = 2.5;
 
@@ -448,6 +462,15 @@ public sealed class AppSettings
         }
 
         MusicAudioDevice = MusicAudioDevice?.Trim() ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(HomeBackgroundImage))
+        {
+            HomeBackgroundImage = null;
+        }
+
+        if (!HomeBackgroundModes.Contains(HomeBackgroundMode))
+        {
+            HomeBackgroundMode = "fill";
+        }
 
         if (string.IsNullOrWhiteSpace(DefaultAspect))
         {

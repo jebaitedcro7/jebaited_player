@@ -143,6 +143,64 @@ public partial class MainWindow : ISettingsHost
         RefreshVuFilter();
     }
 
+    void ISettingsHost.ApplyHomeBackground() => _ = ApplyHomeBackgroundAsync();
+
+    private int _homeBackgroundVersion;
+
+    /// <summary>Zadnje učitavanje pozadine (dijagnostika): putanja, trajanje i je li slika prikazana.</summary>
+    internal (string? Path, long Milliseconds, bool Shown) LastHomeBackground { get; private set; }
+
+    /// <summary>
+    /// N4: vlastita slika pozadine početnog ekrana ili svemir. Slika se dekodira u širini zaslona i izvan UI dretve.
+    /// Ako slike više nema (obrisana, premještena, isključen disk), vrijedi svemir uz obavijest, a postavka ostaje
+    /// (disk se možda opet spoji).
+    /// </summary>
+    internal async Task ApplyHomeBackgroundAsync()
+    {
+        int version = ++_homeBackgroundVersion;
+        string? path = _settings.HomeBackgroundImage;
+        System.Windows.Media.Imaging.BitmapSource? image = null;
+        var watch = System.Diagnostics.Stopwatch.StartNew();
+        if (path is { Length: > 0 })
+        {
+            double scale = System.Windows.Media.VisualTreeHelper.GetDpi(this).DpiScaleX;
+            int width = (int)Math.Ceiling(Math.Max(SystemParameters.PrimaryScreenWidth, ActualWidth) * scale);
+            image = await HomeBackground.LoadAsync(path, width);
+            if (version != _homeBackgroundVersion)
+            {
+                return;
+            }
+
+            if (image is null)
+            {
+                _vm.Notice = Loc.T("home.backgroundMissing");
+            }
+        }
+
+        HomeBackgroundImage.Source = image;
+        HomeBackgroundImage.Stretch = HomeBackground.ToStretch(_settings.HomeBackgroundMode);
+        bool custom = image is not null;
+
+        // Sredina: piksel slike = piksel zaslona (inače WPF fotografiju od 72 dpi prikaže uvećano).
+        bool center = custom && _settings.HomeBackgroundMode == "center";
+        double dpi = System.Windows.Media.VisualTreeHelper.GetDpi(this).DpiScaleX;
+        HomeBackgroundImage.Width = center ? image!.PixelWidth / dpi : double.NaN;
+        HomeBackgroundImage.Height = center ? image!.PixelHeight / dpi : double.NaN;
+        if (center)
+        {
+            HomeBackgroundImage.Stretch = System.Windows.Media.Stretch.Uniform;
+        }
+
+        HomeBackgroundImage.Visibility = custom ? Visibility.Visible : Visibility.Collapsed;
+        HomeBackgroundDim.Visibility = HomeBackgroundImage.Visibility;
+        HomeSpace.Visibility = custom ? Visibility.Collapsed : Visibility.Visible;
+        LastHomeBackground = (path, watch.ElapsedMilliseconds, custom);
+        if (path is { Length: > 0 })
+        {
+            Log.Info($"Pozadina početnog ekrana: {(custom ? $"{image!.PixelWidth}×{image.PixelHeight}, {_settings.HomeBackgroundMode}" : "slika nije dostupna, svemir")} ({watch.ElapsedMilliseconds} ms)");
+        }
+    }
+
     /// <summary>M1b: uvezene postavke odmah na sve dijelove playera (isto kao promjene u prozoru postavki).</summary>
     void ISettingsHost.ApplyImportedSettings()
     {
@@ -163,6 +221,7 @@ public partial class MainWindow : ISettingsHost
         ApplyWindowSettings();
         ((ISettingsHost)this).ApplyMiniPlayerSettings();
         _mini?.BindEqualizer();
+        _ = ApplyHomeBackgroundAsync();
         Log.Info("Uvezene postavke primijenjene.");
     }
 

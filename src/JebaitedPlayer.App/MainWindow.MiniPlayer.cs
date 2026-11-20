@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Input;
 using JebaitedPlayer.Infrastructure;
 using JebaitedPlayer.Library;
+using JebaitedPlayer.Services;
 using JebaitedPlayer.ViewModels;
 using JebaitedPlayer.Views;
 
@@ -175,6 +176,77 @@ public partial class MainWindow : IMiniPlayerHost
     void IMiniPlayerHost.ShowSettings() => ShowPlayerSettings(SettingsTab.Appearance);
 
     void IMiniPlayerHost.ShowRadio(Window owner) => ShowRadio(owner);
+
+    void IMiniPlayerHost.ShowSpotify(Window owner) => ShowSpotify(owner);
+
+    SpotifyRemote IMiniPlayerHost.Spotify => Spotify;
+
+    // --- Ciklus 5, V8: Spotify daljinski --------------------------------------------------------------------------------
+
+    private SpotifyRemote? _spotify;
+    private SpotifyWindow? _spotifyWindow;
+    private bool _spotifyWasActive;
+
+    internal SpotifyWindow? SpotifyWindowForTests => _spotifyWindow;
+
+    /// <summary>Jedan za cijeli player; stvara se tek kad zatreba (bez Spotifyja nema ni mreže ni timera).</summary>
+    internal SpotifyRemote Spotify
+    {
+        get
+        {
+            if (_spotify is null)
+            {
+                _spotify = new SpotifyRemote(_settings, AppPaths.DataDir,
+                    persist: !_options.IsDiagnostics || Environment.GetEnvironmentVariable("JEBAITED_DATA_DIR") is { Length: > 0 });
+                _spotify.Changed += (_, _) => OnSpotifyChanged();
+                _vm.LoadStarting += (_, _) => _spotify.IsActiveSource = false;
+
+                // Nastavak lokalne reprodukcije (npr. razmak u punom playeru) vraća lokalni izvor.
+                _vm.PropertyChanged += (_, e) =>
+                {
+                    if (e.PropertyName == nameof(PlayerViewModel.IsPaused) && !_vm.IsPaused && _vm.HasMedia)
+                    {
+                        _spotify.IsActiveSource = false;
+                    }
+                };
+            }
+
+            return _spotify;
+        }
+    }
+
+    /// <summary>Spotify je postao izvor: lokalni video ili radio se zaustavlja, da ne sviraju dva zvuka.</summary>
+    private void OnSpotifyChanged()
+    {
+        bool active = _spotify?.IsActiveSource == true;
+        if (active && !_spotifyWasActive && _vm.HasMedia)
+        {
+            if (_vm.IsLiveStream)
+            {
+                _vm.StopPlayback();
+            }
+            else
+            {
+                _vm.SetPaused(true);
+            }
+        }
+
+        _spotifyWasActive = active;
+        _mini?.Tick();
+    }
+
+    internal void ShowSpotify(Window? owner = null)
+    {
+        if (_spotifyWindow is { IsLoaded: true })
+        {
+            _spotifyWindow.Activate();
+            return;
+        }
+
+        _spotifyWindow = new SpotifyWindow(Spotify) { Owner = owner ?? (IsMiniPlayerActive ? _mini : this) };
+        _spotifyWindow.Closed += (_, _) => _spotifyWindow = null;
+        _spotifyWindow.Show();
+    }
 
     /// <summary>Pokreni mpv ako još ne radi (inače bi učitavanje bilo tiho preskočeno). Greška se zapiše i javi.</summary>
     private bool TryEnsurePlayer()

@@ -226,6 +226,33 @@
                         <RadioButton x:Name="ThemeLight" GroupName="Theme" Content="{loc:T settings.themeLight}" />
                         <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.themeHint}" Margin="0,6,0,0" />
 
+                        <!-- N4 (ciklus 5): slika pozadine početnog ekrana. -->
+                        <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T settings.homeBackground}" Margin="0,24,0,2" />
+                        <RadioButton x:Name="HomeBgDefault" GroupName="HomeBg" Content="{loc:T settings.homeBackgroundDefault}" />
+                        <RadioButton x:Name="HomeBgCustom" GroupName="HomeBg" Content="{loc:T settings.homeBackgroundImage}" />
+                        <StackPanel Orientation="Horizontal" Margin="28,8,0,0">
+                            <Border Width="160" Height="90" BorderThickness="1" BorderBrush="{DynamicResource MenuBorderBrush}" ClipToBounds="True"
+                                    Background="{DynamicResource PanelBackgroundBrush}">
+                                <Grid>
+                                    <Image x:Name="HomeBgPreview" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality" />
+                                    <Border x:Name="HomeBgPreviewDim" Background="{DynamicResource HomeImageDimBrush}" />
+                                </Grid>
+                            </Border>
+                            <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+                                <Button x:Name="HomeBgChooseButton" Style="{StaticResource SecondaryButton}" Content="{loc:T settings.homeBackgroundChoose}"
+                                        Click="OnHomeBgChoose" HorizontalAlignment="Left" />
+                                <TextBlock x:Name="HomeBgFileText" Style="{StaticResource HintText}" Margin="0,6,0,0" MaxWidth="360"
+                                           TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                        </StackPanel>
+                        <TextBlock Text="{loc:T settings.homeBackgroundMode}" Margin="28,10,0,0" />
+                        <StackPanel Orientation="Horizontal" Margin="28,4,0,0">
+                            <RadioButton x:Name="HomeBgFill" GroupName="HomeBgMode" Content="{loc:T settings.homeBackgroundFill}" Margin="0,0,18,0" />
+                            <RadioButton x:Name="HomeBgFit" GroupName="HomeBgMode" Content="{loc:T settings.homeBackgroundFit}" Margin="0,0,18,0" />
+                            <RadioButton x:Name="HomeBgCenter" GroupName="HomeBgMode" Content="{loc:T settings.homeBackgroundCenter}" />
+                        </StackPanel>
+                        <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.homeBackgroundHint}" TextWrapping="Wrap" Margin="0,8,0,0" />
+
                         <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T settings.controls}" Margin="0,24,0,2" />
                         <TextBlock Text="{loc:T settings.hideControls}" Margin="0,4,0,0" />
                         <Button x:Name="HideControlsButton" Style="{StaticResource ChoiceButton}" Click="OnHideControlsClick" />

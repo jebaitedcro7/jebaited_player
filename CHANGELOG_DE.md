@@ -4,6 +4,27 @@ Alle wichtigen Änderungen an jebaited_player. Format: [Keep a Changelog](https:
 
 Andere Sprachen: [English](CHANGELOG.md) · [Hrvatski](CHANGELOG_HR.md). Derselbe Verlauf ist im Player enthalten (Klick auf die Versionsnummer auf dem Startbildschirm). Diese Datei wird aus `src/JebaitedPlayer.App/History/update-history.json` erzeugt.
 
+## [1.7.4] - 2026-11-21
+
+Zyklus 5: Spotify-Fernbedienung, „Als Nächstes“ auf dem Startbildschirm und eigener Hintergrund.
+
+### Neu
+
+- Spotify (Strg+Umschalt+S oder die Quellenanzeige im Mini-Player): Anmeldung mit deiner eigenen kostenlosen Spotify-Entwickler-App (Anleitung im Fenster), Song mit Cover, Wiedergabe, Pause, Weiter, Spulen, Lautstärke, deine Playlists und gespeicherten Songs, Suche und Geräteauswahl. Die Musik läuft in deiner Spotify-App; solange Spotify die Quelle ist, steuern die Tasten des Mini-Players Spotify. Zum Steuern braucht man Spotify Premium.
+- „Als Nächstes“ auf dem Startbildschirm: Die nächste Folge einer Serie, die du schaust, erscheint von selbst (auch über Staffeln hinweg). Du kannst jedes Video hinzufügen (Rechtsklick auf das Video oder einen Eintrag in „Weiterschauen“), die Reihenfolge mit ▲ ▼ ändern und Einträge mit × entfernen. Ein Eintrag verschwindet, sobald er angesehen ist.
+- Einstellungen → Darstellung → Hintergrund des Startbildschirms: Standard (Weltraum) oder ein eigenes Bild (Füllen, Einpassen oder Zentriert) mit Vorschau. Das Bild wird nicht kopiert; wird es verschoben oder gelöscht, kommt der Weltraum-Hintergrund zurück.
+
+### Verbessert
+
+- Ein großes Hintergrundbild wird im Hintergrund und nur in Bildschirmgröße geladen, daher verlangsamt es den Start nicht.
+
+### Bekannte Probleme
+
+- Die App ist noch nicht digital signiert, daher können Windows SmartScreen oder Smart App Control vor der Installation warnen.
+- Das Fortschrittsfenster des Installationsprogramms stammt von Velopack und ist nur auf Englisch.
+
+Release: [v1.7.4](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v1.7.4) · Änderungen seit [v1.6.3...v1.7.4](https://github.com/jebaitedcro7/jebaited_player/compare/v1.6.3...v1.7.4)
+
 ## [1.6.3] - 2026-11-20
 
 Zyklus 4: Radio nach Stopp wieder live, geschützte Einstellungen, Rückfrage bei ungespeicherten Änderungen und eigene Ausgabe für Musik.

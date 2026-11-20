@@ -155,6 +155,7 @@ public static class SettingsTransfer
     [
         nameof(AppSettings.WindowLeft), nameof(AppSettings.WindowTop), nameof(AppSettings.WindowWidth),
         nameof(AppSettings.WindowHeight), nameof(AppSettings.WindowMaximized),
+        nameof(AppSettings.HomeBackgroundImage), // putanja do slike na ovom računalu (N4)
     ];
 
     public static bool IsSecret(string name) =>
@@ -321,6 +322,9 @@ public static class SettingsWorkingCopy
         (saved.MiniPlayer.Compact, saved.MiniPlayer.ShowEqualizer, saved.MiniPlayer.ShowPlaylist, saved.MiniPlayer.WasOpen) =
             (now.Compact, now.ShowEqualizer, now.ShowPlaylist, now.WasOpen);
         SettingsTransfer.ApplyTo(current, saved);
+
+        // Uvoz ne dira sliku pozadine (putanja na ovom računalu), ali Odbaci je vraća (N4).
+        current.HomeBackgroundImage = saved.HomeBackgroundImage;
     }
 }
 
@@ -364,6 +368,7 @@ public static class SettingsDefaults
                 case "appearance":
                     (s.Theme, s.ControlsHideSeconds, s.UiGpuRendering) = (d.Theme, d.ControlsHideSeconds, d.UiGpuRendering);
                     (s.MiniPlayer.Font, s.MiniPlayer.VuStyle, s.MiniPlayer.AutoSwitch) = (d.MiniPlayer.Font, d.MiniPlayer.VuStyle, d.MiniPlayer.AutoSwitch);
+                    (s.HomeBackgroundImage, s.HomeBackgroundMode) = (d.HomeBackgroundImage, d.HomeBackgroundMode);
                     break;
                 case "updates":
                     s.AutoUpdate = d.AutoUpdate;

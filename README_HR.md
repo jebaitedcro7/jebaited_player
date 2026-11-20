@@ -128,6 +128,13 @@ U istoj kartici podešavaš automatsko traženje, kodiranje starih titlova i izg
 - Postaje sviraju u mini playeru s glazbenim equalizerom, označene s **RADIO** i **UŽIVO**, uz trenutnu pjesmu kad je postaja šalje. Radio ne ulazi u „Nastavi gledati”.
 - **Stop** stvarno zaustavlja postaju (ostaje prikazana u mini playeru); **Play** ili razmak je ponovno spajaju, uživo. I Pauza → Play nastavlja uživo, a radio uživo se ne premotava.
 
+### Spotify
+
+- **Ctrl+Shift+S**, desni klik → **Spotify…** ili oznaka izvora u mini playeru. jebaited_player je daljinski za tvoju Spotify aplikaciju: glazba svira u Spotifyju (računalo, mobitel ili zvučnik), a player prikazuje pjesmu s omotom i upravlja njome. Za upravljanje treba **Spotify Premium**.
+- Spotify dopušta najviše 5 korisnika po developer aplikaciji, pa se spajaš **svojom besplatnom aplikacijom**: prozor pokazuje korake (napravi aplikaciju na developer.spotify.com, dodaj prikazani redirect URI, zalijepi Client ID), zatim **Prijava u Spotify** u pregledniku.
+- Play, pauza, sljedeća, premotavanje i glasnoća, tvoje **playliste**, **spremljene pjesme**, **pretraga** i **izbor uređaja**. Dok je Spotify izvor, mini player pokazuje **SPOTIFY** i njegove tipke upravljaju Spotifyjem; otvaranje datoteke ili postaje vraća natrag.
+- Spotify zvuk nikad ne prolazi kroz player (bez equalizera) i nikamo se ne prosljeđuje.
+
 ### Kopije i prijenos
 
 Postavke → Općenito → **Kopije i prijenos**: postavke i povijest gledanja automatski se kopiraju jednom dnevno i prije svake nadogradnje (zadnjih 7 ostaje na tvom računalu). **Izvezi postavke** sprema ih u datoteku (bez lozinki, ključeva za stranice s titlovima i položaja prozora), a **Uvezi postavke** ih ponovno učitava, i na drugom računalu.
@@ -151,6 +158,7 @@ Prekidačem dolje lijevo na glavnom ekranu (mjesec = tamna, sunce = svijetla) il
 - Mjesto u videu sprema se svakih nekoliko sekundi, pri pauzi, klikom na **Početna** i kad zatvoriš player.
 - **Nastavi gledati** prikazuje zadnje videe (× uklanja jedan iz povijesti).
 - **Omiljeno:** Ctrl+D dodaje film ili cijelu seriju trenutne epizode; × na glavnom ekranu ga uklanja.
+- **Sljedeće za gledanje:** sljedeća epizoda serije koju gledaš pojavi se sama (i preko granice sezone); desni klik na video ili stavku „Nastavi gledati” → **Dodaj u Sljedeće za gledanje**; ▲ ▼ mijenjaju redoslijed, × uklanja. Stavka nestaje kad je pogledaš.
 
 ### Postavke
 
@@ -163,7 +171,7 @@ Postavke su podijeljene u kartice. Svaka promjena vrijedi odmah (i za video koji
 | Titlovi | Jezici titlova i njihov redoslijed, automatsko učitavanje i traženje, izvori na internetu, kodiranje starih titlova, izgled, sinkronizacija |
 | Zvuk | Glasnoća, ujednačavanje glasnoće, equalizer, željeni jezik zvuka, izlazni uređaj, izlaz za glazbu i radio, sinkronizacija zvuka |
 | Slika | Kvaliteta slike, hardversko dekodiranje, zadani omjer slike, HDR |
-| Izgled | Tamna / svijetla tema, koliko dugo su kontrole vidljive, iscrtavanje sučelja preko GPU-a |
+| Izgled | Tamna / svijetla tema, pozadina početnog ekrana (zadana ili vlastita slika: Ispuni, Prilagodi, Sredina), koliko dugo su kontrole vidljive, iscrtavanje sučelja preko GPU-a |
 | Nadogradnje | Verzija, provjeri sada, automatsko preuzimanje, što je novo, povijest nadogradnji |
 | O aplikaciji | Verzija, licenca, korištene tehnologije, priručnik, privatnost, pravila potpisivanja koda |
 
@@ -260,6 +268,7 @@ Arhive sa stranica s titlovima: ZIP je podržan, RAR još nije.
 | Ctrl+D | Dodaj u omiljene / ukloni |
 | Ctrl+M | Mini player / natrag na puni player |
 | Ctrl+R | Radio |
+| Ctrl+Shift+S | Spotify |
 | Ctrl+Backspace | Vrati originalnu sinkronizaciju titlova |
 | F1 | Svi prečaci |
 

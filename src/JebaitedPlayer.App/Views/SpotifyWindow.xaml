@@ -1,0 +1,120 @@
+<Window x:Class="JebaitedPlayer.Views.SpotifyWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:JebaitedPlayer.Infrastructure"
+        Title="{loc:T spotify.title}" Width="680" Height="640" MinWidth="520" MinHeight="460" ShowInTaskbar="False"
+        WindowStartupLocation="CenterOwner" Background="{DynamicResource WindowBackgroundBrush}"
+        Foreground="{DynamicResource TextPrimaryBrush}" FontFamily="{DynamicResource UiFont}" FontSize="13" UseLayoutRounding="True">
+
+    <!-- Ciklus 5, V8 (S1): Spotify daljinski. Zvuk svira u Spotify aplikaciji (Spotify Connect); player prikazuje i upravlja. -->
+    <Grid>
+        <DockPanel Margin="20,16,20,14">
+            <TextBlock DockPanel.Dock="Top" Style="{StaticResource TabTitle}" Text="{loc:T spotify.title}" />
+
+            <!-- 1) Postavljanje: korisnik upisuje svoj Client ID (Development mode: najviše 5 korisnika po aplikaciji). -->
+            <StackPanel x:Name="SetupPanel" DockPanel.Dock="Top" Margin="0,4,0,0">
+                <TextBlock Text="{loc:T spotify.setupTitle}" FontSize="15" FontWeight="SemiBold" />
+                <TextBlock Style="{StaticResource HintText}" Text="{loc:T spotify.setupSteps}" TextWrapping="Wrap" Margin="0,6,0,0" />
+                <Button Style="{StaticResource LinkButton}" Content="{loc:T spotify.openDashboard}" HorizontalAlignment="Left" Margin="0,6,0,0"
+                        Click="OnOpenDashboard" />
+                <TextBlock Text="{loc:T spotify.redirectUri}" Margin="0,10,0,4" />
+                <DockPanel>
+                    <Button DockPanel.Dock="Right" Style="{StaticResource SecondaryButton}" Content="{loc:T spotify.copy}" Click="OnCopyRedirect" Margin="8,0,0,0" />
+                    <TextBox x:Name="RedirectBox" IsReadOnly="True" MinHeight="32" Padding="6,5" VerticalContentAlignment="Center" />
+                </DockPanel>
+                <TextBlock Text="{loc:T spotify.clientId}" Margin="0,10,0,4" />
+                <DockPanel>
+                    <Button DockPanel.Dock="Right" Style="{StaticResource AccentButton}" Content="{loc:T spotify.saveClientId}" Click="OnSaveClientId" Margin="8,0,0,0" />
+                    <TextBox x:Name="ClientIdBox" MinHeight="32" Padding="6,5" VerticalContentAlignment="Center" />
+                </DockPanel>
+            </StackPanel>
+
+            <!-- 2) Račun -->
+            <DockPanel x:Name="AccountPanel" DockPanel.Dock="Top" Margin="0,4,0,0">
+                <Button x:Name="SignInButton" DockPanel.Dock="Right" Style="{StaticResource AccentButton}" Content="{loc:T spotify.signIn}" Click="OnSignIn" />
+                <Button x:Name="SignOutButton" DockPanel.Dock="Right" Style="{StaticResource LinkButton}" Content="{loc:T spotify.signOut}" Click="OnSignOut"
+                        VerticalAlignment="Center" />
+                <Button x:Name="ChangeClientIdButton" DockPanel.Dock="Right" Style="{StaticResource LinkButton}" Content="{loc:T spotify.changeClientId}"
+                        Click="OnChangeClientId" VerticalAlignment="Center" Margin="0,0,14,0" />
+                <TextBlock x:Name="AccountText" VerticalAlignment="Center" TextWrapping="Wrap" />
+            </DockPanel>
+
+            <!-- Napomena i stanje (dolje) -->
+            <TextBlock DockPanel.Dock="Bottom" Style="{StaticResource HintText}" Text="{loc:T spotify.note}" TextWrapping="Wrap" Margin="0,8,0,0" />
+            <TextBlock x:Name="StatusText" DockPanel.Dock="Bottom" Foreground="{DynamicResource AccentBrush}" TextWrapping="Wrap" Margin="0,8,0,0" />
+
+            <!-- 3) Trenutna pjesma i upravljanje -->
+            <Border x:Name="NowPanel" DockPanel.Dock="Top" Margin="0,12,0,0" Padding="12" CornerRadius="8" Background="{DynamicResource HomeCardBrush}"
+                    BorderBrush="{DynamicResource MenuBorderBrush}" BorderThickness="1">
+                <DockPanel>
+                    <Border DockPanel.Dock="Left" Width="96" Height="96" CornerRadius="4" ClipToBounds="True" Background="{DynamicResource PanelBackgroundBrush}">
+                        <Image x:Name="CoverImage" Stretch="UniformToFill" />
+                    </Border>
+                    <StackPanel Margin="14,0,0,0">
+                        <TextBlock x:Name="TrackText" FontSize="16" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                        <TextBlock x:Name="ArtistText" Foreground="{DynamicResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis" Margin="0,2,0,0" />
+                        <TextBlock x:Name="DeviceText" Style="{StaticResource HintText}" TextTrimming="CharacterEllipsis" Margin="0,2,0,0" />
+                        <DockPanel Margin="0,8,0,0">
+                            <TextBlock x:Name="TimeText" DockPanel.Dock="Left" FontFamily="Consolas" FontSize="12" Width="44" VerticalAlignment="Center" />
+                            <TextBlock x:Name="DurationText" DockPanel.Dock="Right" FontFamily="Consolas" FontSize="12" Width="44" TextAlignment="Right" VerticalAlignment="Center" />
+                            <Slider x:Name="ProgressSlider" Style="{StaticResource PlayerSlider}" VerticalAlignment="Center" Margin="6,0" />
+                        </DockPanel>
+                        <DockPanel Margin="0,6,0,0">
+                            <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
+                                <Button x:Name="PrevButton" Style="{StaticResource IconButton}" Content="&#xE892;" Width="36" Height="36" FontSize="15"
+                                        Click="OnPrevious" ToolTip="{loc:T mini.previous}" />
+                                <Button x:Name="PlayPauseButton" Style="{StaticResource IconButton}" Content="&#xE768;" Width="40" Height="36" FontSize="17"
+                                        Click="OnPlayPause" ToolTip="{loc:T controls.playPause}" />
+                                <Button x:Name="NextButton" Style="{StaticResource IconButton}" Content="&#xE893;" Width="36" Height="36" FontSize="15"
+                                        Click="OnNext" ToolTip="{loc:T mini.next}" />
+                            </StackPanel>
+                            <Button x:Name="OpenInSpotifyButton" DockPanel.Dock="Right" Style="{StaticResource LinkButton}" Content="{loc:T spotify.openInSpotify}"
+                                    Click="OnOpenInSpotify" VerticalAlignment="Center" Margin="12,0,0,0" />
+                            <Button x:Name="DeviceButton" DockPanel.Dock="Right" Style="{StaticResource SecondaryButton}" Content="{loc:T spotify.devices}"
+                                    Click="OnDevices" VerticalAlignment="Center" Margin="12,0,0,0" />
+                            <Slider x:Name="VolumeSlider" Style="{StaticResource PlayerSlider}" Minimum="0" Maximum="100" Width="110"
+                                    VerticalAlignment="Center" Margin="12,0,0,0" HorizontalAlignment="Left" ToolTip="{loc:T settings.volume}" />
+                        </DockPanel>
+                    </StackPanel>
+                </DockPanel>
+            </Border>
+
+            <!-- 4) Playliste, spremljene pjesme, pretraga -->
+            <StackPanel x:Name="BrowseHeader" DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,12,0,6">
+                <RadioButton x:Name="PlaylistsTab" GroupName="SpotifyView" Content="{loc:T spotify.playlists}" Margin="0,0,18,0" />
+                <RadioButton x:Name="SavedTab" GroupName="SpotifyView" Content="{loc:T spotify.saved}" Margin="0,0,18,0" />
+                <RadioButton x:Name="SearchTab" GroupName="SpotifyView" Content="{loc:T spotify.search}" />
+            </StackPanel>
+            <DockPanel x:Name="SearchRow" DockPanel.Dock="Top" Margin="0,0,0,6" Visibility="Collapsed">
+                <Button DockPanel.Dock="Right" Style="{StaticResource AccentButton}" Content="{loc:T spotify.search}" Click="OnSearch" Margin="8,0,0,0" />
+                <TextBox x:Name="SearchBox" Height="32" VerticalContentAlignment="Center" KeyDown="OnSearchKey" />
+            </DockPanel>
+
+            <Border x:Name="ListBorder" BorderThickness="1" BorderBrush="{DynamicResource MenuBorderBrush}" CornerRadius="6" Padding="2">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+                    <ItemsControl x:Name="ItemList" Focusable="False">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Button x:Name="PlayButton" Style="{StaticResource IconButton}" Width="36" Height="36" FontSize="15" Tag="{Binding}"
+                                            Content="&#xE768;" Click="OnPlayItem" ToolTip="{loc:T spotify.play}" />
+                                    <Button Grid.Column="1" Style="{StaticResource ListRowButton}" Tag="{Binding}" Click="OnPlayItem" Padding="6,5"
+                                            ToolTip="{loc:T spotify.play}">
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding Name}" FontSize="13" TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Text="{Binding Detail}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis" />
+                                        </StackPanel>
+                                    </Button>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Border>
+        </DockPanel>
+    </Grid>
+</Window>

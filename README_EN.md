@@ -128,6 +128,13 @@ In the same tab you set the automatic search, the encoding of old subtitles and 
 - Stations play in the mini player with the music equalizer, marked **RADIO** and **LIVE**, with the current song when the station sends it. Radio does not appear in “Continue watching”.
 - **Stop** really stops the station (it stays shown in the mini player); **Play** or Space connects again, live. Pause → Play also continues live, and live radio cannot be rewound.
 
+### Spotify
+
+- **Ctrl+Shift+S**, right-click → **Spotify…** or the source label in the mini player. jebaited_player is a remote control for your Spotify app: the music plays in Spotify (computer, phone or speaker), the player shows the song with its cover and controls it. Controlling playback needs **Spotify Premium**.
+- Spotify allows at most 5 users per developer app, so you connect with **your own free app**: the window shows the steps (create an app on developer.spotify.com, add the shown redirect URI, paste the Client ID), then **Sign in to Spotify** in the browser.
+- Play, pause, skip, seek and volume, your **playlists**, **saved songs**, **search** and the **device** choice. While Spotify is the source, the mini player shows **SPOTIFY** and its buttons control Spotify; opening a file or a station switches back.
+- Spotify sound never goes through the player (no equalizer) and is never sent anywhere else.
+
 ### Backup and transfer
 
 Settings → General → **Backup and transfer**: settings and watch history are copied automatically once a day and before every update (the last 7 are kept on your computer). **Export settings** saves them to a file (without passwords, subtitle-site keys and the window position) and **Import settings** loads them again, also on another computer.
@@ -151,6 +158,7 @@ Use the switch at the bottom left of the main screen (moon = dark, sun = light) 
 - The position is saved every few seconds, when you pause, when you click **Home** and when you close the player.
 - **Continue watching** shows the last videos (× removes one from the history).
 - **Favorites:** Ctrl+D adds a movie or the whole series of the current episode; × on the main screen removes it.
+- **Up next:** the next episode of a series you are watching appears by itself (also across seasons); right-click a video or a “Continue watching” item → **Add to Up next**; ▲ ▼ change the order, × removes. An item disappears once it is watched.
 
 ### Settings
 
@@ -163,7 +171,7 @@ Settings are split into tabs. Every change applies right away (also to the video
 | Subtitles | Subtitle languages and their order, automatic loading and searching, sources on the internet, encoding of old subtitles, look, synchronization |
 | Audio | Volume, volume levelling, equalizer, preferred audio language, output device, output for music and radio, audio sync |
 | Video | Picture quality, hardware decoding, default aspect ratio, HDR |
-| Appearance | Dark / light theme, how long the controls stay visible, rendering the interface on the GPU |
+| Appearance | Dark / light theme, home screen background (default or your own picture: Fill, Fit, Center), how long the controls stay visible, rendering the interface on the GPU |
 | Updates | Version, check now, automatic download, what is new, update history |
 | About | Version, license, technologies used, manual, privacy, code signing policy |
 
@@ -260,6 +268,7 @@ Archives from subtitle sites: ZIP is supported; RAR is not yet.
 | Ctrl+D | Add to / remove from favorites |
 | Ctrl+M | Mini player / back to the full player |
 | Ctrl+R | Radio |
+| Ctrl+Shift+S | Spotify |
 | Ctrl+Backspace | Restore original subtitle timing |
 | F1 | All shortcuts |
 

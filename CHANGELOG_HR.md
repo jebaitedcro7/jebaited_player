@@ -4,6 +4,27 @@ Sve važnije promjene jebaited_playera. Oblik: [Keep a Changelog](https://keepac
 
 Drugi jezici: [English](CHANGELOG.md) · [Deutsch](CHANGELOG_DE.md). Ista povijest je i u playeru (klik na broj verzije na početnom ekranu). Ova datoteka nastaje iz `src/JebaitedPlayer.App/History/update-history.json`.
 
+## [1.7.4] - 2026-11-21
+
+Ciklus 5: Spotify daljinski, „Sljedeće za gledanje” na početnom ekranu i vlastita pozadina.
+
+### Novo
+
+- Spotify (Ctrl+Shift+S ili oznaka izvora u mini playeru): prijava sa svojom besplatnom Spotify developer aplikacijom (vodič je u prozoru), pjesma s omotom, play, pauza, sljedeća, premotavanje, glasnoća, tvoje playliste i spremljene pjesme, pretraga i izbor uređaja. Glazba svira u tvojoj Spotify aplikaciji; dok je Spotify izvor, tipke mini playera upravljaju njime. Za upravljanje treba Spotify Premium.
+- „Sljedeće za gledanje” na početnom ekranu: sljedeća epizoda serije koju gledaš pojavi se sama (i preko granice sezone), možeš dodati bilo koji video (desni klik na video ili na stavku „Nastavi gledati”), redoslijed mijenjaš s ▲ ▼, a × uklanja. Stavka nestaje kad je pogledaš.
+- Postavke → Izgled → Pozadina početnog ekrana: zadana (svemir) ili vlastita slika (Ispuni, Prilagodi ili Sredina), s pregledom. Slika se ne kopira; ako je premjestiš ili obrišeš, vraća se svemirska pozadina.
+
+### Poboljšano
+
+- Velika slika pozadine učitava se u pozadini i samo u veličini zaslona, pa ne usporava pokretanje.
+
+### Poznati problemi
+
+- Aplikacija još nije digitalno potpisana, pa Windows SmartScreen ili Smart App Control mogu upozoriti prije instalacije.
+- Prozor napretka instalacije je Velopackov i samo je na engleskom.
+
+Izdanje: [v1.7.4](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v1.7.4) · Promjene od [v1.6.3...v1.7.4](https://github.com/jebaitedcro7/jebaited_player/compare/v1.6.3...v1.7.4)
+
 ## [1.6.3] - 2026-11-20
 
 Ciklus 4: radio nakon Stopa opet uživo, zaštićene postavke, pitanje za nespremljene promjene i zaseban izlaz za glazbu.

@@ -1,0 +1,19 @@
+{
+  "name": "libdave",
+  "version-string": "1.3.0",
+  "license": "MIT",
+  "dependencies": [
+    {
+      "name": "openssl",
+      "version>=": "3.6.5"
+    },
+    "gtest",
+    {
+      "name": "mlspp",
+      "features": [
+        "openssl"
+      ]
+    }
+  ],
+  "builtin-baseline": "9eec002df1cd109f8f104cd966a763daf9751489"
+}

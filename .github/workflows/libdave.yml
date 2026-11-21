@@ -1,0 +1,135 @@
+# libdave (Discordov DAVE E2EE za glas) izgrađen s OpenSSL 3 umjesto BoringSSL-a.
+#
+# Zašto: Discordov gotov Windows paket sadrži stari BoringSSL pod licencom OpenSSL/SSLeay, koja nije spojiva s GPL-3.0.
+# OpenSSL 3 je pod Apache-2.0, a libdave ga službeno podržava (cpp/vcpkg-alts/openssl_3).
+# Sve je zakucano: oznaka libdave-a, commit vcpkg-a (izdanje 2026.10.16) i verzija OpenSSL-a (third_party/libdave/vcpkg.json).
+# Rezultat je zip s libdave.dll, licencama i BUILD-INFO.txt, objavljen kao pre-release (nije „Latest”, Velopack ga ne vidi).
+# SHA256 se zapisuje u third_party/libdave/SOURCE.md, a tools/get-libdave.ps1 ga provjerava pri svakoj izradi playera.
+name: libdave (OpenSSL 3)
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: "Objavi zip kao pre-release (inače samo artifact)"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+env:
+  LIBDAVE_REF: v1.3.0/cpp
+  VCPKG_TAG: 2026.10.16
+  VCPKG_COMMIT: 9eec002df1cd109f8f104cd966a763daf9751489
+  RELEASE_TAG: libdave-1.3.0-openssl-3.6.5
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 90
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          path: player
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: discord/libdave
+          ref: ${{ env.LIBDAVE_REF }}
+          path: libdave
+          submodules: false
+
+      - name: vcpkg (pinned release)
+        shell: pwsh
+        run: |
+          git clone --quiet --branch $env:VCPKG_TAG --depth 1 https://github.com/microsoft/vcpkg.git vcpkg-root
+          $sha = git -C vcpkg-root rev-parse HEAD
+          if ($sha -ne $env:VCPKG_COMMIT) { throw "vcpkg $env:VCPKG_TAG is $sha, expected $env:VCPKG_COMMIT" }
+          .\vcpkg-root\bootstrap-vcpkg.bat -disableMetrics
+
+      - name: Configure (OpenSSL 3, shared, static CRT)
+        shell: pwsh
+        run: |
+          $root = (Get-Location).Path
+          cmake -S libdave/cpp -B build `
+            -DCMAKE_BUILD_TYPE=Release `
+            -DCMAKE_TOOLCHAIN_FILE="$root/vcpkg-root/scripts/buildsystems/vcpkg.cmake" `
+            -DVCPKG_MANIFEST_DIR="$root/player/third_party/libdave" `
+            -DVCPKG_OVERLAY_PORTS="$root/libdave/cpp/vcpkg-alts/overlay-ports" `
+            -DVCPKG_TARGET_TRIPLET=x64-windows-static `
+            -DVCPKG_TARGET_ARCHITECTURE=x86_64 `
+            -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded `
+            -DBUILD_SHARED_LIBS=ON `
+            -DTESTING=ON `
+            -DINSTALL_VCPKG_LICENSES=ON `
+            -DCMAKE_INSTALL_PREFIX="$root/build/install"
+          if ($LASTEXITCODE -ne 0) { throw "cmake configure failed" }
+
+      # Discordov CI na Windowsu u Release (dijeljena biblioteka) pokreće samo testove C API-ja; C++ testovi trebaju neizvezene simbole.
+      - name: Build and test (Discord's C API tests)
+        shell: pwsh
+        run: |
+          foreach ($t in 'libdave', 'capi_test') {
+            cmake --build build --target $t --config Release --parallel
+            if ($LASTEXITCODE -ne 0) { throw "build $t failed" }
+          }
+          $dllDir = (Get-ChildItem build -Recurse -Filter *.dll | Where-Object { $_.Name -like '*dave*.dll' } | Select-Object -First 1).DirectoryName
+          $env:PATH = "$dllDir;$env:PATH"
+          $exe = Get-ChildItem build/test -Recurse -Filter capi_test.exe | Select-Object -First 1
+          if (-not $exe) { throw "capi_test.exe not built" }
+          & $exe.FullName
+          if ($LASTEXITCODE -ne 0) { throw "capi_test failed ($LASTEXITCODE)" }
+
+      - name: Install and package
+        shell: pwsh
+        run: |
+          cmake --build build --target install --config Release
+          if ($LASTEXITCODE -ne 0) { throw "install failed" }
+          $out = New-Item -ItemType Directory -Force out
+          $dll = Get-ChildItem build/install -Recurse -Filter *.dll | Where-Object { $_.Name -like '*dave*.dll' } | Select-Object -First 1
+          if (-not $dll) { throw "no dave dll in install" }
+          Copy-Item $dll.FullName (Join-Path $out 'libdave.dll')
+          Copy-Item build/install/licenses (Join-Path $out 'licenses') -Recurse
+          Copy-Item libdave/LICENSE (Join-Path $out 'licenses/libdave-LICENSE') -ErrorAction SilentlyContinue
+          if (-not (Test-Path (Join-Path $out 'licenses/openssl'))) { throw "OpenSSL licence missing" }
+          if (Test-Path (Join-Path $out 'licenses/boringssl')) { throw "BoringSSL must not be in this build" }
+          $openssl = (Get-Content vcpkg_installed/x64-windows-static/share/openssl/vcpkg.spdx.json -ErrorAction SilentlyContinue | ConvertFrom-Json).packages | Where-Object name -eq 'openssl' | Select-Object -First 1 -ExpandProperty versionInfo
+          if (-not $openssl) { $openssl = (Get-ChildItem build -Recurse -Filter vcpkg.spdx.json | Where-Object { $_.FullName -match '\\openssl\\' } | Select-Object -First 1 | Get-Content | ConvertFrom-Json).packages | Where-Object name -eq 'openssl' | Select-Object -First 1 -ExpandProperty versionInfo }
+          $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -property catalog_productDisplayVersion
+          @(
+            "libdave $env:LIBDAVE_REF (commit $(git -C libdave rev-parse HEAD))",
+            "vcpkg $env:VCPKG_TAG (commit $env:VCPKG_COMMIT), triplet x64-windows-static, static CRT",
+            "OpenSSL $openssl (Apache-2.0); manifest: third_party/libdave/vcpkg.json",
+            "Visual Studio $vs on $env:ImageOS $env:ImageVersion",
+            "Workflow run: $env:GITHUB_SERVER_URL/$env:GITHUB_REPOSITORY/actions/runs/$env:GITHUB_RUN_ID (player commit $env:GITHUB_SHA)",
+            "Tests: capi_test passed"
+          ) | Set-Content (Join-Path $out 'BUILD-INFO.txt') -Encoding utf8
+          $vsPath = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -property installationPath
+          $dumpbin = Get-ChildItem "$vsPath\VC\Tools\MSVC\*\bin\Hostx64\x64\dumpbin.exe" | Select-Object -Last 1
+          $exports = & $dumpbin.FullName /exports (Join-Path $out 'libdave.dll')
+          $exports | Set-Content (Join-Path $out 'EXPORTS.txt') -Encoding utf8
+          Compress-Archive -Path "$out/*" -DestinationPath "$env:RELEASE_TAG-win-x64.zip"
+          $h = (Get-FileHash "$env:RELEASE_TAG-win-x64.zip" -Algorithm SHA256).Hash.ToLowerInvariant()
+          $d = (Get-FileHash (Join-Path $out 'libdave.dll') -Algorithm SHA256).Hash.ToLowerInvariant()
+          "zip $h`nlibdave.dll $d" | Set-Content SHA256SUMS.txt
+          Get-Content SHA256SUMS.txt, (Join-Path $out 'BUILD-INFO.txt')
+          "### libdave (OpenSSL 3)`n`n``````n$(Get-Content SHA256SUMS.txt -Raw)$(Get-Content (Join-Path $out 'BUILD-INFO.txt') -Raw)``````" >> $env:GITHUB_STEP_SUMMARY
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: libdave-openssl3
+          path: |
+            ${{ env.RELEASE_TAG }}-win-x64.zip
+            SHA256SUMS.txt
+
+      - name: Publish pre-release (not Latest)
+        if: ${{ inputs.publish }}
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $notes = "libdave (Discord DAVE end-to-end encryption for voice) built from source with OpenSSL 3 instead of BoringSSL, for the jebaited_player Discord bot. Not a player release.`n`nSee BUILD-INFO.txt inside the zip and the workflow run for exact sources and versions.`n`n``````n$(Get-Content SHA256SUMS.txt -Raw)``````"
+          gh release create $env:RELEASE_TAG "$env:RELEASE_TAG-win-x64.zip" SHA256SUMS.txt --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title "libdave 1.3.0 (OpenSSL 3.6.5) for the Discord bot" --notes $notes --prerelease --latest=false

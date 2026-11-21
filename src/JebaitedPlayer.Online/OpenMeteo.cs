@@ -10,8 +10,32 @@ public sealed record WeatherPlace(string Name, string Region, string Country, do
     public string Label => string.Join(", ", new[] { Name, Region, Country }.Where(x => x.Length > 0).Distinct());
 }
 
-/// <summary>Trenutno vrijeme na mjestu: temperatura, WMO kôd vremena, dan/noć.</summary>
-public sealed record WeatherNow(double Temperature, int Code, bool IsDay, bool Fahrenheit, DateTime FetchedUtc);
+/// <summary>Sat prognoze (2.1.7).</summary>
+public sealed record HourlyForecast(DateTime Time, double Temperature, int Code, double? PrecipProbability);
+
+/// <summary>Dan prognoze (2.1.7).</summary>
+public sealed record DailyForecast(DateTime Date, double Min, double Max, int Code, double? PrecipProbability);
+
+/// <summary>
+/// Trenutno vrijeme na mjestu: temperatura, WMO kôd vremena, dan/noć. Od 2.1.7 i dodatni podaci; svaki je null (ili prazan popis)
+/// ako ga izvor ne šalje, pa se takav podatak ne prikazuje.
+/// </summary>
+public sealed record WeatherNow(double Temperature, int Code, bool IsDay, bool Fahrenheit, DateTime FetchedUtc)
+{
+    public double? Feels { get; init; }
+    public double? Humidity { get; init; }
+    public double? Precipitation { get; init; }
+    public double? PrecipProbability { get; init; }
+    public double? WindSpeed { get; init; }
+    public double? WindDirection { get; init; }
+    public double? TempMin { get; init; }
+    public double? TempMax { get; init; }
+    public double? UvIndex { get; init; }
+    public DateTime? Sunrise { get; init; }
+    public DateTime? Sunset { get; init; }
+    public IReadOnlyList<HourlyForecast> Hourly { get; init; } = [];
+    public IReadOnlyList<DailyForecast> Daily { get; init; } = [];
+}
 
 /// <summary>
 /// Ciklus 6, N3: Open-Meteo (besplatno, bez ključa; izvor se navodi: „Weather data by Open-Meteo.com”).
@@ -50,18 +74,96 @@ public sealed class OpenMeteoClient : IDisposable
 
     public async Task<WeatherNow> CurrentAsync(double latitude, double longitude, bool fahrenheit, CancellationToken ct)
     {
-        string query = string.Create(CultureInfo.InvariantCulture,
-            $"latitude={latitude:0.####}&longitude={longitude:0.####}&current=temperature_2m,weather_code,is_day&timezone=auto") +
-            (fahrenheit ? "&temperature_unit=fahrenheit" : string.Empty);
+        // Jedan upit daje sve (trenutno, po satima, po danima). Imperijalne jedinice samo uz °F.
+        string query = string.Create(CultureInfo.InvariantCulture, $"latitude={latitude:0.####}&longitude={longitude:0.####}") +
+            "&current=temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,weather_code,wind_speed_10m,wind_direction_10m,is_day" +
+            "&hourly=temperature_2m,weather_code,precipitation_probability" +
+            "&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,uv_index_max,sunrise,sunset" +
+            "&forecast_days=6&timezone=auto" +
+            (fahrenheit ? "&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch" : string.Empty);
         using JsonDocument doc = await GetAsync(new Uri(_forecast, "v1/forecast?" + query), ct);
         if (!doc.RootElement.TryGetProperty("current", out JsonElement current) || current.ValueKind != JsonValueKind.Object)
         {
             throw new ProviderException("Open-Meteo: no current weather");
         }
 
+        double? minToday = null, maxToday = null, uv = null, probToday = null;
+        DateTime? sunrise = null, sunset = null;
+        var daily = new List<DailyForecast>();
+        if (doc.RootElement.TryGetProperty("daily", out JsonElement d) && d.ValueKind == JsonValueKind.Object)
+        {
+            JsonElement[] days = Items(d, "time");
+            for (int i = 0; i < days.Length; i++)
+            {
+                DateTime? date = Time(days[i]);
+                double? min = At(d, "temperature_2m_min", i), max = At(d, "temperature_2m_max", i);
+                if (date is null || min is null || max is null)
+                {
+                    continue;
+                }
+
+                daily.Add(new DailyForecast(date.Value, min.Value, max.Value, (int)(At(d, "weather_code", i) ?? 0), At(d, "precipitation_probability_max", i)));
+            }
+
+            minToday = At(d, "temperature_2m_min", 0);
+            maxToday = At(d, "temperature_2m_max", 0);
+            uv = At(d, "uv_index_max", 0);
+            probToday = At(d, "precipitation_probability_max", 0);
+            JsonElement[] rise = Items(d, "sunrise"), set = Items(d, "sunset");
+            sunrise = rise.Length > 0 ? Time(rise[0]) : null;
+            sunset = set.Length > 0 ? Time(set[0]) : null;
+        }
+
+        var hourly = new List<HourlyForecast>();
+        if (doc.RootElement.TryGetProperty("hourly", out JsonElement h) && h.ValueKind == JsonValueKind.Object)
+        {
+            JsonElement[] hours = Items(h, "time");
+            for (int i = 0; i < hours.Length; i++)
+            {
+                DateTime? time = Time(hours[i]);
+                double? t = At(h, "temperature_2m", i);
+                if (time is not null && t is not null)
+                {
+                    hourly.Add(new HourlyForecast(time.Value, t.Value, (int)(At(h, "weather_code", i) ?? 0), At(h, "precipitation_probability", i)));
+                }
+            }
+        }
+
         return new WeatherNow(Num(current, "temperature_2m"), (int)Num(current, "weather_code"),
-            current.TryGetProperty("is_day", out JsonElement d) && d.ValueKind == JsonValueKind.Number && d.GetInt32() == 1, fahrenheit, DateTime.UtcNow);
+            current.TryGetProperty("is_day", out JsonElement day) && day.ValueKind == JsonValueKind.Number && day.GetInt32() == 1, fahrenheit, DateTime.UtcNow)
+        {
+            Feels = NumOrNull(current, "apparent_temperature"),
+            Humidity = NumOrNull(current, "relative_humidity_2m"),
+            Precipitation = NumOrNull(current, "precipitation"),
+            WindSpeed = NumOrNull(current, "wind_speed_10m"),
+            WindDirection = NumOrNull(current, "wind_direction_10m"),
+            PrecipProbability = probToday,
+            TempMin = minToday,
+            TempMax = maxToday,
+            UvIndex = uv,
+            Sunrise = sunrise,
+            Sunset = sunset,
+            Hourly = hourly,
+            Daily = daily,
+        };
     }
+
+    private static JsonElement[] Items(JsonElement e, string name) =>
+        e.TryGetProperty(name, out JsonElement v) && v.ValueKind == JsonValueKind.Array ? v.EnumerateArray().ToArray() : [];
+
+    private static double? At(JsonElement e, string name, int index)
+    {
+        JsonElement[] values = Items(e, name);
+        return index < values.Length && values[index].ValueKind == JsonValueKind.Number ? values[index].GetDouble() : null;
+    }
+
+    /// <summary>Lokalno vrijeme mjesta iz odgovora („2026-11-21T14:00”).</summary>
+    private static DateTime? Time(JsonElement v) =>
+        v.ValueKind == JsonValueKind.String &&
+        DateTime.TryParse(v.GetString(), CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime t) ? t : null;
+
+    private static double? NumOrNull(JsonElement e, string name) =>
+        e.TryGetProperty(name, out JsonElement v) && v.ValueKind == JsonValueKind.Number ? v.GetDouble() : null;
 
     /// <summary>WMO kôd vremena → ključ opisa (prijevod) i simbol.</summary>
     public static (string Key, string Symbol) Describe(int code, bool isDay) => code switch

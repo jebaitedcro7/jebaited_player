@@ -93,6 +93,14 @@ public sealed partial class SourceScanTests
             used.Add("vu." + vu.Groups[1].Value);
         }
 
+        // 2.1.7: ključevi koji se slažu iz id-a (izgledi mini playera, podaci o pjesmi, mjesta i podaci prognoze na početnom ekranu).
+        // Da svaki id ima prijevod provjerava HomeLookAndDesignTests u JebaitedPlayer.App.Tests.
+        string[] composed = ["miniDesign.", "info.", "homePos.", "weatherDetail.", "homeElement."];
+        foreach (string key in english.Keys.Where(k => composed.Any(p => k.StartsWith(p, StringComparison.Ordinal))))
+        {
+            used.Add(key);
+        }
+
         string[] unused = LanguageFileTests.Simple(english)
             .Concat(LanguageFileTests.PluralBases(english))
             .Where(k => !used.Contains(k))

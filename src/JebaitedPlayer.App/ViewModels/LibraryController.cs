@@ -319,6 +319,12 @@ public sealed class LibraryController : ObservableObject
     /// <summary>Koliko sekundi traje odbrojavanje do sljedeće epizode.</summary>
     public int UpNextDelaySeconds { get; set; } = 10;
 
+    /// <summary>Sekundi prije kraja epizode kad se nudi sljedeća; 0 = tek na kraju.</summary>
+    public int UpNextLeadSeconds { get; set; }
+
+    private string? _leadPath;
+    private bool _leadShown;
+
     /// <summary>Isključeno: na kraju epizode kartica samo ponudi sljedeću, bez odbrojavanja.</summary>
     public bool AutoPlayNext { get; set; } = true;
 
@@ -572,6 +578,7 @@ public sealed class LibraryController : ObservableObject
     {
         long now = Environment.TickCount64;
         TrackPlayback(now);
+        OfferNextBeforeEnd(now);
         if (UpNext != null && AutoPlayNext)
         {
             int remaining = (int)Math.Ceiling((_upNextDeadline - now) / 1000.0);
@@ -588,6 +595,41 @@ public sealed class LibraryController : ObservableObject
         {
             SaveCurrentPosition();
         }
+    }
+
+    /// <summary>
+    /// Opcija „ponudi sljedeću X s prije kraja”: kartica se pojavi kad do kraja ostane najviše toliko sekundi (samo dok video svira),
+    /// a odbrojavanje završava točno na kraju epizode. Ako korisnik premota nazad, kartica nestaje i ponovno se nudi pri kraju.
+    /// </summary>
+    private void OfferNextBeforeEnd(long now)
+    {
+        if (UpNextLeadSeconds <= 0 || Current is not { } current || !_vm.HasMedia || _vm.IsLoading || _vm.Duration <= 0 ||
+            MediaScanner.IsAudio(current.Path) || _vm.IsLiveStream)
+        {
+            return;
+        }
+
+        double remaining = _vm.Duration - _vm.Position;
+        if (_leadShown && remaining > UpNextLeadSeconds + 3)
+        {
+            // Premotano nazad: povuci ponudu i pripremi novu.
+            _leadShown = false;
+            _leadPath = null;
+            UpNext = null;
+            return;
+        }
+
+        if (UpNext != null || _vm.IsPaused || _vm.IsScrubbing || remaining > UpNextLeadSeconds || remaining < 0.5 ||
+            string.Equals(_leadPath, current.Path, StringComparison.OrdinalIgnoreCase) || Neighbour(+1) is not { } next)
+        {
+            return;
+        }
+
+        _leadPath = current.Path;
+        _leadShown = true;
+        UpNext = next;
+        UpNextSeconds = (int)Math.Ceiling(remaining);
+        _upNextDeadline = now + (long)(remaining * 1000);
     }
 
     /// <summary>Sprema poziciju trenutne datoteke (i pri promjeni datoteke, pauzi i zatvaranju).</summary>
@@ -926,6 +968,17 @@ public sealed class LibraryController : ObservableObject
         if (Current is { } current && MediaScanner.IsAudio(current.Path) && Neighbour(+1) is { } nextSong)
         {
             PlayItem(nextSong);
+            return;
+        }
+
+        if (_leadShown && UpNext != null)
+        {
+            // Kartica je već ponuđena prije kraja (opcija „prije kraja”): odbrojavanje je završilo na kraju, pa odmah sljedeća.
+            if (AutoPlayNext)
+            {
+                UpNextPlayNow();
+            }
+
             return;
         }
 

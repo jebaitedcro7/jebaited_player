@@ -67,11 +67,13 @@
                 <ScaleTransform x:Name="Zoom" ScaleX="1" ScaleY="1" />
             </Grid.LayoutTransform>
 
+            <StackPanel x:Name="DesignStack">
             <!-- Dizajn 1: Klasični Winamp -->
             <StackPanel x:Name="FullView" Width="460">
                 <DockPanel Height="24" Margin="8,3,3,0">
                     <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
                         <Button Style="{StaticResource MiniIcon}" Content="&#xE73F;" ToolTip="{loc:T mini.compact}" Click="OnCompact" />
+                        <Button Style="{StaticResource MiniIcon}" Content="&#xE921;" ToolTip="{loc:T mini.minimize}" Click="OnMinimize" />
                         <Button Style="{StaticResource MiniIcon}" Content="&#xE8A7;" ToolTip="{loc:T mini.fullPlayer}" Click="OnFullPlayer" />
                         <Button Style="{StaticResource MiniIcon}" Content="&#xE8BB;" ToolTip="{loc:T mini.close}" Click="OnClosePlayer" />
                     </StackPanel>
@@ -104,19 +106,16 @@
 
                     <StackPanel Grid.Column="1" Margin="8,0,0,0">
                         <Border Style="{StaticResource Lcd}" Height="26" Padding="8,0">
-                            <Canvas x:Name="MarqueeBox" ClipToBounds="True">
-                                <TextBlock x:Name="MarqueeText" FontFamily="Consolas" FontSize="13" Canvas.Top="4" Foreground="{DynamicResource LcdText}">
-                                    <TextBlock.RenderTransform>
-                                        <TranslateTransform />
-                                    </TextBlock.RenderTransform>
-                                </TextBlock>
-                            </Canvas>
+                            <views:MarqueeView x:Name="Marquee" TextElement.FontFamily="Consolas" TextElement.FontSize="13"
+                                               TextElement.Foreground="{DynamicResource LcdText}" Background="Transparent"
+                                               MouseRightButtonUp="OnInfoMenu" ToolTip="{loc:T mini.infoHint}" />
                         </Border>
                         <DockPanel Margin="0,9,0,0">
                             <Border DockPanel.Dock="Left" Background="{DynamicResource LcdTag}" CornerRadius="8" Padding="7,1" VerticalAlignment="Center"
                                     Cursor="Hand" ToolTip="{loc:T menu.radio}" MouseLeftButtonDown="OnSourceClick">
                                 <TextBlock x:Name="SourceText" Text="{loc:T mini.sourceLocal}" FontSize="10" Foreground="{DynamicResource LcdText}" />
                             </Border>
+                            <views:LiveBadge x:Name="LiveClassic" DockPanel.Dock="Left" Margin="6,0,0,0" />
                             <TextBlock x:Name="RemainingText" DockPanel.Dock="Right" Width="46" TextAlignment="Right" VerticalAlignment="Center"
                                        Foreground="{DynamicResource TextSecondaryBrush}" />
                             <Slider x:Name="SeekSlider" Style="{StaticResource PlayerSlider}" Margin="8,0,4,0" VerticalAlignment="Center" />
@@ -142,6 +141,38 @@
                         <Slider x:Name="VolumeSlider" Style="{StaticResource PlayerSlider}" Width="78" Minimum="0" Maximum="100" VerticalAlignment="Center" />
                     </StackPanel>
                 </DockPanel>
+            </StackPanel>
+
+            <!-- Dizajn 3: uska traka -->
+            <Grid x:Name="CompactView" Width="560" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="38" />
+                    <RowDefinition Height="4" />
+                </Grid.RowDefinitions>
+                <DockPanel Margin="8,0,14,0">
+                    <Image DockPanel.Dock="Left" Source="/Assets/logo-ufo.png" Height="18" Margin="0,0,8,0" RenderOptions.BitmapScalingMode="HighQuality" />
+                    <Button DockPanel.Dock="Left" Style="{StaticResource MiniButton}" Width="28" Height="26" Content="&#xE892;" ToolTip="{loc:T mini.previous}" Click="OnPrevious" />
+                    <Button x:Name="CompactPlayPause" DockPanel.Dock="Left" Style="{StaticResource MiniButton}" Width="28" Height="26" Content="&#xE768;"
+                            ToolTip="{loc:T mini.play}" Click="OnPlayPause" />
+                    <Button DockPanel.Dock="Left" Style="{StaticResource MiniButton}" Width="28" Height="26" Content="&#xE893;" ToolTip="{loc:T mini.next}" Click="OnNext" />
+                    <Button DockPanel.Dock="Right" Style="{StaticResource MiniIcon}" Content="&#xE8BB;" ToolTip="{loc:T mini.close}" Click="OnClosePlayer" />
+                    <Button DockPanel.Dock="Right" Style="{StaticResource MiniIcon}" Content="&#xE921;" ToolTip="{loc:T mini.minimize}" Click="OnMinimize" />
+                    <Button DockPanel.Dock="Right" Style="{StaticResource MiniIcon}" Content="&#xE740;" ToolTip="{loc:T mini.expand}" Click="OnExpand" />
+                    <Button DockPanel.Dock="Right" Style="{StaticResource MiniIcon}" FontFamily="Consolas" FontSize="11" Content="EQ" ToolTip="{loc:T mini.equalizer}" Click="OnCompactEqualizer" />
+                    <Slider x:Name="CompactVolume" DockPanel.Dock="Right" Style="{StaticResource PlayerSlider}" Width="60" Minimum="0" Maximum="100"
+                            VerticalAlignment="Center" Margin="2,0,4,0" ToolTip="{loc:T controls.volume}" />
+                    <Button x:Name="CompactMute" DockPanel.Dock="Right" Style="{StaticResource MiniIcon}" Content="&#xE767;" ToolTip="{loc:T mini.mute}" Click="OnMute" />
+                    <views:LiveBadge x:Name="LiveCompact" DockPanel.Dock="Left" Margin="6,0,0,0" />
+                    <TextBlock x:Name="CompactTime" DockPanel.Dock="Right" Margin="8,0,6,0" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" />
+                    <views:MarqueeView x:Name="CompactMarquee" Margin="6,0,0,0" Height="20" TextElement.FontSize="13"
+                                       Background="Transparent" MouseRightButtonUp="OnInfoMenu" ToolTip="{loc:T mini.infoHint}" />
+                </DockPanel>
+                <ProgressBar x:Name="CompactProgress" Grid.Row="1" Style="{StaticResource ThinProgress}" Height="2" Margin="8,0,14,2" />
+            </Grid>
+
+
+                <!-- 2.1.7: izgledi 2 (kartica), 4 (bočna ploča) i 5 (NLO zaslon); stvaraju se tek kad se odaberu. -->
+                <ContentPresenter x:Name="SkinHost" Visibility="Collapsed" />
 
                 <Border x:Name="EqHost" Visibility="Collapsed" BorderThickness="0,1,0,0" BorderBrush="{DynamicResource MenuBorderBrush}" Padding="10,6,10,8">
                     <StackPanel>
@@ -171,34 +202,6 @@
                     </ScrollViewer>
                 </Border>
             </StackPanel>
-
-            <!-- Dizajn 3: uska traka -->
-            <Grid x:Name="CompactView" Width="560" Visibility="Collapsed">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="38" />
-                    <RowDefinition Height="4" />
-                </Grid.RowDefinitions>
-                <DockPanel Margin="8,0,14,0">
-                    <Image DockPanel.Dock="Left" Source="/Assets/logo-ufo.png" Height="18" Margin="0,0,8,0" RenderOptions.BitmapScalingMode="HighQuality" />
-                    <Button DockPanel.Dock="Left" Style="{StaticResource MiniButton}" Width="28" Height="26" Content="&#xE892;" ToolTip="{loc:T mini.previous}" Click="OnPrevious" />
-                    <Button x:Name="CompactPlayPause" DockPanel.Dock="Left" Style="{StaticResource MiniButton}" Width="28" Height="26" Content="&#xE768;"
-                            ToolTip="{loc:T mini.play}" Click="OnPlayPause" />
-                    <Button DockPanel.Dock="Left" Style="{StaticResource MiniButton}" Width="28" Height="26" Content="&#xE893;" ToolTip="{loc:T mini.next}" Click="OnNext" />
-                    <Button DockPanel.Dock="Right" Style="{StaticResource MiniIcon}" Content="&#xE8BB;" ToolTip="{loc:T mini.close}" Click="OnClosePlayer" />
-                    <Button DockPanel.Dock="Right" Style="{StaticResource MiniIcon}" Content="&#xE740;" ToolTip="{loc:T mini.expand}" Click="OnExpand" />
-                    <Button DockPanel.Dock="Right" Style="{StaticResource MiniIcon}" FontFamily="Consolas" FontSize="11" Content="EQ" ToolTip="{loc:T mini.equalizer}" Click="OnCompactEqualizer" />
-                    <Button x:Name="CompactMute" DockPanel.Dock="Right" Style="{StaticResource MiniIcon}" Content="&#xE767;" ToolTip="{loc:T mini.mute}" Click="OnMute" />
-                    <TextBlock x:Name="CompactTime" DockPanel.Dock="Right" Margin="8,0,6,0" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" />
-                    <Canvas x:Name="CompactMarqueeBox" ClipToBounds="True" Margin="6,0,0,0" Height="20">
-                        <TextBlock x:Name="CompactMarqueeText" FontSize="13" Canvas.Top="1">
-                            <TextBlock.RenderTransform>
-                                <TranslateTransform />
-                            </TextBlock.RenderTransform>
-                        </TextBlock>
-                    </Canvas>
-                </DockPanel>
-                <ProgressBar x:Name="CompactProgress" Grid.Row="1" Style="{StaticResource ThinProgress}" Height="2" Margin="8,0,14,2" />
-            </Grid>
 
             <!-- Ručno povećavanje i smanjenje -->
             <Thumb x:Name="ResizeGrip" Width="13" Height="13" HorizontalAlignment="Right" VerticalAlignment="Bottom" Cursor="SizeNWSE"

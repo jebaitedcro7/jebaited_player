@@ -72,6 +72,8 @@ public partial class MainWindow
         menu.Items.Add(new Separator());
         menu.Items.Add(Item(Loc.T("menu.settings"), null, ShowPlayerSettings));
         menu.Items.Add(Item(Loc.T("menu.shortcuts"), Shortcuts.Gesture(_settings, "help"), ShowShortcuts, _vm.HasMedia));
+        // 2.1.7: Minimiziraj (taskbar) je zasebno od mini playera i zatvaranja; reprodukcija se ne prekida.
+        menu.Items.Add(Item(Loc.T("menu.minimize"), null, MinimizePlayer));
         menu.Items.Add(Item(Loc.T("menu.exit"), "Alt+F4", Close));
         OpenMenu(menu);
     }

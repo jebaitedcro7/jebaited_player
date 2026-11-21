@@ -4,6 +4,41 @@ Alle wichtigen Änderungen an jebaited_player. Format: [Keep a Changelog](https:
 
 Andere Sprachen: [English](CHANGELOG.md) · [Hrvatski](CHANGELOG_HR.md). Derselbe Verlauf ist im Player enthalten (Klick auf die Versionsnummer auf dem Startbildschirm). Diese Datei wird aus `src/JebaitedPlayer.App/History/update-history.json` erzeugt.
 
+## [2.1.7] - 2026-11-21
+
+Mini-Player und Startbildschirm: fünf Mini-Player-Looks, Lautstärke per Mausrad, pulsierende LIVE-Anzeige fürs Radio, Musik läuft auf dem Startbildschirm weiter, Uhrzeit, Datum und Wetter frei anpassbar.
+
+### Neu
+
+- Fünf Mini-Player-Looks (Rechtsklick → Aussehen): klassisches Winamp, Karte, schmale Leiste, Seitenleiste und UFO-Display. Alle haben dieselben Funktionen, deine Wahl wird gespeichert.
+- Das Mausrad über der Lautstärkeleiste ändert die Lautstärke in 2-%-Schritten, im normalen und im Mini-Player. Das Mausrad über dem Video oder anderen Bereichen ändert die Lautstärke nicht mehr versehentlich.
+- Eine rote, sanft pulsierende LIVE-Anzeige, solange ein Radiosender läuft: in jedem Mini-Player-Look, im normalen Player und auf dem Startbildschirm.
+- Der Titel läuft in einer Endlosschleife (ohne Lücke und ohne Sprung) und zeigt standardmäßig nur Interpret und Titel. Rechtsklick auf den Titel: Album, Jahr, Genre, Klangqualität oder Dateiname hinzufügen.
+- Wiedergabeleiste auf dem Startbildschirm: aktueller Titel, Quelle (lokal, Radio, Spotify, YouTube Music, Discord), Play/Pause, Zurück/Weiter und Lautstärke.
+- Aussehen des Startbildschirms (Einstellungen → Aussehen): Schriftart, Größe und Position von Uhrzeit, Datum und Wetter jeweils einzeln, mit Vorschau und „Aussehen zurücksetzen“.
+- Mehr Wetterdetails (Open-Meteo, kostenlos, ohne Schlüssel): gefühlte Temperatur, Minimum und Maximum, Regenwahrscheinlichkeit und -menge, Wind, Luftfeuchtigkeit, UV-Index, Sonnenauf- und -untergang, nächste Stunden und Tage. Angezeigt wird nur, was der Wetterdienst liefert.
+- Eigene Minimieren-Schaltfläche (und Menüeintrag): Der Player geht in die Taskleiste und die Musik läuft weiter; getrennt von Mini-Player und Schließen.
+- Der Discord-Bot steht im Quellenmenü neben Radio, Spotify und YouTube Music.
+- Nächste Folge vor dem Ende (Einstellungen → Allgemein): Du wählst, wie viele Sekunden vor dem Ende einer Folge die Karte für die nächste erscheint; der Countdown endet dann genau am Ende. 0 behält das bisherige Verhalten (erst nach dem Ende).
+
+### Verbessert
+
+- Der Mini-Player und alle anderen Fenster (Equalizer-Bereich, Radio, Discord …) bleiben immer vollständig im sichtbaren Bildschirmbereich: Taskleiste, Skalierung und mehrere Monitore werden berücksichtigt, und ein nach außen geschobenes Fenster wird zurückgeholt.
+- Die schmale Leiste hat jetzt einen Lautstärkeregler.
+
+### Behoben
+
+- Die Taste Home stoppt Musik und Radio nicht mehr. Nur Videos werden weiterhin geschlossen, wie bisher.
+- Beim Start öffnet sich nur ein Fenster: der Mini-Player, wenn er die letzte Ansicht war (oder bei einer Musikdatei), sonst der normale Player. Vorher erschien zuerst der große Player und kurz danach der Mini-Player.
+
+### Bekannte Probleme
+
+- Der Ort wird nur über den Städtenamen gewählt; eine automatische Ortung ist nicht enthalten (vor der Städtewahl wird nichts gesendet).
+- Die App ist noch nicht digital signiert, daher können Windows SmartScreen oder Smart App Control vor der Installation warnen.
+- Das Fortschrittsfenster des Installers stammt von Velopack und ist nur auf Englisch.
+
+Release: [v2.1.7](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v2.1.7) · Änderungen seit [v2.0.6...v2.1.7](https://github.com/jebaitedcro7/jebaited_player/compare/v2.0.6...v2.1.7)
+
 ## [2.0.6] - 2026-11-21
 
 2.0: Dein eigener Discord-Bot spielt Musik und Radio des Players in einem Sprachkanal; jedes Tastenkürzel lässt sich ändern; Akzentfarbe nach Wahl.

@@ -99,24 +99,9 @@ public partial class MiniPlayerWindow : Window
         ContextMenu = BuildMenu();
 
         VolumeSlider.Value = vm.Volume;
-        VolumeSlider.ValueChanged += (_, e) =>
-        {
-            if (!_updatingVolume)
-            {
-                _vm.Volume = e.NewValue;
-                _settings.Volume = _vm.Volume;
-            }
-        };
-        SeekSlider.PreviewMouseLeftButtonDown += (_, _) => _seeking = true;
-        SeekSlider.PreviewMouseLeftButtonUp += (_, _) =>
-        {
-            if (_seeking && _vm.HasMedia)
-            {
-                _vm.SeekAbsolute(SeekSlider.Value, exact: true);
-            }
-
-            _seeking = false;
-        };
+        AttachVolume(VolumeSlider);
+        AttachVolume(CompactVolume);
+        AttachSeek(SeekSlider);
 
         _timer = new DispatcherTimer(TimeSpan.FromMilliseconds(250), DispatcherPriority.Background, (_, _) => Tick(), Dispatcher);
         _vuTimer = new DispatcherTimer(TimeSpan.FromMilliseconds(100), DispatcherPriority.Background, async (_, _) => await UpdateVuAsync(), Dispatcher);
@@ -140,8 +125,6 @@ public partial class MiniPlayerWindow : Window
         PreviewMouseWheel += OnWheel;
         Drop += OnDrop;
         Closing += OnClosingWindow;
-        MarqueeBox.SizeChanged += (_, _) => StartMarquee(MarqueeBox, MarqueeText);
-        CompactMarqueeBox.SizeChanged += (_, _) => StartMarquee(CompactMarqueeBox, CompactMarqueeText);
         this.OnLanguageChanged(() =>
         {
             BindEqualizer();
@@ -166,14 +149,169 @@ public partial class MiniPlayerWindow : Window
         EqTitle.Text = Loc.T(MpvConfig.MusicMode ? "mini.eqMusic" : "mini.eqMovies");
     }
 
+    // --- 2.1.7: glasnoća kotačićem, premotavanje, izgledi ----------------------------------------------------------
+
+    internal bool IsSeeking => _seeking;
+
+    /// <summary>Traka glasnoće: povlačenje i kotačić miša (samo iznad trake; 0–100 %), isto u svim izgledima.</summary>
+    private void AttachVolume(Slider slider)
+    {
+        slider.ValueChanged += (_, e) =>
+        {
+            if (!_updatingVolume)
+            {
+                _vm.Volume = e.NewValue;
+                _settings.Volume = _vm.Volume;
+            }
+        };
+        slider.PreviewMouseWheel += (_, e) =>
+        {
+            _vm.Volume += e.Delta > 0 ? PlayerViewModel.VolumeWheelStep : -PlayerViewModel.VolumeWheelStep;
+            _settings.Volume = _vm.Volume;
+            e.Handled = true;
+        };
+    }
+
+    /// <summary>Postavi traku glasnoće na stvarnu glasnoću (bez povratnog učinka na player).</summary>
+    internal void SyncVolume(Slider slider, double volume)
+    {
+        if (!slider.IsMouseCaptureWithin && Math.Abs(slider.Value - volume) > 0.5)
+        {
+            _updatingVolume = true;
+            slider.Value = volume;
+            _updatingVolume = false;
+        }
+    }
+
+    private void AttachSeek(Slider slider)
+    {
+        slider.PreviewMouseLeftButtonDown += (_, _) => _seeking = true;
+        slider.PreviewMouseLeftButtonUp += (_, _) =>
+        {
+            if (_seeking && _vm.HasMedia)
+            {
+                _vm.SeekAbsolute(slider.Value, exact: true);
+            }
+
+            _seeking = false;
+        };
+    }
+
+    private MiniSkinBase? _skin;
+    private string _skinDesign = string.Empty;
+    private bool _isLive;
+    private MiniSkinState _lastSkinState;
+
+    internal string ActiveDesign => _settings.MiniPlayer.ActiveDesign;
+
+    /// <summary>Izgled koji je trenutno vidljiv (za provjeru).</summary>
+    internal MiniSkinBase? CurrentSkin => ActiveDesign is "card" or "side" or "ufo" ? _skin : null;
+
+    /// <summary>Odabir izgleda: classic (1), card (2), strip (3), side (4), ufo (5). Sprema se i pamti.</summary>
+    internal void SetDesign(string design)
+    {
+        MiniPlayerSettings m = _settings.MiniPlayer;
+        if (!MiniPlayerSettings.Designs.Contains(design))
+        {
+            return;
+        }
+
+        if (design == "strip")
+        {
+            m.Compact = true;
+        }
+        else
+        {
+            m.Compact = false;
+            m.Design = design;
+            if (design == "side")
+            {
+                m.ShowPlaylist = true; // bočna ploča pokazuje popis odmah (dizajn 4)
+            }
+        }
+
+        ApplyLayout();
+        _marquee = string.Empty;
+        Tick();
+        Log.Info($"Mini player: izgled {design}");
+    }
+
+    private MiniSkinBase CreateSkin(string design)
+    {
+        MiniSkinBase skin = design switch
+        {
+            "card" => new MiniCardSkin(),
+            "side" => new MiniSideSkin(),
+            _ => new MiniUfoSkin(),
+        };
+        skin.Mini = this;
+        AttachVolume(skin.VolumeBar);
+        AttachSeek(skin.SeekBar);
+        ApplySkinFont(skin);
+        return skin;
+    }
+
+    private void ApplySkinFont(MiniSkinBase skin)
+    {
+        // Izgledi s LCD zaslonom (NLO) prate odabrani font zaslona.
+        if (skin is MiniUfoSkin)
+        {
+            System.Windows.Documents.TextElement.SetFontFamily(skin.TitleMarquee, new FontFamily(MiniPlayerSettings.FontFamilyFor(_settings.MiniPlayer.Font)));
+            skin.TitleMarquee.Refresh();
+        }
+    }
+
+    /// <summary>Isti podaci u svim izgledima: čita se iz kontrola klasičnog izgleda koje Tick() već održava.</summary>
+    private void SyncSkin()
+    {
+        if (CurrentSkin is not { } skin)
+        {
+            return;
+        }
+
+        MiniPlayerSettings m = _settings.MiniPlayer;
+        bool spotify = SpotifyMode, youtube = YouTubeMode;
+        bool has = !spotify && !youtube && _vm.HasMedia && _vm.Duration > 0 && !_vm.IsLiveStream;
+        double position = spotify || youtube ? SeekSlider.Value : has ? _vm.Position : 0;
+        var state = new MiniSkinState(
+            Title: _marquee,
+            Time: _skinTime,
+            Remaining: RemainingText.Text,
+            Source: SourceText.Text,
+            Position: position,
+            Duration: SeekSlider.Maximum,
+            CanSeek: SeekSlider.IsEnabled,
+            Playing: _skinPlaying,
+            MuteGlyph: _vm.IsMuted || _vm.Volume <= 0 ? "" : "",
+            Live: _isLive,
+            Volume: _vm.Volume,
+            EqOn: m.ShowEqualizer,
+            PlaylistOn: m.ShowPlaylist);
+        _lastSkinState = state;
+        skin.Apply(state);
+    }
+
+    private string _skinTime = string.Empty;
+    private bool _skinPlaying;
+
+    /// <summary>Podaci za provjeru: što izgled prikazuje.</summary>
+    internal MiniSkinState LastSkinState => _lastSkinState;
+
     /// <summary>Font zaslona i izgled VU metra (desni klik ili Postavke → Izgled).</summary>
     internal void ApplyDisplayStyle()
     {
         MiniPlayerSettings m = _settings.MiniPlayer;
         var family = new FontFamily(MiniPlayerSettings.FontFamilyFor(m.Font));
         TimeText.FontFamily = family;
-        MarqueeText.FontFamily = family;
-        CompactMarqueeText.FontFamily = family;
+        System.Windows.Documents.TextElement.SetFontFamily(Marquee, family);
+        System.Windows.Documents.TextElement.SetFontFamily(CompactMarquee, family);
+        Marquee.Refresh();
+        CompactMarquee.Refresh();
+        if (_skin is not null)
+        {
+            ApplySkinFont(_skin);
+        }
+
         Vu.VuStyle = m.VuStyle;
         VuLabels.Visibility = m.VuStyle == "off" ? Visibility.Hidden : Visibility.Visible;
         _marquee = string.Empty;
@@ -220,6 +358,17 @@ public partial class MiniPlayerWindow : Window
             size.Items.Add(Check($"{s * 100:0} %", Math.Abs(Scale - s) < 0.01, () => SetScale(s)));
         }
 
+        var designs = new MenuItem { Header = Loc.T("mini.menuDesign") };
+        foreach (string id in MiniPlayerSettings.Designs)
+        {
+            designs.Items.Add(Check(Loc.T("miniDesign." + id), m.ActiveDesign == id, () => SetDesign(id)));
+        }
+
+        var info = new MenuItem { Header = Loc.T("mini.menuInfo") };
+        AddInfoItems(info.Items);
+
+        menu.Items.Add(designs);
+        menu.Items.Add(info);
         menu.Items.Add(fonts);
         menu.Items.Add(vu);
         menu.Items.Add(size);
@@ -232,6 +381,7 @@ public partial class MiniPlayerWindow : Window
         menu.Items.Add(Check(Loc.T("menu.radio"), false, () => _host.ShowRadio(this)));
         menu.Items.Add(Check(Loc.T("menu.discord"), false, () => _host.ShowDiscord(this)));
         menu.Items.Add(Check(Loc.T("mini.settings"), false, _host.ShowSettings));
+        menu.Items.Add(Check(Loc.T("mini.minimize"), false, () => OnMinimize(this, new RoutedEventArgs())));
         menu.Items.Add(Check(Loc.T("mini.fullPlayer"), false, _host.ShowFullPlayer));
         menu.Items.Add(Check(Loc.T("mini.close"), false, _host.ClosePlayer));
         return menu;
@@ -250,17 +400,39 @@ public partial class MiniPlayerWindow : Window
 
     // --- Izgled -------------------------------------------------------------------------------------------------
 
-    /// <summary>Puni izgled ili uska traka, ploče EQ i popisa, povećanje.</summary>
+    /// <summary>Odabrani izgled (1–5), ploče EQ i popisa, povećanje.</summary>
     internal void ApplyLayout()
     {
         MiniPlayerSettings m = _settings.MiniPlayer;
-        FullView.Visibility = m.Compact ? Visibility.Collapsed : Visibility.Visible;
-        CompactView.Visibility = m.Compact ? Visibility.Visible : Visibility.Collapsed;
+        string design = m.ActiveDesign;
+        FullView.Visibility = design == "classic" ? Visibility.Visible : Visibility.Collapsed;
+        CompactView.Visibility = design == "strip" ? Visibility.Visible : Visibility.Collapsed;
+        if (design is "card" or "side" or "ufo")
+        {
+            if (_skin is null || _skinDesign != design)
+            {
+                _skin = CreateSkin(design);
+                _skinDesign = design;
+                SkinHost.Content = _skin;
+            }
+
+            SkinHost.Visibility = Visibility.Visible;
+        }
+        else
+        {
+            SkinHost.Visibility = Visibility.Collapsed;
+        }
+
         EqToggle.IsChecked = m.ShowEqualizer;
         PlaylistToggle.IsChecked = m.ShowPlaylist;
-        EqHost.Visibility = m.ShowEqualizer ? Visibility.Visible : Visibility.Collapsed;
-        PlaylistHost.Visibility = m.ShowPlaylist ? Visibility.Visible : Visibility.Collapsed;
+        bool panels = design != "strip";
+        EqHost.Visibility = m.ShowEqualizer && panels ? Visibility.Visible : Visibility.Collapsed;
+        PlaylistHost.Visibility = m.ShowPlaylist && panels ? Visibility.Visible : Visibility.Collapsed;
         SetScale(m.Scale);
+        if (IsLoaded)
+        {
+            SyncSkin();
+        }
     }
 
     internal void SetScale(double scale)
@@ -286,7 +458,7 @@ public partial class MiniPlayerWindow : Window
         ApplyLayout();
     }
 
-    /// <summary>Zapamćen položaj ako je na nekom zaslonu, inače dolje desno na radnoj površini.</summary>
+    /// <summary>Zapamćen položaj ako je na nekom zaslonu, inače dolje desno na radnoj površini; uvijek cijeli u vidljivom području.</summary>
     private void PlaceOnScreen()
     {
         MiniPlayerSettings m = _settings.MiniPlayer;
@@ -304,6 +476,8 @@ public partial class MiniPlayerWindow : Window
         Top = work.Bottom - 140 * m.Scale - 24;
     }
 
+    internal void OnMinimize(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
+
     private void OnCompact(object sender, RoutedEventArgs e) => SetCompact(true);
 
     private void OnExpand(object sender, RoutedEventArgs e) => SetCompact(false);
@@ -316,9 +490,9 @@ public partial class MiniPlayerWindow : Window
 
     private void OnPanelsChanged(object sender, RoutedEventArgs e) => SetPanels(EqToggle.IsChecked == true, PlaylistToggle.IsChecked == true);
 
-    private void OnFullPlayer(object sender, RoutedEventArgs e) => _host.ShowFullPlayer();
+    internal void OnFullPlayer(object sender, RoutedEventArgs e) => _host.ShowFullPlayer();
 
-    private void OnClosePlayer(object sender, RoutedEventArgs e) => _host.ClosePlayer();
+    internal void OnClosePlayer(object sender, RoutedEventArgs e) => _host.ClosePlayer();
 
     private void OnClosingWindow(object? sender, CancelEventArgs e)
     {
@@ -391,7 +565,7 @@ public partial class MiniPlayerWindow : Window
     /// <summary>V9: YouTube je izvor (svira u prozoru YouTube Music), pa tipke idu ugrađenom playeru.</summary>
     private bool YouTubeMode => _host.YouTube.IsActiveSource;
 
-    private void OnPrevious(object sender, RoutedEventArgs e)
+    internal void OnPrevious(object sender, RoutedEventArgs e)
     {
         if (YouTubeMode)
         {
@@ -408,7 +582,7 @@ public partial class MiniPlayerWindow : Window
         _vm.Library.PlayPrevious();
     }
 
-    private void OnNext(object sender, RoutedEventArgs e)
+    internal void OnNext(object sender, RoutedEventArgs e)
     {
         if (YouTubeMode)
         {
@@ -425,7 +599,7 @@ public partial class MiniPlayerWindow : Window
         _vm.Library.PlayNext();
     }
 
-    private void OnPlay(object sender, RoutedEventArgs e)
+    internal void OnPlay(object sender, RoutedEventArgs e)
     {
         if (YouTubeMode)
         {
@@ -458,7 +632,7 @@ public partial class MiniPlayerWindow : Window
         }
     }
 
-    private void OnPause(object sender, RoutedEventArgs e)
+    internal void OnPause(object sender, RoutedEventArgs e)
     {
         if (YouTubeMode)
         {
@@ -479,7 +653,7 @@ public partial class MiniPlayerWindow : Window
         }
     }
 
-    private void OnPlayPause(object sender, RoutedEventArgs e)
+    internal void OnPlayPause(object sender, RoutedEventArgs e)
     {
         if (YouTubeMode)
         {
@@ -507,7 +681,7 @@ public partial class MiniPlayerWindow : Window
     /// Stop kao u Winampu: pjesma ostaje učitana, na početku i pauzirana. Radio (R1) se stvarno zaustavlja,
     /// a Play ga ponovno spaja uživo (prije je „početak” streama bio trenutak uključenja postaje).
     /// </summary>
-    private void OnStop(object sender, RoutedEventArgs e)
+    internal void OnStop(object sender, RoutedEventArgs e)
     {
         if (YouTubeMode)
         {
@@ -524,9 +698,9 @@ public partial class MiniPlayerWindow : Window
         _vm.StopPlayback();
     }
 
-    private void OnOpen(object sender, RoutedEventArgs e) => _host.ShowOpenDialog(this);
+    internal void OnOpen(object sender, RoutedEventArgs e) => _host.ShowOpenDialog(this);
 
-    private void OnMute(object sender, RoutedEventArgs e) => _vm.ToggleMute();
+    internal void OnMute(object sender, RoutedEventArgs e) => _vm.ToggleMute();
 
     private void OnTimeClick(object sender, MouseButtonEventArgs e)
     {
@@ -550,8 +724,6 @@ public partial class MiniPlayerWindow : Window
         {
             _timer.Stop();
             _vuTimer.Stop();
-            StopMarquee(MarqueeText);
-            StopMarquee(CompactMarqueeText);
         }
     }
 
@@ -580,12 +752,14 @@ public partial class MiniPlayerWindow : Window
         if (YouTubeMode)
         {
             TickYouTube();
+            SyncSkin();
             return;
         }
 
         if (spotify)
         {
             TickSpotify();
+            SyncSkin();
             return;
         }
 
@@ -607,30 +781,35 @@ public partial class MiniPlayerWindow : Window
         CompactProgress.Value = has ? position / duration : 0;
         CompactTime.Text = has ? $"{Short(position)} / {Short(duration)}" : string.Empty;
         SourceText.Text = Loc.T(stream || stopped != null ? "mini.sourceRadio" : "mini.sourceLocal");
+        _skinTime = TimeText.Text;
+
+        // 2.1.7: LIVE svijetli samo dok radio stvarno svira (ne i kad je pauziran ili zaustavljen).
+        _isLive = stream && !_vm.IsPaused;
         if (stream)
         {
-            // Radio uživo: vrijeme slušanja, bez premotavanja i bez preostalog vremena.
+            // Radio uživo: vrijeme slušanja, bez premotavanja; oznaka LIVE umjesto preostalog vremena.
             TimeText.Text = Short(position);
-            RemainingText.Text = Loc.T("mini.live");
+            RemainingText.Text = string.Empty;
             SeekSlider.IsEnabled = false;
-            CompactTime.Text = $"{Short(position)} · {Loc.T("mini.live")}";
+            CompactTime.Text = Short(position);
+            _skinTime = Short(position);
         }
         else if (stopped != null)
         {
             // R1: postaja zaustavljena tipkom Stop ostaje prikazana u naslovu; Play je ponovno spaja uživo.
             // (Polje preostalog vremena je preusko za „ZAUSTAVLJENO”, pa ostaje prazno.)
             CompactTime.Text = Loc.T("mini.stopped");
+            _skinTime = Loc.T("mini.stopped");
         }
-        CompactPlayPause.Content = has && !_vm.IsPaused ? "" : "";
-        string muteGlyph = _vm.IsMuted || _vm.Volume <= 0 ? "" : "";
+
+        LiveClassic.Visibility = LiveCompact.Visibility = _isLive ? Visibility.Visible : Visibility.Collapsed;
+        _skinPlaying = _vm.HasMedia && !_vm.IsPaused;
+        CompactPlayPause.Content = _skinPlaying ? "\uE769" : "\uE768";
+        string muteGlyph = _vm.IsMuted || _vm.Volume <= 0 ? "\uE74F" : "\uE767";
         MuteButton.Content = muteGlyph;
         CompactMute.Content = muteGlyph;
-        if (!VolumeSlider.IsMouseCaptureWithin && Math.Abs(VolumeSlider.Value - _vm.Volume) > 0.5)
-        {
-            _updatingVolume = true;
-            VolumeSlider.Value = _vm.Volume;
-            _updatingVolume = false;
-        }
+        SyncVolume(VolumeSlider, _vm.Volume);
+        SyncVolume(CompactVolume, _vm.Volume);
 
         if (stopped != null)
         {
@@ -644,49 +823,22 @@ public partial class MiniPlayerWindow : Window
         {
             _ = UpdateTitleAsync();
         }
+
+        SyncSkin();
     }
 
-    /// <summary>„Izvođač — Naslov  ···  320 kbps · 48 kHz” iz oznaka datoteke (mpv).</summary>
+    /// <summary>
+    /// Traka s podacima o pjesmi: zadano „Izvođač — Naslov”; ostale podatke (album, godinu, žanr, kvalitetu, datoteku)
+    /// korisnik uključuje desnim klikom na traku. Postavka vrijedi za sve izglede.
+    /// </summary>
     private async Task UpdateTitleAsync()
     {
         bool stream = PlayerViewModel.IsStreamPath(_vm.CurrentPath);
-        (string? artist, string? title, string? bitrate, string? rate, string? icy) = await Task.Run(() => (
-            _host.GetMpvProperty("metadata/by-key/Artist"),
-            _host.GetMpvProperty("media-title"),
-            _host.GetMpvProperty("audio-bitrate"),
-            _host.GetMpvProperty("audio-params/samplerate"),
-            stream ? _host.GetMpvProperty("metadata/by-key/icy-title") : null));
-        string name;
-        if (stream)
-        {
-            // Radio: „Postaja — trenutna pjesma” (ICY oznaka streama, ako je postaja šalje).
-            name = _vm.Title is { Length: > 0 } station ? station : title ?? string.Empty;
-            if (icy is { Length: > 0 } song && !name.Contains(song, StringComparison.OrdinalIgnoreCase))
-            {
-                name += " — " + song;
-            }
-        }
-        else
-        {
-            name = title is { Length: > 0 } t ? t : System.IO.Path.GetFileNameWithoutExtension(_vm.CurrentPath ?? string.Empty);
-            if (artist is { Length: > 0 } a && !name.Contains(a, StringComparison.OrdinalIgnoreCase))
-            {
-                name = a + " — " + name;
-            }
-        }
-
-        var quality = new List<string>();
-        if (double.TryParse(bitrate, NumberStyles.Float, CultureInfo.InvariantCulture, out double bps) && bps > 0)
-        {
-            quality.Add($"{Math.Round(bps / 1000):0} kbps");
-        }
-
-        if (double.TryParse(rate, NumberStyles.Float, CultureInfo.InvariantCulture, out double hz) && hz > 0)
-        {
-            quality.Add((hz / 1000).ToString("0.#", CultureInfo.InvariantCulture) + " kHz");
-        }
-
-        SetMarquee(quality.Count > 0 ? $"{name}  ···  {string.Join(" · ", quality)}" : name);
+        string? path = _vm.CurrentPath;
+        string title = _vm.Title;
+        JebaitedPlayer.Services.TrackMeta meta = await Task.Run(() =>
+            JebaitedPlayer.Services.TrackInfo.Read(name => _host.GetMpvProperty(name), path, title, stream));
+        SetMarquee(JebaitedPlayer.Services.TrackInfo.Format(meta, _settings.MiniPlayer.InfoFields));
     }
 
     internal string MarqueeTextValue => _marquee;
@@ -699,43 +851,48 @@ public partial class MiniPlayerWindow : Window
         }
 
         _marquee = text;
-        MarqueeText.Text = text;
-        CompactMarqueeText.Text = text;
-        StartMarquee(MarqueeBox, MarqueeText);
-        StartMarquee(CompactMarqueeBox, CompactMarqueeText);
+        Marquee.Text = text;
+        CompactMarquee.Text = text;
     }
 
-    /// <summary>Predug naslov polako klizi lijevo-desno (20 sličica u sekundi, malo CPU-a); kratak stoji.</summary>
-    private void StartMarquee(FrameworkElement box, TextBlock text)
+    /// <summary>Desni klik na traku s pjesmom: izbor podataka koji se prikazuju (izvođač, naziv, album, godina…).</summary>
+    internal void OnInfoMenu(object sender, MouseButtonEventArgs e)
     {
-        StopMarquee(text);
-        if (!IsVisible || box.ActualWidth <= 0)
-        {
-            return;
-        }
-
-        text.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-        double overflow = text.DesiredSize.Width - box.ActualWidth;
-        if (overflow <= 2)
-        {
-            return;
-        }
-
-        var animation = new DoubleAnimation(0, -overflow - 8, TimeSpan.FromSeconds(1 + overflow / 25))
-        {
-            BeginTime = TimeSpan.FromSeconds(1.5),
-            AutoReverse = true,
-            RepeatBehavior = RepeatBehavior.Forever,
-        };
-        Timeline.SetDesiredFrameRate(animation, 20);
-        ((TranslateTransform)text.RenderTransform).BeginAnimation(TranslateTransform.XProperty, animation);
+        e.Handled = true;
+        var menu = new ContextMenu { PlacementTarget = (UIElement)sender, Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom };
+        AddInfoItems(menu.Items);
+        menu.IsOpen = true;
     }
 
-    private static void StopMarquee(TextBlock text)
+    private void AddInfoItems(ItemCollection items)
     {
-        var shift = (TranslateTransform)text.RenderTransform;
-        shift.BeginAnimation(TranslateTransform.XProperty, null);
-        shift.X = 0;
+        foreach (string id in JebaitedPlayer.Services.TrackInfo.AllFields)
+        {
+            bool on = _settings.MiniPlayer.InfoFields.Contains(id);
+            items.Add(Check(Loc.T("info." + id), on, () => ToggleInfoField(id)));
+        }
+
+        items.Add(new Separator());
+        items.Add(Check(Loc.T("info.reset"), false, () => SetInfoFields(JebaitedPlayer.Services.TrackInfo.DefaultFields)));
+    }
+
+    internal void ToggleInfoField(string id)
+    {
+        List<string> fields = [.. _settings.MiniPlayer.InfoFields];
+        if (!fields.Remove(id))
+        {
+            fields.Add(id);
+        }
+
+        SetInfoFields(fields);
+    }
+
+    internal void SetInfoFields(IEnumerable<string> fields)
+    {
+        _settings.MiniPlayer.InfoFields = JebaitedPlayer.Services.TrackInfo.Normalize(fields);
+        _ticks = 0;
+        _marquee = string.Empty;
+        Tick();
     }
 
     /// <summary>VU metar: stvarna razina (RMS, dB) lijevog i desnog kanala iz mpv-a; brzo raste, polako pada.</summary>
@@ -783,7 +940,11 @@ public partial class MiniPlayerWindow : Window
         double position = (s?.ProgressMs ?? 0) / 1000.0;
         double duration = (s?.DurationMs ?? 0) / 1000.0;
         SourceText.Text = Loc.T("mini.sourceSpotify");
+        _isLive = false;
+        LiveClassic.Visibility = LiveCompact.Visibility = Visibility.Collapsed;
+        _skinPlaying = s is { IsPlaying: true };
         TimeText.Text = _showRemaining && duration > 0 ? "-" + Short(Math.Max(0, duration - position)) : Short(position);
+        _skinTime = TimeText.Text;
         RemainingText.Text = duration > 0 ? "-" + Short(Math.Max(0, duration - position)) : string.Empty;
         SeekSlider.IsEnabled = false;
         SeekSlider.Maximum = Math.Max(1, duration);
@@ -804,7 +965,11 @@ public partial class MiniPlayerWindow : Window
         double position = s?.CurrentTime ?? 0;
         double duration = s?.Duration ?? 0;
         SourceText.Text = Loc.T("mini.sourceYouTube");
+        _isLive = false;
+        LiveClassic.Visibility = LiveCompact.Visibility = Visibility.Collapsed;
+        _skinPlaying = s is { IsPlaying: true };
         TimeText.Text = _showRemaining && duration > 0 ? "-" + Short(Math.Max(0, duration - position)) : Short(position);
+        _skinTime = TimeText.Text;
         RemainingText.Text = duration > 0 ? "-" + Short(Math.Max(0, duration - position)) : string.Empty;
         SeekSlider.IsEnabled = false;
         SeekSlider.Maximum = Math.Max(1, duration);
@@ -838,7 +1003,7 @@ public partial class MiniPlayerWindow : Window
 
     private string _discordState = string.Empty;
 
-    private void OnDiscord(object sender, RoutedEventArgs e) => _host.ShowDiscord(this);
+    internal void OnDiscord(object sender, RoutedEventArgs e) => _host.ShowDiscord(this);
 
     /// <summary>Oznaka bota: zelena dok šalje glazbu u kanal, inače obična; u opisu je kanal i što se šalje.</summary>
     private void TickDiscord()
@@ -869,20 +1034,31 @@ public partial class MiniPlayerWindow : Window
 
     internal bool DiscordButtonIsLit => DiscordButton.ReadLocalValue(ForegroundProperty) != DependencyProperty.UnsetValue;
 
-    /// <summary>Klik na oznaku izvora: Radio, Spotify ili YouTube Music (ciklusi 5 i 6).</summary>
-    private void OnSourceClick(object sender, MouseButtonEventArgs e)
+    /// <summary>Klik na oznaku izvora: Radio, Spotify, YouTube Music ili Discord Bot (ciklusi 5 i 6, V4-B).</summary>
+    internal void OnSourceClick(object sender, MouseButtonEventArgs e)
     {
         e.Handled = true;
-        var menu = new ContextMenu { PlacementTarget = (UIElement)sender, Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom };
+        ContextMenu menu = BuildSourceMenu();
+        menu.PlacementTarget = (UIElement)sender;
+        menu.IsOpen = true;
+    }
+
+    /// <summary>Izbornik izvora; zasebna metoda da ga test može pregledati.</summary>
+    internal ContextMenu BuildSourceMenu()
+    {
+        var menu = new ContextMenu { Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom };
         var radio = new MenuItem { Header = Loc.T("menu.radio") };
         radio.Click += (_, _) => _host.ShowRadio(this);
         var spotify = new MenuItem { Header = Loc.T("menu.spotify") };
         spotify.Click += (_, _) => _host.ShowSpotify(this);
         var youTube = new MenuItem { Header = Loc.T("menu.youtube") };
         youTube.Click += (_, _) => _host.ShowYouTube(this);
+        var discord = new MenuItem { Header = Loc.T("menu.discord") };
+        discord.Click += (_, _) => _host.ShowDiscord(this);
         menu.Items.Add(radio);
         menu.Items.Add(spotify);
         menu.Items.Add(youTube);
-        menu.IsOpen = true;
+        menu.Items.Add(discord);
+        return menu;
     }
 }

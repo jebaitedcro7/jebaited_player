@@ -90,7 +90,7 @@ public partial class MainWindow
         r["play"] = new Dictionary<string, object?>
         {
             ["loads"] = loads - loadsBefore, ["hasMedia"] = _vm.HasMedia, ["samePath"] = _vm.CurrentPath == playing.Url,
-            ["position"] = Math.Round(_vm.Position, 1), ["paused"] = _vm.IsPaused, ["live"] = mini.RemainingText.Text,
+            ["position"] = Math.Round(_vm.Position, 1), ["paused"] = _vm.IsPaused, ["live"] = mini.LiveClassic.IsVisible ? Loc.T("mini.live") : mini.RemainingText.Text,
             ["stoppedCleared"] = _vm.StoppedStream is null,
         };
 

@@ -16,6 +16,14 @@ public partial class MainWindow
     private DispatcherTimer? _homeClock;
     private DateTime _lastWeatherCheck;
 
+    private System.Windows.Controls.TextBlock HomeTimeText => HomeLayer.TimeText;
+
+    private System.Windows.Controls.TextBlock HomeDateText => HomeLayer.DateText;
+
+    private System.Windows.Controls.TextBlock HomeWeatherText => HomeLayer.WeatherText;
+
+    private System.Windows.Controls.TextBlock HomeWeatherSource => HomeLayer.WeatherSource;
+
     internal HomeInfoService HomeInfo => _homeInfo ??= new HomeInfoService(_settings, AppPaths.DataDir);
 
     // --- N1 (ciklus 6): izvještaji o greškama --------------------------------------------------------------------------
@@ -75,6 +83,7 @@ public partial class MainWindow
             _lastWeatherCheck = DateTime.MinValue;
         }
 
+        HomeLayer.ApplyStyle(_settings.HomeInfo);
         UpdateHomeClockTimer();
         TickHomeInfo();
     }
@@ -88,9 +97,7 @@ public partial class MainWindow
         HomeTimeText.Visibility = s.ShowTime ? Visibility.Visible : Visibility.Collapsed;
         HomeDateText.Visibility = s.ShowDate ? Visibility.Visible : Visibility.Collapsed;
 
-        string weather = _homeInfo?.WeatherText() ?? string.Empty;
-        HomeWeatherText.Text = weather;
-        HomeWeatherText.Visibility = HomeWeatherSource.Visibility = weather.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
+        ShowWeatherTexts();
 
         if (s.ShowWeather && s.HasPlace && DateTime.UtcNow - _lastWeatherCheck > TimeSpan.FromMinutes(1))
         {
@@ -102,8 +109,18 @@ public partial class MainWindow
     private async Task RefreshWeatherAsync()
     {
         await HomeInfo.RefreshAsync();
-        HomeWeatherText.Text = HomeInfo.WeatherText();
-        HomeWeatherText.Visibility = HomeWeatherSource.Visibility = HomeWeatherText.Text.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
+        ShowWeatherTexts();
+    }
+
+    /// <summary>Redak prognoze i dodatni podaci (samo oni koje izvor šalje i koje je korisnik uključio).</summary>
+    private void ShowWeatherTexts()
+    {
+        string weather = _homeInfo?.WeatherText() ?? string.Empty;
+        HomeWeatherText.Text = weather;
+        HomeWeatherText.Visibility = HomeWeatherSource.Visibility = weather.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
+        IReadOnlyList<string> details = weather.Length > 0 ? _homeInfo!.DetailLines() : [];
+        HomeLayer.WeatherDetails.Text = string.Join(Environment.NewLine, details);
+        HomeLayer.WeatherDetails.Visibility = details.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
     }
 
     internal Task<IReadOnlyList<WeatherPlace>> SearchWeatherPlacesAsync(string name) => HomeInfo.SearchPlacesAsync(name);

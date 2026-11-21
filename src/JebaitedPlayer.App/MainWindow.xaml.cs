@@ -173,11 +173,7 @@ public partial class MainWindow : Window
             SetFullscreen(!_vm.IsFullscreen);
         };
         Video.VideoRightClick += (_, _) => ShowContextMenu();
-        Video.VideoMouseWheel += (_, delta) =>
-        {
-            _vm.ChangeVolume(delta > 0 ? 5 : -5);
-            RegisterActivity();
-        };
+        // 2.1.7: kotačić mijenja glasnoću samo iznad trake glasnoće (ControlsOverlay, mini player), ne nad videom.
         Video.FilesDropped += (_, files) => OpenFiles(files);
         Video.FocusReceived += (_, _) => Dispatcher.BeginInvoke(RestoreKeyboardFocus);
 
@@ -219,7 +215,6 @@ public partial class MainWindow : Window
         Activated += (_, _) => RestoreKeyboardFocus();
         MouseMove += (_, _) => RegisterActivity();
         PreviewKeyDown += OnPreviewKeyDown;
-        PreviewMouseWheel += OnPreviewMouseWheel;
         InitializeUpdates();
     }
 
@@ -478,12 +473,8 @@ public partial class MainWindow : Window
             SetFullscreen(!_vm.IsFullscreen);
         };
         _topBar.BackgroundRightClick += (_, _) => ShowContextMenu();
-        _topBar.MouseWheel += (_, delta) =>
-        {
-            _vm.ChangeVolume(delta > 0 ? 5 : -5);
-            RegisterActivity();
-        };
         _ = _topBar.Handle;
+        InitializeHomePlayback();
         InitializeLibraryUi();
 
         _uiTimer.Start();
@@ -645,6 +636,13 @@ public partial class MainWindow : Window
             SetFullscreen(false);
         }
 
+        // 2.1.7: glazba i radio sviraju dalje (isti mpv, bez novog učitavanja); zaustavlja se samo video.
+        if (HomeKeepsPlaying)
+        {
+            EnterHomeWhilePlaying();
+            return;
+        }
+
         _vm.Stop();
         RestoreKeyboardFocus();
     }
@@ -710,10 +708,17 @@ public partial class MainWindow : Window
 
     private void UpdatePanels()
     {
-        bool video = _vm.HasMedia && !_vm.IsAudioOnly;
+        if (!_vm.HasMedia)
+        {
+            _homeView = false;
+        }
+
+        bool home = _homeView && _vm.HasMedia;
+        bool video = _vm.HasMedia && !_vm.IsAudioOnly && !home;
         Video.Visibility = video ? Visibility.Visible : Visibility.Hidden;
-        AudioPanel.Visibility = _vm.HasMedia && _vm.IsAudioOnly ? Visibility.Visible : Visibility.Collapsed;
-        WelcomePanel.Visibility = _vm.HasMedia ? Visibility.Collapsed : Visibility.Visible;
+        AudioPanel.Visibility = _vm.HasMedia && _vm.IsAudioOnly && !home ? Visibility.Visible : Visibility.Collapsed;
+        WelcomePanel.Visibility = _vm.HasMedia && !home ? Visibility.Collapsed : Visibility.Visible;
+        UpdateHomePlayback();
     }
 
     private void UpdateTitle()
@@ -726,6 +731,8 @@ public partial class MainWindow : Window
         _vm.RefreshPosition();
         _vm.Library.OnTick();
         UpdateOverlayVisibility();
+        UpdateHomePlayback();
+        AudioLive.Visibility = _vm.IsLiveStream && !_vm.IsPaused && AudioPanel.IsVisible ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private void RegisterActivity()
@@ -741,7 +748,7 @@ public partial class MainWindow : Window
             return;
         }
 
-        bool show = _vm.HasMedia && IsVisible && WindowState != WindowState.Minimized &&
+        bool show = _vm.HasMedia && !_homeView && IsVisible && WindowState != WindowState.Minimized &&
                     (_options.DiagShowControls || _vm.IsAudioOnly || _vm.IsPaused || _vm.IsScrubbing ||
                      _contextMenuOpen || _overlay.IsMouseOver || _topBar?.IsMouseOver == true ||
                      DateTime.UtcNow - _lastActivity < HideControlsAfter);
@@ -1106,17 +1113,6 @@ public partial class MainWindow : Window
         }
 
         return true;
-    }
-
-    private void OnPreviewMouseWheel(object sender, MouseWheelEventArgs e)
-    {
-        // Iznad popisa epizoda kotačić pomiče popis, a ne glasnoću.
-        if (_vm.HasMedia && !PlaylistPanel.IsMouseOver)
-        {
-            _vm.ChangeVolume(e.Delta > 0 ? 5 : -5);
-            RegisterActivity();
-            e.Handled = true;
-        }
     }
 
     private void ShowShortcuts()

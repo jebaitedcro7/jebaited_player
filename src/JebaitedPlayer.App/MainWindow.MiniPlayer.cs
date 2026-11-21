@@ -42,6 +42,9 @@ public partial class MainWindow : IMiniPlayerHost
 
         if (_userOpenPending)
         {
+            // Korisnik je sam otvorio datoteku ili postaju: natrag na prikaz playera (Home ekran je bio samo prekrivač).
+            // Sljedeća/Prethodna pjesma s Home ekrana ostaju na Home ekranu.
+            LeaveHomeView();
             _userOpenPending = false;
             if (_settings.MiniPlayer.AutoSwitch && (!_options.IsDiagnostics || _diagAutoSwitch))
             {
@@ -122,26 +125,40 @@ public partial class MainWindow : IMiniPlayerHost
 
     internal void ShowMiniPlayer()
     {
-        if (_vm.IsFullscreen)
+        try
         {
-            SetFullscreen(false);
-        }
+            if (_vm.IsFullscreen)
+            {
+                SetFullscreen(false);
+            }
 
-        // Dok je glavni prozor još vidljiv: pripremi mpv, da mini player (i radio iz njega) može odmah svirati.
-        TryEnsurePlayer();
-        _mini ??= new MiniPlayerWindow(_vm, _settings, this);
-        _mini.Show();
-        _mini.Activate();
-        if (_radio is { IsLoaded: true } radio && ReferenceEquals(radio.Owner, this))
-        {
-            // Prozor Radio ostaje vidljiv kad se glavni prozor sakrije (1.5.1).
-            radio.Owner = _mini;
-            radio.Activate();
+            // Dok je glavni prozor još vidljiv: pripremi mpv, da mini player (i radio iz njega) može odmah svirati.
+            TryEnsurePlayer();
+            _mini ??= new MiniPlayerWindow(_vm, _settings, this);
+            _mini.Show();
+            if (_mini.WindowState == WindowState.Minimized)
+            {
+                _mini.WindowState = WindowState.Normal;
+            }
+
+            _mini.Activate();
+            if (_radio is { IsLoaded: true } radio && ReferenceEquals(radio.Owner, this))
+            {
+                // Prozor Radio ostaje vidljiv kad se glavni prozor sakrije (1.5.1).
+                radio.Owner = _mini;
+                radio.Activate();
+            }
+
+            RefreshVuFilter();
+            Hide();
+            UpdateOverlayVisibility();
+            WindowPlacement.Ensure(_mini);
+            Log.Info("Mini player otvoren.");
         }
-        RefreshVuFilter();
-        Hide();
-        UpdateOverlayVisibility();
-        Log.Info("Mini player otvoren.");
+        finally
+        {
+            FinishHiddenStart();
+        }
     }
 
     void IMiniPlayerHost.ShowFullPlayer()

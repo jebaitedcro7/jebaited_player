@@ -75,7 +75,7 @@ public partial class MainWindow
             return;
         }
 
-        bool show = _vm.Library.IsPromptVisible && _vm.HasMedia;
+        bool show = _vm.Library.IsPromptVisible && _vm.HasMedia && !_homeView;
         if (show == _cardsVisible)
         {
             return;

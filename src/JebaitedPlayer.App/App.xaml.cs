@@ -26,6 +26,7 @@ public partial class App : Application
         Log.Init();
         Log.StartSession();
         UiEvents.Install();
+        WindowPlacement.RegisterForAllWindows();
         SessionEnding += (_, args) =>
         {
             DiagLog.Info(LogCat.App, "session.windows_ending", "App", "Windows is ending the session", ("reason", args.ReasonSessionEnding));
@@ -106,6 +107,7 @@ public partial class App : Application
             window.AttachInstance(_instance);
         }
 
+        window.PrepareStartup();
         window.Show();
         if (settings.LoadReport is { } report && !options.IsDiagnostics)
         {

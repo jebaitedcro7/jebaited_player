@@ -4,6 +4,41 @@ All notable changes to jebaited_player. Format: [Keep a Changelog](https://keepa
 
 Other languages: [Deutsch](CHANGELOG_DE.md) · [Hrvatski](CHANGELOG_HR.md). The same history is included in the player (click the version number on the home screen). This file is generated from `src/JebaitedPlayer.App/History/update-history.json`.
 
+## [2.1.7] - 2026-11-21
+
+Mini player and home screen: five mini player looks, volume by mouse wheel, a pulsing LIVE badge for radio, music that keeps playing on the home screen and a fully customizable clock, date and weather.
+
+### Added
+
+- Five mini player looks (right-click → Look): classic Winamp, card, narrow strip, side panel and UFO screen. They all have the same functions and your choice is remembered.
+- The mouse wheel over the volume bar changes the volume in steps of 2 % in the full and the mini player. The wheel over the video or other parts of the player no longer changes the volume by accident.
+- A red, gently pulsing LIVE badge while a radio station plays: in every mini player look, in the full player and on the home screen.
+- The song title scrolls in an endless loop (no gap and no jump) and by default shows only the artist and the song. Right-click the title to add album, year, genre, sound quality or the file name.
+- Playback bar on the home screen: current song, source (local, radio, Spotify, YouTube Music, Discord), Play/Pause, Previous/Next and volume.
+- Home screen look (Settings → Appearance): font, size and position of the time, the date and the weather, each on its own, with a preview and “Reset look to default”.
+- More weather details (Open-Meteo, free, no key): feels-like temperature, minimum and maximum, chance and amount of rain, wind, humidity, UV index, sunrise and sunset, the next hours and the next days. Only what the weather service provides is shown.
+- A separate Minimize button (and menu item): the player goes to the taskbar and the music keeps playing; it is different from Mini player and Close.
+- Discord bot is in the source menu next to Radio, Spotify and YouTube Music.
+- Next episode before the end (Settings → General): choose how many seconds before the end of an episode the card for the next one appears; the countdown then ends exactly at the end. 0 keeps the old behavior (only when the episode has ended).
+
+### Improved
+
+- The mini player and all other windows (the Equalizer panel, Radio, Discord…) always stay completely inside the visible screen area: the taskbar, display scaling and several monitors are taken into account, and a window moved outside is pulled back.
+- The narrow strip now has a volume slider.
+
+### Fixed
+
+- Pressing Home no longer stops music or radio. Only video still closes, as before.
+- Only one window opens at start: the mini player if it was the last view (or when a music file is opened), otherwise the full player. Before, the big player appeared first and the mini player a moment later.
+
+### Known issues
+
+- The location is chosen by city name only; automatic location is not included (nothing is sent before you pick a city).
+- The app is not digitally signed yet, so Windows SmartScreen or Smart App Control may warn before the installation.
+- The progress window of the installer comes from Velopack and is only in English.
+
+Release: [v2.1.7](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v2.1.7) · Changes since [v2.0.6...v2.1.7](https://github.com/jebaitedcro7/jebaited_player/compare/v2.0.6...v2.1.7)
+
 ## [2.0.6] - 2026-11-21
 
 2.0: your own Discord bot plays the player's music and radio in a voice channel; every keyboard shortcut can be changed; choose the accent color.

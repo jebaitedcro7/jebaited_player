@@ -1,0 +1,109 @@
+<views:MiniSkinBase x:Class="JebaitedPlayer.Views.MiniUfoSkin"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:JebaitedPlayer.Infrastructure"
+        xmlns:views="clr-namespace:JebaitedPlayer.Views">
+
+    <views:MiniSkinBase.Resources>
+        <!-- Okrugla tipka Play/Pause. -->
+        <Style x:Key="RoundPlay" TargetType="Button">
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="Width" Value="56" />
+            <Setter Property="Height" Value="56" />
+            <Setter Property="FontFamily" Value="{DynamicResource IconFont}" />
+            <Setter Property="FontSize" Value="22" />
+            <Setter Property="Foreground" Value="{DynamicResource LcdText}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <Ellipse x:Name="Ring" Fill="{DynamicResource LcdBack}" Stroke="{DynamicResource LcdText}" StrokeThickness="2" />
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Ring" Property="Fill" Value="{DynamicResource LcdTag}" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Ring" Property="Fill" Value="{DynamicResource LcdTrack}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </views:MiniSkinBase.Resources>
+
+    <!-- Dizajn 5: NLO zaslon. Zaobljeni LCD, okrugla tipka Play i NLO čiji je snop traka napretka. -->
+    <StackPanel Width="380">
+        <DockPanel Height="24" Margin="8,3,3,0">
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                <Button Style="{DynamicResource MiniIcon}" Content="&#xE73F;" ToolTip="{loc:T mini.compact}" Click="OnStrip" />
+                <Button Style="{DynamicResource MiniIcon}" Content="&#xE921;" ToolTip="{loc:T mini.minimize}" Click="OnMinimize" />
+                <Button Style="{DynamicResource MiniIcon}" Content="&#xE8A7;" ToolTip="{loc:T mini.fullPlayer}" Click="OnFullPlayer" />
+                <Button Style="{DynamicResource MiniIcon}" Content="&#xE8BB;" ToolTip="{loc:T mini.close}" Click="OnClosePlayer" />
+            </StackPanel>
+            <Image Source="/Assets/logo-ufo.png" Height="16" Margin="0,0,6,0" RenderOptions.BitmapScalingMode="HighQuality" />
+            <TextBlock Text="jebaited_cro · mini" FontSize="11" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" />
+        </DockPanel>
+
+        <Border Style="{DynamicResource Lcd}" CornerRadius="16" Margin="12,4,12,0" Padding="12,10,12,10">
+            <StackPanel>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Button x:Name="PlayPause" Style="{StaticResource RoundPlay}" Content="&#xE768;" ToolTip="{loc:T mini.play}" Click="OnPlayPause" />
+                    <StackPanel Grid.Column="1" Margin="14,0,0,0" VerticalAlignment="Center">
+                        <views:MarqueeView x:Name="Title" Height="24" TextElement.FontSize="15" TextElement.FontFamily="Consolas"
+                                           TextElement.Foreground="{DynamicResource LcdText}" Background="Transparent"
+                                           MouseRightButtonUp="OnInfoMenu" ToolTip="{loc:T mini.infoHint}" />
+                        <DockPanel Margin="0,6,0,0">
+                            <Border DockPanel.Dock="Left" Background="{DynamicResource LcdTag}" CornerRadius="8" Padding="7,1" VerticalAlignment="Center"
+                                    Cursor="Hand" ToolTip="{loc:T menu.radio}" MouseLeftButtonDown="OnSourceClick">
+                                <TextBlock x:Name="Source" FontSize="10" Foreground="{DynamicResource LcdText}" />
+                            </Border>
+                            <views:LiveBadge x:Name="Live" DockPanel.Dock="Left" Margin="6,0,0,0" />
+                            <TextBlock x:Name="Time" HorizontalAlignment="Right" VerticalAlignment="Center" FontFamily="Consolas" FontSize="14"
+                                       Foreground="{DynamicResource LcdText}" />
+                        </DockPanel>
+                    </StackPanel>
+                </Grid>
+
+                <!-- NLO sa snopom: snop je traka napretka (klik ili povlačenje premotava). -->
+                <Grid Margin="0,10,0,0" Height="34">
+                    <Border CornerRadius="6" Margin="34,0,0,0">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                                <GradientStop Color="#40FFFFFF" Offset="0" />
+                                <GradientStop Color="#00FFFFFF" Offset="1" />
+                            </LinearGradientBrush>
+                        </Border.Background>
+                    </Border>
+                    <Image Source="/Assets/logo-ufo.png" Height="28" HorizontalAlignment="Left" VerticalAlignment="Center"
+                           RenderOptions.BitmapScalingMode="HighQuality" />
+                    <Slider x:Name="Seek" Style="{StaticResource PlayerSlider}" Margin="40,0,4,0" VerticalAlignment="Center" />
+                </Grid>
+            </StackPanel>
+        </Border>
+
+        <DockPanel Margin="12,8,12,10">
+            <ToggleButton x:Name="Playlist" DockPanel.Dock="Right" Style="{DynamicResource MiniButton}" Width="36" Margin="0" FontFamily="Consolas" FontSize="12"
+                          Content="PL" ToolTip="{loc:T mini.playlist}" Click="OnPanels" />
+            <ToggleButton x:Name="Eq" DockPanel.Dock="Right" Style="{DynamicResource MiniButton}" Width="36" FontFamily="Consolas" FontSize="12"
+                          Content="EQ" ToolTip="{loc:T mini.equalizer}" Click="OnPanels" />
+            <Button x:Name="Discord" DockPanel.Dock="Right" Style="{DynamicResource MiniButton}" Width="36" Content="&#xE95B;"
+                    ToolTip="{loc:T mini.discord}" Click="OnDiscord" />
+            <StackPanel Orientation="Horizontal">
+                <Button Style="{DynamicResource MiniButton}" Content="&#xE892;" ToolTip="{loc:T mini.previous}" Click="OnPrevious" />
+                <Button Style="{DynamicResource MiniButton}" Content="&#xE893;" ToolTip="{loc:T mini.next}" Click="OnNext" />
+                <Button Style="{DynamicResource MiniButton}" Content="&#xE71A;" ToolTip="{loc:T mini.stop}" Click="OnStop" />
+                <Button Style="{DynamicResource MiniButton}" Content="&#xE838;" ToolTip="{loc:T mini.open}" Click="OnOpen" />
+                <Button x:Name="Mute" Style="{DynamicResource MiniIcon}" Content="&#xE767;" Margin="4,0,0,0" ToolTip="{loc:T mini.mute}" Click="OnMute" />
+                <Slider x:Name="Volume" Style="{StaticResource PlayerSlider}" Width="60" Minimum="0" Maximum="100" VerticalAlignment="Center"
+                        ToolTip="{loc:T controls.volume}" />
+            </StackPanel>
+        </DockPanel>
+    </StackPanel>
+</views:MiniSkinBase>

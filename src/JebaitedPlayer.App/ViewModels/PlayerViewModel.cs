@@ -55,6 +55,7 @@ public sealed class PlayerViewModel : ObservableObject
         {
             AutoPlayNext = settings.AutoPlayNext,
             UpNextDelaySeconds = Math.Clamp(settings.UpNextSeconds, 3, 60),
+            UpNextLeadSeconds = Math.Clamp(settings.UpNextLeadSeconds, 0, 120),
             ResumeMode = settings.ResumeMode,
         };
         Extras = new PlaybackExtrasController(settings, this, store);
@@ -550,6 +551,9 @@ public sealed class PlayerViewModel : ObservableObject
             Position = t;
         }
     }
+
+    /// <summary>Jedan zarez kotačića miša iznad trake glasnoće (%): 50 zareza za cijeli raspon, dovoljno precizno.</summary>
+    public const double VolumeWheelStep = 2;
 
     public void ChangeVolume(double delta)
     {

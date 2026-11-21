@@ -56,6 +56,8 @@ public partial class MainWindow
                     "discorduilive" => await DiscordWindowLiveUiTestAsync(),
                     "shortcuts" => await ShortcutsUiTestAsync(),
                     "accent" => await AccentUiTestAsync(),
+                    "ui217" => await Ui217UiTestAsync(),
+                    "upnextlead" => await UpNextLeadUiTestAsync(),
                     _ => new Dictionary<string, object?> { ["error"] = "nepoznat scenarij " + scenario },
                 };
             }

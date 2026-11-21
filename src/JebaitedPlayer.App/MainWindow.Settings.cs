@@ -222,6 +222,7 @@ public partial class MainWindow : ISettingsHost
         _vm.IsMuted = _settings.Muted;
         _vm.Library.AutoPlayNext = _settings.AutoPlayNext;
         _vm.Library.UpNextDelaySeconds = _settings.UpNextSeconds;
+        _vm.Library.UpNextLeadSeconds = Math.Clamp(_settings.UpNextLeadSeconds, 0, 120);
         _vm.Library.ResumeMode = _settings.ResumeMode;
         _vm.Subtitles.ApplyLanguagePriority();
         _vm.Subtitles.ApplyStyle();

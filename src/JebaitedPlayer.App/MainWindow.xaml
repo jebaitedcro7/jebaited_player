@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:loc="clr-namespace:JebaitedPlayer.Infrastructure"
         xmlns:controls="clr-namespace:JebaitedPlayer.Controls"
+        xmlns:views="clr-namespace:JebaitedPlayer.Views"
         Title="jebaited_player"
         Width="1280" Height="760" MinWidth="520" MinHeight="320"
         Background="{DynamicResource WindowBackgroundBrush}"
@@ -28,6 +29,7 @@
                                HorizontalAlignment="Center" Foreground="{DynamicResource AccentBrush}" />
                     <TextBlock Text="{Binding Title}" FontSize="20" Margin="0,18,0,0" TextAlignment="Center"
                                TextWrapping="Wrap" MaxWidth="640" />
+                    <views:LiveBadge x:Name="AudioLive" HorizontalAlignment="Center" Margin="0,12,0,0" />
                 </StackPanel>
             </Grid>
 
@@ -49,14 +51,7 @@
                         IsHitTestVisible="False" />
 
                 <!-- N3 (ciklus 6): vrijeme, datum i prognoza gore lijevo (nenametljivo, ne prima klikove). -->
-                <StackPanel x:Name="HomeInfoPanel" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="26,16,0,0" IsHitTestVisible="False"
-                            Panel.ZIndex="1">
-                    <TextBlock x:Name="HomeTimeText" FontSize="30" FontWeight="Light" />
-                    <TextBlock x:Name="HomeDateText" FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" />
-                    <TextBlock x:Name="HomeWeatherText" FontSize="13" Margin="0,8,0,0" Visibility="Collapsed" />
-                    <TextBlock x:Name="HomeWeatherSource" FontSize="10" Foreground="{DynamicResource TextSecondaryBrush}" Text="{loc:T weather.source}"
-                               Visibility="Collapsed" />
-                </StackPanel>
+                <controls:HomeInfoLayer x:Name="HomeLayer" Panel.ZIndex="1" />
 
                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
                     <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="24,20,24,16">
@@ -279,7 +274,42 @@
                 </ScrollViewer>
 
                 <!-- Donja traka: postavke i tema lijevo (zaseban red, pa popisi ne prelaze preko nje), verzija desno. -->
-                <DockPanel Grid.Row="1" Margin="8,0,14,8" LastChildFill="False">
+                <StackPanel Grid.Row="1">
+                <!-- 2.1.7: kontrole reprodukcije na početnom ekranu (isto stanje kao player i mini player). -->
+                <Border x:Name="HomePlaybackBar" Visibility="Collapsed" MaxWidth="760" Margin="14,0,14,8" Padding="14,10"
+                        Background="{DynamicResource HomeCardBrush}" CornerRadius="10">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Margin="0,0,14,0" VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock x:Name="HomeSourceText" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource AccentBrush}"
+                                           VerticalAlignment="Center" />
+                                <views:LiveBadge x:Name="HomeLive" Margin="8,0,0,0" />
+                            </StackPanel>
+                            <TextBlock x:Name="HomeTrackText" FontSize="15" Margin="0,3,0,0" TextTrimming="CharacterEllipsis" />
+                            <TextBlock x:Name="HomeTimeInfo" FontSize="12" Margin="0,2,0,0" Foreground="{DynamicResource TextSecondaryBrush}" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                            <Button x:Name="HomePrevButton" Style="{StaticResource IconButton}" Content="&#xE892;" ToolTip="{loc:T mini.previous}" Click="OnHomePrevious" />
+                            <Button x:Name="HomePlayPauseButton" Style="{StaticResource IconButton}" FontSize="20" Content="&#xE768;" ToolTip="{loc:T controls.playPause}" Click="OnHomePlayPause" />
+                            <Button x:Name="HomeNextButton" Style="{StaticResource IconButton}" Content="&#xE893;" ToolTip="{loc:T mini.next}" Click="OnHomeNext" />
+                            <Button Style="{StaticResource IconButton}" Content="&#xE8A7;" ToolTip="{loc:T home.showPlayer}" Click="OnHomeShowPlayer" />
+                        </StackPanel>
+                        <StackPanel x:Name="HomeVolumeArea" Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0,0,0" Background="Transparent">
+                            <Button Style="{StaticResource IconButton}" Content="{Binding VolumeGlyph}" Command="{Binding MuteCommand}" ToolTip="{loc:T controls.mute}" />
+                            <Slider x:Name="HomeVolumeSlider" Style="{StaticResource PlayerSlider}" Width="90" Margin="4,0,0,0" VerticalAlignment="Center"
+                                    Minimum="0" Maximum="100" SmallChange="5" LargeChange="10" Value="{Binding Volume, Mode=TwoWay}"
+                                    ToolTip="{loc:T controls.volume}" />
+                            <TextBlock Text="{Binding VolumeText}" Margin="8,0,0,0" MinWidth="36" VerticalAlignment="Center"
+                                       Foreground="{DynamicResource TextSecondaryBrush}" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+                <DockPanel Margin="8,0,14,8" LastChildFill="False">
                     <Button DockPanel.Dock="Left" Style="{StaticResource IconButton}" Content="&#xE713;" FontSize="17"
                             ToolTip="{loc:T home.settingsTooltip}" AutomationProperties.Name="{loc:T home.settingsTooltip}"
                             Click="OnHomeSettingsClick" />
@@ -297,6 +327,7 @@
                             FontSize="11" VerticalAlignment="Center" Click="OnVersionClick"
                             ToolTip="{loc:T history.versionTooltip}" AutomationProperties.Name="{loc:T history.versionTooltip}" />
                 </DockPanel>
+                </StackPanel>
             </Grid>
         </Grid>
 

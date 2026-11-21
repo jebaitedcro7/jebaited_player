@@ -69,7 +69,7 @@ Kontrole se pojave kad pomakneš miš i sakriju se tijekom gledanja (vrijeme se 
 
 | Kontrola | Što radi |
 |---|---|
-| ⌂ Početna (gore lijevo) | Povratak na početni ekran bez zatvaranja playera. Pozicija se sprema, pa možeš nastaviti kasnije. Pojavljuje se i skriva zajedno s ostalim kontrolama. |
+| ⌂ Početna (gore lijevo) | Povratak na početni ekran bez zatvaranja playera. Glazba i radio sviraju dalje, a početni ekran prikazuje traku reprodukcije (pjesma, izvor, Play/Pause, Prethodna/Sljedeća, glasnoća); video se zatvara i pozicija se sprema, pa možeš nastaviti kasnije. Pojavljuje se i skriva zajedno s ostalim kontrolama. |
 | Reproduciraj / pauziraj | Razmaknica ili K, ili klik na sliku |
 | Vremenska traka | Klik bilo gdje odmah skoči na to mjesto, ili povuci. Oblačić pokazuje vrijeme ispod miša. ← / → skok 5 s, Ctrl+← / → 30 s (podešava se u Postavke → Općenito); , / . kadar natrag / naprijed |
 | Glasnoća | ↑ / ↓ ili kotačić miša; M isključuje zvuk |
@@ -121,6 +121,12 @@ U istoj kartici podešavaš automatsko traženje, kodiranje starih titlova i izg
 - Glazba otvara mini player, a film ili serija puni player (može se isključiti u Postavke → Izgled). Mini player se uvijek otvara gdje si ga ostavio.
 - Desni klik na mini player (ili Postavke → Izgled): šest fontova zaslona i četiri izgleda VU metra (trake, LED segmenti, tanke linije s vrhom, isključen).
 - Filmovi i serije imaju svoj equalizer, a glazba i radio svoj (Postavke → Zvuk: biraš koji uređuješ).
+- **Pet izgleda** (desni klik → **Izgled**): klasični Winamp, kartica, uska traka, bočna ploča i NLO zaslon. Svi imaju iste tipke i funkcije, a tvoj odabir se pamti.
+- **Kotačić miša iznad trake glasnoće** mijenja glasnoću za 2 % (u mini playeru i u punom playeru). Kotačić bilo gdje drugdje nikad ne mijenja glasnoću.
+- Naslov se neprekidno vrti u krug, a zadano prikazuje samo **izvođača i pjesmu**. Desni klik na naslov: dodaj album, godinu, žanr, kvalitetu zvuka ili naziv datoteke.
+- Crvena, blago pulsirajuća oznaka **UŽIVO** prikazuje se dok svira radio (svi izgledi, puni player i početni ekran).
+- **Minimiziraj** (tipka ili desni klik → Minimiziraj na taskbar) stavlja player na taskbar, a glazba svira dalje; to je nešto drugo od **Mini playera** i zatvaranja. Mini player i svi ostali prozori (Equalizer, Radio, Discord …) uvijek ostaju potpuno unutar vidljivog zaslona, iznad taskbara, i s više monitora.
+- Pri pokretanju se otvara samo jedan prozor: mini player ako je to bio tvoj zadnji prikaz (ili kad otvoriš glazbu), inače puni player.
 
 ### Radio
 
@@ -189,7 +195,7 @@ Postavke su podijeljene u kartice. Svaka promjena vrijedi odmah (i za video koji
 | Titlovi | Jezici titlova i njihov redoslijed, automatsko učitavanje i traženje, izvori na internetu, kodiranje starih titlova, izgled, sinkronizacija |
 | Zvuk | Glasnoća, ujednačavanje glasnoće, equalizer, željeni jezik zvuka, izlazni uređaj, izlaz za glazbu i radio, sinkronizacija zvuka |
 | Slika | Kvaliteta slike, hardversko dekodiranje, zadani omjer slike, HDR |
-| Izgled | Tamna / svijetla tema, boja isticanja, pozadina početnog ekrana (zadana ili vlastita slika: Ispuni, Prilagodi, Sredina), koliko dugo su kontrole vidljive, iscrtavanje sučelja preko GPU-a, vrijeme, datum i prognoza na početnom ekranu (grad po izboru, s Open-Meteoa) |
+| Izgled | Tamna / svijetla tema, boja isticanja, pozadina početnog ekrana (zadana ili vlastita slika: Ispuni, Prilagodi, Sredina), koliko dugo su kontrole vidljive, iscrtavanje sučelja preko GPU-a, vrijeme, datum i prognoza na početnom ekranu (grad po izboru, s Open-Meteoa; font, veličina i mjesto svakog elementa, pregled te podaci o vremenu: osjećaj temperature, min/maks, kiša, vjetar, vlažnost, UV, izlazak i zalazak sunca, sljedeći sati i dani) |
 | Prečaci | Tipke za sve radnje, do dvije po radnji (vidi [Tipkovnički prečaci](#tipkovnički-prečaci)) |
 | Nadogradnje | Verzija, provjeri sada, automatsko preuzimanje, što je novo, povijest nadogradnji |
 | O aplikaciji | Verzija, licenca, korištene tehnologije, priručnik, privatnost, pravila potpisivanja koda, izvještaji o greškama (spremljeni na računalu bez osobnih podataka; šalješ ih sam preko GitHuba) |

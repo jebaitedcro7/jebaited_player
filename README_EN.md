@@ -69,7 +69,7 @@ The controls appear when you move the mouse and hide during playback (the time c
 
 | Control | What it does |
 |---|---|
-| ⌂ Home (top left) | Back to the home screen without closing the player. The position is saved, so you can continue later. It shows and hides together with the other controls. |
+| ⌂ Home (top left) | Back to the home screen without closing the player. Music and radio keep playing and the home screen shows a playback bar (song, source, Play/Pause, Previous/Next, volume); a video is closed and its position is saved, so you can continue later. It shows and hides together with the other controls. |
 | Play / pause | Space or K, or click the picture |
 | Timeline | Click anywhere to jump there right away, or drag. A bubble shows the time under the mouse. ← / → jump 5 s, Ctrl+← / → 30 s (adjustable in Settings → General); , / . one frame back / forward |
 | Volume | ↑ / ↓ or the mouse wheel; M mutes |
@@ -121,6 +121,12 @@ In the same tab you set the automatic search, the encoding of old subtitles and 
 - Music opens the mini player, a film or series the full player (Settings → Appearance can turn this off). The mini player always opens where you left it.
 - Right-click the mini player (or Settings → Appearance) for six display fonts and four VU meter styles (bars, LED segments, thin lines with peak, off).
 - Films and series have their own equalizer, music and radio their own (Settings → Audio: choose which one to edit).
+- **Five looks** (right-click → **Look**): classic Winamp, card, narrow strip, side panel and UFO screen. All of them have the same buttons and functions, and your choice is remembered.
+- The **mouse wheel over the volume bar** changes the volume by 2 % (in the mini player and in the full player). The wheel anywhere else never changes the volume.
+- The title scrolls in an endless loop and by default shows only **artist and song**. Right-click the title to add album, year, genre, sound quality or the file name.
+- A red, gently pulsing **LIVE** badge shows while a radio station plays (all looks, full player and home screen).
+- **Minimize** (button, or right-click → Minimize to taskbar) puts the player on the taskbar while the music keeps playing; it is different from **Mini player** and from closing. The mini player and every other window (Equalizer, Radio, Discord …) always stay fully inside the visible screen, above the taskbar, also with several monitors.
+- At start only one window opens: the mini player if it was your last view (or when you open a music file), otherwise the full player.
 
 ### Radio
 
@@ -189,7 +195,7 @@ Settings are split into tabs. Every change applies right away (also to the video
 | Subtitles | Subtitle languages and their order, automatic loading and searching, sources on the internet, encoding of old subtitles, look, synchronization |
 | Audio | Volume, volume levelling, equalizer, preferred audio language, output device, output for music and radio, audio sync |
 | Video | Picture quality, hardware decoding, default aspect ratio, HDR |
-| Appearance | Dark / light theme, accent color, home screen background (default or your own picture: Fill, Fit, Center), how long the controls stay visible, rendering the interface on the GPU, time, date and weather on the home screen (a city you choose, from Open-Meteo) |
+| Appearance | Dark / light theme, accent color, home screen background (default or your own picture: Fill, Fit, Center), how long the controls stay visible, rendering the interface on the GPU, time, date and weather on the home screen (a city you choose, from Open-Meteo; font, size and position of each element, a preview, and weather details such as feels-like, min/max, rain, wind, humidity, UV, sunrise and sunset, the next hours and days) |
 | Shortcuts | Keys for every action, up to two per action (see [Keyboard shortcuts](#keyboard-shortcuts)) |
 | Updates | Version, check now, automatic download, what is new, update history |
 | About | Version, license, technologies used, manual, privacy, code signing policy, error reports (saved on your computer without personal data; you send them yourself via GitHub) |

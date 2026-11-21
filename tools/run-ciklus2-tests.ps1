@@ -78,7 +78,7 @@ if (-not $m -or $m.exception -or $m.error) { throw "mini: $($m.exception)$($m.er
 Check "V1: jedna pjesma otvara cijeli album" (@($m.playlist).Count -eq 3) "popis: $($m.playlist -join ' | ')"
 $sw = $m.switch
 Check "V1: prebacivanje bez prekida glazbe" (-not $sw.mainVisible -and $sw.miniVisible -and -not $sw.overlayVisible -and [double]$sw.advanced -gt 1.0 -and -not $sw.paused) "glavni $($sw.mainVisible), mini $($sw.miniVisible), kontrole $($sw.overlayVisible), napredak $($sw.advanced) s"
-Check "V1: naslov iz oznaka i kvaliteta" ($sw.title -match "jebaited_cro — Prva pjesma" -and $sw.title -match "kHz") "'$($sw.title)'"
+Check "V1: naslov iz oznaka (zadano samo izvođač i pjesma, od 2.1.7 bez kvalitete)" ($sw.title -match "jebaited_cro — Prva pjesma" -and $sw.title -notmatch "kHz") "'$($sw.title)'"
 Check "V1: VU metar mjeri stvarnu razinu" ($sw.af -match "astats" -and [double]$sw.vu[0] -gt -40 -and [double]$sw.vu[1] -gt -40) "L $($sw.vu[0]) dB, D $($sw.vu[1]) dB, af=$($sw.af), mpv: $($sw.vuRaw)"
 $p = $m.panels
 Check "V1: ploče EQ i popis" ([int]$p.eqColumns -eq 11 -and [int]$p.playlistRows -eq 3 -and [double]$p.size[1] -gt [double]$sw.size[1] + 150) "EQ stupaca $($p.eqColumns), redaka $($p.playlistRows), visina $($sw.size[1]) → $($p.size[1])"

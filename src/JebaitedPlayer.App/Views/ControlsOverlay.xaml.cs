@@ -34,10 +34,16 @@ public partial class ControlsOverlay : Window
             SetWindowLongPtr(h, GWL_EXSTYLE, ex | WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW);
         };
 
+        // 2.1.7: crvena oznaka LIVE dok radio stvarno svira.
+        void UpdateLive() => LiveMark.Visibility = _vm.IsLiveStream && !_vm.IsPaused ? Visibility.Visible : Visibility.Collapsed;
+        vm.PropertyChanged += (_, _) => UpdateLive();
+        UpdateLive();
+
         PreviewMouseMove += (_, _) => UserActivity?.Invoke(this, EventArgs.Empty);
-        PreviewMouseWheel += (_, e) =>
+        // 2.1.7: samo iznad trake glasnoće; kotačić drugdje ne smije slučajno mijenjati glasnoću.
+        VolumeArea.PreviewMouseWheel += (_, e) =>
         {
-            _vm.ChangeVolume(e.Delta > 0 ? 5 : -5);
+            _vm.ChangeVolume(e.Delta > 0 ? PlayerViewModel.VolumeWheelStep : -PlayerViewModel.VolumeWheelStep);
             UserActivity?.Invoke(this, EventArgs.Empty);
             e.Handled = true;
         };

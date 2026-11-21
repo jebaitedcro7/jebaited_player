@@ -1,0 +1,60 @@
+<views:MiniSkinBase x:Class="JebaitedPlayer.Views.MiniSideSkin"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:JebaitedPlayer.Infrastructure"
+        xmlns:views="clr-namespace:JebaitedPlayer.Views">
+
+    <!-- Dizajn 4: bočna ploča (uski stupac uz rub zaslona). Isti elementi i radnje kao u ostalim izgledima. -->
+    <StackPanel MinWidth="250">
+        <DockPanel Height="24" Margin="8,3,3,0">
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                <Button Style="{DynamicResource MiniIcon}" Content="&#xE73F;" ToolTip="{loc:T mini.compact}" Click="OnStrip" />
+                <Button Style="{DynamicResource MiniIcon}" Content="&#xE921;" ToolTip="{loc:T mini.minimize}" Click="OnMinimize" />
+                <Button Style="{DynamicResource MiniIcon}" Content="&#xE8A7;" ToolTip="{loc:T mini.fullPlayer}" Click="OnFullPlayer" />
+                <Button Style="{DynamicResource MiniIcon}" Content="&#xE8BB;" ToolTip="{loc:T mini.close}" Click="OnClosePlayer" />
+            </StackPanel>
+            <Image Source="/Assets/logo-ufo.png" Height="16" Margin="0,0,6,0" RenderOptions.BitmapScalingMode="HighQuality" />
+            <TextBlock Text="jebaited_cro" FontSize="11" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" />
+        </DockPanel>
+
+        <Border Style="{DynamicResource Lcd}" Height="150" Margin="14,6,14,0">
+            <Image Source="/Assets/logo-ufo.png" Margin="18" RenderOptions.BitmapScalingMode="HighQuality" />
+        </Border>
+
+        <views:MarqueeView x:Name="Title" Height="26" Margin="14,10,14,0" TextElement.FontSize="15" TextElement.FontWeight="SemiBold"
+                           TextElement.Foreground="{DynamicResource TextPrimaryBrush}" Background="Transparent"
+                           MouseRightButtonUp="OnInfoMenu" ToolTip="{loc:T mini.infoHint}" />
+        <DockPanel Margin="14,4,14,0">
+            <Border DockPanel.Dock="Left" Background="{DynamicResource LcdTag}" CornerRadius="8" Padding="7,1" VerticalAlignment="Center"
+                    Cursor="Hand" ToolTip="{loc:T menu.radio}" MouseLeftButtonDown="OnSourceClick">
+                <TextBlock x:Name="Source" FontSize="10" Foreground="{DynamicResource LcdText}" />
+            </Border>
+            <views:LiveBadge x:Name="Live" DockPanel.Dock="Left" Margin="6,0,0,0" />
+            <TextBlock x:Name="Time" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" />
+        </DockPanel>
+        <Slider x:Name="Seek" Style="{StaticResource PlayerSlider}" Margin="14,8,14,0" />
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,8,0,0">
+            <Button Style="{DynamicResource MiniButton}" Content="&#xE71A;" ToolTip="{loc:T mini.stop}" Click="OnStop" />
+            <Button Style="{DynamicResource MiniButton}" Content="&#xE892;" ToolTip="{loc:T mini.previous}" Click="OnPrevious" />
+            <Button x:Name="PlayPause" Style="{DynamicResource MiniButton}" Width="48" Height="34" FontSize="18" Content="&#xE768;"
+                    ToolTip="{loc:T mini.play}" Click="OnPlayPause" />
+            <Button Style="{DynamicResource MiniButton}" Content="&#xE893;" ToolTip="{loc:T mini.next}" Click="OnNext" />
+            <Button Style="{DynamicResource MiniButton}" Margin="0" Content="&#xE838;" ToolTip="{loc:T mini.open}" Click="OnOpen" />
+        </StackPanel>
+
+        <DockPanel Margin="14,8,14,0">
+            <Button x:Name="Mute" DockPanel.Dock="Left" Style="{DynamicResource MiniIcon}" Content="&#xE767;" ToolTip="{loc:T mini.mute}" Click="OnMute" />
+            <Slider x:Name="Volume" Style="{StaticResource PlayerSlider}" Minimum="0" Maximum="100" VerticalAlignment="Center" Margin="6,0,0,0"
+                    ToolTip="{loc:T controls.volume}" />
+        </DockPanel>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,8,0,10">
+            <Button x:Name="Discord" Style="{DynamicResource MiniButton}" Width="36" Content="&#xE95B;" ToolTip="{loc:T mini.discord}" Click="OnDiscord" />
+            <ToggleButton x:Name="Eq" Style="{DynamicResource MiniButton}" Width="36" FontFamily="Consolas" FontSize="12" Content="EQ"
+                          ToolTip="{loc:T mini.equalizer}" Click="OnPanels" />
+            <ToggleButton x:Name="Playlist" Style="{DynamicResource MiniButton}" Width="36" Margin="0" FontFamily="Consolas" FontSize="12" Content="PL"
+                          ToolTip="{loc:T mini.playlist}" Click="OnPanels" />
+        </StackPanel>
+    </StackPanel>
+</views:MiniSkinBase>

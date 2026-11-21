@@ -329,6 +329,9 @@ public sealed class AppSettings
     /// <summary>Odbrojavanje do sljedeće epizode (s).</summary>
     public int UpNextSeconds { get; set; } = 10;
 
+    /// <summary>Koliko sekundi prije kraja epizode se nudi sljedeća (0 = tek na kraju, kao prije 2.1.8).</summary>
+    public int UpNextLeadSeconds { get; set; }
+
     /// <summary>Automatski provjeri i preuzmi novu verziju (instalira se pri zatvaranju playera).</summary>
     public bool AutoUpdate { get; set; } = true;
 
@@ -480,6 +483,7 @@ public sealed class AppSettings
         }
 
         HomeInfo ??= new JebaitedPlayer.Services.HomeInfoSettings();
+        HomeInfo.Normalize();
         ErrorReports ??= new JebaitedPlayer.Services.ErrorReportSettings();
         if (!HomeBackgroundModes.Contains(HomeBackgroundMode))
         {

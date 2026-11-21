@@ -217,6 +217,15 @@ public partial class PlayerSettingsWindow : Window
             _vm.Library.UpNextDelaySeconds = _settings.UpNextSeconds;
         };
 
+        UpNextLeadSlider.Value = Math.Clamp(_settings.UpNextLeadSeconds, 0, 120);
+        UpdateLeadText();
+        UpNextLeadSlider.ValueChanged += (_, e) =>
+        {
+            _settings.UpNextLeadSeconds = (int)Math.Round(e.NewValue);
+            _vm.Library.UpNextLeadSeconds = _settings.UpNextLeadSeconds;
+            UpdateLeadText();
+        };
+
         UpdateFolderText();
         UpdateShellStatus();
         UpdateBackupStatus();
@@ -875,6 +884,7 @@ public partial class PlayerSettingsWindow : Window
         WeatherCelsius.Checked += (_, _) => SetHomeInfo(() => h.Fahrenheit = false, weather: true);
         WeatherFahrenheit.Checked += (_, _) => SetHomeInfo(() => h.Fahrenheit = true, weather: true);
         UpdateWeatherTexts();
+        BuildHomeLook();
     }
 
     private void SetHomeInfo(Action change, bool weather = false)
@@ -887,6 +897,10 @@ public partial class PlayerSettingsWindow : Window
         change();
         UpdateWeatherTexts();
         _host.ApplyHomeInfo(weather);
+        if (_homePreview is not null)
+        {
+            RefreshHomeLook();
+        }
     }
 
     private void UpdateWeatherTexts()
@@ -895,6 +909,9 @@ public partial class PlayerSettingsWindow : Window
         WeatherCityText.Text = h.City is { Length: > 0 } c ? Loc.T("settings.weatherCity", c) : Loc.T("settings.weatherCityNone");
         WeatherCityBox.IsEnabled = WeatherFindButton.IsEnabled = WeatherCelsius.IsEnabled = WeatherFahrenheit.IsEnabled = h.ShowWeather;
     }
+
+    private void UpdateLeadText() =>
+        UpNextLeadText.Text = _settings.UpNextLeadSeconds <= 0 ? Loc.T("settings.upNextLeadEnd") : Loc.T("settings.seconds", _settings.UpNextLeadSeconds);
 
     private async void OnWeatherFind(object sender, RoutedEventArgs e) => await FindWeatherCityAsync(WeatherCityBox.Text);
 

@@ -63,6 +63,21 @@ public sealed class MiniPlayerSettings
     /// <summary>Uska traka (dizajn 3) umjesto punog izgleda (dizajn 1).</summary>
     public bool Compact { get; set; }
 
+    /// <summary>
+    /// 2.1.7: izgled kad nije uska traka (<see cref="Compact"/>): "classic" (dizajn 1), "card" (2), "side" (4) ili "ufo" (5).
+    /// Uska traka je dizajn 3. Svi izgledi dijele iste funkcije; mijenja se samo raspored.
+    /// </summary>
+    public string Design { get; set; } = "classic";
+
+    /// <summary>2.1.7: podaci u traci s pjesmom (id iz <c>TrackInfo.AllFields</c>); zadano samo izvođač i naziv.</summary>
+    public List<string> InfoFields { get; set; } = [.. JebaitedPlayer.Services.TrackInfo.DefaultFields];
+
+    public static readonly IReadOnlyList<string> Designs = ["classic", "card", "strip", "side", "ufo"];
+
+    /// <summary>Izgled koji vrijedi sada (uska traka ima prednost).</summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    public string ActiveDesign => Compact ? "strip" : Design;
+
     public bool ShowEqualizer { get; set; }
 
     public bool ShowPlaylist { get; set; }
@@ -103,6 +118,13 @@ public sealed class MiniPlayerSettings
         {
             VuStyle = "bars";
         }
+
+        if (Design is not ("classic" or "card" or "side" or "ufo"))
+        {
+            Design = "classic";
+        }
+
+        InfoFields = JebaitedPlayer.Services.TrackInfo.Normalize(InfoFields);
     }
 }
 

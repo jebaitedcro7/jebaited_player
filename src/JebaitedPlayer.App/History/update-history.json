@@ -40,6 +40,96 @@
   },
   "versions": [
     {
+      "version": "2.1.7",
+      "date": "2026-11-21",
+      "notes": {
+        "en": {
+          "summary": "Mini player and home screen: five mini player looks, volume by mouse wheel, a pulsing LIVE badge for radio, music that keeps playing on the home screen and a fully customizable clock, date and weather.",
+          "features": [
+            "Five mini player looks (right-click → Look): classic Winamp, card, narrow strip, side panel and UFO screen. They all have the same functions and your choice is remembered.",
+            "The mouse wheel over the volume bar changes the volume in steps of 2 % in the full and the mini player. The wheel over the video or other parts of the player no longer changes the volume by accident.",
+            "A red, gently pulsing LIVE badge while a radio station plays: in every mini player look, in the full player and on the home screen.",
+            "The song title scrolls in an endless loop (no gap and no jump) and by default shows only the artist and the song. Right-click the title to add album, year, genre, sound quality or the file name.",
+            "Playback bar on the home screen: current song, source (local, radio, Spotify, YouTube Music, Discord), Play/Pause, Previous/Next and volume.",
+            "Home screen look (Settings → Appearance): font, size and position of the time, the date and the weather, each on its own, with a preview and “Reset look to default”.",
+            "More weather details (Open-Meteo, free, no key): feels-like temperature, minimum and maximum, chance and amount of rain, wind, humidity, UV index, sunrise and sunset, the next hours and the next days. Only what the weather service provides is shown.",
+            "A separate Minimize button (and menu item): the player goes to the taskbar and the music keeps playing; it is different from Mini player and Close.",
+            "Discord bot is in the source menu next to Radio, Spotify and YouTube Music.",
+            "Next episode before the end (Settings → General): choose how many seconds before the end of an episode the card for the next one appears; the countdown then ends exactly at the end. 0 keeps the old behavior (only when the episode has ended)."
+          ],
+          "improvements": [
+            "The mini player and all other windows (the Equalizer panel, Radio, Discord…) always stay completely inside the visible screen area: the taskbar, display scaling and several monitors are taken into account, and a window moved outside is pulled back.",
+            "The narrow strip now has a volume slider."
+          ],
+          "fixes": [
+            "Pressing Home no longer stops music or radio. Only video still closes, as before.",
+            "Only one window opens at start: the mini player if it was the last view (or when a music file is opened), otherwise the full player. Before, the big player appeared first and the mini player a moment later."
+          ],
+          "known": [
+            "The location is chosen by city name only; automatic location is not included (nothing is sent before you pick a city).",
+            "The app is not digitally signed yet, so Windows SmartScreen or Smart App Control may warn before the installation.",
+            "The progress window of the installer comes from Velopack and is only in English."
+          ]
+        },
+        "de": {
+          "summary": "Mini-Player und Startbildschirm: fünf Mini-Player-Looks, Lautstärke per Mausrad, pulsierende LIVE-Anzeige fürs Radio, Musik läuft auf dem Startbildschirm weiter, Uhrzeit, Datum und Wetter frei anpassbar.",
+          "features": [
+            "Fünf Mini-Player-Looks (Rechtsklick → Aussehen): klassisches Winamp, Karte, schmale Leiste, Seitenleiste und UFO-Display. Alle haben dieselben Funktionen, deine Wahl wird gespeichert.",
+            "Das Mausrad über der Lautstärkeleiste ändert die Lautstärke in 2-%-Schritten, im normalen und im Mini-Player. Das Mausrad über dem Video oder anderen Bereichen ändert die Lautstärke nicht mehr versehentlich.",
+            "Eine rote, sanft pulsierende LIVE-Anzeige, solange ein Radiosender läuft: in jedem Mini-Player-Look, im normalen Player und auf dem Startbildschirm.",
+            "Der Titel läuft in einer Endlosschleife (ohne Lücke und ohne Sprung) und zeigt standardmäßig nur Interpret und Titel. Rechtsklick auf den Titel: Album, Jahr, Genre, Klangqualität oder Dateiname hinzufügen.",
+            "Wiedergabeleiste auf dem Startbildschirm: aktueller Titel, Quelle (lokal, Radio, Spotify, YouTube Music, Discord), Play/Pause, Zurück/Weiter und Lautstärke.",
+            "Aussehen des Startbildschirms (Einstellungen → Aussehen): Schriftart, Größe und Position von Uhrzeit, Datum und Wetter jeweils einzeln, mit Vorschau und „Aussehen zurücksetzen“.",
+            "Mehr Wetterdetails (Open-Meteo, kostenlos, ohne Schlüssel): gefühlte Temperatur, Minimum und Maximum, Regenwahrscheinlichkeit und -menge, Wind, Luftfeuchtigkeit, UV-Index, Sonnenauf- und -untergang, nächste Stunden und Tage. Angezeigt wird nur, was der Wetterdienst liefert.",
+            "Eigene Minimieren-Schaltfläche (und Menüeintrag): Der Player geht in die Taskleiste und die Musik läuft weiter; getrennt von Mini-Player und Schließen.",
+            "Der Discord-Bot steht im Quellenmenü neben Radio, Spotify und YouTube Music.",
+            "Nächste Folge vor dem Ende (Einstellungen → Allgemein): Du wählst, wie viele Sekunden vor dem Ende einer Folge die Karte für die nächste erscheint; der Countdown endet dann genau am Ende. 0 behält das bisherige Verhalten (erst nach dem Ende)."
+          ],
+          "improvements": [
+            "Der Mini-Player und alle anderen Fenster (Equalizer-Bereich, Radio, Discord …) bleiben immer vollständig im sichtbaren Bildschirmbereich: Taskleiste, Skalierung und mehrere Monitore werden berücksichtigt, und ein nach außen geschobenes Fenster wird zurückgeholt.",
+            "Die schmale Leiste hat jetzt einen Lautstärkeregler."
+          ],
+          "fixes": [
+            "Die Taste Home stoppt Musik und Radio nicht mehr. Nur Videos werden weiterhin geschlossen, wie bisher.",
+            "Beim Start öffnet sich nur ein Fenster: der Mini-Player, wenn er die letzte Ansicht war (oder bei einer Musikdatei), sonst der normale Player. Vorher erschien zuerst der große Player und kurz danach der Mini-Player."
+          ],
+          "known": [
+            "Der Ort wird nur über den Städtenamen gewählt; eine automatische Ortung ist nicht enthalten (vor der Städtewahl wird nichts gesendet).",
+            "Die App ist noch nicht digital signiert, daher können Windows SmartScreen oder Smart App Control vor der Installation warnen.",
+            "Das Fortschrittsfenster des Installers stammt von Velopack und ist nur auf Englisch."
+          ]
+        },
+        "hr": {
+          "summary": "Mini player i početni ekran: pet izgleda mini playera, glasnoća kotačićem miša, pulsirajuća oznaka UŽIVO za radio, glazba svira dalje na početnom ekranu te potpuno prilagodljivo vrijeme, datum i prognoza.",
+          "features": [
+            "Pet izgleda mini playera (desni klik → Izgled): klasični Winamp, kartica, uska traka, bočna ploča i NLO zaslon. Svi imaju iste funkcije, a tvoj odabir se pamti.",
+            "Kotačić miša iznad trake glasnoće mijenja glasnoću u koracima od 2 % u punom i mini playeru. Kotačić iznad videa ili drugih dijelova playera više ne mijenja glasnoću slučajno.",
+            "Crvena, blago pulsirajuća oznaka UŽIVO dok svira radio: u svakom izgledu mini playera, u punom playeru i na početnom ekranu.",
+            "Naslov pjesme se neprekidno vrti u krug (bez praznine i bez trzaja), a zadano prikazuje samo izvođača i pjesmu. Desni klik na naslov: dodaj album, godinu, žanr, kvalitetu zvuka ili naziv datoteke.",
+            "Traka reprodukcije na početnom ekranu: trenutna pjesma, izvor (lokalno, radio, Spotify, YouTube Music, Discord), Play/Pause, Prethodna/Sljedeća i glasnoća.",
+            "Izgled početnog ekrana (Postavke → Izgled): font, veličina i mjesto vremena, datuma i prognoze, svaki zasebno, uz pregled i „Vrati izgled na zadano”.",
+            "Više podataka o vremenu (Open-Meteo, besplatno, bez ključa): osjećaj temperature, najniža i najviša, vjerojatnost i količina oborina, vjetar, vlažnost, UV indeks, izlazak i zalazak sunca, sljedeći sati i dani. Prikazuje se samo ono što izvor podataka šalje.",
+            "Zasebna tipka Minimiziraj (i stavka u izborniku): player ide na taskbar, a glazba svira dalje; razlikuje se od Mini playera i Zatvaranja.",
+            "Discord bot je u izborniku izvora uz Radio, Spotify i YouTube Music.",
+            "Sljedeća epizoda prije kraja (Postavke → Općenito): biraš koliko sekundi prije kraja epizode se pojavljuje kartica za sljedeću; odbrojavanje tada završava točno na kraju. 0 zadržava staro ponašanje (tek kad epizoda završi)."
+          ],
+          "improvements": [
+            "Mini player i svi ostali prozori (ploča Equalizera, Radio, Discord…) uvijek ostaju potpuno unutar vidljivog dijela zaslona: uzimaju se u obzir taskbar, skaliranje zaslona i više monitora, a prozor koji se makne izvan zaslona vraća se natrag.",
+            "Uska traka sada ima klizač glasnoće."
+          ],
+          "fixes": [
+            "Tipka Home više ne zaustavlja glazbu ni radio. Samo se video i dalje zatvara, kao prije.",
+            "Pri pokretanju se otvara samo jedan prozor: mini player ako je to bio zadnji prikaz (ili kad se otvara glazba), inače puni player. Prije se prvo pojavio veliki player, a nakon trenutka i mali."
+          ],
+          "known": [
+            "Lokacija se bira samo upisom grada; automatsko određivanje lokacije nije uključeno (ništa se ne šalje dok ne odabereš grad).",
+            "Aplikacija još nije digitalno potpisana, pa Windows SmartScreen ili Smart App Control mogu upozoriti prije instalacije.",
+            "Prozor napretka instalacijskog programa dolazi iz Velopacka i samo je na engleskom."
+          ]
+        }
+      }
+    },
+    {
       "version": "2.0.6",
       "date": "2026-11-21",
       "notes": {

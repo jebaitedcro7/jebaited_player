@@ -4,6 +4,41 @@ Sve važnije promjene jebaited_playera. Oblik: [Keep a Changelog](https://keepac
 
 Drugi jezici: [English](CHANGELOG.md) · [Deutsch](CHANGELOG_DE.md). Ista povijest je i u playeru (klik na broj verzije na početnom ekranu). Ova datoteka nastaje iz `src/JebaitedPlayer.App/History/update-history.json`.
 
+## [2.1.7] - 2026-11-21
+
+Mini player i početni ekran: pet izgleda mini playera, glasnoća kotačićem miša, pulsirajuća oznaka UŽIVO za radio, glazba svira dalje na početnom ekranu te potpuno prilagodljivo vrijeme, datum i prognoza.
+
+### Novo
+
+- Pet izgleda mini playera (desni klik → Izgled): klasični Winamp, kartica, uska traka, bočna ploča i NLO zaslon. Svi imaju iste funkcije, a tvoj odabir se pamti.
+- Kotačić miša iznad trake glasnoće mijenja glasnoću u koracima od 2 % u punom i mini playeru. Kotačić iznad videa ili drugih dijelova playera više ne mijenja glasnoću slučajno.
+- Crvena, blago pulsirajuća oznaka UŽIVO dok svira radio: u svakom izgledu mini playera, u punom playeru i na početnom ekranu.
+- Naslov pjesme se neprekidno vrti u krug (bez praznine i bez trzaja), a zadano prikazuje samo izvođača i pjesmu. Desni klik na naslov: dodaj album, godinu, žanr, kvalitetu zvuka ili naziv datoteke.
+- Traka reprodukcije na početnom ekranu: trenutna pjesma, izvor (lokalno, radio, Spotify, YouTube Music, Discord), Play/Pause, Prethodna/Sljedeća i glasnoća.
+- Izgled početnog ekrana (Postavke → Izgled): font, veličina i mjesto vremena, datuma i prognoze, svaki zasebno, uz pregled i „Vrati izgled na zadano”.
+- Više podataka o vremenu (Open-Meteo, besplatno, bez ključa): osjećaj temperature, najniža i najviša, vjerojatnost i količina oborina, vjetar, vlažnost, UV indeks, izlazak i zalazak sunca, sljedeći sati i dani. Prikazuje se samo ono što izvor podataka šalje.
+- Zasebna tipka Minimiziraj (i stavka u izborniku): player ide na taskbar, a glazba svira dalje; razlikuje se od Mini playera i Zatvaranja.
+- Discord bot je u izborniku izvora uz Radio, Spotify i YouTube Music.
+- Sljedeća epizoda prije kraja (Postavke → Općenito): biraš koliko sekundi prije kraja epizode se pojavljuje kartica za sljedeću; odbrojavanje tada završava točno na kraju. 0 zadržava staro ponašanje (tek kad epizoda završi).
+
+### Poboljšano
+
+- Mini player i svi ostali prozori (ploča Equalizera, Radio, Discord…) uvijek ostaju potpuno unutar vidljivog dijela zaslona: uzimaju se u obzir taskbar, skaliranje zaslona i više monitora, a prozor koji se makne izvan zaslona vraća se natrag.
+- Uska traka sada ima klizač glasnoće.
+
+### Ispravljeno
+
+- Tipka Home više ne zaustavlja glazbu ni radio. Samo se video i dalje zatvara, kao prije.
+- Pri pokretanju se otvara samo jedan prozor: mini player ako je to bio zadnji prikaz (ili kad se otvara glazba), inače puni player. Prije se prvo pojavio veliki player, a nakon trenutka i mali.
+
+### Poznati problemi
+
+- Lokacija se bira samo upisom grada; automatsko određivanje lokacije nije uključeno (ništa se ne šalje dok ne odabereš grad).
+- Aplikacija još nije digitalno potpisana, pa Windows SmartScreen ili Smart App Control mogu upozoriti prije instalacije.
+- Prozor napretka instalacijskog programa dolazi iz Velopacka i samo je na engleskom.
+
+Izdanje: [v2.1.7](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v2.1.7) · Promjene od [v2.0.6...v2.1.7](https://github.com/jebaitedcro7/jebaited_player/compare/v2.0.6...v2.1.7)
+
 ## [2.0.6] - 2026-11-21
 
 2.0: tvoj vlastiti bot za Discord pušta glazbu i radio iz playera u glasovnom kanalu; svaki prečac se može promijeniti; boja isticanja po izboru.

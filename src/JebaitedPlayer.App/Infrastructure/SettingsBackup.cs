@@ -272,6 +272,7 @@ public static class SettingsWorkingCopy
     [
         nameof(MiniPlayerSettings.Left), nameof(MiniPlayerSettings.Top), nameof(MiniPlayerSettings.Scale), nameof(MiniPlayerSettings.Compact),
         nameof(MiniPlayerSettings.ShowEqualizer), nameof(MiniPlayerSettings.ShowPlaylist), nameof(MiniPlayerSettings.WasOpen),
+        nameof(MiniPlayerSettings.Design), nameof(MiniPlayerSettings.InfoFields),
     ];
 
     /// <summary>Cijelo stanje (za vraćanje).</summary>
@@ -321,6 +322,7 @@ public static class SettingsWorkingCopy
         (saved.MiniPlayer.Left, saved.MiniPlayer.Top, saved.MiniPlayer.Scale) = (now.Left, now.Top, now.Scale);
         (saved.MiniPlayer.Compact, saved.MiniPlayer.ShowEqualizer, saved.MiniPlayer.ShowPlaylist, saved.MiniPlayer.WasOpen) =
             (now.Compact, now.ShowEqualizer, now.ShowPlaylist, now.WasOpen);
+        (saved.MiniPlayer.Design, saved.MiniPlayer.InfoFields) = (now.Design, now.InfoFields);
         SettingsTransfer.ApplyTo(current, saved);
 
         // Uvoz ne dira sliku pozadine (putanja na ovom računalu), ali Odbaci je vraća (N4).
@@ -347,6 +349,7 @@ public static class SettingsDefaults
                 case "general":
                     (s.ResumeMode, s.SeekStepSeconds, s.OpenFullscreen, s.OnTopWhilePlaying) = (d.ResumeMode, d.SeekStepSeconds, d.OpenFullscreen, d.OnTopWhilePlaying);
                     (s.AutoPlayNext, s.UpNextSeconds, s.ScreenshotFolder) = (d.AutoPlayNext, d.UpNextSeconds, d.ScreenshotFolder);
+                    s.UpNextLeadSeconds = d.UpNextLeadSeconds;
                     break;
                 case "subtitles":
                     s.SubtitleLanguages = AppSettings.DefaultSubtitleLanguages(s.Language ?? "en");
@@ -370,6 +373,7 @@ public static class SettingsDefaults
                     (s.MiniPlayer.Font, s.MiniPlayer.VuStyle, s.MiniPlayer.AutoSwitch) = (d.MiniPlayer.Font, d.MiniPlayer.VuStyle, d.MiniPlayer.AutoSwitch);
                     (s.HomeBackgroundImage, s.HomeBackgroundMode) = (d.HomeBackgroundImage, d.HomeBackgroundMode);
                     (s.HomeInfo.ShowTime, s.HomeInfo.ShowDate, s.HomeInfo.ShowWeather) = (true, true, false);
+                    s.HomeInfo.ResetStyle();
                     break;
                 case "shortcuts":
                     s.Shortcuts = new Dictionary<string, string[]>();

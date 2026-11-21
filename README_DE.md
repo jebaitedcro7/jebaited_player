@@ -69,7 +69,7 @@ Die Steuerung erscheint, wenn du die Maus bewegst, und verschwindet während der
 
 | Element | Funktion |
 |---|---|
-| ⌂ Startseite (oben links) | Zurück zum Startbildschirm, ohne den Player zu schließen. Die Position wird gespeichert, du kannst später weiterschauen. Erscheint und verschwindet zusammen mit der übrigen Steuerung. |
+| ⌂ Startseite (oben links) | Zurück zum Startbildschirm, ohne den Player zu schließen. Musik und Radio laufen weiter und der Startbildschirm zeigt eine Wiedergabeleiste (Titel, Quelle, Play/Pause, Zurück/Weiter, Lautstärke); ein Video wird geschlossen und die Position gespeichert, damit du später weitermachen kannst. Erscheint und verschwindet zusammen mit der übrigen Steuerung. |
 | Wiedergabe / Pause | Leertaste oder K, oder Klick auf das Bild |
 | Zeitleiste | Irgendwo klicken springt sofort dorthin, oder ziehen. Eine Blase zeigt die Zeit unter der Maus. ← / → springen 5 s, Ctrl+← / → 30 s (einstellbar unter Einstellungen → Allgemein); , / . ein Bild zurück / vor |
 | Lautstärke | ↑ / ↓ oder Mausrad; M schaltet den Ton aus |
@@ -121,6 +121,12 @@ Im selben Tab stellst du die automatische Suche, die Zeichenkodierung alter Unte
 - Musik öffnet den Mini-Player, ein Film oder eine Serie den vollen Player (abschaltbar unter Einstellungen → Darstellung). Der Mini-Player öffnet sich immer dort, wo du ihn gelassen hast.
 - Rechtsklick auf den Mini-Player (oder Einstellungen → Darstellung): sechs Anzeigeschriften und vier VU-Meter-Stile (Balken, LED-Segmente, dünne Linien mit Spitze, aus).
 - Filme und Serien haben einen eigenen Equalizer, Musik und Radio einen eigenen (Einstellungen → Audio: wählen, welcher bearbeitet wird).
+- **Fünf Looks** (Rechtsklick → **Aussehen**): klassisches Winamp, Karte, schmale Leiste, Seitenleiste und UFO-Display. Alle haben dieselben Tasten und Funktionen, deine Wahl wird gespeichert.
+- Das **Mausrad über der Lautstärkeleiste** ändert die Lautstärke um 2 % (im Mini-Player und im vollen Player). Das Mausrad an anderer Stelle ändert die Lautstärke nie.
+- Der Titel läuft in einer Endlosschleife und zeigt standardmäßig nur **Interpret und Titel**. Rechtsklick auf den Titel: Album, Jahr, Genre, Klangqualität oder Dateiname hinzufügen.
+- Eine rote, sanft pulsierende **LIVE**-Anzeige erscheint, solange ein Radiosender läuft (alle Looks, voller Player und Startbildschirm).
+- **Minimieren** (Taste oder Rechtsklick → In die Taskleiste minimieren) legt den Player in die Taskleiste, die Musik läuft weiter; das ist etwas anderes als **Mini-Player** und Schließen. Der Mini-Player und alle anderen Fenster (Equalizer, Radio, Discord …) bleiben immer ganz im sichtbaren Bildschirm, über der Taskleiste, auch mit mehreren Monitoren.
+- Beim Start öffnet sich nur ein Fenster: der Mini-Player, wenn er deine letzte Ansicht war (oder wenn du eine Musikdatei öffnest), sonst der volle Player.
 
 ### Radio
 
@@ -189,7 +195,7 @@ Die Einstellungen sind in Tabs aufgeteilt. Jede Änderung gilt sofort (auch für
 | Untertitel | Untertitelsprachen und ihre Reihenfolge, automatisches Laden und Suchen, Quellen im Internet, Zeichenkodierung alter Untertitel, Aussehen, Synchronisierung |
 | Audio | Lautstärke, Lautstärkeausgleich, Equalizer, bevorzugte Audiosprache, Ausgabegerät, Ausgabe für Musik und Radio, Audio-Synchronisierung |
 | Video | Bildqualität, Hardware-Dekodierung, Standard-Seitenverhältnis, HDR |
-| Darstellung | Dunkles / helles Design, Akzentfarbe, Hintergrund des Startbildschirms (Standard oder eigenes Bild: Füllen, Einpassen, Zentriert), wie lange die Steuerung sichtbar bleibt, Oberfläche über die GPU darstellen, Uhrzeit, Datum und Wetter auf dem Startbildschirm (eine Stadt deiner Wahl, von Open-Meteo) |
+| Darstellung | Dunkles / helles Design, Akzentfarbe, Hintergrund des Startbildschirms (Standard oder eigenes Bild: Füllen, Einpassen, Zentriert), wie lange die Steuerung sichtbar bleibt, Oberfläche über die GPU darstellen, Uhrzeit, Datum und Wetter auf dem Startbildschirm (eine Stadt deiner Wahl, von Open-Meteo; Schriftart, Größe und Position jedes Elements, Vorschau und Wetterdetails wie gefühlte Temperatur, Min/Max, Regen, Wind, Luftfeuchtigkeit, UV, Sonnenauf- und -untergang, nächste Stunden und Tage) |
 | Tastenkürzel | Tasten für jede Aktion, bis zu zwei pro Aktion (siehe [Tastenkürzel](#tastenkürzel)) |
 | Updates | Version, jetzt prüfen, automatischer Download, Neuerungen, Update-Verlauf |
 | Info | Version, Lizenz, verwendete Technologien, Handbuch, Datenschutz, Richtlinie zur Code-Signierung, Fehlerberichte (ohne persönliche Daten auf deinem Computer gespeichert; du sendest sie selbst über GitHub) |

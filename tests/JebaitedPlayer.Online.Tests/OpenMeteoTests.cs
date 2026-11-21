@@ -59,8 +59,42 @@ public sealed class OpenMeteoTests
         await server;
         StringAssert.Contains(paths[0], "name=Zagreb");
         StringAssert.Contains(paths[0], "language=hr");
-        StringAssert.Contains(paths[1], "latitude=45.8144&longitude=15.978&current=temperature_2m,weather_code,is_day");
-        StringAssert.Contains(paths[1], "temperature_unit=fahrenheit");
+        StringAssert.Contains(paths[1], "latitude=45.8144&longitude=15.978&current=temperature_2m,apparent_temperature,");
+        StringAssert.Contains(paths[1], "temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch");
+        Assert.IsNull(now.Feels, "izvor ne šalje osjećaj temperature, pa ga nema");
+        Assert.AreEqual(0, now.Hourly.Count);
+        Assert.AreEqual(0, now.Daily.Count);
+    }
+
+    [TestMethod]
+    public async Task Detailed_forecast_is_parsed_and_missing_values_stay_empty()
+    {
+        const string body = """
+            { "current": { "temperature_2m": 14.2, "apparent_temperature": 12.1, "relative_humidity_2m": 71, "precipitation": 0.4, "weather_code": 61, "wind_speed_10m": 18.5, "wind_direction_10m": 225, "is_day": 1 },
+              "hourly": { "time": ["2026-11-21T10:00","2026-11-21T11:00","2026-11-21T12:00"], "temperature_2m": [13.1, 14.2, 15.0], "weather_code": [3, 61, 61], "precipitation_probability": [10, 60, 80] },
+              "daily": { "time": ["2026-11-21","2026-11-22"], "weather_code": [61, 3], "temperature_2m_max": [15.0, 11.0], "temperature_2m_min": [8.5, 6.0],
+                         "precipitation_probability_max": [80, 20], "uv_index_max": [1.5, 1.0], "sunrise": ["2026-11-21T07:05","2026-11-22T07:06"], "sunset": ["2026-11-21T16:01","2026-11-22T16:00"] } }
+            """;
+        (Uri baseUri, Task server, _) = Serve(_ => (200, body), 1);
+        using var client = new OpenMeteoClient("test", baseUri);
+        WeatherNow w = await client.CurrentAsync(45.8, 15.9, fahrenheit: false, CancellationToken.None);
+        await server;
+
+        Assert.AreEqual(12.1, w.Feels!.Value, 0.001);
+        Assert.AreEqual(71, w.Humidity!.Value, 0.001);
+        Assert.AreEqual(0.4, w.Precipitation!.Value, 0.001);
+        Assert.AreEqual(18.5, w.WindSpeed!.Value, 0.001);
+        Assert.AreEqual(225, w.WindDirection!.Value, 0.001);
+        Assert.AreEqual(8.5, w.TempMin!.Value, 0.001);
+        Assert.AreEqual(15.0, w.TempMax!.Value, 0.001);
+        Assert.AreEqual(80, w.PrecipProbability!.Value, 0.001);
+        Assert.AreEqual(1.5, w.UvIndex!.Value, 0.001);
+        Assert.AreEqual(new DateTime(2026, 11, 21, 7, 5, 0), w.Sunrise);
+        Assert.AreEqual(new DateTime(2026, 11, 21, 16, 1, 0), w.Sunset);
+        Assert.AreEqual(3, w.Hourly.Count);
+        Assert.AreEqual(60, w.Hourly[1].PrecipProbability);
+        Assert.AreEqual(2, w.Daily.Count);
+        Assert.AreEqual(11.0, w.Daily[1].Max, 0.001);
     }
 
     [TestMethod]

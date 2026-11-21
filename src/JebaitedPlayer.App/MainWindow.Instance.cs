@@ -33,16 +33,94 @@ public partial class MainWindow
         _rendered = true;
         var files = _options.Files.Concat(_filesBeforeRender).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
         _filesBeforeRender.Clear();
-        if (files.Count > 0)
+        try
         {
-            _openMerger.Add(files, DateTime.UtcNow);
-            OpenFiles(files);
+            if (files.Count > 0)
+            {
+                if (_hiddenStart)
+                {
+                    ShowMiniPlayer(); // glazba iz naredbenog retka: odmah mini, glavni prozor se nikad ne vidi
+                }
+
+                _openMerger.Add(files, DateTime.UtcNow);
+                OpenFiles(files);
+            }
+            else if (_hiddenStart || (_settings.MiniPlayer.WasOpen && !_options.IsDiagnostics))
+            {
+                // Zatvoren kao mini player: tako se i otvara, na zapamćenom mjestu.
+                ShowMiniPlayer();
+            }
         }
-        else if (_settings.MiniPlayer.WasOpen && !_options.IsDiagnostics)
+        finally
         {
-            // Zatvoren kao mini player: tako se i otvara, na zapamćenom mjestu.
-            ShowMiniPlayer();
+            FinishHiddenStart();
         }
+    }
+
+    // --- 2.1.7: pokretanje otvara samo jedan prikaz -------------------------------------------------------------------
+
+    private bool _hiddenStart;
+    private Point _hiddenStartLocation;
+
+    /// <summary>
+    /// Prije prvog prikaza: ako se treba otvoriti mini player (zadnji prikaz je bio mini ili je zadana samo glazba),
+    /// glavni prozor se ne smije ni načas pojaviti. Prije se prvo prikazao veliki prozor, pa tek onda mali.
+    /// Glavni prozor se zato prikaže izvan zaslona i bez gumba na taskbaru (mpv i dalje dobiva svoj prozor), a mini ga zatim sakrije.
+    /// </summary>
+    internal void PrepareStartup()
+    {
+        if (_options.IsDiagnostics)
+        {
+            return;
+        }
+
+        bool mini = _options.Files.Count == 0
+            ? _settings.MiniPlayer.WasOpen
+            : _settings.MiniPlayer.AutoSwitch && _options.Files.All(f => File.Exists(f) && JebaitedPlayer.Library.MediaScanner.IsAudio(f));
+        if (!mini)
+        {
+            return;
+        }
+
+        _hiddenStart = true;
+        _hiddenStartLocation = new Point(Left, Top);
+        WindowStartupLocation = WindowStartupLocation.Manual;
+        ShowInTaskbar = false;
+        ShowActivated = false;
+        Left = -32000;
+        Top = -32000;
+        Log.Info("Pokretanje: otvara se mini player (glavni prozor se ne prikazuje).");
+    }
+
+    /// <summary>Mini player je preuzeo prikaz (ili nije uspio): glavni prozor dobiva natrag svoje mjesto i gumb na taskbaru.</summary>
+    private void FinishHiddenStart()
+    {
+        if (!_hiddenStart)
+        {
+            return;
+        }
+
+        _hiddenStart = false;
+        ShowActivated = true;
+        Rect work = SystemParameters.WorkArea;
+        Left = double.IsNaN(_hiddenStartLocation.X) ? work.Left + Math.Max(0, (work.Width - Width) / 2) : _hiddenStartLocation.X;
+        Top = double.IsNaN(_hiddenStartLocation.Y) ? work.Top + Math.Max(0, (work.Height - Height) / 2) : _hiddenStartLocation.Y;
+        ShowInTaskbar = true;
+    }
+
+    /// <summary>Minimiziraj na taskbar (2.1.7): zasebno od mini playera; glazba i radio sviraju dalje.</summary>
+    internal void MinimizePlayer()
+    {
+        if (IsMiniPlayerActive)
+        {
+            _mini!.WindowState = WindowState.Minimized;
+        }
+        else
+        {
+            WindowState = WindowState.Minimized;
+        }
+
+        Log.Info("Player minimiziran (reprodukcija se ne prekida).");
     }
 
     private void OnExternalOpen(IReadOnlyList<string> files)

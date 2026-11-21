@@ -171,7 +171,7 @@ public partial class MainWindow
             ["miniVisible"] = mini?.IsVisible,
             ["mainVisible"] = IsVisible,
             ["source"] = mini?.SourceText.Text,
-            ["live"] = mini?.RemainingText.Text,
+            ["live"] = mini?.LiveClassic.IsVisible == true ? Loc.T("mini.live") : mini?.RemainingText.Text,
             ["title"] = mini?.MarqueeTextValue,
             ["icy"] = await Task.Run(() => _player?.GetPropertyString("metadata/by-key/icy-title")),
             ["libraryCurrent"] = _vm.Library.Current?.Label,

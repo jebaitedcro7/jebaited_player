@@ -815,6 +815,7 @@
   "update.checking": "Suche nach einer neuen Version…",
   "update.downloaded": "Version {0} wurde heruntergeladen. Sie wird installiert, wenn du den Player schließt.",
   "update.downloading": "Lade die neue Version herunter…",
+  "update.downloadingVersion": "Lade Version {0} herunter · {1}",
   "update.failed": "Die Prüfung ist fehlgeschlagen (keine Internetverbindung oder GitHub antwortet nicht). Ich versuche es später erneut.",
   "update.notInstalled": "Updates funktionieren in der installierten Version (diese wurde außerhalb der Installation gestartet).",
   "update.store": "Updates werden über den Microsoft Store installiert.",

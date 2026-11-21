@@ -4,6 +4,26 @@ Sve važnije promjene jebaited_playera. Oblik: [Keep a Changelog](https://keepac
 
 Drugi jezici: [English](CHANGELOG.md) · [Deutsch](CHANGELOG_DE.md). Ista povijest je i u playeru (klik na broj verzije na početnom ekranu). Ova datoteka nastaje iz `src/JebaitedPlayer.App/History/update-history.json`.
 
+## [2.1.9] - 2026-11-22
+
+Glasnoća kotačićem bilo gdje na playeru, traka preuzimanja nadogradnje, ikone uz podatke o vremenu i jasnija postavka sljedeće epizode.
+
+### Novo
+
+- Preuzimanje nadogradnje: player pokazuje koja se verzija preuzima, koliko je velika i traku napretka s postotkom i laganom animacijom (Postavke → Nadogradnje), uz obavijest kad preuzimanje krene.
+- Ikone ispred svakog podatka o vremenu na početnom ekranu (osjećaj temperature, min/maks, kiša, vjetar, vlažnost i ostalo).
+
+### Poboljšano
+
+- Kotačić miša mijenja glasnoću bilo gdje na playeru (video, kontrole, početni ekran, cijeli mini player). Popisi koji se mogu listati i dalje se listaju kotačićem. Ctrl + kotačić i dalje mijenja veličinu mini playera.
+- Natpis „Podaci o vremenu: Open-Meteo.com“ više se ne prikazuje na početnom ekranu; izvor je i dalje naveden u postavkama.
+
+### Ispravljeno
+
+- Postavke → Općenito: vrijednost uz „Ponudi sljedeću epizodu prije kraja“ bila je izgurana izvan vidljivog dijela; klizač sada ima svoj redak i prikazuje sekunde.
+
+Izdanje: [v2.1.9](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v2.1.9) · Promjene od [v2.1.8...v2.1.9](https://github.com/jebaitedcro7/jebaited_player/compare/v2.1.8...v2.1.9)
+
 ## [2.1.8] - 2026-11-21
 
 Popravak: player se opet pokreće kad je glavni prozor bio maksimiziran, a zadnji prikaz mini player; kotačić miša mijenja glasnoću brže i glatkije.

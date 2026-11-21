@@ -78,6 +78,21 @@ public sealed class UpdateService
 
     public UpdateState State => _state;
 
+    /// <summary>Verzija koja se upravo preuzima (samo dok je stanje Downloading).</summary>
+    public string? DownloadVersion { get; private set; }
+
+    /// <summary>Koliko se bajtova preuzima (paket razlika kad postoji, inače cijeli paket).</summary>
+    public long DownloadTotalBytes { get; private set; }
+
+    /// <summary>Napredak preuzimanja, 0-100.</summary>
+    public int DownloadPercent { get; private set; }
+
+    /// <summary>Veličina za prikaz, npr. "114,8 MB".</summary>
+    public static string FormatSize(long bytes) =>
+        bytes >= 1024 * 1024 * 1024 ? (bytes / 1024.0 / 1024 / 1024).ToString("0.0", Loc.Culture) + " GB"
+        : bytes >= 1024 * 1024 ? (bytes / 1024.0 / 1024).ToString("0.0", Loc.Culture) + " MB"
+        : Math.Max(1, bytes / 1024).ToString("0", Loc.Culture) + " KB";
+
     /// <summary>Tekst za postavke, npr. "Nova verzija 1.0.1 je preuzeta…".</summary>
     /// <summary>Opis stanja na trenutnom jeziku (čita se svaki put, pa prati promjenu jezika).</summary>
     public string Status => DescribeState();
@@ -115,8 +130,20 @@ public sealed class UpdateService
             }
 
             Log.Updates.Info($"Nadogradnja: dostupna verzija {info.TargetFullRelease.Version} (trenutna {CurrentVersion}), preuzimam.");
+            DownloadVersion = info.TargetFullRelease.Version.ToString();
+            DownloadTotalBytes = info.DeltasToTarget is { Length: > 0 } deltas ? deltas.Sum(d => d.Size) : info.TargetFullRelease.Size;
+            DownloadPercent = 0;
             SetState(UpdateState.Downloading);
-            await _manager.DownloadUpdatesAsync(info, null, ct).ConfigureAwait(false);
+            await _manager.DownloadUpdatesAsync(info, percent =>
+            {
+                int clamped = Math.Clamp(percent, 0, 100);
+                if (clamped != DownloadPercent)
+                {
+                    DownloadPercent = clamped;
+                    Changed?.Invoke(this, EventArgs.Empty);
+                }
+            }, ct).ConfigureAwait(false);
+            DownloadPercent = 100;
             _ready = info.TargetFullRelease;
             Log.Updates.Info($"Nadogradnja: verzija {_ready.Version} preuzeta, instalira se pri zatvaranju playera.");
             SetState(UpdateState.Ready);
@@ -175,7 +202,9 @@ public sealed class UpdateService
     {
         UpdateState.NotInstalled => Loc.T(IsStore ? "update.store" : "update.notInstalled"),
         UpdateState.Checking => Loc.T("update.checking"),
-        UpdateState.Downloading => Loc.T("update.downloading"),
+        UpdateState.Downloading => DownloadVersion is { } v
+            ? Loc.T("update.downloadingVersion", v, FormatSize(DownloadTotalBytes))
+            : Loc.T("update.downloading"),
         UpdateState.UpToDate => Loc.T("update.upToDate"),
         UpdateState.Ready => Loc.T("update.downloaded", ReadyVersion),
         UpdateState.Failed => Loc.T("update.failed"),

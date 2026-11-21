@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:loc="clr-namespace:JebaitedPlayer.Infrastructure"
         xmlns:views="clr-namespace:JebaitedPlayer.Views"
+        xmlns:ctl="clr-namespace:JebaitedPlayer.Controls"
         Title="{loc:T settings.title}"
         Width="900" Height="660" MinWidth="700" MinHeight="440" ShowInTaskbar="False"
         WindowStartupLocation="CenterOwner"
@@ -67,16 +68,17 @@
                                        HorizontalAlignment="Right" VerticalAlignment="Center" />
                         </Grid>
                         <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.autoNextHint}" />
-                        <Grid Margin="0,12,0,0" MaxWidth="540" HorizontalAlignment="Left">
+                        <!-- Naslov je u svom retku: u jednom retku s klizačem je dugi naslov guran vrijednost izvan vidljivog dijela. -->
+                        <TextBlock Text="{loc:T settings.upNextLead}" Margin="0,12,0,4" TextWrapping="Wrap" />
+                        <Grid MaxWidth="440" HorizontalAlignment="Left">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="260" />
-                                <ColumnDefinition Width="90" />
+                                <ColumnDefinition Width="280" />
+                                <ColumnDefinition Width="Auto" MinWidth="110" />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="{loc:T settings.upNextLead}" VerticalAlignment="Center" Margin="0,0,14,0" />
-                            <Slider x:Name="UpNextLeadSlider" Grid.Column="1" Style="{StaticResource PlayerSlider}" Minimum="0" Maximum="120"
+                            <Slider x:Name="UpNextLeadSlider" Style="{StaticResource PlayerSlider}" Minimum="0" Maximum="120"
                                     TickFrequency="5" IsSnapToTickEnabled="True" VerticalAlignment="Center" />
-                            <TextBlock x:Name="UpNextLeadText" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                            <TextBlock x:Name="UpNextLeadText" Grid.Column="1" Margin="14,0,0,0" FontWeight="SemiBold"
+                                       HorizontalAlignment="Left" VerticalAlignment="Center" />
                         </Grid>
                         <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.upNextLeadHint}" TextWrapping="Wrap" />
 
@@ -345,6 +347,7 @@
                         <TextBlock Style="{StaticResource TabTitle}" Text="{loc:T settings.updates}" />
                         <TextBlock x:Name="VersionText" FontSize="15" FontWeight="SemiBold" Margin="0,8,0,0" />
                         <TextBlock x:Name="UpdateStatusText" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,4,0,0" />
+                        <ctl:DownloadProgressBar x:Name="UpdateProgress" Margin="0,10,0,0" HorizontalAlignment="Stretch" Visibility="Collapsed" />
                         <CheckBox x:Name="AutoUpdateBox" Content="{loc:T settings.autoUpdate}" Margin="0,12,0,0" />
                         <WrapPanel x:Name="UpdateButtons" Margin="0,10,0,0">
                             <Button x:Name="CheckUpdateButton" Style="{StaticResource SecondaryButton}" Content="{loc:T settings.checkNow}" Click="OnCheckUpdate" />

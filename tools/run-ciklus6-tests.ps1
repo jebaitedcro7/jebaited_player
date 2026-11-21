@@ -36,7 +36,7 @@ finally { Remove-Item Env:JEBAITED_DATA_DIR -ErrorAction SilentlyContinue }
 $h = Read-Ui "ciklus6_homeinfo"
 Check "N3: vrijeme i datum na početnom ekranu, prognoza zadano isključena" ($h.start.homeVisible -and $h.start.time -match "\d" -and $h.start.date.Length -gt 5 -and -not $h.start.weatherVisible) "'$($h.start.time)' · '$($h.start.date)'"
 Check "N3: bez grada nema prognoze ni mreže" (-not $h.beforeCity) "prognoza vidljiva $($h.beforeCity)"
-Check "N3: grad iz postavki, prognoza na početnom ekranu" ([int]$h.found -eq 1 -and $h.weather.text -match "8 °C · Oblačno · Zagreb" -and $h.weather.visible -and $h.weather.source -and $h.weather.cityText -match "Zagreb") "'$($h.weather.text)' | $($h.weather.cityText)"
+Check "N3: grad iz postavki, prognoza na početnom ekranu" ([int]$h.found -eq 1 -and $h.weather.text -match "8 °C · Oblačno · Zagreb" -and $h.weather.visible -and -not $h.weather.source -and $h.weather.cityText -match "Zagreb") "'$($h.weather.text)' | $($h.weather.cityText)"
 Check "N3: °F" ($h.fahrenheit -match "47 °F") "'$($h.fahrenheit)'"
 Check "N3: bez interneta zadnja prognoza s vremenom ažuriranja" ($h.offline.stale -and $h.offline.text -match "47 °F" -and $h.offline.text -match "ažurirano") "'$($h.offline.text)'"
 Check "N3: isključeno = ne prikazuje se" (-not $h.hidden.time -and -not $h.hidden.weather -and $h.hidden.date) "vrijeme $($h.hidden.time), prognoza $($h.hidden.weather), datum $($h.hidden.date)"

@@ -71,7 +71,7 @@ function ExeVersion { if (Test-Path $currentExe) { (Get-Item $currentExe).Versio
 $before = ExeVersion
 $r1 = Run (Join-Path $work "r1.json")
 $u = $r1.update
-Check "0.99.0 pronalazi i preuzima 0.99.1" ($u.installed -and $u.portable -and $u.current -eq "0.99.0" -and $u.ready -eq "0.99.1" -and $u.state -eq "Ready") `
+Check "0.99.0 pronalazi i preuzima 0.99.1" ($u.installed -and $u.portable -and $u.current -eq "0.99.0" -and $u.ready -eq "0.99.1" -and $u.state -eq "Ready" -and $u.downloadVersion -eq "0.99.1" -and [long]$u.downloadBytes -gt 0 -and [int]$u.downloadPercent -eq 100) `
     ("exe {0}; Velopack: instalirano {1}, prijenosna {2}, trenutna {3}, spremna {4} ({5})" -f $before, $u.installed, $u.portable, $u.current, $u.ready, $u.status)
 
 # Velopack instalira nakon zatvaranja playera (Update.exe čeka da proces završi).

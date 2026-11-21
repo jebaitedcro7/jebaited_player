@@ -4,6 +4,26 @@ Alle wichtigen Änderungen an jebaited_player. Format: [Keep a Changelog](https:
 
 Andere Sprachen: [English](CHANGELOG.md) · [Hrvatski](CHANGELOG_HR.md). Derselbe Verlauf ist im Player enthalten (Klick auf die Versionsnummer auf dem Startbildschirm). Diese Datei wird aus `src/JebaitedPlayer.App/History/update-history.json` erzeugt.
 
+## [2.1.9] - 2026-11-22
+
+Lautstärke mit dem Mausrad überall im Player, ein Fortschrittsbalken für Updates, Wetter-Symbole und eine klarere Einstellung für die nächste Folge.
+
+### Neu
+
+- Update-Download: Der Player zeigt, welche Version geladen wird, wie groß sie ist und einen Fortschrittsbalken mit Prozent und sanfter Animation (Einstellungen → Updates) sowie einen Hinweis beim Start des Downloads.
+- Symbole vor jeder Wetterangabe auf dem Startbildschirm (gefühlte Temperatur, Min/Max, Regen, Wind, Luftfeuchtigkeit und mehr).
+
+### Verbessert
+
+- Das Mausrad ändert die Lautstärke überall im Player (Video, Steuerung, Startbildschirm, ganzer Mini-Player). Listen, die scrollen können, scrollen weiterhin mit dem Rad. Strg + Rad ändert weiterhin die Größe des Mini-Players.
+- Der Text „Wetterdaten von Open-Meteo.com“ wird auf dem Startbildschirm nicht mehr angezeigt; die Quelle steht weiterhin in den Einstellungen.
+
+### Behoben
+
+- Einstellungen → Allgemein: Der Wert neben „Nächste Folge vor dem Ende anbieten“ wurde aus dem sichtbaren Bereich geschoben; der Regler hat jetzt eine eigene Zeile und zeigt die Sekunden.
+
+Release: [v2.1.9](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v2.1.9) · Änderungen seit [v2.1.8...v2.1.9](https://github.com/jebaitedcro7/jebaited_player/compare/v2.1.8...v2.1.9)
+
 ## [2.1.8] - 2026-11-21
 
 Korrektur: Der Player startet wieder, wenn das Hauptfenster maximiert war und der Mini-Player die letzte Ansicht war; das Mausrad ändert die Lautstärke schneller und flüssiger.

@@ -123,14 +123,12 @@ public partial class PlayerSettingsWindow
             preview.TimeText.Text = now.ToString("t", Loc.Culture);
             preview.DateText.Text = now.ToString("ddd, d. MMM", Loc.Culture);
             preview.WeatherText.Text = "☀ 14 °C · " + Loc.T("weather.clear");
-            preview.WeatherDetails.Text = string.Join(Environment.NewLine, new[]
-            {
-                h.WeatherDetails.Contains("feels") ? Loc.T("weather.feels", "12 °C") : null,
-                h.WeatherDetails.Contains("minmax") ? Loc.T("weather.minmax", "9 °C", "15 °C") : null,
-                h.WeatherDetails.Contains("wind") ? Loc.T("weather.wind", "12", "km/h", "↗") : null,
-            }.Where(x => x is not null));
-            preview.WeatherDetails.Visibility = preview.WeatherDetails.Text.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
-            preview.WeatherText.Visibility = preview.WeatherSource.Visibility = Visibility.Visible;
+            var sample = new List<(string Icon, string Text)>();
+            if (h.WeatherDetails.Contains("feels")) { sample.Add((HomeInfoService.IconFor("feels"), Loc.T("weather.feels", "12 °C"))); }
+            if (h.WeatherDetails.Contains("minmax")) { sample.Add((HomeInfoService.IconFor("minmax"), Loc.T("weather.minmax", "9 °C", "15 °C"))); }
+            if (h.WeatherDetails.Contains("wind")) { sample.Add((HomeInfoService.IconFor("wind"), Loc.T("weather.wind", "12", "km/h", "↗"))); }
+            preview.SetDetails(sample);
+            preview.WeatherText.Visibility = Visibility.Visible;
         }
     }
 

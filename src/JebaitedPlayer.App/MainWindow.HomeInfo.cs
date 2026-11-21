@@ -117,10 +117,8 @@ public partial class MainWindow
     {
         string weather = _homeInfo?.WeatherText() ?? string.Empty;
         HomeWeatherText.Text = weather;
-        HomeWeatherText.Visibility = HomeWeatherSource.Visibility = weather.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
-        IReadOnlyList<string> details = weather.Length > 0 ? _homeInfo!.DetailLines() : [];
-        HomeLayer.WeatherDetails.Text = string.Join(Environment.NewLine, details);
-        HomeLayer.WeatherDetails.Visibility = details.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+        HomeWeatherText.Visibility = weather.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
+        HomeLayer.SetDetails(weather.Length > 0 ? _homeInfo!.DetailItems() : []);
     }
 
     internal Task<IReadOnlyList<WeatherPlace>> SearchWeatherPlacesAsync(string name) => HomeInfo.SearchPlacesAsync(name);

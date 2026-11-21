@@ -4,6 +4,26 @@ All notable changes to jebaited_player. Format: [Keep a Changelog](https://keepa
 
 Other languages: [Deutsch](CHANGELOG_DE.md) · [Hrvatski](CHANGELOG_HR.md). The same history is included in the player (click the version number on the home screen). This file is generated from `src/JebaitedPlayer.App/History/update-history.json`.
 
+## [2.1.9] - 2026-11-22
+
+Volume with the mouse wheel anywhere on the player, a download bar for updates, weather icons and a clearer next-episode setting.
+
+### Added
+
+- Update download: the player shows which version is downloading, how big it is and a progress bar with percent and a gentle animation (Settings → Updates), and a notice when the download starts.
+- Icons in front of every weather detail on the home screen (feels like, min/max, rain, wind, humidity and more).
+
+### Improved
+
+- The mouse wheel changes the volume anywhere on the player (video, controls, home screen, the whole mini player). Lists that can scroll still scroll with the wheel. Ctrl + wheel still resizes the mini player.
+- The text “Weather data by Open-Meteo.com” is no longer shown on the home screen; the source is still named in Settings.
+
+### Fixed
+
+- Settings → General: the value next to “Offer the next episode before the end” was pushed out of view; the slider now has its own row and shows the seconds.
+
+Release: [v2.1.9](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v2.1.9) · Changes since [v2.1.8...v2.1.9](https://github.com/jebaitedcro7/jebaited_player/compare/v2.1.8...v2.1.9)
+
 ## [2.1.8] - 2026-11-21
 
 Fix: the player starts again when the main window was maximized and the mini player was the last view; the mouse wheel changes the volume faster and more smoothly.

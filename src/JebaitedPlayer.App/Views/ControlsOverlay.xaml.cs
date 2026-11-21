@@ -40,8 +40,8 @@ public partial class ControlsOverlay : Window
         UpdateLive();
 
         PreviewMouseMove += (_, _) => UserActivity?.Invoke(this, EventArgs.Empty);
-        // 2.1.7: samo iznad trake glasnoće; kotačić drugdje ne smije slučajno mijenjati glasnoću.
-        VolumeArea.PreviewMouseWheel += (_, e) =>
+        // 2.1.9: kotačić bilo gdje na kontrolama mijenja glasnoću (osim nad popisom koji se lista).
+        PreviewMouseWheel += (_, e) =>
         {
             _vm.ChangeVolumeByWheel(e.Delta);
             _vm.ShowOsd(Loc.T("osd.volume", _vm.Volume));

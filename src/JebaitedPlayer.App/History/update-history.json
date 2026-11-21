@@ -40,6 +40,57 @@
   },
   "versions": [
     {
+      "version": "2.1.9",
+      "date": "2026-11-22",
+      "notes": {
+        "en": {
+          "summary": "Volume with the mouse wheel anywhere on the player, a download bar for updates, weather icons and a clearer next-episode setting.",
+          "features": [
+            "Update download: the player shows which version is downloading, how big it is and a progress bar with percent and a gentle animation (Settings → Updates), and a notice when the download starts.",
+            "Icons in front of every weather detail on the home screen (feels like, min/max, rain, wind, humidity and more)."
+          ],
+          "improvements": [
+            "The mouse wheel changes the volume anywhere on the player (video, controls, home screen, the whole mini player). Lists that can scroll still scroll with the wheel. Ctrl + wheel still resizes the mini player.",
+            "The text “Weather data by Open-Meteo.com” is no longer shown on the home screen; the source is still named in Settings."
+          ],
+          "fixes": [
+            "Settings → General: the value next to “Offer the next episode before the end” was pushed out of view; the slider now has its own row and shows the seconds."
+          ],
+          "known": []
+        },
+        "de": {
+          "summary": "Lautstärke mit dem Mausrad überall im Player, ein Fortschrittsbalken für Updates, Wetter-Symbole und eine klarere Einstellung für die nächste Folge.",
+          "features": [
+            "Update-Download: Der Player zeigt, welche Version geladen wird, wie groß sie ist und einen Fortschrittsbalken mit Prozent und sanfter Animation (Einstellungen → Updates) sowie einen Hinweis beim Start des Downloads.",
+            "Symbole vor jeder Wetterangabe auf dem Startbildschirm (gefühlte Temperatur, Min/Max, Regen, Wind, Luftfeuchtigkeit und mehr)."
+          ],
+          "improvements": [
+            "Das Mausrad ändert die Lautstärke überall im Player (Video, Steuerung, Startbildschirm, ganzer Mini-Player). Listen, die scrollen können, scrollen weiterhin mit dem Rad. Strg + Rad ändert weiterhin die Größe des Mini-Players.",
+            "Der Text „Wetterdaten von Open-Meteo.com“ wird auf dem Startbildschirm nicht mehr angezeigt; die Quelle steht weiterhin in den Einstellungen."
+          ],
+          "fixes": [
+            "Einstellungen → Allgemein: Der Wert neben „Nächste Folge vor dem Ende anbieten“ wurde aus dem sichtbaren Bereich geschoben; der Regler hat jetzt eine eigene Zeile und zeigt die Sekunden."
+          ],
+          "known": []
+        },
+        "hr": {
+          "summary": "Glasnoća kotačićem bilo gdje na playeru, traka preuzimanja nadogradnje, ikone uz podatke o vremenu i jasnija postavka sljedeće epizode.",
+          "features": [
+            "Preuzimanje nadogradnje: player pokazuje koja se verzija preuzima, koliko je velika i traku napretka s postotkom i laganom animacijom (Postavke → Nadogradnje), uz obavijest kad preuzimanje krene.",
+            "Ikone ispred svakog podatka o vremenu na početnom ekranu (osjećaj temperature, min/maks, kiša, vjetar, vlažnost i ostalo)."
+          ],
+          "improvements": [
+            "Kotačić miša mijenja glasnoću bilo gdje na playeru (video, kontrole, početni ekran, cijeli mini player). Popisi koji se mogu listati i dalje se listaju kotačićem. Ctrl + kotačić i dalje mijenja veličinu mini playera.",
+            "Natpis „Podaci o vremenu: Open-Meteo.com“ više se ne prikazuje na početnom ekranu; izvor je i dalje naveden u postavkama."
+          ],
+          "fixes": [
+            "Postavke → Općenito: vrijednost uz „Ponudi sljedeću epizodu prije kraja“ bila je izgurana izvan vidljivog dijela; klizač sada ima svoj redak i prikazuje sekunde."
+          ],
+          "known": []
+        }
+      }
+    },
+    {
       "version": "2.1.8",
       "date": "2026-11-21",
       "notes": {

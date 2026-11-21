@@ -533,6 +533,15 @@ public partial class MiniPlayerWindow : Window
         {
             SetScale(Scale + (e.Delta > 0 ? 0.1 : -0.1));
             e.Handled = true;
+            return;
+        }
+
+        // 2.1.9: kotačić bilo gdje na mini playeru mijenja glasnoću (popis pjesama se i dalje lista kotačićem).
+        if (Keyboard.Modifiers == ModifierKeys.None && !e.Handled && !WheelHelper.IsInsideScrollable(e.OriginalSource))
+        {
+            _vm.ChangeVolumeByWheel(e.Delta);
+            _settings.Volume = _vm.Volume;
+            e.Handled = true;
         }
     }
 

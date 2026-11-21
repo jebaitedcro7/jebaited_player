@@ -73,10 +73,10 @@ if ($u.videoHome) {
 # 1) Kotačić
 $w = $u.wheel
 Check "1: kotačić iznad trake glasnoće (mini): korak i smjer" ([double]$w.step -eq 5 -and [double]$w.miniDown -eq 45) "gore +$($w.step), dvaput dolje → $($w.miniDown)"
-Check "1: kotačić drugdje ne mijenja glasnoću (mini)" ([double]$w.elsewhere -eq 45 -and [double]$w.realElsewhere -eq [double]$w.realUp) "iznad naslova/vremena: $($w.elsewhere), pravi miš: $($w.realUp) → $($w.realElsewhere)"
+Check "1: kotačić bilo gdje na mini playeru mijenja glasnoću" ([double]$w.elsewhere -eq 55 -and [double]$w.realElsewhere -eq ([double]$w.realUp + 5)) "iznad naslova i vremena: $($w.elsewhere), pravi miš: $($w.realUp) → $($w.realElsewhere)"
 Check "1: pravi kotačić miša iznad trake glasnoće" ([double]$w.realUp -eq 45) "40 → $($w.realUp)"
 Check "1: glasnoća ostaje 0–100" ([double]$w.clampedTop -eq 100 -and [double]$w.clampedBottom -eq 0) "gore $($w.clampedTop), dolje $($w.clampedBottom)"
-Check "1: puni player: samo traka glasnoće" ([double]$w.overlayStep -eq 5 -and [double]$w.overlayTimeline -eq 55) "traka glasnoće +$($w.overlayStep), vremenska traka ostavlja $($w.overlayTimeline)"
+Check "1: puni player: kotačić bilo gdje na kontrolama" ([double]$w.overlayStep -eq 5 -and [double]$w.overlayTimeline -eq 60) "traka glasnoće +$($w.overlayStep), vremenska traka $($w.overlayTimeline)"
 
 # 6) Izgledi
 $d = $u.designs

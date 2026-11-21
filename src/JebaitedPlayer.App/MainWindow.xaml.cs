@@ -173,7 +173,8 @@ public partial class MainWindow : Window
             SetFullscreen(!_vm.IsFullscreen);
         };
         Video.VideoRightClick += (_, _) => ShowContextMenu();
-        // 2.1.7: kotačić mijenja glasnoću samo iznad trake glasnoće (ControlsOverlay, mini player), ne nad videom.
+        // 2.1.9: kotačić mijenja glasnoću bilo gdje na playeru (video, trake, Home); popisi koji se listaju kotačićem se i dalje listaju.
+        Video.VideoMouseWheel += (_, delta) => ChangeVolumeByWheel(delta);
         Video.FilesDropped += (_, files) => OpenFiles(files);
         Video.FocusReceived += (_, _) => Dispatcher.BeginInvoke(RestoreKeyboardFocus);
 
@@ -473,6 +474,7 @@ public partial class MainWindow : Window
             SetFullscreen(!_vm.IsFullscreen);
         };
         _topBar.BackgroundRightClick += (_, _) => ShowContextMenu();
+        _topBar.MouseWheel += (_, delta) => ChangeVolumeByWheel(delta);
         _ = _topBar.Handle;
         InitializeHomePlayback();
         InitializeLibraryUi();

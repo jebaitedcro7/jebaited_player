@@ -217,6 +217,25 @@ public sealed class UiImprovementsTests
     }
 
     [TestMethod]
+    public void Every_weather_detail_has_an_icon()
+    {
+        foreach (string id in HomeInfoSettings.AllDetails)
+        {
+            Assert.IsTrue(HomeInfoService.IconFor(id).Length > 0, $"nedostaje ikona za '{id}'");
+        }
+
+        Assert.AreEqual(HomeInfoSettings.AllDetails.Count, HomeInfoSettings.AllDetails.Select(HomeInfoService.IconFor).Distinct().Count(), "ikone se ne smiju ponavljati");
+    }
+
+    [TestMethod]
+    public void Update_download_size_is_readable()
+    {
+        Assert.AreEqual("500 KB", UpdateService.FormatSize(500 * 1024));
+        StringAssert.Contains(UpdateService.FormatSize(115_000_000), "MB");
+        StringAssert.Contains(UpdateService.FormatSize(3L * 1024 * 1024 * 1024), "GB");
+    }
+
+    [TestMethod]
     public void Next_episode_lead_defaults_to_the_end_and_survives_save_and_load()
     {
         Assert.AreEqual(0, new AppSettings().UpNextLeadSeconds, "zadano kao prije: tek na kraju");

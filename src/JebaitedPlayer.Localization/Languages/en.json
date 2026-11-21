@@ -815,6 +815,7 @@
   "update.checking": "Checking for a new version…",
   "update.downloaded": "New version {0} has been downloaded. It will be installed when you close the player.",
   "update.downloading": "Downloading the new version…",
+  "update.downloadingVersion": "Downloading version {0} · {1}",
   "update.failed": "The check failed (no internet connection or GitHub is not responding). I will try again later.",
   "update.notInstalled": "Updates work in the installed version (this one was started outside the installation).",
   "update.store": "Updates are installed by Microsoft Store.",

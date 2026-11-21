@@ -1087,6 +1087,8 @@ public partial class PlayerSettingsWindow : Window
     {
         VersionText.Text = $"jebaited_player {_updates.CurrentVersion}{(_updates.IsPortable ? " " + Loc.T("settings.portable") : string.Empty)}";
         UpdateStatusText.Text = _updates.Status;
+        UpdateProgress.Visibility = _updates.State == UpdateState.Downloading ? Visibility.Visible : Visibility.Collapsed;
+        UpdateProgress.Percent = _updates.DownloadPercent;
         bool installed = _updates.IsInstalled;
         UpdatesHintText.Visibility = _updates.IsStore ? Visibility.Collapsed : Visibility.Visible;
         UpdatesStoreHintText.Visibility = _updates.IsStore ? Visibility.Visible : Visibility.Collapsed;

@@ -22,14 +22,12 @@ public sealed class HomeInfoLayer : Grid
         TimeText = new TextBlock { FontWeight = FontWeights.Light };
         DateText = new TextBlock();
         WeatherText = new TextBlock { Visibility = Visibility.Collapsed };
-        WeatherDetails = new TextBlock { Visibility = Visibility.Collapsed, Margin = new Thickness(0, 3, 0, 0), LineHeight = double.NaN };
-        WeatherSource = new TextBlock { Visibility = Visibility.Collapsed, Margin = new Thickness(0, 3, 0, 0), Text = Loc.T("weather.source") };
+        WeatherDetails = new StackPanel { Visibility = Visibility.Collapsed, Margin = new Thickness(0, 3, 0, 0) };
+        // 2.1.9: natpis "Weather data by Open-Meteo.com" je skriven na Home ekranu (izvor je naveden u postavkama i u THIRD_PARTY_NOTICES).
+        WeatherSource = new TextBlock { Visibility = Visibility.Collapsed };
         DateText.SetResourceReference(TextBlock.ForegroundProperty, "TextSecondaryBrush");
-        WeatherDetails.SetResourceReference(TextBlock.ForegroundProperty, "TextSecondaryBrush");
-        WeatherSource.SetResourceReference(TextBlock.ForegroundProperty, "TextSecondaryBrush");
         _weatherBlock.Children.Add(WeatherText);
         _weatherBlock.Children.Add(WeatherDetails);
-        _weatherBlock.Children.Add(WeatherSource);
 
         foreach (string id in HomeInfoSettings.Positions)
         {
@@ -56,10 +54,62 @@ public sealed class HomeInfoLayer : Grid
     /// <summary>Redak sa simbolom, temperaturom i opisom.</summary>
     public TextBlock WeatherText { get; }
 
-    /// <summary>Dodatni podaci prognoze, jedan po retku.</summary>
-    public TextBlock WeatherDetails { get; }
+    /// <summary>Dodatni podaci prognoze, jedan po retku, svaki s ikonom ispred.</summary>
+    public StackPanel WeatherDetails { get; }
 
+    /// <summary>Više se ne prikazuje (skriveno na zahtjev); ostaje samo da kod koji ga postavlja radi.</summary>
     public TextBlock WeatherSource { get; }
+
+    private double _detailSize = 14;
+    private FontFamily? _detailFont;
+    private TextAlignment _detailAlignment = TextAlignment.Left;
+    private IReadOnlyList<(string Icon, string Text)> _details = [];
+
+    /// <summary>Postavi retke prognoze: ikona (emoji) u stupcu fiksne širine, pa tekst.</summary>
+    public void SetDetails(IReadOnlyList<(string Icon, string Text)> details)
+    {
+        _details = details;
+        RebuildDetails();
+    }
+
+    /// <summary>Tekst svih redaka (za provjeru).</summary>
+    public string DetailsText => string.Join(Environment.NewLine, _details.Select(d => d.Text));
+
+    private void RebuildDetails()
+    {
+        WeatherDetails.Children.Clear();
+        foreach ((string icon, string text) in _details)
+        {
+            var row = new StackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                Margin = new Thickness(0, 1, 0, 1),
+                HorizontalAlignment = _detailAlignment switch
+                {
+                    TextAlignment.Right => HorizontalAlignment.Right,
+                    TextAlignment.Center => HorizontalAlignment.Center,
+                    _ => HorizontalAlignment.Left,
+                },
+            };
+            var iconBlock = new TextBlock
+            {
+                Text = icon, FontFamily = new FontFamily("Segoe UI Emoji"), FontSize = _detailSize,
+                Width = _detailSize * 1.5, TextAlignment = TextAlignment.Center, VerticalAlignment = VerticalAlignment.Center,
+            };
+            var textBlock = new TextBlock { Text = text, FontSize = _detailSize, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(4, 0, 0, 0) };
+            if (_detailFont != null)
+            {
+                textBlock.FontFamily = _detailFont;
+            }
+
+            textBlock.SetResourceReference(TextBlock.ForegroundProperty, "TextSecondaryBrush");
+            row.Children.Add(iconBlock);
+            row.Children.Add(textBlock);
+            WeatherDetails.Children.Add(row);
+        }
+
+        WeatherDetails.Visibility = _details.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+    }
 
     /// <summary>Mjesto na kojem je pojedini element ("time", "date", "weather"). Za provjeru.</summary>
     public string PositionOf(string element) => _anchors.First(a => a.Value.Children.Contains(element switch
@@ -69,7 +119,7 @@ public sealed class HomeInfoLayer : Grid
         _ => _weatherBlock,
     })).Key;
 
-    private void OnLanguage() => WeatherSource.Text = Loc.T("weather.source");
+    private void OnLanguage() { }
 
     /// <summary>Font, veličina i mjesto svakog elementa iz postavki; <paramref name="scale"/> smanjuje sve za pregled u postavkama.</summary>
     public void ApplyStyle(HomeInfoSettings s, double scale = 1)
@@ -81,8 +131,8 @@ public sealed class HomeInfoLayer : Grid
         StyleText(TimeText, s.TimeStyle, timeSize, light: true);
         StyleText(DateText, s.DateStyle, dateSize);
         StyleText(WeatherText, s.WeatherStyle, weatherSize);
-        StyleText(WeatherDetails, s.WeatherStyle, Math.Max(8, weatherSize * 0.92));
-        StyleText(WeatherSource, s.WeatherStyle, Math.Max(7, weatherSize * 0.75));
+        _detailSize = Math.Max(8, weatherSize * 0.92);
+        _detailFont = s.WeatherStyle.Font.Length > 0 ? new FontFamily(s.WeatherStyle.Font) : null;
         Margin = new Thickness(0);
 
         foreach (StackPanel panel in _anchors.Values)
@@ -132,6 +182,9 @@ public sealed class HomeInfoLayer : Grid
             {
                 child.TextAlignment = alignment;
             }
+
+            _detailAlignment = alignment;
+            RebuildDetails();
         }
     }
 }

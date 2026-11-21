@@ -28,12 +28,25 @@ public partial class MainWindow
 
     private void InitializeHomePlayback()
     {
-        // Kotačić miša mijenja glasnoću samo iznad trake glasnoće (i ovdje).
-        HomeVolumeArea.PreviewMouseWheel += (_, e) =>
+        // 2.1.9: kotačić miša mijenja glasnoću bilo gdje u prozoru (i na Home ekranu), osim nad popisom koji se može listati.
+        PreviewMouseWheel += (_, e) =>
         {
-            _vm.ChangeVolumeByWheel(e.Delta);
+            if (e.Handled || WheelHelper.IsInsideScrollable(e.OriginalSource))
+            {
+                return;
+            }
+
+            ChangeVolumeByWheel(e.Delta);
             e.Handled = true;
         };
+    }
+
+    /// <summary>Kotačić miša: glasnoća razmjerno okretanju, uz prikaz na zaslonu.</summary>
+    internal void ChangeVolumeByWheel(int delta)
+    {
+        _vm.ChangeVolumeByWheel(delta);
+        _vm.ShowOsd(Loc.T("osd.volume", _vm.Volume));
+        RegisterActivity();
     }
 
     private void EnterHomeWhilePlaying()

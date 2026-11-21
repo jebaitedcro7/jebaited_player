@@ -17,6 +17,7 @@ public partial class MainWindow
     private UpdateService? _updates;
     private DispatcherTimer? _updateTimer;
     private bool _updateNoticeShown;
+    private string? _downloadNoticeFor;
     private bool _restartAfterUpdate;
 
     internal UpdateService Updates => _updates ??= new UpdateService(_options.DiagUpdateSource);
@@ -41,6 +42,9 @@ public partial class MainWindow
                         ["portable"] = updates.IsPortable,
                         ["current"] = updates.CurrentVersion,
                         ["ready"] = ready,
+                        ["downloadVersion"] = updates.DownloadVersion,
+                        ["downloadBytes"] = updates.DownloadTotalBytes,
+                        ["downloadPercent"] = updates.DownloadPercent,
                         ["state"] = updates.State.ToString(),
                         ["status"] = updates.Status,
                         ["dataDir"] = AppPaths.DataDir,
@@ -75,6 +79,13 @@ public partial class MainWindow
 
     private void OnUpdateStateChanged()
     {
+        if (_updates is { State: UpdateState.Downloading, DownloadVersion: { } downloading } d && _downloadNoticeFor != downloading && !_closing)
+        {
+            // Preuzimanje je počelo: koja verzija i koliko je velika (napredak se vidi u Postavke > Nadogradnje).
+            _downloadNoticeFor = downloading;
+            Notify(Loc.T("update.downloadingVersion", downloading, UpdateService.FormatSize(d.DownloadTotalBytes)));
+        }
+
         if (_updates is { State: UpdateState.Ready } u && !_updateNoticeShown && !_closing)
         {
             _updateNoticeShown = true;

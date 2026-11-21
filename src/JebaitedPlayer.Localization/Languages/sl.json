@@ -819,6 +819,7 @@
   "update.checking": "Preverjam, ali obstaja nova različica…",
   "update.downloaded": "Nova različica {0} je prenesena. Namestila se bo, ko zapreš predvajalnik.",
   "update.downloading": "Prenašam novo različico…",
+  "update.downloadingVersion": "Prenašam različico {0} · {1}",
   "update.failed": "Preverjanje ni uspelo (ni internetne povezave ali GitHub se ne odziva). Poskusil bom pozneje.",
   "update.notInstalled": "Posodobitve delujejo v nameščeni različici (ta je zagnana zunaj namestitve).",
   "update.store": "Posodobitve namešča Microsoft Store.",

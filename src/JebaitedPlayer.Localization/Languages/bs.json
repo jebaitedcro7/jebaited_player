@@ -817,6 +817,7 @@
   "update.checking": "Provjeravam postoji li nova verzija…",
   "update.downloaded": "Nova verzija {0} je preuzeta. Instalirat će se kad zatvoriš player.",
   "update.downloading": "Preuzimam novu verziju…",
+  "update.downloadingVersion": "Preuzimam verziju {0} · {1}",
   "update.failed": "Provjera nije uspjela (nema veze s internetom ili GitHub ne odgovara). Pokušat ću kasnije.",
   "update.notInstalled": "Ažuriranja rade u instaliranoj verziji (ova je pokrenuta izvan instalacije).",
   "update.store": "Nadogradnje instalira Microsoft Store.",

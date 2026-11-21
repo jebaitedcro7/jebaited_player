@@ -219,8 +219,26 @@ internal sealed class HomeInfoService : IDisposable
         return IsStale ? text + " · " + Loc.T("weather.updatedAt", w.FetchedUtc.ToLocalTime().ToString("t", Loc.Culture)) : text;
     }
 
-    /// <summary>Dodatni podaci prognoze koje je korisnik uključio i koje izvor šalje (ostali se ne prikazuju).</summary>
-    public IReadOnlyList<string> DetailLines()
+    /// <summary>Dodatni podaci prognoze koje je korisnik uključio i koje izvor šalje (ostali se ne prikazuju), samo tekst.</summary>
+    public IReadOnlyList<string> DetailLines() => DetailItems().Select(i => i.Text).ToList();
+
+    /// <summary>Ikona (emoji) za pojedini podatak prognoze.</summary>
+    public static string IconFor(string id) => id switch
+    {
+        "feels" => "🌡",
+        "minmax" => "↕",
+        "precip" => "🌧",
+        "wind" => "💨",
+        "humidity" => "💧",
+        "uv" => "🔆",
+        "sun" => "🌅",
+        "hourly" => "🕒",
+        "daily" => "📅",
+        _ => string.Empty,
+    };
+
+    /// <summary>Isti podaci kao <see cref="DetailLines"/>, svaki s ikonom ispred (2.1.9).</summary>
+    public IReadOnlyList<(string Icon, string Text)> DetailItems()
     {
         HomeInfoSettings s = _settings.HomeInfo;
         if (!s.ShowWeather || Weather is not { } w)
@@ -230,39 +248,39 @@ internal sealed class HomeInfoService : IDisposable
 
         string deg = w.Fahrenheit ? "°F" : "°C";
         string T(double v) => $"{Math.Round(v):0}{deg}";
-        var lines = new List<string>();
+        var lines = new List<(string Icon, string Text)>();
         foreach (string id in s.WeatherDetails)
         {
             switch (id)
             {
                 case "feels" when w.Feels is { } feels:
-                    lines.Add(Loc.T("weather.feels", T(feels)));
+                    lines.Add((IconFor(id), Loc.T("weather.feels", T(feels))));
                     break;
                 case "minmax" when w.TempMin is { } min && w.TempMax is { } max:
-                    lines.Add(Loc.T("weather.minmax", T(min), T(max)));
+                    lines.Add((IconFor(id), Loc.T("weather.minmax", T(min), T(max))));
                     break;
                 case "precip" when w.PrecipProbability is not null || w.Precipitation is not null:
                     string chance = w.PrecipProbability is { } p ? Loc.T("weather.precipChance", $"{Math.Round(p):0}") : Loc.T("weather.precip");
                     string amount = w.Precipitation is > 0 ? $" · {w.Precipitation.Value.ToString("0.#", Loc.Culture)} {(w.Fahrenheit ? "in" : "mm")}" : string.Empty;
-                    lines.Add(chance + amount);
+                    lines.Add((IconFor(id), chance + amount));
                     break;
                 case "wind" when w.WindSpeed is { } wind:
-                    lines.Add(Loc.T("weather.wind", $"{Math.Round(wind):0}", w.Fahrenheit ? "mph" : "km/h", WindArrow(w.WindDirection)));
+                    lines.Add((IconFor(id), Loc.T("weather.wind", $"{Math.Round(wind):0}", w.Fahrenheit ? "mph" : "km/h", WindArrow(w.WindDirection))));
                     break;
                 case "humidity" when w.Humidity is { } humidity:
-                    lines.Add(Loc.T("weather.humidity", $"{Math.Round(humidity):0}"));
+                    lines.Add((IconFor(id), Loc.T("weather.humidity", $"{Math.Round(humidity):0}")));
                     break;
                 case "uv" when w.UvIndex is { } uv:
-                    lines.Add(Loc.T("weather.uv", uv.ToString("0.#", Loc.Culture)));
+                    lines.Add((IconFor(id), Loc.T("weather.uv", uv.ToString("0.#", Loc.Culture))));
                     break;
                 case "sun" when w.Sunrise is { } rise && w.Sunset is { } set:
-                    lines.Add(Loc.T("weather.sun", rise.ToString("t", Loc.Culture), set.ToString("t", Loc.Culture)));
+                    lines.Add((IconFor(id), Loc.T("weather.sun", rise.ToString("t", Loc.Culture), set.ToString("t", Loc.Culture))));
                     break;
                 case "hourly" when HourlyText() is { Length: > 0 } hourly:
-                    lines.Add(hourly);
+                    lines.Add((IconFor(id), hourly));
                     break;
                 case "daily":
-                    lines.AddRange(DailyLines());
+                    lines.AddRange(DailyLines().Select(d => (IconFor(id), d)));
                     break;
             }
         }

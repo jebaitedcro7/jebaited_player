@@ -302,6 +302,7 @@
                         <Button Style="{StaticResource SecondaryButton}" Content="{loc:T settings.homeLookDefault}" Click="OnHomeLookDefault"
                                 Margin="28,10,0,0" HorizontalAlignment="Left" />
                         <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.homeInfoHint}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                        <TextBlock Style="{StaticResource HintText}" Text="{loc:T weather.source}" TextWrapping="Wrap" Margin="0,2,0,0" />
 
                         <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T settings.controls}" Margin="0,24,0,2" />
                         <TextBlock Text="{loc:T settings.hideControls}" Margin="0,4,0,0" />

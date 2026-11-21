@@ -5,6 +5,9 @@
 # Sve je zakucano: oznaka libdave-a, commit vcpkg-a (izdanje 2026.10.16) i verzija OpenSSL-a (third_party/libdave/vcpkg.json).
 # Rezultat je zip s libdave.dll, licencama i BUILD-INFO.txt, objavljen kao pre-release (nije „Latest”, Velopack ga ne vidi).
 # SHA256 se zapisuje u third_party/libdave/SOURCE.md, a tools/get-libdave.ps1 ga provjerava pri svakoj izradi playera.
+# Verzija libdave-a mora odgovarati C API-ju koji zove NetCord (broj parametara, ne samo imena funkcija):
+# NetCord 1.0.0-beta.30 → libdave v1.2.2. libdave 1.3.0 je promijenio daveSessionProcessProposals i daveSessionProcessWelcome.
+# Zato zip sadrži i include/dave/dave.h, s kojim unit test uspoređuje potpise.
 name: libdave (OpenSSL 3)
 
 on:
@@ -19,10 +22,10 @@ permissions:
   contents: read
 
 env:
-  LIBDAVE_REF: v1.3.0/cpp
+  LIBDAVE_REF: v1.2.2/cpp
   VCPKG_TAG: 2026.10.16
   VCPKG_COMMIT: 9eec002df1cd109f8f104cd966a763daf9751489
-  RELEASE_TAG: libdave-1.3.0-openssl-3.6.5
+  RELEASE_TAG: libdave-1.2.2-openssl-3.6.5
 
 jobs:
   build:
@@ -96,6 +99,8 @@ jobs:
           Copy-Item $dll.FullName (Join-Path $out 'libdave.dll')
           Copy-Item build/install/licenses (Join-Path $out 'licenses') -Recurse
           Copy-Item libdave/LICENSE (Join-Path $out 'licenses/libdave-LICENSE') -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory -Force (Join-Path $out 'include/dave') | Out-Null
+          Copy-Item libdave/cpp/includes/dave/dave.h (Join-Path $out 'include/dave/dave.h')
           if (-not (Test-Path (Join-Path $out 'licenses/openssl'))) { throw "OpenSSL licence missing" }
           if (Test-Path (Join-Path $out 'licenses/boringssl')) { throw "BoringSSL must not be in this build" }
           $openssl = (Get-Content vcpkg_installed/x64-windows-static/share/openssl/vcpkg.spdx.json -ErrorAction SilentlyContinue | ConvertFrom-Json).packages | Where-Object name -eq 'openssl' | Select-Object -First 1 -ExpandProperty versionInfo
@@ -133,5 +138,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          $notes = "libdave (Discord DAVE end-to-end encryption for voice) built from source with OpenSSL 3 instead of BoringSSL, for the jebaited_player Discord bot. Not a player release.`n`nSee BUILD-INFO.txt inside the zip and the workflow run for exact sources and versions.`n`n``````n$(Get-Content SHA256SUMS.txt -Raw)``````"
-          gh release create $env:RELEASE_TAG "$env:RELEASE_TAG-win-x64.zip" SHA256SUMS.txt --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title "libdave 1.3.0 (OpenSSL 3.6.5) for the Discord bot" --notes $notes --prerelease --latest=false
+          $ver = $env:LIBDAVE_REF -replace '^v' -replace '/cpp$'
+          $ssl = $env:RELEASE_TAG -replace '^.*-openssl-'
+          $notes = "libdave $ver (Discord DAVE end-to-end encryption for voice) built from source with OpenSSL 3 instead of BoringSSL, for the jebaited_player Discord bot. Not a player release.`n`nThis version matches the libdave C API used by NetCord 1.0.0-beta.30 (libdave 1.3.0 changed it). The C header is included as include/dave/dave.h.`n`nSee BUILD-INFO.txt inside the zip and the workflow run for exact sources and versions.`n`n``````n$(Get-Content SHA256SUMS.txt -Raw)``````"
+          gh release create $env:RELEASE_TAG "$env:RELEASE_TAG-win-x64.zip" SHA256SUMS.txt --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title "libdave $ver (OpenSSL $ssl) for the Discord bot" --notes $notes --prerelease --latest=false

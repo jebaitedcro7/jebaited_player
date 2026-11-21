@@ -4,6 +4,27 @@ Sve važnije promjene jebaited_playera. Oblik: [Keep a Changelog](https://keepac
 
 Drugi jezici: [English](CHANGELOG.md) · [Deutsch](CHANGELOG_DE.md). Ista povijest je i u playeru (klik na broj verzije na početnom ekranu). Ova datoteka nastaje iz `src/JebaitedPlayer.App/History/update-history.json`.
 
+## [1.8.4] - 2026-11-21
+
+Ciklus 6: YouTube Music, vrijeme, datum i prognoza na početnom ekranu te izvještaji o greškama.
+
+### Novo
+
+- YouTube Music (Ctrl+Shift+Y ili oznaka izvora u mini playeru): zalijepi link s YouTubea ili YouTube Musica (pjesma ili playlista) i svira u službenom YouTube playeru u vlastitom prozoru, bez računa i bez ključa. Pretraga traži tvoj besplatni YouTube API ključ (koraci su u prozoru; „API ključ…” ga mijenja ili uklanja). Dok je YouTube izvor, mini player pokazuje YOUTUBE i njegove tipke upravljaju YouTubeom. YouTube player mora ostati vidljiv (pravila YouTubea), pa nema reprodukcije u pozadini.
+- Informacije na početnom ekranu: vrijeme i datum gore lijevo te po želji prognoza za grad koji odabereš (Postavke → Izgled; s Open-Meteoa, besplatno i bez računa, najviše svakih 30 minuta, °C ili °F). Bez interneta prikazuje se zadnja poznata prognoza s vremenom ažuriranja.
+- Izvještaji o greškama: greške i padovi spremaju se na tvoje računalo kao kratki redigirani izvještaji (bez mapa, naziva videa, imena, ključeva i IP adrese). Postavke → O aplikaciji → „Pošalji preko GitHuba…” otvara pripremljeni issue koji pročitaš prije slanja.
+
+### Poboljšano
+
+- Jedan zvuk u isto vrijeme: kad krene YouTube, lokalna datoteka se pauzira (radio postaja stane), a Spotify više nije izvor; otvaranje datoteke ili postaje pauzira YouTube.
+
+### Poznati problemi
+
+- Aplikacija još nije digitalno potpisana, pa Windows SmartScreen ili Smart App Control mogu upozoriti prije instalacije.
+- Prozor napretka instalacije je Velopackov i samo je na engleskom.
+
+Izdanje: [v1.8.4](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v1.8.4) · Promjene od [v1.7.4...v1.8.4](https://github.com/jebaitedcro7/jebaited_player/compare/v1.7.4...v1.8.4)
+
 ## [1.7.4] - 2026-11-21
 
 Ciklus 5: Spotify daljinski, „Sljedeće za gledanje” na početnom ekranu i vlastita pozadina.

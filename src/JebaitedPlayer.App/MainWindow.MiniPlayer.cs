@@ -231,6 +231,12 @@ public partial class MainWindow : IMiniPlayerHost
             }
         }
 
+        if (active && _youTube is { IsActiveSource: true } yt)
+        {
+            yt.IsActiveSource = false;
+            _ = yt.PauseAsync();
+        }
+
         _spotifyWasActive = active;
         _mini?.Tick();
     }

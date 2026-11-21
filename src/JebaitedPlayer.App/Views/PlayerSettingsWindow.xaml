@@ -253,6 +253,22 @@
                         </StackPanel>
                         <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.homeBackgroundHint}" TextWrapping="Wrap" Margin="0,8,0,0" />
 
+                        <!-- N3 (ciklus 6): vrijeme, datum i prognoza na početnom ekranu. -->
+                        <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T settings.homeInfo}" Margin="0,24,0,2" />
+                        <CheckBox x:Name="HomeTimeBox" Content="{loc:T settings.homeInfoTime}" />
+                        <CheckBox x:Name="HomeDateBox" Content="{loc:T settings.homeInfoDate}" Margin="0,4,0,0" />
+                        <CheckBox x:Name="HomeWeatherBox" Content="{loc:T settings.homeInfoWeather}" Margin="0,4,0,0" />
+                        <DockPanel Margin="28,8,0,0" MaxWidth="520" HorizontalAlignment="Left">
+                            <Button x:Name="WeatherFindButton" DockPanel.Dock="Right" Style="{StaticResource SecondaryButton}" Content="{loc:T settings.weatherFind}" Click="OnWeatherFind" Margin="8,0,0,0" />
+                            <TextBox x:Name="WeatherCityBox" MinHeight="32" Padding="6,5" MinWidth="260" VerticalContentAlignment="Center" KeyDown="OnWeatherCityKey" />
+                        </DockPanel>
+                        <TextBlock x:Name="WeatherCityText" Style="{StaticResource HintText}" Margin="28,6,0,0" />
+                        <StackPanel Orientation="Horizontal" Margin="28,6,0,0">
+                            <RadioButton x:Name="WeatherCelsius" GroupName="WeatherUnit" Content="{loc:T weather.celsius}" Margin="0,0,18,0" />
+                            <RadioButton x:Name="WeatherFahrenheit" GroupName="WeatherUnit" Content="{loc:T weather.fahrenheit}" />
+                        </StackPanel>
+                        <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.homeInfoHint}" TextWrapping="Wrap" Margin="0,8,0,0" />
+
                         <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T settings.controls}" Margin="0,24,0,2" />
                         <TextBlock Text="{loc:T settings.hideControls}" Margin="0,4,0,0" />
                         <Button x:Name="HideControlsButton" Style="{StaticResource ChoiceButton}" Click="OnHideControlsClick" />
@@ -317,6 +333,14 @@
                             </StackPanel>
                         </DockPanel>
                         <TextBlock Text="{loc:T settings.aboutDescription}" TextWrapping="Wrap" Margin="0,16,0,0" />
+
+                        <!-- N1 (ciklus 6): dijagnostika (pristanak, red izvještaja, ručno slanje preko GitHuba). -->
+                        <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T settings.diagnostics}" Margin="0,24,0,2" />
+                        <CheckBox x:Name="SendReportsBox" Content="{loc:T settings.sendReports}" />
+                        <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.sendReportsHint}" TextWrapping="Wrap" Margin="28,4,0,0" />
+                        <TextBlock x:Name="ReportsStatusText" Margin="28,6,0,0" TextWrapping="Wrap" />
+                        <Button x:Name="ReportGitHubButton" Style="{StaticResource SecondaryButton}" Content="{loc:T settings.reportGitHub}" Click="OnReportGitHub"
+                                HorizontalAlignment="Left" Margin="28,8,0,0" />
 
                         <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T settings.license}" Margin="0,24,0,2" />
                         <TextBlock Text="{loc:T settings.licenseText}" TextWrapping="Wrap" />

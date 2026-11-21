@@ -4,6 +4,27 @@ All notable changes to jebaited_player. Format: [Keep a Changelog](https://keepa
 
 Other languages: [Deutsch](CHANGELOG_DE.md) · [Hrvatski](CHANGELOG_HR.md). The same history is included in the player (click the version number on the home screen). This file is generated from `src/JebaitedPlayer.App/History/update-history.json`.
 
+## [1.8.4] - 2026-11-21
+
+Cycle 6: YouTube Music, time, date and weather on the home screen, and error reports.
+
+### Added
+
+- YouTube Music (Ctrl+Shift+Y, or the source label in the mini player): paste a link from YouTube or YouTube Music (a song or a playlist) and it plays in the official YouTube player in its own window, without an account or a key. Searching needs your own free YouTube API key (the steps are in the window; “API key…” changes or removes it). While YouTube is the source, the mini player shows YOUTUBE and its buttons control it. The YouTube player must stay visible (YouTube rules), so there is no background playback.
+- Home screen information: the time and the date at the top left, and if you want the weather for a city you choose (Settings → Appearance; from Open-Meteo, free and without an account, at most every 30 minutes, °C or °F). Without internet the last known weather is shown with the time it was updated.
+- Error reports: errors and crashes are saved on your computer as short redacted reports (no folders, video names, names, keys or IP address). Settings → About → “Send via GitHub…” opens a prepared issue that you can read before you send it.
+
+### Improved
+
+- One sound at a time: when YouTube starts, the local file pauses (a radio station stops) and Spotify is no longer the source; opening a file or a station pauses YouTube.
+
+### Known issues
+
+- The app is not digitally signed yet, so Windows SmartScreen or Smart App Control may warn before the installation.
+- The progress window of the installer comes from Velopack and is only in English.
+
+Release: [v1.8.4](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v1.8.4) · Changes since [v1.7.4...v1.8.4](https://github.com/jebaitedcro7/jebaited_player/compare/v1.7.4...v1.8.4)
+
 ## [1.7.4] - 2026-11-21
 
 Cycle 5: Spotify remote control, “Up next” on the home screen and your own home screen background.

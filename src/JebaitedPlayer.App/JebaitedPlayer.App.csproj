@@ -32,6 +32,8 @@
   <ItemGroup>
     <!-- Instalacija i nadogradnje preko GitHub Releases (MIT). -->
     <PackageReference Include="Velopack" Version="1.2.161" />
+    <!-- Ciklus 6, V9: službeni ugrađeni YouTube player (IFrame) u vidljivom prozoru. -->
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3537.50" />
   </ItemGroup>
 
   <ItemGroup>

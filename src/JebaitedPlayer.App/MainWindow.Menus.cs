@@ -36,6 +36,7 @@ public partial class MainWindow
         menu.Items.Add(Item(Loc.T("menu.miniPlayer"), "Ctrl+M", ShowMiniPlayer));
         menu.Items.Add(Item(Loc.T("menu.radio"), "Ctrl+R", () => ShowRadio()));
         menu.Items.Add(Item(Loc.T("menu.spotify"), "Ctrl+Shift+S", () => ShowSpotify()));
+        menu.Items.Add(Item(Loc.T("menu.youtube"), "Ctrl+Shift+Y", () => ShowYouTube()));
         menu.Items.Add(Item(_vm.Library.IsCurrentFavorite ? Loc.T("home.removeFavorite") : Loc.T("menu.addFavorite"), "Ctrl+D",
             _vm.Library.ToggleFavorite, _vm.HasMedia));
         // N2 (ciklus 5): trenutni video u „Sljedeće za gledanje” (ne za radio).

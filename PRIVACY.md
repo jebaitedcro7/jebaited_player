@@ -6,7 +6,7 @@
 
 ## English
 
-jebaited_player has **no account, no ads, no telemetry and no tracking**. It does not send your watch history, your files or any analytics anywhere. Everything it remembers (settings, watch history, positions, favourites, logs, caches) stays on your computer in `%LOCALAPPDATA%\jebaited_player`.
+jebaited_player has **no account, no ads, no telemetry and no tracking** (the only exception is redacted error reports, and only if you allow them). It does not send your watch history, your files or any analytics anywhere. Everything it remembers (settings, watch history, positions, favourites, logs, caches) stays on your computer in `%LOCALAPPDATA%\jebaited_player`.
 
 The player connects to other systems only in these cases:
 
@@ -17,11 +17,15 @@ The player connects to other systems only in these cases:
 | Searching and downloading subtitles (automatically when a video has no subtitles in your first language, or when you search yourself with Ctrl+F) | Only the subtitle sites you set up: OpenSubtitles.com, SubDL.com, Titlovi.com (off by default) | The title, year, season and episode taken from the file name, your subtitle languages, for OpenSubtitles also the file's hash and size (to find subtitles for exactly your release), and the API key, user name and password that **you** entered for that site. | Settings → Subtitles → “Search the internet …”; each site can be disabled in “Subtitle sources (keys)” |
 | You search for radio stations (Radio window, Ctrl+R) | Radio Browser directory (`radio-browser.info`) | The station name, genre and country you search for (and your IP address, as with any website). Clicks are not reported. | Do not search; favorites and stream URLs do not use the directory |
 | You play a radio station or a stream URL | That station's own server | A normal request for the audio stream (your IP address) | Stop the station |
+| You use Spotify (Ctrl+Shift+S) after signing in with your own Spotify app | Spotify (`accounts.spotify.com`, `api.spotify.com`) | Sign-in in your browser; then requests to show and control playback, your playlists, saved songs and searches. The sign-in token is stored encrypted (DPAPI) on your computer. The music plays in your Spotify app, not in the player. | Sign out in the Spotify window |
+| You open YouTube Music (Ctrl+Shift+Y) | YouTube / Google (`www.youtube.com`, `www.googleapis.com`) | The official YouTube player runs in a built-in Microsoft Edge (WebView2) window, so YouTube receives what any visit to an embedded YouTube video sends (YouTube cookies are kept in the player's own data folder). Searching sends your search words with your own YouTube API key; the key is stored encrypted (DPAPI) on your computer. | Close the YouTube window; remove the key with “API key…”, an empty field and “Save key” |
+| You turn on the weather on the home screen and choose a city | Open-Meteo (`api.open-meteo.com`, `geocoding-api.open-meteo.com`) | The city name you search for, then only that city's coordinates and the unit (°C/°F), at most every 30 minutes while the home screen is visible. No automatic location. | Settings → Appearance → “Show the weather” |
+| An error or crash happens **and** you allowed error reports | The project's diagnostics endpoint (only when one is set up; until then nothing is sent automatically) | A redacted report: player version, edition, Windows version, the error type, message and where it happened. No folders, video names, user names, keys or IP address in the report. | Settings → About → “Send error reports automatically” (off unless you allow it) |
 | You click a link (manual, sign-up pages, GitHub) | Your web browser opens that page | Whatever your browser sends to that website | Do not click the link |
 
 - Keys and passwords for subtitle sites are stored **encrypted** with Windows DPAPI (only your Windows account can read them) and are sent only to the site they belong to.
 - Synchronizing subtitles to the speech is done **locally**; the audio never leaves your computer.
-- Diagnostic logs (what the player did and any errors, with file names but no full paths, no subtitle text and no keys or passwords) are written only to your computer, are limited in size (about 50 MB) and age (14 days, 30 days for errors), and are never sent anywhere. You can view them under Settings → About → Diagnostics / Logs, export them to a ZIP yourself, or delete the `logs` folder at any time.
+- Diagnostic logs (what the player did and any errors, with file names but no full paths, no subtitle text and no keys or passwords) are written only to your computer, are limited in size (about 50 MB) and age (14 days, 30 days for errors), and are never sent anywhere (only redacted error reports, if you allow them). You can view them under Settings → About → Diagnostics / Logs, export them to a ZIP yourself, or delete the `logs` folder at any time.
 - When you click “Set as default player”, the player adds itself to “Open with” for your Windows user (HKCU). “Remove from ‘Open with’” and uninstalling remove these entries again. Nothing else in Windows is changed.
 - The privacy policies of the services above apply to the data they receive: [GitHub](https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement), [OpenSubtitles](https://www.opensubtitles.com/en/privacy), [SubDL](https://subdl.com), [Titlovi.com](https://titlovi.com).
 
@@ -29,26 +33,34 @@ This policy is shown in the player right after installation (language selection)
 
 ## Deutsch
 
-jebaited_player hat **kein Konto, keine Werbung, keine Telemetrie und kein Tracking**. Einstellungen, Wiedergabeverlauf, Positionen, Favoriten, Protokolle und Zwischenspeicher bleiben auf deinem Computer (`%LOCALAPPDATA%\jebaited_player`).
+jebaited_player hat **kein Konto, keine Werbung, keine Telemetrie und kein Tracking** (einzige Ausnahme: bereinigte Fehlerberichte, nur wenn du sie erlaubst). Einstellungen, Wiedergabeverlauf, Positionen, Favoriten, Protokolle und Zwischenspeicher bleiben auf deinem Computer (`%LOCALAPPDATA%\jebaited_player`).
 
 Der Player verbindet sich nur:
 
 - **mit GitHub** für die Update-Prüfung (20 Sekunden nach dem Start, dann alle 12 Stunden oder per „Jetzt prüfen“) und beim Öffnen des Update-Verlaufs. Abschalten: Einstellungen → Updates → „Neue Versionen automatisch herunterladen“.
 - **mit den Untertitelseiten, die du einrichtest** (OpenSubtitles.com, SubDL.com, Titlovi.com): Titel, Jahr, Staffel und Folge aus dem Dateinamen, deine Untertitelsprachen, bei OpenSubtitles auch Hash und Größe der Datei sowie deine Zugangsdaten für die jeweilige Seite. Abschalten: Einstellungen → Untertitel → „Im Internet suchen …“; jede Seite einzeln in „Untertitelquellen (Schlüssel)“.
 - **mit dem Radio-Verzeichnis Radio Browser** (radio-browser.info), wenn du Sender suchst: Name, Genre und Land der Suche. Ein Sender, den du abspielst, sieht wie jede Webseite deine IP-Adresse. Klicks werden nicht gemeldet.
+- **mit Spotify**, wenn du dich mit deiner eigenen Spotify-App anmeldest: Anzeigen und Steuern der Wiedergabe, Playlists, gespeicherte Songs, Suche. Der Anmelde-Token wird verschlüsselt (DPAPI) gespeichert. Abmelden im Spotify-Fenster.
+- **mit YouTube / Google**, wenn du YouTube Music öffnest (Strg+Umschalt+Y): Der offizielle YouTube-Player läuft in einem eingebauten Microsoft-Edge-Fenster (WebView2), YouTube erhält also das, was jeder Besuch eines eingebetteten YouTube-Videos sendet (YouTube-Cookies bleiben im Datenordner des Players). Die Suche sendet deine Suchwörter mit deinem eigenen YouTube-API-Schlüssel; der Schlüssel wird verschlüsselt (DPAPI) gespeichert.
+- **mit Open-Meteo**, wenn du das Wetter einschaltest und eine Stadt wählst: der Stadtname bei der Suche, danach nur die Koordinaten der Stadt und die Einheit, höchstens alle 30 Minuten. Keine automatische Ortung.
+- **mit dem Diagnose-Endpunkt des Projekts** nur, wenn du Fehlerberichte erlaubst (Einstellungen → Über) und ein Endpunkt eingerichtet ist: ein bereinigter Bericht (Version, Windows-Version, Fehler und Ort), ohne Ordner, Videonamen, Namen, Schlüssel oder IP-Adresse.
 - **mit Webseiten, deren Link du anklickst** (dein Browser öffnet sie).
 
 Schlüssel und Passwörter werden mit Windows DPAPI verschlüsselt gespeichert. Die Synchronisierung zur Sprache läuft lokal; der Ton verlässt deinen Computer nicht. Diagnoseprotokolle (Aktionen und Fehler, mit Dateinamen, aber ohne vollständige Pfade, Untertiteltext, Schlüssel oder Passwörter) bleiben nur auf deinem Computer, sind in Größe (ca. 50 MB) und Alter (14 Tage, Fehler 30 Tage) begrenzt und werden nie gesendet; Ansicht und ZIP-Export unter Einstellungen → Info → Diagnose / Protokolle.
 
 ## Hrvatski
 
-jebaited_player **nema račun, reklame, telemetriju ni praćenje**. Postavke, povijest gledanja, pozicije, omiljeno, zapisi i predmemorija ostaju na tvom računalu (`%LOCALAPPDATA%\jebaited_player`).
+jebaited_player **nema račun, reklame, telemetriju ni praćenje** (jedina iznimka su redigirani izvještaji o greškama, i to samo ako ih dopustiš). Postavke, povijest gledanja, pozicije, omiljeno, zapisi i predmemorija ostaju na tvom računalu (`%LOCALAPPDATA%\jebaited_player`).
 
 Player se spaja samo:
 
 - **na GitHub** radi provjere nadogradnji (20 sekundi nakon pokretanja, zatim svakih 12 sati ili klikom na „Provjeri sada”) i kad otvoriš povijest nadogradnji. Isključivanje: Postavke → Nadogradnje → „Automatski preuzmi nove verzije”.
 - **na stranice s titlovima koje postaviš** (OpenSubtitles.com, SubDL.com, Titlovi.com): naslov, godina, sezona i epizoda iz naziva datoteke, tvoji jezici titlova, za OpenSubtitles i otisak (hash) i veličina datoteke te podaci za prijavu na tu stranicu. Isključivanje: Postavke → Titlovi → „Traži titlove na internetu …”; svaka stranica posebno u „Izvori titlova (ključevi)”.
 - **na imenik radija Radio Browser** (radio-browser.info) kad tražiš postaje: naziv, žanr i država koje tražiš. Postaja koju slušaš vidi tvoju IP adresu, kao svaka web stranica. Klikovi se ne prijavljuju.
+- **na Spotify**, kad se prijaviš svojom Spotify aplikacijom: prikaz i upravljanje reprodukcijom, playliste, spremljene pjesme, pretraga. Token prijave sprema se kriptirano (DPAPI). Odjava je u prozoru Spotify.
+- **na YouTube / Google**, kad otvoriš YouTube Music (Ctrl+Shift+Y): službeni YouTube player radi u ugrađenom prozoru Microsoft Edgea (WebView2), pa YouTube dobiva ono što šalje svaki posjet ugrađenom YouTube videu (YouTube kolačići ostaju u mapi podataka playera). Pretraga šalje tvoje riječi pretrage s tvojim YouTube API ključem; ključ se sprema kriptirano (DPAPI).
+- **na Open-Meteo**, kad uključiš prognozu i odabereš grad: naziv grada pri traženju, a zatim samo koordinate grada i jedinica, najviše svakih 30 minuta. Bez automatske lokacije.
+- **na prijemnu točku dijagnostike projekta** samo ako dopustiš izvještaje o greškama (Postavke → O aplikaciji) i ako je točka postavljena: redigirani izvještaj (verzija, verzija Windowsa, greška i mjesto), bez mapa, naziva videa, imena, ključeva i IP adrese.
 - **na stranice čiju poveznicu klikneš** (otvara ih tvoj preglednik).
 
 Ključevi i lozinke spremaju se kriptirano (Windows DPAPI). Sinkronizacija prema govoru radi lokalno; zvuk ne napušta tvoje računalo. Dijagnostički logovi (radnje i greške, s nazivima datoteka, ali bez punih putanja, teksta titlova, ključeva i lozinki) ostaju samo na tvom računalu, ograničeni su veličinom (oko 50 MB) i starošću (14 dana, greške 30 dana) i nikad se nikamo ne šalju; pregled i izvoz u ZIP: Postavke → O aplikaciji → Dijagnostika / Logovi.

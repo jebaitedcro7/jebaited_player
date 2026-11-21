@@ -135,6 +135,13 @@ U istoj kartici podešavaš automatsko traženje, kodiranje starih titlova i izg
 - Play, pauza, sljedeća, premotavanje i glasnoća, tvoje **playliste**, **spremljene pjesme**, **pretraga** i **izbor uređaja**. Dok je Spotify izvor, mini player pokazuje **SPOTIFY** i njegove tipke upravljaju Spotifyjem; otvaranje datoteke ili postaje vraća natrag.
 - Spotify zvuk nikad ne prolazi kroz player (bez equalizera) i nikamo se ne prosljeđuje.
 
+### YouTube Music
+
+- **Ctrl+Shift+Y**, desni klik → **YouTube Music…** ili oznaka izvora u mini playeru. Zalijepi link s YouTubea ili YouTube Musica (pjesma ili playlista) i stisni **Pusti link**; to radi bez računa i bez ključa.
+- **Pretraga** traži tvoj besplatni YouTube API ključ: prozor pokazuje korake (Google Cloud konzola → projekt → uključi „YouTube Data API v3” → napravi API ključ). Google dopušta otprilike 100 pretraga dnevno po ključu. **API ključ…** pokraj pretrage mijenja ili uklanja ključ.
+- Službeni YouTube player svira u prozoru i mora ostati vidljiv (pravila YouTubea): bez reprodukcije u pozadini i bez blokiranja reklama; smanjivanje prozora ga pauzira. Dok je YouTube izvor, mini player pokazuje **YOUTUBE** i njegove tipke upravljaju YouTubeom; otvaranje datoteke ili postaje vraća natrag.
+- YouTube zvuk ne ide kroz equalizer playera.
+
 ### Kopije i prijenos
 
 Postavke → Općenito → **Kopije i prijenos**: postavke i povijest gledanja automatski se kopiraju jednom dnevno i prije svake nadogradnje (zadnjih 7 ostaje na tvom računalu). **Izvezi postavke** sprema ih u datoteku (bez lozinki, ključeva za stranice s titlovima i položaja prozora), a **Uvezi postavke** ih ponovno učitava, i na drugom računalu.
@@ -171,9 +178,9 @@ Postavke su podijeljene u kartice. Svaka promjena vrijedi odmah (i za video koji
 | Titlovi | Jezici titlova i njihov redoslijed, automatsko učitavanje i traženje, izvori na internetu, kodiranje starih titlova, izgled, sinkronizacija |
 | Zvuk | Glasnoća, ujednačavanje glasnoće, equalizer, željeni jezik zvuka, izlazni uređaj, izlaz za glazbu i radio, sinkronizacija zvuka |
 | Slika | Kvaliteta slike, hardversko dekodiranje, zadani omjer slike, HDR |
-| Izgled | Tamna / svijetla tema, pozadina početnog ekrana (zadana ili vlastita slika: Ispuni, Prilagodi, Sredina), koliko dugo su kontrole vidljive, iscrtavanje sučelja preko GPU-a |
+| Izgled | Tamna / svijetla tema, pozadina početnog ekrana (zadana ili vlastita slika: Ispuni, Prilagodi, Sredina), koliko dugo su kontrole vidljive, iscrtavanje sučelja preko GPU-a, vrijeme, datum i prognoza na početnom ekranu (grad po izboru, s Open-Meteoa) |
 | Nadogradnje | Verzija, provjeri sada, automatsko preuzimanje, što je novo, povijest nadogradnji |
-| O aplikaciji | Verzija, licenca, korištene tehnologije, priručnik, privatnost, pravila potpisivanja koda |
+| O aplikaciji | Verzija, licenca, korištene tehnologije, priručnik, privatnost, pravila potpisivanja koda, izvještaji o greškama (spremljeni na računalu bez osobnih podataka; šalješ ih sam preko GitHuba) |
 
 ### Povijest nadogradnji
 
@@ -269,6 +276,7 @@ Arhive sa stranica s titlovima: ZIP je podržan, RAR još nije.
 | Ctrl+M | Mini player / natrag na puni player |
 | Ctrl+R | Radio |
 | Ctrl+Shift+S | Spotify |
+| Ctrl+Shift+Y | YouTube Music |
 | Ctrl+Backspace | Vrati originalnu sinkronizaciju titlova |
 | F1 | Svi prečaci |
 

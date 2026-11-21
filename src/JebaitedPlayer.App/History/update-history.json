@@ -40,6 +40,60 @@
   },
   "versions": [
     {
+      "version": "1.8.4",
+      "date": "2026-11-21",
+      "notes": {
+        "en": {
+          "summary": "Cycle 6: YouTube Music, time, date and weather on the home screen, and error reports.",
+          "features": [
+            "YouTube Music (Ctrl+Shift+Y, or the source label in the mini player): paste a link from YouTube or YouTube Music (a song or a playlist) and it plays in the official YouTube player in its own window, without an account or a key. Searching needs your own free YouTube API key (the steps are in the window; “API key…” changes or removes it). While YouTube is the source, the mini player shows YOUTUBE and its buttons control it. The YouTube player must stay visible (YouTube rules), so there is no background playback.",
+            "Home screen information: the time and the date at the top left, and if you want the weather for a city you choose (Settings → Appearance; from Open-Meteo, free and without an account, at most every 30 minutes, °C or °F). Without internet the last known weather is shown with the time it was updated.",
+            "Error reports: errors and crashes are saved on your computer as short redacted reports (no folders, video names, names, keys or IP address). Settings → About → “Send via GitHub…” opens a prepared issue that you can read before you send it."
+          ],
+          "improvements": [
+            "One sound at a time: when YouTube starts, the local file pauses (a radio station stops) and Spotify is no longer the source; opening a file or a station pauses YouTube."
+          ],
+          "fixes": [],
+          "known": [
+            "The app is not digitally signed yet, so Windows SmartScreen or Smart App Control may warn before the installation.",
+            "The progress window of the installer comes from Velopack and is only in English."
+          ]
+        },
+        "de": {
+          "summary": "Zyklus 6: YouTube Music, Uhrzeit, Datum und Wetter auf dem Startbildschirm und Fehlerberichte.",
+          "features": [
+            "YouTube Music (Strg+Umschalt+Y oder die Quellenanzeige im Mini-Player): Füge einen Link von YouTube oder YouTube Music ein (Song oder Playlist); er läuft im offiziellen YouTube-Player in einem eigenen Fenster, ohne Konto und ohne Schlüssel. Die Suche braucht deinen eigenen kostenlosen YouTube-API-Schlüssel (die Schritte stehen im Fenster; „API-Schlüssel …“ ändert oder entfernt ihn). Solange YouTube die Quelle ist, zeigt der Mini-Player YOUTUBE und seine Tasten steuern YouTube. Der YouTube-Player muss sichtbar bleiben (YouTube-Regeln), daher gibt es keine Wiedergabe im Hintergrund.",
+            "Informationen auf dem Startbildschirm: Uhrzeit und Datum oben links und auf Wunsch das Wetter für eine Stadt deiner Wahl (Einstellungen → Darstellung; von Open-Meteo, kostenlos und ohne Konto, höchstens alle 30 Minuten, °C oder °F). Ohne Internet wird das zuletzt bekannte Wetter mit der Uhrzeit der Aktualisierung angezeigt.",
+            "Fehlerberichte: Fehler und Abstürze werden als kurze bereinigte Berichte auf deinem Computer gespeichert (keine Ordner, Videonamen, Namen, Schlüssel oder IP-Adresse). Einstellungen → Info → „Über GitHub senden …“ öffnet ein vorbereitetes Issue, das du vor dem Senden lesen kannst."
+          ],
+          "improvements": [
+            "Nur ein Ton gleichzeitig: Startet YouTube, pausiert die lokale Datei (ein Radiosender stoppt) und Spotify ist nicht mehr die Quelle; eine Datei oder ein Sender pausiert YouTube."
+          ],
+          "fixes": [],
+          "known": [
+            "Die App ist noch nicht digital signiert, daher können Windows SmartScreen oder Smart App Control vor der Installation warnen.",
+            "Das Fortschrittsfenster des Installationsprogramms stammt von Velopack und ist nur auf Englisch."
+          ]
+        },
+        "hr": {
+          "summary": "Ciklus 6: YouTube Music, vrijeme, datum i prognoza na početnom ekranu te izvještaji o greškama.",
+          "features": [
+            "YouTube Music (Ctrl+Shift+Y ili oznaka izvora u mini playeru): zalijepi link s YouTubea ili YouTube Musica (pjesma ili playlista) i svira u službenom YouTube playeru u vlastitom prozoru, bez računa i bez ključa. Pretraga traži tvoj besplatni YouTube API ključ (koraci su u prozoru; „API ključ…” ga mijenja ili uklanja). Dok je YouTube izvor, mini player pokazuje YOUTUBE i njegove tipke upravljaju YouTubeom. YouTube player mora ostati vidljiv (pravila YouTubea), pa nema reprodukcije u pozadini.",
+            "Informacije na početnom ekranu: vrijeme i datum gore lijevo te po želji prognoza za grad koji odabereš (Postavke → Izgled; s Open-Meteoa, besplatno i bez računa, najviše svakih 30 minuta, °C ili °F). Bez interneta prikazuje se zadnja poznata prognoza s vremenom ažuriranja.",
+            "Izvještaji o greškama: greške i padovi spremaju se na tvoje računalo kao kratki redigirani izvještaji (bez mapa, naziva videa, imena, ključeva i IP adrese). Postavke → O aplikaciji → „Pošalji preko GitHuba…” otvara pripremljeni issue koji pročitaš prije slanja."
+          ],
+          "improvements": [
+            "Jedan zvuk u isto vrijeme: kad krene YouTube, lokalna datoteka se pauzira (radio postaja stane), a Spotify više nije izvor; otvaranje datoteke ili postaje pauzira YouTube."
+          ],
+          "fixes": [],
+          "known": [
+            "Aplikacija još nije digitalno potpisana, pa Windows SmartScreen ili Smart App Control mogu upozoriti prije instalacije.",
+            "Prozor napretka instalacije je Velopackov i samo je na engleskom."
+          ]
+        }
+      }
+    },
+    {
       "version": "1.7.4",
       "date": "2026-11-21",
       "notes": {

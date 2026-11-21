@@ -409,6 +409,12 @@ public sealed class AppSettings
     /// </summary>
     public string? SpotifyClientId { get; set; }
 
+    /// <summary>N1 (ciklus 6): pristanak za slanje redigiranih izvještaja o greškama.</summary>
+    public JebaitedPlayer.Services.ErrorReportSettings ErrorReports { get; set; } = new();
+
+    /// <summary>N3 (ciklus 6): datum, vrijeme i prognoza na početnom ekranu.</summary>
+    public JebaitedPlayer.Services.HomeInfoSettings HomeInfo { get; set; } = new();
+
     /// <summary>N4 (ciklus 5): slika pozadine početnog ekrana (samo putanja, slika se ne kopira); prazno = svemir.</summary>
     public string? HomeBackgroundImage { get; set; }
 
@@ -467,6 +473,8 @@ public sealed class AppSettings
             HomeBackgroundImage = null;
         }
 
+        HomeInfo ??= new JebaitedPlayer.Services.HomeInfoSettings();
+        ErrorReports ??= new JebaitedPlayer.Services.ErrorReportSettings();
         if (!HomeBackgroundModes.Contains(HomeBackgroundMode))
         {
             HomeBackgroundMode = "fill";

@@ -47,6 +47,9 @@ public partial class MainWindow
                     "homebg" => await HomeBackgroundUiTestAsync(),
                     "watchnext" => await WatchNextUiTestAsync(),
                     "spotify" => await SpotifyUiTestAsync(),
+                    "homeinfo" => await HomeInfoUiTestAsync(),
+                    "reports" => await ReportsUiTestAsync(),
+                    "youtube" => await YouTubeUiTestAsync(),
                     _ => new Dictionary<string, object?> { ["error"] = "nepoznat scenarij " + scenario },
                 };
             }

@@ -40,9 +40,18 @@ public static class DiagLog
     public static void Warn(string category, string type, string component, string message, params (string, object?)[] data) =>
         _logger?.Log(LogLevel.Warning, category, type, component, message, data);
 
-    public static void Error(string category, string type, string component, string message, Exception? ex = null, params (string, object?)[] data) =>
-        _logger?.Log(LogLevel.Error, category, type, component, message, ex, data);
+    /// <summary>N1 (ciklus 6): greška ili pad za izvještaj (aplikacija ga redigira i stavlja u lokalni red).</summary>
+    public static event Action<LogLevel, string, string, string, string, Exception?>? Problem;
 
-    public static void Critical(string category, string type, string component, string message, Exception? ex = null, params (string, object?)[] data) =>
+    public static void Error(string category, string type, string component, string message, Exception? ex = null, params (string, object?)[] data)
+    {
+        _logger?.Log(LogLevel.Error, category, type, component, message, ex, data);
+        Problem?.Invoke(LogLevel.Error, category, type, component, message, ex);
+    }
+
+    public static void Critical(string category, string type, string component, string message, Exception? ex = null, params (string, object?)[] data)
+    {
         _logger?.Log(LogLevel.Critical, category, type, component, message, ex, data);
+        Problem?.Invoke(LogLevel.Critical, category, type, component, message, ex);
+    }
 }

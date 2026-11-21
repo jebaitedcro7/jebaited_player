@@ -226,7 +226,7 @@ public class RedactorTests
     [TestMethod]
     public void Clean_RemovesProfileAndSecrets()
     {
-        Assert.AreEqual(@"<dir>\a.mkv", Redactor.Clean(@"C:\Users\Emir Test\Videos\a.mkv"));
+        Assert.AreEqual(@"<dir>\a.mkv", Redactor.Clean(@"C:\Users\Some User\Videos\a.mkv"));
         Assert.AreEqual(@"Titl <dir>\x.srt (SRT, UTF-8)", Redactor.Clean(@"Titl D:\Moj film\Sezona 1\x.srt (SRT, UTF-8)"));
         Assert.AreEqual(@"<dir>\x.srt", Redactor.Clean(@"\\server\share\mapa\x.srt"));
         Assert.AreEqual("password=***", Redactor.Clean("password=hunter2"));

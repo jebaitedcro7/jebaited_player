@@ -369,6 +369,7 @@ public static class SettingsDefaults
                     (s.Theme, s.ControlsHideSeconds, s.UiGpuRendering) = (d.Theme, d.ControlsHideSeconds, d.UiGpuRendering);
                     (s.MiniPlayer.Font, s.MiniPlayer.VuStyle, s.MiniPlayer.AutoSwitch) = (d.MiniPlayer.Font, d.MiniPlayer.VuStyle, d.MiniPlayer.AutoSwitch);
                     (s.HomeBackgroundImage, s.HomeBackgroundMode) = (d.HomeBackgroundImage, d.HomeBackgroundMode);
+                    (s.HomeInfo.ShowTime, s.HomeInfo.ShowDate, s.HomeInfo.ShowWeather) = (true, true, false);
                     break;
                 case "updates":
                     s.AutoUpdate = d.AutoUpdate;

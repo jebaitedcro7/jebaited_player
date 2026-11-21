@@ -135,6 +135,13 @@ Im selben Tab stellst du die automatische Suche, die Zeichenkodierung alter Unte
 - Wiedergabe, Pause, Weiter, Spulen und Lautstärke, deine **Playlists**, **gespeicherten Songs**, **Suche** und **Geräteauswahl**. Solange Spotify die Quelle ist, zeigt der Mini-Player **SPOTIFY** und seine Tasten steuern Spotify; eine Datei oder ein Sender schaltet zurück.
 - Spotify-Ton läuft nie durch den Player (kein Equalizer) und wird nirgendwohin weitergeleitet.
 
+### YouTube Music
+
+- **Strg+Umschalt+Y**, Rechtsklick → **YouTube Music …** oder die Quellenanzeige im Mini-Player. Füge einen Link von YouTube oder YouTube Music ein (Song oder Playlist) und drücke **Link abspielen**; das geht ohne Konto und ohne Schlüssel.
+- Die **Suche** braucht deinen eigenen kostenlosen YouTube-API-Schlüssel: Das Fenster zeigt die Schritte (Google-Cloud-Konsole → Projekt → „YouTube Data API v3“ aktivieren → API-Schlüssel erstellen). Google erlaubt etwa 100 Suchen pro Tag und Schlüssel. Mit **API-Schlüssel …** neben der Suche änderst oder entfernst du den Schlüssel.
+- Der offizielle YouTube-Player läuft im Fenster und muss sichtbar bleiben (YouTube-Regeln): keine Wiedergabe im Hintergrund, kein Werbeblocker; Minimieren pausiert ihn. Solange YouTube die Quelle ist, zeigt der Mini-Player **YOUTUBE** und seine Tasten steuern YouTube; eine Datei oder ein Sender schaltet zurück.
+- YouTube-Ton läuft nicht über den Equalizer des Players.
+
 ### Sicherung und Übertragung
 
 Einstellungen → Allgemein → **Sicherung und Übertragung**: Einstellungen und Wiedergabeverlauf werden einmal täglich und vor jedem Update automatisch kopiert (die letzten 7 bleiben auf deinem Computer). **Einstellungen exportieren** speichert sie in einer Datei (ohne Passwörter, Schlüssel für Untertitelseiten und Fensterposition), **Einstellungen importieren** lädt sie wieder, auch auf einem anderen Computer.
@@ -171,9 +178,9 @@ Die Einstellungen sind in Tabs aufgeteilt. Jede Änderung gilt sofort (auch für
 | Untertitel | Untertitelsprachen und ihre Reihenfolge, automatisches Laden und Suchen, Quellen im Internet, Zeichenkodierung alter Untertitel, Aussehen, Synchronisierung |
 | Audio | Lautstärke, Lautstärkeausgleich, Equalizer, bevorzugte Audiosprache, Ausgabegerät, Ausgabe für Musik und Radio, Audio-Synchronisierung |
 | Video | Bildqualität, Hardware-Dekodierung, Standard-Seitenverhältnis, HDR |
-| Darstellung | Dunkles / helles Design, Hintergrund des Startbildschirms (Standard oder eigenes Bild: Füllen, Einpassen, Zentriert), wie lange die Steuerung sichtbar bleibt, Oberfläche über die GPU darstellen |
+| Darstellung | Dunkles / helles Design, Hintergrund des Startbildschirms (Standard oder eigenes Bild: Füllen, Einpassen, Zentriert), wie lange die Steuerung sichtbar bleibt, Oberfläche über die GPU darstellen, Uhrzeit, Datum und Wetter auf dem Startbildschirm (eine Stadt deiner Wahl, von Open-Meteo) |
 | Updates | Version, jetzt prüfen, automatischer Download, Neuerungen, Update-Verlauf |
-| Info | Version, Lizenz, verwendete Technologien, Handbuch, Datenschutz, Richtlinie zur Code-Signierung |
+| Info | Version, Lizenz, verwendete Technologien, Handbuch, Datenschutz, Richtlinie zur Code-Signierung, Fehlerberichte (ohne persönliche Daten auf deinem Computer gespeichert; du sendest sie selbst über GitHub) |
 
 ### Update-Verlauf
 
@@ -269,6 +276,7 @@ Archive von Untertitelseiten: ZIP wird unterstützt, RAR noch nicht.
 | Ctrl+M | Mini-Player / zurück zum vollen Player |
 | Ctrl+R | Radio |
 | Ctrl+Shift+S | Spotify |
+| Ctrl+Shift+Y | YouTube Music |
 | Ctrl+Backspace | Ursprüngliche Untertitel-Synchronisation wiederherstellen |
 | F1 | Alle Tastenkürzel |
 

@@ -1,0 +1,79 @@
+<Window x:Class="JebaitedPlayer.Views.YouTubeWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:JebaitedPlayer.Infrastructure"
+        xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+        Title="{loc:T youtube.title}" Width="720" Height="720" MinWidth="460" MinHeight="520" ShowInTaskbar="True"
+        WindowStartupLocation="CenterOwner" Background="{DynamicResource WindowBackgroundBrush}"
+        Foreground="{DynamicResource TextPrimaryBrush}" FontFamily="{DynamicResource UiFont}" FontSize="13" UseLayoutRounding="True">
+
+    <!-- Ciklus 6, V9: YouTube Music samo službenim putem: vidljiv ugrađeni YouTube player (IFrame) i Data API s korisnikovim ključem. -->
+    <Grid>
+        <DockPanel Margin="20,14,20,14">
+            <TextBlock DockPanel.Dock="Top" Style="{StaticResource TabTitle}" Text="{loc:T youtube.title}" />
+
+            <!-- Link (radi bez ključa) -->
+            <DockPanel DockPanel.Dock="Top" Margin="0,2,0,0">
+                <Button DockPanel.Dock="Right" Style="{StaticResource AccentButton}" Content="{loc:T youtube.playLink}" Click="OnPlayLink" Margin="8,0,0,0" />
+                <TextBox x:Name="LinkBox" MinHeight="32" Padding="6,5" VerticalContentAlignment="Center" ToolTip="{loc:T youtube.linkHint}" KeyDown="OnLinkKey" />
+            </DockPanel>
+
+            <!-- Pretraga (s ključem) -->
+            <DockPanel x:Name="SearchRow" DockPanel.Dock="Top" Margin="0,8,0,0">
+                <Button x:Name="ChangeKeyButton" DockPanel.Dock="Right" Style="{StaticResource LinkButton}" Content="{loc:T youtube.changeKey}" Click="OnChangeKey"
+                        Margin="8,0,0,0" VerticalAlignment="Center" />
+                <Button DockPanel.Dock="Right" Style="{StaticResource SecondaryButton}" Content="{loc:T youtube.search}" Click="OnSearch" Margin="8,0,0,0" />
+                <TextBox x:Name="SearchBox" MinHeight="32" Padding="6,5" VerticalContentAlignment="Center" KeyDown="OnSearchKey" />
+            </DockPanel>
+
+            <!-- Vodič za API ključ -->
+            <StackPanel x:Name="KeyPanel" DockPanel.Dock="Top" Margin="0,8,0,0">
+                <TextBlock Style="{StaticResource HintText}" Text="{loc:T youtube.keySteps}" TextWrapping="Wrap" />
+                <DockPanel Margin="0,6,0,0">
+                    <Button x:Name="SaveKeyButton" DockPanel.Dock="Right" Style="{StaticResource SecondaryButton}" Content="{loc:T youtube.saveKey}" Click="OnSaveKey"
+                            Margin="8,0,0,0" ToolTip="{loc:T youtube.saveKeyHint}" />
+                    <Button DockPanel.Dock="Right" Style="{StaticResource LinkButton}" Content="{loc:T youtube.openConsole}" Click="OnOpenConsole" Margin="8,0,0,0"
+                            VerticalAlignment="Center" />
+                    <PasswordBox x:Name="KeyBox" MinHeight="32" Padding="6,5" VerticalContentAlignment="Center" />
+                </DockPanel>
+            </StackPanel>
+
+            <TextBlock DockPanel.Dock="Bottom" Style="{StaticResource HintText}" Text="{loc:T youtube.note}" TextWrapping="Wrap" Margin="0,8,0,0" />
+            <TextBlock x:Name="StatusText" DockPanel.Dock="Bottom" Foreground="{DynamicResource AccentBrush}" TextWrapping="Wrap" Margin="0,6,0,0" />
+
+            <!-- Vidljivi ugrađeni player (pravila YouTubea: player mora biti vidljiv) -->
+            <Border DockPanel.Dock="Top" Margin="0,10,0,0" Background="Black" CornerRadius="6" ClipToBounds="True" MinHeight="225" Height="300">
+                <Grid>
+                    <wv2:WebView2 x:Name="Web" />
+                    <TextBlock x:Name="WebMissingText" Text="{loc:T youtube.webviewMissing}" Foreground="White" TextWrapping="Wrap" Margin="20"
+                               VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="Collapsed" />
+                </Grid>
+            </Border>
+
+            <Border Margin="0,10,0,0" BorderThickness="1" BorderBrush="{DynamicResource MenuBorderBrush}" CornerRadius="6" Padding="2">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+                    <ItemsControl x:Name="ItemList" Focusable="False">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Button x:Name="PlayButton" Style="{StaticResource IconButton}" Width="36" Height="36" FontSize="15" Tag="{Binding}"
+                                            Content="&#xE768;" Click="OnPlayItem" ToolTip="{loc:T youtube.play}" />
+                                    <Button Grid.Column="1" Style="{StaticResource ListRowButton}" Tag="{Binding}" Click="OnPlayItem" Padding="6,5" ToolTip="{loc:T youtube.play}">
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding Title}" FontSize="13" TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Text="{Binding Channel}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis" />
+                                        </StackPanel>
+                                    </Button>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Border>
+        </DockPanel>
+    </Grid>
+</Window>

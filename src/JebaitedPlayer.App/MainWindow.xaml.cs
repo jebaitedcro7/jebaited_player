@@ -359,6 +359,8 @@ public partial class MainWindow : Window
 
         // N4: vlastita pozadina se učitava tek kad je prozor prikazan, izvan UI dretve (ne usporava pokretanje).
         _ = ApplyHomeBackgroundAsync();
+        InitializeHomeInfo();
+        AskErrorReportConsent();
         if (_options.DiagShow is { } show && _options.Files.Count == 0)
         {
             // Dijagnostika stalno mjeri iscrtavanje (dretva nikad nije "idle"), pa se prozor otvara nakon kratke pauze.
@@ -431,6 +433,8 @@ public partial class MainWindow : Window
         }
 
         _spotify?.Dispose();
+        _reports?.Dispose();
+        _youTube?.Dispose();
         _store?.Dispose();
         ApplyUpdateOnExit();
         _closeConfirmed = true;
@@ -883,6 +887,13 @@ public partial class MainWindow : Window
         if (key == Key.M && mods == ModifierKeys.Control)
         {
             ToggleMiniPlayer();
+            return true;
+        }
+
+        // Ciklus 6: Ctrl+Shift+Y otvara YouTube Music.
+        if (key == Key.Y && mods == (ModifierKeys.Control | ModifierKeys.Shift))
+        {
+            ShowYouTube();
             return true;
         }
 

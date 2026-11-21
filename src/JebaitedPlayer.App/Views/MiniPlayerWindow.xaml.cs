@@ -40,6 +40,11 @@ internal interface IMiniPlayerHost
 
     /// <summary>Ciklus 5, V8: stanje i upravljanje Spotifyjem (dok je on izvor, tipke mini playera upravljaju njime).</summary>
     JebaitedPlayer.Services.SpotifyRemote Spotify { get; }
+
+    /// <summary>Ciklus 6, V9: YouTube Music (prozor s ugrađenim playerom).</summary>
+    void ShowYouTube(Window owner);
+
+    JebaitedPlayer.Services.YouTubeRemote YouTube { get; }
 }
 
 /// <summary>
@@ -371,8 +376,17 @@ public partial class MiniPlayerWindow : Window
     /// <summary>V8: Spotify je izvor (pušten iz prozora Spotify), pa tipke upravljaju njime dok se ne pusti nešto lokalno.</summary>
     private bool SpotifyMode => _host.Spotify.IsActiveSource;
 
+    /// <summary>V9: YouTube je izvor (svira u prozoru YouTube Music), pa tipke idu ugrađenom playeru.</summary>
+    private bool YouTubeMode => _host.YouTube.IsActiveSource;
+
     private void OnPrevious(object sender, RoutedEventArgs e)
     {
+        if (YouTubeMode)
+        {
+            _ = _host.YouTube.PreviousAsync();
+            return;
+        }
+
         if (SpotifyMode)
         {
             _ = _host.Spotify.PreviousAsync();
@@ -384,6 +398,12 @@ public partial class MiniPlayerWindow : Window
 
     private void OnNext(object sender, RoutedEventArgs e)
     {
+        if (YouTubeMode)
+        {
+            _ = _host.YouTube.NextAsync();
+            return;
+        }
+
         if (SpotifyMode)
         {
             _ = _host.Spotify.NextAsync();
@@ -395,6 +415,12 @@ public partial class MiniPlayerWindow : Window
 
     private void OnPlay(object sender, RoutedEventArgs e)
     {
+        if (YouTubeMode)
+        {
+            _ = _host.YouTube.SendAsync("player.playVideo()");
+            return;
+        }
+
         if (SpotifyMode)
         {
             if (_host.Spotify.State is not { IsPlaying: true })
@@ -422,6 +448,12 @@ public partial class MiniPlayerWindow : Window
 
     private void OnPause(object sender, RoutedEventArgs e)
     {
+        if (YouTubeMode)
+        {
+            _ = _host.YouTube.TogglePlayAsync();
+            return;
+        }
+
         if (SpotifyMode)
         {
             _ = _host.Spotify.TogglePlayAsync();
@@ -437,6 +469,12 @@ public partial class MiniPlayerWindow : Window
 
     private void OnPlayPause(object sender, RoutedEventArgs e)
     {
+        if (YouTubeMode)
+        {
+            _ = _host.YouTube.TogglePlayAsync();
+            return;
+        }
+
         if (SpotifyMode)
         {
             _ = _host.Spotify.TogglePlayAsync();
@@ -459,6 +497,12 @@ public partial class MiniPlayerWindow : Window
     /// </summary>
     private void OnStop(object sender, RoutedEventArgs e)
     {
+        if (YouTubeMode)
+        {
+            _ = _host.YouTube.PauseAsync();
+            return;
+        }
+
         if (SpotifyMode)
         {
             _ = _host.Spotify.PauseAsync();
@@ -517,6 +561,12 @@ public partial class MiniPlayerWindow : Window
             {
                 _host.Spotify.RemoveConsumer();
             }
+        }
+
+        if (YouTubeMode)
+        {
+            TickYouTube();
+            return;
         }
 
         if (spotify)
@@ -733,7 +783,25 @@ public partial class MiniPlayerWindow : Window
         SetMarquee(title);
     }
 
-    /// <summary>Klik na oznaku izvora: Radio ili Spotify (ciklus 5).</summary>
+    /// <summary>V9: YouTube kao izvor — naslov, vrijeme i oznaka YOUTUBE (tipke idu ugrađenom playeru).</summary>
+    private void TickYouTube()
+    {
+        JebaitedPlayer.Services.YouTubeState? s = _host.YouTube.State;
+        double position = s?.CurrentTime ?? 0;
+        double duration = s?.Duration ?? 0;
+        SourceText.Text = Loc.T("mini.sourceYouTube");
+        TimeText.Text = _showRemaining && duration > 0 ? "-" + Short(Math.Max(0, duration - position)) : Short(position);
+        RemainingText.Text = duration > 0 ? "-" + Short(Math.Max(0, duration - position)) : string.Empty;
+        SeekSlider.IsEnabled = false;
+        SeekSlider.Maximum = Math.Max(1, duration);
+        SeekSlider.Value = Math.Min(position, SeekSlider.Maximum);
+        CompactProgress.Value = duration > 0 ? position / duration : 0;
+        CompactTime.Text = duration > 0 ? $"{Short(position)} / {Short(duration)}" : string.Empty;
+        CompactPlayPause.Content = s is { IsPlaying: true } ? "\uE769" : "\uE768";
+        SetMarquee(s is { Title.Length: > 0 } ? s.Title : _host.YouTube.Status is { Length: > 0 } st ? st : Loc.T("youtube.title"));
+    }
+
+    /// <summary>Klik na oznaku izvora: Radio, Spotify ili YouTube Music (ciklusi 5 i 6).</summary>
     private void OnSourceClick(object sender, MouseButtonEventArgs e)
     {
         e.Handled = true;
@@ -742,8 +810,11 @@ public partial class MiniPlayerWindow : Window
         radio.Click += (_, _) => _host.ShowRadio(this);
         var spotify = new MenuItem { Header = Loc.T("menu.spotify") };
         spotify.Click += (_, _) => _host.ShowSpotify(this);
+        var youTube = new MenuItem { Header = Loc.T("menu.youtube") };
+        youTube.Click += (_, _) => _host.ShowYouTube(this);
         menu.Items.Add(radio);
         menu.Items.Add(spotify);
+        menu.Items.Add(youTube);
         menu.IsOpen = true;
     }
 }

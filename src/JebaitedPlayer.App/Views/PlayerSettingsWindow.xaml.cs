@@ -54,6 +54,15 @@ internal interface ISettingsHost
     /// <summary>Slika pozadine početnog ekrana odmah (N4).</summary>
     void ApplyHomeBackground();
 
+    /// <summary>Datum, vrijeme i prognoza na početnom ekranu odmah (N3).</summary>
+    void ApplyHomeInfo(bool weatherChanged);
+
+    /// <summary>N1: red izvještaja o greškama i slanje.</summary>
+    JebaitedPlayer.Services.ErrorReporting Reports { get; }
+
+    /// <summary>N3: traži grad (Open-Meteo geokoder).</summary>
+    Task<IReadOnlyList<JebaitedPlayer.Online.WeatherPlace>> SearchWeatherPlacesAsync(string name);
+
     /// <summary>Uvezene postavke (M1b) odmah na cijeli player.</summary>
     void ApplyImportedSettings();
 
@@ -91,6 +100,7 @@ public partial class PlayerSettingsWindow : Window
         ("SQLite", "Public domain"),
         ("WebRtcVadSharp", "MIT"),
         ("WebRTC VAD", "BSD-3-Clause"),
+        ("Microsoft Edge WebView2 SDK", "BSD-3-Clause"),
     ];
 
     private readonly AppSettings _settings;
@@ -123,6 +133,7 @@ public partial class PlayerSettingsWindow : Window
         LoadAppearance();
         LoadUpdates();
         LoadAbout();
+        LoadDiagnostics();
         SelectTab(tab);
         _loading = false;
 
@@ -785,7 +796,140 @@ public partial class PlayerSettingsWindow : Window
         GpuUiBox.Unchecked += (_, _) => _settings.UiGpuRendering = false;
 
         LoadHomeBackground();
+        LoadHomeInfo();
     }
+
+    // --- N1: dijagnostika -------------------------------------------------------------------------------------------
+
+    private void LoadDiagnostics()
+    {
+        SendReportsBox.IsChecked = _settings.ErrorReports.SendReports;
+        // Bez prijemne točke nema automatskog slanja, pa ni prekidača: izvještaji ostaju lokalni i šalju se ručno preko GitHuba.
+        SendReportsBox.Visibility = _host.Reports.HasEndpoint ? Visibility.Visible : Visibility.Collapsed;
+        SendReportsBox.Checked += (_, _) => SetSendReports(true);
+        SendReportsBox.Unchecked += (_, _) => SetSendReports(false);
+        UpdateReportsStatus();
+    }
+
+    private void SetSendReports(bool send)
+    {
+        if (_loading)
+        {
+            return;
+        }
+
+        _settings.ErrorReports.SendReports = send;
+        _settings.ErrorReports.ConsentAsked = true;
+        UpdateReportsStatus();
+        if (send)
+        {
+            _ = _host.Reports.SendAsync().ContinueWith(_ => Dispatcher.BeginInvoke(UpdateReportsStatus), TaskScheduler.Default);
+        }
+    }
+
+    internal void UpdateReportsStatus()
+    {
+        int pending = _host.Reports.Queue.Pending().Count;
+        ReportsStatusText.Text = pending == 0 ? Loc.T("settings.reportsNone")
+            : _host.Reports.HasEndpoint && _settings.ErrorReports.SendReports ? Loc.T("settings.reportsWaiting", pending)
+            : Loc.T("settings.reportsLocal", pending);
+        ReportGitHubButton.IsEnabled = pending > 0;
+    }
+
+    private void OnReportGitHub(object sender, RoutedEventArgs e)
+    {
+        string url = _host.Reports.GitHubIssueUrl();
+        if (url.StartsWith("https://github.com/", StringComparison.Ordinal))
+        {
+            Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+        }
+    }
+
+    // --- N3: vrijeme, datum i prognoza na početnom ekranu -----------------------------------------------------------
+
+    private void LoadHomeInfo()
+    {
+        JebaitedPlayer.Services.HomeInfoSettings h = _settings.HomeInfo;
+        HomeTimeBox.IsChecked = h.ShowTime;
+        HomeDateBox.IsChecked = h.ShowDate;
+        HomeWeatherBox.IsChecked = h.ShowWeather;
+        (h.Fahrenheit ? WeatherFahrenheit : WeatherCelsius).IsChecked = true;
+        HomeTimeBox.Checked += (_, _) => SetHomeInfo(() => h.ShowTime = true);
+        HomeTimeBox.Unchecked += (_, _) => SetHomeInfo(() => h.ShowTime = false);
+        HomeDateBox.Checked += (_, _) => SetHomeInfo(() => h.ShowDate = true);
+        HomeDateBox.Unchecked += (_, _) => SetHomeInfo(() => h.ShowDate = false);
+        HomeWeatherBox.Checked += (_, _) => SetHomeInfo(() => h.ShowWeather = true, weather: true);
+        HomeWeatherBox.Unchecked += (_, _) => SetHomeInfo(() => h.ShowWeather = false);
+        WeatherCelsius.Checked += (_, _) => SetHomeInfo(() => h.Fahrenheit = false, weather: true);
+        WeatherFahrenheit.Checked += (_, _) => SetHomeInfo(() => h.Fahrenheit = true, weather: true);
+        UpdateWeatherTexts();
+    }
+
+    private void SetHomeInfo(Action change, bool weather = false)
+    {
+        if (_loading)
+        {
+            return;
+        }
+
+        change();
+        UpdateWeatherTexts();
+        _host.ApplyHomeInfo(weather);
+    }
+
+    private void UpdateWeatherTexts()
+    {
+        JebaitedPlayer.Services.HomeInfoSettings h = _settings.HomeInfo;
+        WeatherCityText.Text = h.City is { Length: > 0 } c ? Loc.T("settings.weatherCity", c) : Loc.T("settings.weatherCityNone");
+        WeatherCityBox.IsEnabled = WeatherFindButton.IsEnabled = WeatherCelsius.IsEnabled = WeatherFahrenheit.IsEnabled = h.ShowWeather;
+    }
+
+    private async void OnWeatherFind(object sender, RoutedEventArgs e) => await FindWeatherCityAsync(WeatherCityBox.Text);
+
+    private async void OnWeatherCityKey(object sender, System.Windows.Input.KeyEventArgs e)
+    {
+        if (e.Key == System.Windows.Input.Key.Enter)
+        {
+            e.Handled = true;
+            await FindWeatherCityAsync(WeatherCityBox.Text);
+        }
+    }
+
+    /// <summary>Traži grad i ponudi izbor; odabrani grad odmah vrijedi (prognoza se osvježava).</summary>
+    internal async Task<int> FindWeatherCityAsync(string name)
+    {
+        if (name.Trim().Length < 2)
+        {
+            return 0;
+        }
+
+        IReadOnlyList<JebaitedPlayer.Online.WeatherPlace> places;
+        try
+        {
+            places = await _host.SearchWeatherPlacesAsync(name);
+        }
+        catch (JebaitedPlayer.Online.ProviderException ex)
+        {
+            Log.Warn($"Traženje grada: {ex.Message}");
+            WeatherCityText.Text = Loc.T("settings.weatherOffline");
+            return 0;
+        }
+
+        if (places.Count == 0)
+        {
+            WeatherCityText.Text = Loc.T("settings.weatherNotFound");
+            return 0;
+        }
+
+        ShowChoices(WeatherFindButton, places.Select(p => (p.Label, false, (Action)(() => SetWeatherPlace(p)))).ToList());
+        return places.Count;
+    }
+
+    internal void SetWeatherPlace(JebaitedPlayer.Online.WeatherPlace place) => SetHomeInfo(() =>
+    {
+        JebaitedPlayer.Services.HomeInfoSettings h = _settings.HomeInfo;
+        (h.City, h.Latitude, h.Longitude) = (place.Name, place.Latitude, place.Longitude);
+    }, weather: true);
 
     // --- N4: slika pozadine početnog ekrana ------------------------------------------------------------------------
 

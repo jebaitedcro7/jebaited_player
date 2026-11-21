@@ -13,6 +13,7 @@ jebaited_player je objavljen pod licencom **GPL-3.0** (vidi [LICENSE](LICENSE)).
 | SQLite | baza podataka | javno dobro (public domain) | https://sqlite.org |
 | WebRtcVadSharp | detekcija govora (sinkronizacija titlova) | MIT | https://github.com/ladenedge/WebRtcVadSharp |
 | WebRTC VAD | detektor govora unutar WebRtcVadSharp | BSD-3-Clause | https://webrtc.googlesource.com/src |
+| Microsoft Edge WebView2 SDK (`Microsoft.Web.WebView2`) | ugrađeni preglednik za službeni YouTube player (sam preglednik je dio Windowsa) | BSD-3-Clause | https://www.nuget.org/packages/Microsoft.Web.WebView2 |
 
 ## Izvorni kod za libmpv
 

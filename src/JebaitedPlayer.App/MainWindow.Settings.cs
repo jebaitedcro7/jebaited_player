@@ -145,6 +145,12 @@ public partial class MainWindow : ISettingsHost
 
     void ISettingsHost.ApplyHomeBackground() => _ = ApplyHomeBackgroundAsync();
 
+    void ISettingsHost.ApplyHomeInfo(bool weatherChanged) => ApplyHomeInfo(weatherChanged);
+
+    ErrorReporting ISettingsHost.Reports => Reports;
+
+    Task<IReadOnlyList<JebaitedPlayer.Online.WeatherPlace>> ISettingsHost.SearchWeatherPlacesAsync(string name) => SearchWeatherPlacesAsync(name);
+
     private int _homeBackgroundVersion;
 
     /// <summary>Zadnje učitavanje pozadine (dijagnostika): putanja, trajanje i je li slika prikazana.</summary>
@@ -222,6 +228,7 @@ public partial class MainWindow : ISettingsHost
         ((ISettingsHost)this).ApplyMiniPlayerSettings();
         _mini?.BindEqualizer();
         _ = ApplyHomeBackgroundAsync();
+        ApplyHomeInfo(weatherChanged: true);
         Log.Info("Uvezene postavke primijenjene.");
     }
 

@@ -4,6 +4,27 @@ Alle wichtigen Änderungen an jebaited_player. Format: [Keep a Changelog](https:
 
 Andere Sprachen: [English](CHANGELOG.md) · [Hrvatski](CHANGELOG_HR.md). Derselbe Verlauf ist im Player enthalten (Klick auf die Versionsnummer auf dem Startbildschirm). Diese Datei wird aus `src/JebaitedPlayer.App/History/update-history.json` erzeugt.
 
+## [1.8.4] - 2026-11-21
+
+Zyklus 6: YouTube Music, Uhrzeit, Datum und Wetter auf dem Startbildschirm und Fehlerberichte.
+
+### Neu
+
+- YouTube Music (Strg+Umschalt+Y oder die Quellenanzeige im Mini-Player): Füge einen Link von YouTube oder YouTube Music ein (Song oder Playlist); er läuft im offiziellen YouTube-Player in einem eigenen Fenster, ohne Konto und ohne Schlüssel. Die Suche braucht deinen eigenen kostenlosen YouTube-API-Schlüssel (die Schritte stehen im Fenster; „API-Schlüssel …“ ändert oder entfernt ihn). Solange YouTube die Quelle ist, zeigt der Mini-Player YOUTUBE und seine Tasten steuern YouTube. Der YouTube-Player muss sichtbar bleiben (YouTube-Regeln), daher gibt es keine Wiedergabe im Hintergrund.
+- Informationen auf dem Startbildschirm: Uhrzeit und Datum oben links und auf Wunsch das Wetter für eine Stadt deiner Wahl (Einstellungen → Darstellung; von Open-Meteo, kostenlos und ohne Konto, höchstens alle 30 Minuten, °C oder °F). Ohne Internet wird das zuletzt bekannte Wetter mit der Uhrzeit der Aktualisierung angezeigt.
+- Fehlerberichte: Fehler und Abstürze werden als kurze bereinigte Berichte auf deinem Computer gespeichert (keine Ordner, Videonamen, Namen, Schlüssel oder IP-Adresse). Einstellungen → Info → „Über GitHub senden …“ öffnet ein vorbereitetes Issue, das du vor dem Senden lesen kannst.
+
+### Verbessert
+
+- Nur ein Ton gleichzeitig: Startet YouTube, pausiert die lokale Datei (ein Radiosender stoppt) und Spotify ist nicht mehr die Quelle; eine Datei oder ein Sender pausiert YouTube.
+
+### Bekannte Probleme
+
+- Die App ist noch nicht digital signiert, daher können Windows SmartScreen oder Smart App Control vor der Installation warnen.
+- Das Fortschrittsfenster des Installationsprogramms stammt von Velopack und ist nur auf Englisch.
+
+Release: [v1.8.4](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v1.8.4) · Änderungen seit [v1.7.4...v1.8.4](https://github.com/jebaitedcro7/jebaited_player/compare/v1.7.4...v1.8.4)
+
 ## [1.7.4] - 2026-11-21
 
 Zyklus 5: Spotify-Fernbedienung, „Als Nächstes“ auf dem Startbildschirm und eigener Hintergrund.

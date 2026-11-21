@@ -135,6 +135,13 @@ In the same tab you set the automatic search, the encoding of old subtitles and 
 - Play, pause, skip, seek and volume, your **playlists**, **saved songs**, **search** and the **device** choice. While Spotify is the source, the mini player shows **SPOTIFY** and its buttons control Spotify; opening a file or a station switches back.
 - Spotify sound never goes through the player (no equalizer) and is never sent anywhere else.
 
+### YouTube Music
+
+- **Ctrl+Shift+Y**, right-click → **YouTube Music…** or the source label in the mini player. Paste a link from YouTube or YouTube Music (a song or a playlist) and press **Play link**; this works without an account or a key.
+- **Search** needs your own free YouTube API key: the window shows the steps (Google Cloud console → project → enable “YouTube Data API v3” → create an API key). Google allows about 100 searches a day per key. **API key…** next to the search changes or removes the key.
+- The official YouTube player plays in the window and must stay visible (YouTube rules): no background playback and no ad blocking; minimizing the window pauses it. While YouTube is the source, the mini player shows **YOUTUBE** and its buttons control YouTube; opening a file or a station switches back.
+- YouTube sound does not go through the player’s equalizer.
+
 ### Backup and transfer
 
 Settings → General → **Backup and transfer**: settings and watch history are copied automatically once a day and before every update (the last 7 are kept on your computer). **Export settings** saves them to a file (without passwords, subtitle-site keys and the window position) and **Import settings** loads them again, also on another computer.
@@ -171,9 +178,9 @@ Settings are split into tabs. Every change applies right away (also to the video
 | Subtitles | Subtitle languages and their order, automatic loading and searching, sources on the internet, encoding of old subtitles, look, synchronization |
 | Audio | Volume, volume levelling, equalizer, preferred audio language, output device, output for music and radio, audio sync |
 | Video | Picture quality, hardware decoding, default aspect ratio, HDR |
-| Appearance | Dark / light theme, home screen background (default or your own picture: Fill, Fit, Center), how long the controls stay visible, rendering the interface on the GPU |
+| Appearance | Dark / light theme, home screen background (default or your own picture: Fill, Fit, Center), how long the controls stay visible, rendering the interface on the GPU, time, date and weather on the home screen (a city you choose, from Open-Meteo) |
 | Updates | Version, check now, automatic download, what is new, update history |
-| About | Version, license, technologies used, manual, privacy, code signing policy |
+| About | Version, license, technologies used, manual, privacy, code signing policy, error reports (saved on your computer without personal data; you send them yourself via GitHub) |
 
 ### Update history
 
@@ -269,6 +276,7 @@ Archives from subtitle sites: ZIP is supported; RAR is not yet.
 | Ctrl+M | Mini player / back to the full player |
 | Ctrl+R | Radio |
 | Ctrl+Shift+S | Spotify |
+| Ctrl+Shift+Y | YouTube Music |
 | Ctrl+Backspace | Restore original subtitle timing |
 | F1 | All shortcuts |
 

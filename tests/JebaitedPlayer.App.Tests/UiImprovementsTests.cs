@@ -194,6 +194,29 @@ public sealed class UiImprovementsTests
     }
 
     [TestMethod]
+    public void Mouse_wheel_volume_is_proportional_to_delta_and_keeps_fractions()
+    {
+        var vm = new ViewModels.PlayerViewModel(new AppSettings { Volume = 50 }, null);
+        vm.Volume = 50;
+        vm.ChangeVolumeByWheel(120);
+        Assert.AreEqual(50 + ViewModels.PlayerViewModel.VolumeWheelStep, vm.Volume, "jedan zarez = jedan korak");
+        vm.ChangeVolumeByWheel(-120);
+        Assert.AreEqual(50, vm.Volume);
+
+        // Fini kotačić (npr. 30 po događaju) ne smije se izgubiti zaokruživanjem: 4 događaja = jedan zarez.
+        for (int i = 0; i < 4; i++)
+        {
+            vm.ChangeVolumeByWheel(30);
+        }
+
+        Assert.AreEqual(50 + ViewModels.PlayerViewModel.VolumeWheelStep, vm.Volume);
+        vm.ChangeVolumeByWheel(120 * 40);
+        Assert.AreEqual(100, vm.Volume);
+        vm.ChangeVolumeByWheel(-120 * 40);
+        Assert.AreEqual(0, vm.Volume);
+    }
+
+    [TestMethod]
     public void Next_episode_lead_defaults_to_the_end_and_survives_save_and_load()
     {
         Assert.AreEqual(0, new AppSettings().UpNextLeadSeconds, "zadano kao prije: tek na kraju");

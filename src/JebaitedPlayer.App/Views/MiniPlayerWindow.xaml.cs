@@ -166,8 +166,9 @@ public partial class MiniPlayerWindow : Window
         };
         slider.PreviewMouseWheel += (_, e) =>
         {
-            _vm.Volume += e.Delta > 0 ? PlayerViewModel.VolumeWheelStep : -PlayerViewModel.VolumeWheelStep;
+            _vm.ChangeVolumeByWheel(e.Delta);
             _settings.Volume = _vm.Volume;
+            SyncVolume(slider, _vm.Volume); // traka odmah prati kotačić, bez čekanja na sat
             e.Handled = true;
         };
     }

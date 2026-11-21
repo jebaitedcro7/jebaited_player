@@ -31,7 +31,7 @@ public partial class MainWindow
         // Kotačić miša mijenja glasnoću samo iznad trake glasnoće (i ovdje).
         HomeVolumeArea.PreviewMouseWheel += (_, e) =>
         {
-            _vm.Volume += e.Delta > 0 ? ViewModels.PlayerViewModel.VolumeWheelStep : -ViewModels.PlayerViewModel.VolumeWheelStep;
+            _vm.ChangeVolumeByWheel(e.Delta);
             e.Handled = true;
         };
     }

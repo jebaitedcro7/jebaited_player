@@ -553,7 +553,27 @@ public sealed class PlayerViewModel : ObservableObject
     }
 
     /// <summary>Jedan zarez kotačića miša iznad trake glasnoće (%): 50 zareza za cijeli raspon, dovoljno precizno.</summary>
-    public const double VolumeWheelStep = 2;
+    public const double VolumeWheelStep = 5;
+
+    private double _wheelVolumeRemainder;
+
+    /// <summary>
+    /// Kotačić miša: jedan zarez (Delta 120) = <see cref="VolumeWheelStep"/> %. Razmjerno Deltau, pa miševi s finim kotačićem
+    /// i touchpadi mijenjaju glasnoću glatko; ostatak manji od 1 % se pamti, da se ne gubi zaokruživanjem.
+    /// Vraća novu glasnoću.
+    /// </summary>
+    public double ChangeVolumeByWheel(int wheelDelta)
+    {
+        _wheelVolumeRemainder += wheelDelta / 120.0 * VolumeWheelStep;
+        double whole = Math.Truncate(_wheelVolumeRemainder);
+        _wheelVolumeRemainder -= whole;
+        if (whole != 0)
+        {
+            Volume += whole;
+        }
+
+        return Volume;
+    }
 
     public void ChangeVolume(double delta)
     {

@@ -4,6 +4,20 @@ All notable changes to jebaited_player. Format: [Keep a Changelog](https://keepa
 
 Other languages: [Deutsch](CHANGELOG_DE.md) · [Hrvatski](CHANGELOG_HR.md). The same history is included in the player (click the version number on the home screen). This file is generated from `src/JebaitedPlayer.App/History/update-history.json`.
 
+## [2.1.8] - 2026-11-21
+
+Fix: the player starts again when the main window was maximized and the mini player was the last view; the mouse wheel changes the volume faster and more smoothly.
+
+### Improved
+
+- The mouse wheel over the volume bar changes the volume by 5 % per notch (was 2 %), in proportion to how far the wheel turns, so fine-grained wheels and touchpads are smooth. The mini player slider follows at once.
+
+### Fixed
+
+- The player no longer starts without any window when the main window was maximized and the last view was the mini player.
+
+Release: [v2.1.8](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v2.1.8) · Changes since [v2.1.7...v2.1.8](https://github.com/jebaitedcro7/jebaited_player/compare/v2.1.7...v2.1.8)
+
 ## [2.1.7] - 2026-11-21
 
 Mini player and home screen: five mini player looks, volume by mouse wheel, a pulsing LIVE badge for radio, music that keeps playing on the home screen and a fully customizable clock, date and weather.

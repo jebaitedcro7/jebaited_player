@@ -59,7 +59,7 @@ Check "9: Home ne prekida glazbu" ($h.homeView -and $h.welcomeVisible -and $h.ha
 Check "9: Home ne učitava ponovno (isti audio engine)" ([int]$h.loads -eq 0) "novih učitavanja: $($h.loads)"
 Check "9: Home prikazuje pjesmu, izvor i traku kontrola" ($h.bar -and $h.track -match "jebaited_cro — Prva pjesma" -and $h.source -match "LOKALNO" -and -not $h.overlayVisible -and -not $h.audioPanel) "'$($h.track)', izvor '$($h.source)', kontrole playera $($h.overlayVisible), snimka $($h.screenshot)"
 $c = $u.homeControls
-Check "9: Home Play/Pause, glasnoća" ($c.pausedByHome -and $c.resumed -and [double]$c.volumeStep -eq 2 -and $c.volumeBack) "pauza $($c.pausedByHome), nastavak $($c.resumed), korak glasnoće $($c.volumeStep)"
+Check "9: Home Play/Pause, glasnoća" ($c.pausedByHome -and $c.resumed -and [double]$c.volumeStep -eq 5 -and $c.volumeBack) "pauza $($c.pausedByHome), nastavak $($c.resumed), korak glasnoće $($c.volumeStep)"
 $n = $u.homeNext
 Check "9: Home Sljedeća / Prethodna mijenjaju pjesmu uz isti prikaz" ($n.current -match "02" -and $n.homeView -and $n.welcomeVisible -and -not $n.paused -and $n.track -match "Druga pjesma") "'$($n.current)', naslov '$($n.track)'"
 $sw = $u.switches
@@ -72,11 +72,11 @@ if ($u.videoHome) {
 
 # 1) Kotačić
 $w = $u.wheel
-Check "1: kotačić iznad trake glasnoće (mini): korak i smjer" ([double]$w.step -eq 2 -and [double]$w.miniDown -eq 48) "gore +$($w.step), dvaput dolje → $($w.miniDown)"
-Check "1: kotačić drugdje ne mijenja glasnoću (mini)" ([double]$w.elsewhere -eq 48 -and [double]$w.realElsewhere -eq [double]$w.realUp) "iznad naslova/vremena: $($w.elsewhere), pravi miš: $($w.realUp) → $($w.realElsewhere)"
-Check "1: pravi kotačić miša iznad trake glasnoće" ([double]$w.realUp -eq 42) "40 → $($w.realUp)"
+Check "1: kotačić iznad trake glasnoće (mini): korak i smjer" ([double]$w.step -eq 5 -and [double]$w.miniDown -eq 45) "gore +$($w.step), dvaput dolje → $($w.miniDown)"
+Check "1: kotačić drugdje ne mijenja glasnoću (mini)" ([double]$w.elsewhere -eq 45 -and [double]$w.realElsewhere -eq [double]$w.realUp) "iznad naslova/vremena: $($w.elsewhere), pravi miš: $($w.realUp) → $($w.realElsewhere)"
+Check "1: pravi kotačić miša iznad trake glasnoće" ([double]$w.realUp -eq 45) "40 → $($w.realUp)"
 Check "1: glasnoća ostaje 0–100" ([double]$w.clampedTop -eq 100 -and [double]$w.clampedBottom -eq 0) "gore $($w.clampedTop), dolje $($w.clampedBottom)"
-Check "1: puni player: samo traka glasnoće" ([double]$w.overlayStep -eq 2 -and [double]$w.overlayTimeline -eq 52) "traka glasnoće +$($w.overlayStep), vremenska traka ostavlja $($w.overlayTimeline)"
+Check "1: puni player: samo traka glasnoće" ([double]$w.overlayStep -eq 5 -and [double]$w.overlayTimeline -eq 55) "traka glasnoće +$($w.overlayStep), vremenska traka ostavlja $($w.overlayTimeline)"
 
 # 6) Izgledi
 $d = $u.designs
@@ -87,9 +87,9 @@ foreach ($id in "classic", "card", "strip", "side", "ufo") {
     $titleOk = $e.title -match "jebaited_cro — (Prva|Druga) pjesma" -and $e.title -notmatch "kHz|kbps"
     Check "6: izgled $id" ($e.active -eq $id -and $e.saved -eq $id -and $skinOk -and $titleOk -and $e.inside) "$($e.skin) $($e.size -join '×'), '$($e.title)', snimka $($e.screenshot)"
     if ($id -ne "strip") {
-        Check "6: izgled ${id}: Play/Pause i glasnoća rade isto" ($e.pausedByButton -and $e.resumedByButton -and $e.volumeSliderFollows -and [double]$e.wheelStep -eq 2) "pauza $($e.pausedByButton), nastavak $($e.resumedByButton), traka prati $($e.volumeSliderFollows), kotačić +$($e.wheelStep)"
+        Check "6: izgled ${id}: Play/Pause i glasnoća rade isto" ($e.pausedByButton -and $e.resumedByButton -and $e.volumeSliderFollows -and [double]$e.wheelStep -eq 5) "pauza $($e.pausedByButton), nastavak $($e.resumedByButton), traka prati $($e.volumeSliderFollows), kotačić +$($e.wheelStep)"
     } else {
-        Check "6: izgled strip: glasnoća radi isto" ($e.volumeSliderFollows -and [double]$e.wheelStep -eq 2) "traka prati $($e.volumeSliderFollows), kotačić +$($e.wheelStep)"
+        Check "6: izgled strip: glasnoća radi isto" ($e.volumeSliderFollows -and [double]$e.wheelStep -eq 5) "traka prati $($e.volumeSliderFollows), kotačić +$($e.wheelStep)"
     }
     if ($id -in "card", "side", "ufo") {
         Check "6: izgled ${id}: sve funkcije (LIVE, EQ, Discord)" ($e.hasLive -and $e.hasEq -and $e.hasDiscord -and $e.source -match "LOKALNO" -and $e.time -match "\d") "vrijeme '$($e.time)', izvor '$($e.source)'"
@@ -212,6 +212,13 @@ $t2 = $wins | Where-Object { $_.Title -eq "jebaited_player mini" } | Select-Obje
 if ($t2) { [void][WinProbe]::PostMessage($t2.H, 0x0010, [IntPtr]::Zero, [IntPtr]::Zero) }
 if (-not $app.WaitForExit(15000)) { $app.Kill() }
 Check "4: ponovno pokretanje otvara isti prikaz" ($mini2 -and -not $main2) "mini $mini2, veliki $main2"
+
+# 2.1.8: prije je maksimiziran glavni prozor + pokretanje u mini playeru rušilo Show() (ShowActivated=false uz Maximized) i
+# player je radio bez ijednog prozora.
+$s1m = Test-Startup "mini-maximized" "{ $base, `"WindowMaximized`": true, `"MiniPlayer`": { `"WasOpen`": true } }" @()
+Check "4: mini pri pokretanju radi i kad je glavni prozor bio maksimiziran" ($s1m.Mini -and -not $s1m.Main -and $s1m.Closed) "mini $($s1m.Mini), veliki $($s1m.Main), uredno zatvoren $($s1m.Closed)"
+$savedMax = (Get-Content -LiteralPath (Join-Path $s1m.Dir "settings.json") -Raw -Encoding UTF8 | ConvertFrom-Json).WindowMaximized
+Check "4: maksimizirano stanje glavnog prozora se ne gubi" ([bool]$savedMax) "WindowMaximized u postavkama: $savedMax"
 
 $s2 = Test-Startup "normal" "{ $base, `"MiniPlayer`": { `"WasOpen`": false } }" @()
 Check "4: zadnji prikaz normalni → pokreće se samo veliki prozor" ($s2.Main -and -not $s2.Mini -and $s2.Both -eq 0) "veliki $($s2.Main), mini $($s2.Mini)"

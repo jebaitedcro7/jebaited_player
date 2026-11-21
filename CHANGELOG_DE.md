@@ -4,6 +4,20 @@ Alle wichtigen Änderungen an jebaited_player. Format: [Keep a Changelog](https:
 
 Andere Sprachen: [English](CHANGELOG.md) · [Hrvatski](CHANGELOG_HR.md). Derselbe Verlauf ist im Player enthalten (Klick auf die Versionsnummer auf dem Startbildschirm). Diese Datei wird aus `src/JebaitedPlayer.App/History/update-history.json` erzeugt.
 
+## [2.1.8] - 2026-11-21
+
+Korrektur: Der Player startet wieder, wenn das Hauptfenster maximiert war und der Mini-Player die letzte Ansicht war; das Mausrad ändert die Lautstärke schneller und flüssiger.
+
+### Verbessert
+
+- Das Mausrad über der Lautstärkeleiste ändert die Lautstärke um 5 % pro Raststufe (vorher 2 %), proportional zur Drehung, sodass feine Mausräder und Touchpads flüssig arbeiten. Der Regler im Mini-Player folgt sofort.
+
+### Behoben
+
+- Der Player startet nicht mehr ohne Fenster, wenn das Hauptfenster maximiert war und die letzte Ansicht der Mini-Player war.
+
+Release: [v2.1.8](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v2.1.8) · Änderungen seit [v2.1.7...v2.1.8](https://github.com/jebaitedcro7/jebaited_player/compare/v2.1.7...v2.1.8)
+
 ## [2.1.7] - 2026-11-21
 
 Mini-Player und Startbildschirm: fünf Mini-Player-Looks, Lautstärke per Mausrad, pulsierende LIVE-Anzeige fürs Radio, Musik läuft auf dem Startbildschirm weiter, Uhrzeit, Datum und Wetter frei anpassbar.

@@ -40,6 +40,45 @@
   },
   "versions": [
     {
+      "version": "2.1.8",
+      "date": "2026-11-21",
+      "notes": {
+        "en": {
+          "summary": "Fix: the player starts again when the main window was maximized and the mini player was the last view; the mouse wheel changes the volume faster and more smoothly.",
+          "features": [],
+          "improvements": [
+            "The mouse wheel over the volume bar changes the volume by 5 % per notch (was 2 %), in proportion to how far the wheel turns, so fine-grained wheels and touchpads are smooth. The mini player slider follows at once."
+          ],
+          "fixes": [
+            "The player no longer starts without any window when the main window was maximized and the last view was the mini player."
+          ],
+          "known": []
+        },
+        "de": {
+          "summary": "Korrektur: Der Player startet wieder, wenn das Hauptfenster maximiert war und der Mini-Player die letzte Ansicht war; das Mausrad ändert die Lautstärke schneller und flüssiger.",
+          "features": [],
+          "improvements": [
+            "Das Mausrad über der Lautstärkeleiste ändert die Lautstärke um 5 % pro Raststufe (vorher 2 %), proportional zur Drehung, sodass feine Mausräder und Touchpads flüssig arbeiten. Der Regler im Mini-Player folgt sofort."
+          ],
+          "fixes": [
+            "Der Player startet nicht mehr ohne Fenster, wenn das Hauptfenster maximiert war und die letzte Ansicht der Mini-Player war."
+          ],
+          "known": []
+        },
+        "hr": {
+          "summary": "Popravak: player se opet pokreće kad je glavni prozor bio maksimiziran, a zadnji prikaz mini player; kotačić miša mijenja glasnoću brže i glatkije.",
+          "features": [],
+          "improvements": [
+            "Kotačić miša iznad trake glasnoće mijenja glasnoću za 5 % po zarezu (prije 2 %), razmjerno okretanju kotačića, pa fini kotačići i touchpadi rade glatko. Traka u mini playeru odmah prati."
+          ],
+          "fixes": [
+            "Player se više ne pokreće bez ijednog prozora kad je glavni prozor bio maksimiziran, a zadnji prikaz je bio mini player."
+          ],
+          "known": []
+        }
+      }
+    },
+    {
       "version": "2.1.7",
       "date": "2026-11-21",
       "notes": {

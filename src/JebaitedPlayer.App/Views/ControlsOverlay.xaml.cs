@@ -43,7 +43,8 @@ public partial class ControlsOverlay : Window
         // 2.1.7: samo iznad trake glasnoće; kotačić drugdje ne smije slučajno mijenjati glasnoću.
         VolumeArea.PreviewMouseWheel += (_, e) =>
         {
-            _vm.ChangeVolume(e.Delta > 0 ? PlayerViewModel.VolumeWheelStep : -PlayerViewModel.VolumeWheelStep);
+            _vm.ChangeVolumeByWheel(e.Delta);
+            _vm.ShowOsd(Loc.T("osd.volume", _vm.Volume));
             UserActivity?.Invoke(this, EventArgs.Empty);
             e.Handled = true;
         };

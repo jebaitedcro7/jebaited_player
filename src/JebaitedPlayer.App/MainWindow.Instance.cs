@@ -61,6 +61,7 @@ public partial class MainWindow
 
     private bool _hiddenStart;
     private Point _hiddenStartLocation;
+    private WindowState _hiddenStartState = WindowState.Normal;
 
     /// <summary>
     /// Prije prvog prikaza: ako se treba otvoriti mini player (zadnji prikaz je bio mini ili je zadana samo glazba),
@@ -84,6 +85,10 @@ public partial class MainWindow
 
         _hiddenStart = true;
         _hiddenStartLocation = new Point(Left, Top);
+        // WPF ne dopušta Show() uz ShowActivated=false i maksimiziran prozor (InvalidOperationException, player se tada
+        // pokrene bez ijednog prozora). Stanje se vraća u FinishHiddenStart.
+        _hiddenStartState = WindowState;
+        WindowState = WindowState.Normal;
         WindowStartupLocation = WindowStartupLocation.Manual;
         ShowInTaskbar = false;
         ShowActivated = false;
@@ -106,6 +111,10 @@ public partial class MainWindow
         Left = double.IsNaN(_hiddenStartLocation.X) ? work.Left + Math.Max(0, (work.Width - Width) / 2) : _hiddenStartLocation.X;
         Top = double.IsNaN(_hiddenStartLocation.Y) ? work.Top + Math.Max(0, (work.Height - Height) / 2) : _hiddenStartLocation.Y;
         ShowInTaskbar = true;
+        if (WindowState != _hiddenStartState)
+        {
+            WindowState = _hiddenStartState;
+        }
     }
 
     /// <summary>Minimiziraj na taskbar (2.1.7): zasebno od mini playera; glazba i radio sviraju dalje.</summary>

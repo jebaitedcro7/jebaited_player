@@ -4,6 +4,20 @@ Sve važnije promjene jebaited_playera. Oblik: [Keep a Changelog](https://keepac
 
 Drugi jezici: [English](CHANGELOG.md) · [Deutsch](CHANGELOG_DE.md). Ista povijest je i u playeru (klik na broj verzije na početnom ekranu). Ova datoteka nastaje iz `src/JebaitedPlayer.App/History/update-history.json`.
 
+## [2.1.8] - 2026-11-21
+
+Popravak: player se opet pokreće kad je glavni prozor bio maksimiziran, a zadnji prikaz mini player; kotačić miša mijenja glasnoću brže i glatkije.
+
+### Poboljšano
+
+- Kotačić miša iznad trake glasnoće mijenja glasnoću za 5 % po zarezu (prije 2 %), razmjerno okretanju kotačića, pa fini kotačići i touchpadi rade glatko. Traka u mini playeru odmah prati.
+
+### Ispravljeno
+
+- Player se više ne pokreće bez ijednog prozora kad je glavni prozor bio maksimiziran, a zadnji prikaz je bio mini player.
+
+Izdanje: [v2.1.8](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v2.1.8) · Promjene od [v2.1.7...v2.1.8](https://github.com/jebaitedcro7/jebaited_player/compare/v2.1.7...v2.1.8)
+
 ## [2.1.7] - 2026-11-21
 
 Mini player i početni ekran: pet izgleda mini playera, glasnoća kotačićem miša, pulsirajuća oznaka UŽIVO za radio, glazba svira dalje na početnom ekranu te potpuno prilagodljivo vrijeme, datum i prognoza.

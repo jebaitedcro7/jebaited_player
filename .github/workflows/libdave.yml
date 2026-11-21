@@ -45,7 +45,9 @@ jobs:
       - name: vcpkg (pinned release)
         shell: pwsh
         run: |
-          git clone --quiet --branch $env:VCPKG_TAG --depth 1 https://github.com/microsoft/vcpkg.git vcpkg-root
+          # Puni klon: vcpkg verzije paketa (version>=, builtin-baseline) čita iz git povijesti.
+          git clone --quiet https://github.com/microsoft/vcpkg.git vcpkg-root
+          git -C vcpkg-root checkout --quiet $env:VCPKG_COMMIT
           $sha = git -C vcpkg-root rev-parse HEAD
           if ($sha -ne $env:VCPKG_COMMIT) { throw "vcpkg $env:VCPKG_TAG is $sha, expected $env:VCPKG_COMMIT" }
           .\vcpkg-root\bootstrap-vcpkg.bat -disableMetrics

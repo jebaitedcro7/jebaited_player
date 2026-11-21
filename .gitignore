@@ -9,9 +9,10 @@ Releases/
 .vscode/
 *.log
 
-# Velike binarne datoteke (izvor i SHA256 zapisani su u third_party/libmpv/SOURCE.md)
+# Velike binarne datoteke (izvor i SHA256 zapisani su u third_party/libmpv/SOURCE.md i third_party/libdave/SOURCE.md)
 third_party/libmpv/*.dll
 third_party/libmpv/*.dll.a
+third_party/libdave/*.dll
 
 # Testni video i titlovi (generiraju se lokalno, ne idu u git)
 testdata/

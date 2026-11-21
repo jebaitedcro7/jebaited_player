@@ -1,0 +1,52 @@
+<Window x:Class="JebaitedPlayer.Views.ColorPickerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:JebaitedPlayer.Infrastructure"
+        Title="{loc:T colorPicker.title}" Width="440" SizeToContent="Height" ResizeMode="NoResize" ShowInTaskbar="False"
+        WindowStartupLocation="CenterOwner" Background="{DynamicResource WindowBackgroundBrush}"
+        Foreground="{DynamicResource TextPrimaryBrush}" FontFamily="{DynamicResource UiFont}" FontSize="13" UseLayoutRounding="True">
+
+    <!-- 2.0: vlastita boja isticanja. Pregled pokazuje boju kakva će biti u trenutnoj temi (po potrebi posvijetljena ili
+         potamnjena radi čitljivosti) i tekst na njoj. -->
+    <Grid>
+    <StackPanel Margin="22,16,22,18">
+        <TextBlock Style="{StaticResource TabTitle}" Text="{loc:T colorPicker.title}" />
+        <Border x:Name="PreviewBox" Height="58" CornerRadius="8" Margin="0,6,0,14">
+            <TextBlock x:Name="PreviewText" Text="{loc:T colorPicker.sample}" HorizontalAlignment="Center" VerticalAlignment="Center"
+                       FontWeight="SemiBold" FontSize="14" />
+        </Border>
+
+        <TextBlock Text="{loc:T colorPicker.hue}" />
+        <Border Height="6" CornerRadius="3" Margin="5,6,5,0">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                    <GradientStop Color="#FF0000" Offset="0" />
+                    <GradientStop Color="#FFFF00" Offset="0.1667" />
+                    <GradientStop Color="#00FF00" Offset="0.3333" />
+                    <GradientStop Color="#00FFFF" Offset="0.5" />
+                    <GradientStop Color="#0000FF" Offset="0.6667" />
+                    <GradientStop Color="#FF00FF" Offset="0.8333" />
+                    <GradientStop Color="#FF0000" Offset="1" />
+                </LinearGradientBrush>
+            </Border.Background>
+        </Border>
+        <Slider x:Name="HueSlider" Style="{StaticResource PlayerSlider}" Minimum="0" Maximum="359" Margin="0,2,0,10" />
+
+        <TextBlock Text="{loc:T colorPicker.saturation}" />
+        <Slider x:Name="SaturationSlider" Style="{StaticResource PlayerSlider}" Minimum="0" Maximum="100" Margin="0,4,0,10" />
+
+        <TextBlock Text="{loc:T colorPicker.lightness}" />
+        <Slider x:Name="LightnessSlider" Style="{StaticResource PlayerSlider}" Minimum="10" Maximum="90" Margin="0,4,0,10" />
+
+        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+            <TextBlock Text="{loc:T colorPicker.hex}" VerticalAlignment="Center" Margin="0,0,10,0" />
+            <TextBox x:Name="HexBox" Width="110" MinHeight="30" Padding="6,4" VerticalContentAlignment="Center" FontFamily="Consolas" MaxLength="7" />
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,18,0,0">
+            <Button Style="{StaticResource SecondaryButton}" Content="{loc:T common.cancel}" Click="OnCancel" IsCancel="True" Margin="0,0,8,0" />
+            <Button x:Name="UseButton" Style="{StaticResource AccentButton}" Content="{loc:T colorPicker.use}" Click="OnUse" IsDefault="True" />
+        </StackPanel>
+    </StackPanel>
+    </Grid>
+</Window>

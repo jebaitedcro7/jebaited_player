@@ -92,7 +92,8 @@ Test-Home "home-fullscreen" "home-fullscreen" $film $true
 
 $s = Invoke-UiTest "settings" "settings" $film
 $tabsOk = @($s.tabs.PSObject.Properties | Where-Object { $_.Value.selected -eq $_.Name -and $_.Value.contentHeight -gt 100 }).Count
-Check "postavke: 8 kartica" ($tabsOk -eq 8) "otvara se $tabsOk/8 kartica: $(($s.tabs.PSObject.Properties | ForEach-Object { $_.Value.header }) -join ', ')"
+# 2.0: deveta kartica Prečaci.
+Check "postavke: 9 kartica" ($tabsOk -eq 9) "otvara se $tabsOk/9 kartica: $(($s.tabs.PSObject.Properties | ForEach-Object { $_.Value.header }) -join ', ')"
 Check "postavke: audio uređaji" (@($s.audioDevices).Count -ge 1) "$(@($s.audioDevices).Count) uređaja"
 $c = $s.changed
 Check "postavke: promjene odmah u mpv-u" ($c.hwdec -eq "no" -and $c.scale -eq "ewa_lanczossharp" -and $c.deband -eq "yes" -and $c.af -match "dynaudnorm" -and [double]$c.'audio-delay' -eq 0.25 -and $c.alang -match "^en" -and $c.'target-colorspace-hint' -eq "yes") "hwdec=$($c.hwdec), scale=$($c.scale), deband=$($c.deband), af=$($c.af), audio-delay=$($c.'audio-delay'), alang=$($c.alang), HDR=$($c.'target-colorspace-hint')"

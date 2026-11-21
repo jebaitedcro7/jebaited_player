@@ -50,6 +50,12 @@ public partial class MainWindow
                     "homeinfo" => await HomeInfoUiTestAsync(),
                     "reports" => await ReportsUiTestAsync(),
                     "youtube" => await YouTubeUiTestAsync(),
+                    "discord" => await DiscordUiTestAsync(),
+                    "discordlive" => await DiscordLiveUiTestAsync(),
+                    "discordui" => await DiscordWindowUiTestAsync(),
+                    "discorduilive" => await DiscordWindowLiveUiTestAsync(),
+                    "shortcuts" => await ShortcutsUiTestAsync(),
+                    "accent" => await AccentUiTestAsync(),
                     _ => new Dictionary<string, object?> { ["error"] = "nepoznat scenarij " + scenario },
                 };
             }

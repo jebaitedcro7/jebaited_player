@@ -69,6 +69,13 @@ try {
     $expected = ([regex]::Match((Get-Content (Join-Path $root "third_party\libmpv\SOURCE.md") -Raw), 'libmpv-2\.dll` \| `([0-9a-f]{64})')).Groups[1].Value
     if ($mpv -ne $expected) { throw "libmpv-2.dll u paketu nema očekivani SHA256 ($mpv)." }
 
+    # libdave (bot za Discord) mora biti u paketu i točno onaj provjereni (SHA256 u third_party\libdave\SOURCE.md).
+    $daveFile = Join-Path $publishDir "libdave.dll"
+    if (-not (Test-Path $daveFile)) { throw "libdave.dll nije u paketu. Pokreni tools\get-libdave.ps1 pa ponovi." }
+    $dave = (Get-FileHash $daveFile -Algorithm SHA256).Hash.ToLowerInvariant()
+    $expectedDave = ([regex]::Match((Get-Content (Join-Path $root "third_party\libdave\SOURCE.md") -Raw), 'libdave\.dll` \| `([0-9a-f]{64})')).Groups[1].Value
+    if ($dave -ne $expectedDave) { throw "libdave.dll u paketu nema očekivani SHA256 ($dave)." }
+
     $exeVersion = (Get-Item (Join-Path $publishDir "jebaited_player.exe")).VersionInfo.ProductVersion
     if ($exeVersion -ne $Version) { throw "Exe ima verziju '$exeVersion', a izdanje je $Version." }
 

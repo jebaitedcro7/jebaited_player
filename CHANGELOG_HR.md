@@ -4,6 +4,34 @@ Sve važnije promjene jebaited_playera. Oblik: [Keep a Changelog](https://keepac
 
 Drugi jezici: [English](CHANGELOG.md) · [Deutsch](CHANGELOG_DE.md). Ista povijest je i u playeru (klik na broj verzije na početnom ekranu). Ova datoteka nastaje iz `src/JebaitedPlayer.App/History/update-history.json`.
 
+## [2.0.6] - 2026-11-21
+
+2.0: tvoj vlastiti bot za Discord pušta glazbu i radio iz playera u glasovnom kanalu; svaki prečac se može promijeniti; boja isticanja po izboru.
+
+### Novo
+
+- Bot za Discord (Ctrl+Shift+D, gumb sa slušalicama u mini playeru ili desni klik → Bot za Discord…): tvoj vlastiti bot pušta glazbu i radio iz playera u glasovnom kanalu na tvom serveru, pa prijatelji čuju što slušaš. Napravi besplatnog bota u Discord Developer Portalu (koraci su u prozoru), zalijepi njegov token i pozovi ga; „Uđi u moj kanal” pronađe kanal u kojem jesi. Token se sprema kriptiran, samo na ovom računalu. Šalju se samo lokalna glazba i radio: filmovi, YouTube i Spotify nikad se ne šalju (bot šalje tišinu). Glasovna veza je kriptirana s kraja na kraj (Discord DAVE).
+- Vlastiti prečaci (Postavke → Prečaci): svaka radnja može imati dvije tipke. Klikni tipku i pritisni novu kombinaciju; ako je već koristi druga radnja, player to javi, a drugi pritisak je premjesti. „Zadano” vraća jednu radnju ili cijelu karticu. F1 i izbornici uvijek pokazuju tvoje stvarne tipke, a tvoje tipke su u izvozu postavki i u kopijama.
+- Boja isticanja (Postavke → Izgled → Boja isticanja): osam gotovih boja ili vlastita (nijansa, zasićenost i svjetlina ili #RRGGBB) uz pregled uživo. Prate je gumbi, klizači, označene stavke te zaslon i VU metar mini playera; u svakoj temi boja se po potrebi prilagodi da tekst ostane čitljiv.
+
+### Poboljšano
+
+- Dulje premotavanje (Ctrl+←/→) te fini i grubi pomak titlova (Ctrl+G/H, Shift+G/H) sad su zasebne radnje, pa se i njihove tipke mogu mijenjati.
+- Puni tekstovi licenci komponenti bota za Discord (NetCord, Concentus, libdave, OpenSSL, mlspp, nlohmann/json) instaliraju se uz program u mapu licenses, zajedno s THIRD_PARTY_NOTICES.
+
+### Ispravljeno
+
+- Kratki opis privatnosti u Postavkama bio je zastario (spominjao je samo GitHub, titlove i radio); sad navodi svaku uslugu na koju se player može spojiti.
+- Na F1 popisu prečaca nedostajali su Ctrl+M, Ctrl+R, Ctrl+Shift+S i Ctrl+Shift+Y; sad nastaje iz istog popisa koji player koristi, pa je uvijek potpun.
+
+### Poznati problemi
+
+- Bot za Discord za slanje zvuka treba Windows 11 (ili Windows 10 build 20348 ili noviji).
+- Aplikacija još nije digitalno potpisana, pa Windows SmartScreen ili Smart App Control mogu upozoriti prije instalacije.
+- Prozor napretka instalacije je Velopackov i samo je na engleskom.
+
+Izdanje: [v2.0.6](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v2.0.6) · Promjene od [v1.8.4...v2.0.6](https://github.com/jebaitedcro7/jebaited_player/compare/v1.8.4...v2.0.6)
+
 ## [1.8.4] - 2026-11-21
 
 Ciklus 6: YouTube Music, vrijeme, datum i prognoza na početnom ekranu te izvještaji o greškama.

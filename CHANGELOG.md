@@ -4,6 +4,34 @@ All notable changes to jebaited_player. Format: [Keep a Changelog](https://keepa
 
 Other languages: [Deutsch](CHANGELOG_DE.md) · [Hrvatski](CHANGELOG_HR.md). The same history is included in the player (click the version number on the home screen). This file is generated from `src/JebaitedPlayer.App/History/update-history.json`.
 
+## [2.0.6] - 2026-11-21
+
+2.0: your own Discord bot plays the player's music and radio in a voice channel; every keyboard shortcut can be changed; choose the accent color.
+
+### Added
+
+- Discord bot (Ctrl+Shift+D, the headphones button in the mini player, or right-click → Discord bot…): your own bot plays the player's music and radio in a voice channel on your server, so friends hear what you listen to. Create a free bot in the Discord Developer Portal (the steps are in the window), paste its token and invite it; “Join my channel” finds the channel you are in. The token is stored encrypted on this computer only. Only local music and radio are sent: films, YouTube and Spotify are never sent (the bot sends silence). Voice is end-to-end encrypted (Discord DAVE).
+- Your own keyboard shortcuts (Settings → Shortcuts): every action can have two keys. Click a key and press the new combination; if another action already uses it, the player tells you, and pressing it again moves it. “Default” restores one action or the whole tab. F1 and the menus always show your actual keys, and your keys are included in settings export and backups.
+- Accent color (Settings → Appearance → Accent color): eight ready-made colors or your own (hue, saturation and lightness, or #RRGGBB) with a live preview. Buttons, sliders, selected items and the mini player display and level meter follow it; in each theme the color is adjusted when needed so that text stays readable.
+
+### Improved
+
+- The longer seek (Ctrl+←/→) and the fine and coarse subtitle shifts (Ctrl+G/H, Shift+G/H) are now actions of their own, so their keys can be changed too.
+- The full license texts of the Discord bot components (NetCord, Concentus, libdave, OpenSSL, mlspp, nlohmann/json) are installed with the program in the licenses folder, together with THIRD_PARTY_NOTICES.
+
+### Fixed
+
+- The short privacy text in Settings was out of date (it named only GitHub, subtitles and radio); it now lists every service the player can connect to.
+- The F1 list of shortcuts was missing Ctrl+M, Ctrl+R, Ctrl+Shift+S and Ctrl+Shift+Y; it is now built from the same list the player uses, so it is always complete.
+
+### Known issues
+
+- The Discord bot needs Windows 11 (or Windows 10 build 20348 or newer) to send sound.
+- The app is not digitally signed yet, so Windows SmartScreen or Smart App Control may warn before the installation.
+- The progress window of the installer comes from Velopack and is only in English.
+
+Release: [v2.0.6](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v2.0.6) · Changes since [v1.8.4...v2.0.6](https://github.com/jebaitedcro7/jebaited_player/compare/v1.8.4...v2.0.6)
+
 ## [1.8.4] - 2026-11-21
 
 Cycle 6: YouTube Music, time, date and weather on the home screen, and error reports.

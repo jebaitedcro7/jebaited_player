@@ -45,6 +45,10 @@ jobs:
         shell: powershell
         run: .\tools\get-libmpv.ps1
 
+      - name: libdave (verified SHA-256)
+        shell: powershell
+        run: .\tools\get-libdave.ps1
+
       - name: Unit tests
         run: dotnet test jebaited_player.slnx -c Release --nologo
 

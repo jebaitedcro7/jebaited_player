@@ -391,6 +391,12 @@ public sealed class AppSettings
     /// <summary>Mini Music Player (ciklus 2).</summary>
     public MiniPlayerSettings MiniPlayer { get; set; } = new();
 
+    /// <summary>2.0: boja isticanja: "" = zadana zelena, inače #RRGGBB (gotova ili vlastita boja).</summary>
+    public string AccentColor { get; set; } = string.Empty;
+
+    /// <summary>2.0: promijenjeni prečaci (ID radnje → do dvije tipke, npr. "Ctrl+O"); zadani se ne spremaju.</summary>
+    public Dictionary<string, string[]> Shortcuts { get; set; } = new();
+
     /// <summary>Hardversko dekodiranje (grafička kartica).</summary>
     public bool HardwareDecoding { get; set; } = true;
 
@@ -490,6 +496,9 @@ public sealed class AppSettings
         MusicEqualizer.Normalize();
         MiniPlayer ??= new MiniPlayerSettings();
         MiniPlayer.Normalize();
+        Shortcuts ??= new Dictionary<string, string[]>();
+        JebaitedPlayer.Infrastructure.Shortcuts.Normalize(this);
+        AccentColor = AccentColors.Normalize(AccentColor);
     }
 
     public SubtitleStyleSettings SubtitleStyle { get; set; } = new();
@@ -1040,31 +1049,51 @@ public sealed record ShortcutInfo(string Keys, string Description);
 
 public static class KeyboardShortcuts
 {
-    /// <summary>Popis na trenutnom jeziku (gradi se pri svakom čitanju, pa prati promjenu jezika).</summary>
-    public static IReadOnlyList<ShortcutInfo> All =>
-    [
-        new(Loc.T("shortcut.playPause.keys"), Loc.T("shortcut.playPause")),
-        new("← / →", Loc.T("shortcut.seek5")),
-        new("Ctrl + ← / →", Loc.T("shortcut.seek30")),
-        new(Loc.T("shortcut.volume.keys"), Loc.T("shortcut.volume")),
-        new("M", Loc.T("shortcut.mute")),
-        new(Loc.T("shortcut.fullscreen.keys"), Loc.T("shortcut.fullscreen")),
-        new(", / .", Loc.T("shortcut.frame")),
-        new("N / P / L", Loc.T("shortcut.episodes")),
-        new("Ctrl + O / Ctrl + Shift + O", Loc.T("shortcut.open")),
-        new("Ctrl + T / Ctrl + F", Loc.T("shortcut.subtitleFiles")),
-        new("V / J", Loc.T("shortcut.subtitleToggle")),
-        new("G / H", Loc.T("shortcut.subtitleDelay")),
-        new(Loc.T("shortcut.zx.keys"), Loc.T("shortcut.zx")),
-        new("A", Loc.T("shortcut.autoSync")),
-        new("B", Loc.T("menu.nextAudio")),
-        new("+ / − / Backspace", Loc.T("shortcut.speed")),
-        new("O", Loc.T("shortcut.aspect")),
-        new("S / Shift + S", Loc.T("shortcut.screenshot")),
-        new("Ctrl + D", Loc.T("shortcut.favorite")),
-        new("Ctrl + Backspace", Loc.T("shortcut.resetSync")),
-        new("F1", Loc.T("shortcut.help")),
-    ];
+    /// <summary>Postavke iz kojih se čitaju tipke (postavlja glavni prozor); bez toga zadane tipke.</summary>
+    public static AppSettings Settings { get; set; } = new();
+
+    /// <summary>
+    /// F1 i početni ekran: najvažniji prečaci sa stvarnim tipkama (2.0: iz registra i korisnikovih promjena), na trenutnom
+    /// jeziku. Red bez ijedne tipke se ne prikazuje. Svi prečaci su u Postavke → Prečaci.
+    /// </summary>
+    public static IReadOnlyList<ShortcutInfo> All
+    {
+        get
+        {
+            AppSettings s = Settings;
+            string Keys(params string[] ids) => string.Join(" / ", ids.Select(id => Shortcuts.Gesture(s, id)).Where(k => k.Length > 0));
+            string Full(string id) => Shortcuts.Display(s, id);
+            static string With(string keys, string extra) => keys.Length == 0 ? string.Empty : $"{keys} / {extra}";
+            string first = Shortcuts.Gesture(s, "markAudio"), then = Shortcuts.Gesture(s, "markSubtitle");
+            ShortcutInfo[] rows =
+            [
+                new(Full("playPause"), Loc.T("shortcut.playPause")),
+                new(Keys("seekBack", "seekForward"), Loc.T("shortcut.seek5")),
+                new(Keys("seekBackLong", "seekForwardLong"), Loc.T("shortcut.seek30")),
+                new(With(Keys("volumeUp", "volumeDown"), Loc.T("key.wheel")), Loc.T("shortcut.volume")),
+                new(Full("mute"), Loc.T("shortcut.mute")),
+                new(With(Full("fullscreen"), Loc.T("key.doubleClick")), Loc.T("shortcut.fullscreen")),
+                new(Keys("frameBack", "frameForward"), Loc.T("shortcut.frame")),
+                new(Keys("nextEpisode", "previousEpisode", "playlist"), Loc.T("shortcut.episodes")),
+                new(Keys("openFile", "openFolder"), Loc.T("shortcut.open")),
+                new(Keys("loadSubtitles", "searchSubtitles"), Loc.T("shortcut.subtitleFiles")),
+                new(Keys("toggleSubtitles", "nextSubtitles"), Loc.T("shortcut.subtitleToggle")),
+                new(Keys("subtitleEarlier", "subtitleLater"), Loc.T("shortcut.subtitleDelay")),
+                new(first.Length > 0 && then.Length > 0 ? Loc.T("shortcut.zx.keys", first, then) : string.Empty, Loc.T("shortcut.zx")),
+                new(Full("autoSync"), Loc.T("shortcut.autoSync")),
+                new(Full("nextAudio"), Loc.T("menu.nextAudio")),
+                new(Keys("speedUp", "speedDown", "speedNormal"), Loc.T("shortcut.speed")),
+                new(Full("aspect"), Loc.T("shortcut.aspect")),
+                new(Keys("screenshot", "screenshotPictureOnly"), Loc.T("shortcut.screenshot")),
+                new(Full("favorite"), Loc.T("shortcut.favorite")),
+                new(Full("resetSync"), Loc.T("shortcut.resetSync")),
+                new(Full("miniPlayer"), Loc.T("menu.miniPlayer")),
+                new(Keys("radio", "spotify", "youTube", "discord"), Loc.T("shortcut.services")),
+                new(Full("help"), Loc.T("shortcut.help")),
+            ];
+            return rows.Where(r => r.Keys.Length > 0).ToList();
+        }
+    }
 
     public static string AsOsdText() => string.Join("\n", All.Select(s => $"{s.Keys}   —   {s.Description}"));
 }

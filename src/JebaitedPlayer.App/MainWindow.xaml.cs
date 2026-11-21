@@ -58,6 +58,7 @@ public partial class MainWindow : Window
     public MainWindow(AppSettings settings, StartupOptions options)
     {
         _settings = settings;
+        KeyboardShortcuts.Settings = settings; // 2.0: F1 i početni ekran pokazuju stvarne (i promijenjene) tipke
         _options = options;
 
         // Dijagnostika: automatska sinkronizacija samo za ovo pokretanje (postavke se u dijagnostici ne spremaju).
@@ -413,6 +414,9 @@ public partial class MainWindow : Window
         _topBar?.Hide();
         _cards?.Hide();
         Hide();
+
+        // V4-B: bot izlazi iz glasovnog kanala prije gašenja mpv-a (najviše 3 s).
+        await CloseDiscordAsync();
 
         _events?.Detach();
         _health?.Dispose();
@@ -877,40 +881,13 @@ public partial class MainWindow : Window
     /// <summary>Svi prečaci playera. Koriste ga i dijaloški prozori (npr. G/H i Z/X u prozoru sinkronizacije).</summary>
     internal bool HandleKey(KeyEventArgs e) => HandleShortcut(e.Key == Key.System ? e.SystemKey : e.Key, Keyboard.Modifiers);
 
-    /// <summary>Svi tipkovnički prečaci. Dijagnostika ih poziva izravno (isti put kao prava tipkovnica).</summary>
+    /// <summary>
+    /// Svi tipkovnički prečaci. 2.0: tipke dolaze iz registra <see cref="Shortcuts"/> i korisnikovih promjena (Postavke →
+    /// Prečaci). Stalnu ulogu imaju kartice (nastavak gledanja, sljedeća epizoda), Esc, Alt+Enter i medijske tipke.
+    /// Dijagnostika ih poziva izravno (isti put kao prava tipkovnica).
+    /// </summary>
     internal bool HandleShortcut(Key key, ModifierKeys mods)
     {
-        bool handled = true;
-        bool ctrlOrAlt = (mods & (ModifierKeys.Control | ModifierKeys.Alt)) != 0;
-
-        // Ciklus 2: Ctrl+M prebacuje između punog playera i mini playera (M bez Ctrl ostaje utišavanje).
-        if (key == Key.M && mods == ModifierKeys.Control)
-        {
-            ToggleMiniPlayer();
-            return true;
-        }
-
-        // Ciklus 6: Ctrl+Shift+Y otvara YouTube Music.
-        if (key == Key.Y && mods == (ModifierKeys.Control | ModifierKeys.Shift))
-        {
-            ShowYouTube();
-            return true;
-        }
-
-        // Ciklus 5: Ctrl+Shift+S otvara Spotify daljinski.
-        if (key == Key.S && mods == (ModifierKeys.Control | ModifierKeys.Shift))
-        {
-            ShowSpotify();
-            return true;
-        }
-
-        // Ciklus 3: Ctrl+R otvara radio.
-        if (key == Key.R && mods == ModifierKeys.Control)
-        {
-            ShowRadio();
-            return true;
-        }
-
         // Dok je otvorena kartica (nastavak gledanja / sljedeća epizoda), Enter i ostale tipke odgovaraju njoj.
         LibraryController library = _vm.Library;
         if (library.HasResumeOffer && key is Key.Enter or Key.Space or Key.Home or Key.Back)
@@ -942,144 +919,193 @@ public partial class MainWindow : Window
             return true;
         }
 
-        switch (key)
+        string? action = key switch
         {
-            case Key.O when mods == (ModifierKeys.Control | ModifierKeys.Shift):
-                ShowOpenFolderDialog();
-                break;
-            case Key.O when mods == ModifierKeys.Control:
-                ShowOpenDialog();
-                break;
-            case Key.L when mods == ModifierKeys.None && library.HasPlaylist:
-                SetPlaylistPanel(PlaylistPanel.Visibility != Visibility.Visible);
-                break;
-            case Key.T when mods == ModifierKeys.Control:
-                ShowLoadSubtitlesDialog();
-                break;
-            case Key.F when mods == ModifierKeys.Control:
-                ShowSearchWindow();
-                break;
-            case Key.F1:
-                ShowShortcuts();
-                break;
-            case Key.F or Key.F11 when mods == ModifierKeys.None:
-            case Key.Enter when mods == ModifierKeys.Alt:
-                SetFullscreen(!_vm.IsFullscreen);
-                break;
-            case Key.Escape when _vm.IsFullscreen:
-                SetFullscreen(false);
-                break;
-
-            // M6: omiljeni, snimka zaslona, audio traka, omjer slike, brzina reprodukcije.
-            case Key.D when mods == ModifierKeys.Control:
-                library.ToggleFavorite();
-                break;
-            case Key.S when mods is ModifierKeys.None or ModifierKeys.Shift:
-                _ = _vm.Extras.TakeScreenshotAsync(withSubtitles: mods == ModifierKeys.None);
-                break;
-            case Key.B when mods == ModifierKeys.None:
-                _vm.Extras.CycleAudio();
-                break;
-            case Key.O when mods == ModifierKeys.None && _vm.HasMedia:
-                _vm.Extras.CycleAspect();
-                break;
-            case Key.OemPlus or Key.Add when !ctrlOrAlt && _vm.HasMedia:
-                _vm.Extras.StepSpeed(+1);
-                break;
-            case Key.OemMinus or Key.Subtract when !ctrlOrAlt && _vm.HasMedia:
-                _vm.Extras.StepSpeed(-1);
-                break;
-            case Key.Back when mods == ModifierKeys.None && _vm.HasMedia:
-                _vm.Extras.SetSpeed(1);
-                break;
-            default:
-                handled = HandlePlaybackKey(key, mods);
-                break;
+            Key.Escape when _vm.IsFullscreen => "exitFullscreen",
+            Key.Enter when mods == ModifierKeys.Alt => "fullscreen",
+            Key.MediaPlayPause => "playPause",
+            Key.MediaNextTrack => "nextEpisode",
+            Key.MediaPreviousTrack => "previousEpisode",
+            _ => Shortcuts.Resolve(_settings, key, mods),
+        };
+        if (action is null || !RunShortcut(action))
+        {
+            return false;
         }
 
-        if (handled)
-        {
-            RegisterActivity();
-        }
-
-        return handled;
+        RegisterActivity();
+        return true;
     }
 
-    private bool HandlePlaybackKey(Key key, ModifierKeys mods)
+    /// <summary>Izvršava radnju prečaca (ID iz <see cref="Shortcuts.Actions"/>); false ako sada nema smisla (npr. nema videa).</summary>
+    internal bool RunShortcut(string action)
     {
+        LibraryController library = _vm.Library;
+        switch (action)
+        {
+            case "openFile":
+                ShowOpenDialog();
+                return true;
+            case "openFolder":
+                ShowOpenFolderDialog();
+                return true;
+            case "loadSubtitles":
+                ShowLoadSubtitlesDialog();
+                return true;
+            case "searchSubtitles":
+                ShowSearchWindow();
+                return true;
+            case "help":
+                ShowShortcuts();
+                return true;
+            case "fullscreen":
+                SetFullscreen(!_vm.IsFullscreen);
+                return true;
+            case "exitFullscreen":
+                SetFullscreen(false);
+                return true;
+            case "favorite":
+                library.ToggleFavorite();
+                return true;
+            case "screenshot":
+                _ = _vm.Extras.TakeScreenshotAsync(withSubtitles: true);
+                return true;
+            case "screenshotPictureOnly":
+                _ = _vm.Extras.TakeScreenshotAsync(withSubtitles: false);
+                return true;
+            case "nextAudio":
+                _vm.Extras.CycleAudio();
+                return true;
+            case "miniPlayer":
+                ToggleMiniPlayer();
+                return true;
+            case "radio":
+                ShowRadio();
+                return true;
+            case "spotify":
+                ShowSpotify();
+                return true;
+            case "youTube":
+                ShowYouTube();
+                return true;
+            case "discord":
+                ShowDiscord();
+                return true;
+            case "settings":
+                ShowPlayerSettings();
+                return true;
+            case "playlist":
+                if (!library.HasPlaylist)
+                {
+                    return false;
+                }
+
+                SetPlaylistPanel(PlaylistPanel.Visibility != Visibility.Visible);
+                return true;
+        }
+
         if (!_vm.HasMedia)
         {
             // R1: razmak / medijska tipka ponovno spaja radio zaustavljen tipkom Stop.
-            return key is Key.Space or Key.K or Key.MediaPlayPause && _vm.ResumeStoppedStream();
+            return action == "playPause" && _vm.ResumeStoppedStream();
         }
 
-        bool ctrl = mods.HasFlag(ModifierKeys.Control);
-        bool shift = mods.HasFlag(ModifierKeys.Shift);
-        double step = ctrl ? 10 : shift ? 1000 : 100;
         int seek = Math.Clamp(_settings.SeekStepSeconds, 1, 60);
         SubtitleController subs = _vm.Subtitles;
-        switch (key)
+        switch (action)
         {
-            case Key.G:
-                subs.AdjustDelay(-step);
-                return true;
-            case Key.H:
-                subs.AdjustDelay(step);
-                return true;
-            case Key.Z:
-                subs.MarkAudio();
-                return true;
-            case Key.X:
-                subs.MarkSubtitle();
-                return true;
-            case Key.A when mods == ModifierKeys.None:
-                _autoSync.SyncSelected();
-                return true;
-            case Key.V:
-                subs.ToggleVisibility();
-                return true;
-            case Key.J:
-                subs.CycleTrack();
-                return true;
-            case Key.Back when ctrl:
-                subs.ResetSync();
-                return true;
-            case Key.Space or Key.K or Key.MediaPlayPause:
+            case "playPause":
                 _vm.TogglePause();
-                return true;
-            case Key.Left:
-                _vm.SeekRelative(ctrl ? -seek * 6 : -seek);
-                return true;
-            case Key.Right:
-                _vm.SeekRelative(ctrl ? seek * 6 : seek);
-                return true;
-            case Key.Up:
-                _vm.ChangeVolume(5);
-                return true;
-            case Key.Down:
-                _vm.ChangeVolume(-5);
-                return true;
-            case Key.M:
-                _vm.ToggleMute();
-                return true;
-            case Key.OemComma:
-                _vm.FrameStep(back: true);
-                return true;
-            case Key.OemPeriod:
-                _vm.FrameStep(back: false);
-                return true;
-            case Key.N or Key.MediaNextTrack:
-                _vm.Library.PlayNext();
-                return true;
-            case Key.P or Key.MediaPreviousTrack:
-                _vm.Library.PlayPrevious();
-                return true;
-            case Key.Home:
+                break;
+            case "seekBack":
+                _vm.SeekRelative(-seek);
+                break;
+            case "seekForward":
+                _vm.SeekRelative(seek);
+                break;
+            case "seekBackLong":
+                _vm.SeekRelative(-seek * 6);
+                break;
+            case "seekForwardLong":
+                _vm.SeekRelative(seek * 6);
+                break;
+            case "seekStart":
                 _vm.SeekAbsolute(0);
-                return true;
+                break;
+            case "volumeUp":
+                _vm.ChangeVolume(5);
+                break;
+            case "volumeDown":
+                _vm.ChangeVolume(-5);
+                break;
+            case "mute":
+                _vm.ToggleMute();
+                break;
+            case "frameBack":
+                _vm.FrameStep(back: true);
+                break;
+            case "frameForward":
+                _vm.FrameStep(back: false);
+                break;
+            case "speedUp":
+                _vm.Extras.StepSpeed(+1);
+                break;
+            case "speedDown":
+                _vm.Extras.StepSpeed(-1);
+                break;
+            case "speedNormal":
+                _vm.Extras.SetSpeed(1);
+                break;
+            case "aspect":
+                _vm.Extras.CycleAspect();
+                break;
+            case "toggleSubtitles":
+                subs.ToggleVisibility();
+                break;
+            case "nextSubtitles":
+                subs.CycleTrack();
+                break;
+            case "subtitleEarlier":
+                subs.AdjustDelay(-100);
+                break;
+            case "subtitleLater":
+                subs.AdjustDelay(100);
+                break;
+            case "subtitleEarlierFine":
+                subs.AdjustDelay(-10);
+                break;
+            case "subtitleLaterFine":
+                subs.AdjustDelay(10);
+                break;
+            case "subtitleEarlierCoarse":
+                subs.AdjustDelay(-1000);
+                break;
+            case "subtitleLaterCoarse":
+                subs.AdjustDelay(1000);
+                break;
+            case "markAudio":
+                subs.MarkAudio();
+                break;
+            case "markSubtitle":
+                subs.MarkSubtitle();
+                break;
+            case "autoSync":
+                _autoSync.SyncSelected();
+                break;
+            case "resetSync":
+                subs.ResetSync();
+                break;
+            case "nextEpisode":
+                library.PlayNext();
+                break;
+            case "previousEpisode":
+                library.PlayPrevious();
+                break;
             default:
                 return false;
         }
+
+        return true;
     }
 
     private void OnPreviewMouseWheel(object sender, MouseWheelEventArgs e)
@@ -1095,6 +1121,8 @@ public partial class MainWindow : Window
 
     private void ShowShortcuts()
     {
+        KeyboardShortcuts.Settings = _settings;
+        _vm.RefreshShortcuts();
         if (_vm.HasMedia)
         {
             _vm.ShowOsd(KeyboardShortcuts.AsOsdText(), 6000);

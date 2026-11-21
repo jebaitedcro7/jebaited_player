@@ -128,6 +128,9 @@ public sealed class PlayerViewModel : ObservableObject
 
     public IReadOnlyList<ShortcutInfo> Shortcuts => KeyboardShortcuts.All;
 
+    /// <summary>2.0: tipke su promijenjene u Postavkama (popis na početnom ekranu i F1 slijede stvarne tipke).</summary>
+    public void RefreshShortcuts() => OnPropertyChanged(nameof(Shortcuts));
+
     /// <summary>Promjena jezika: tekstovi koje slažu kontroleri (popis, povijest, titlovi, prečaci) na novom jeziku.</summary>
     public void RefreshTexts()
     {

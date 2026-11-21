@@ -211,6 +211,8 @@ public partial class MainWindow : ISettingsHost
     void ISettingsHost.ApplyImportedSettings()
     {
         WindowTheme.Apply(_settings.Theme);
+        WindowTheme.ApplyAccent(_settings.AccentColor);
+        _vm.RefreshShortcuts();
         if (!_options.IsDiagnostics && _settings.Language is { Length: > 0 } language)
         {
             Loc.SetLanguage(language);

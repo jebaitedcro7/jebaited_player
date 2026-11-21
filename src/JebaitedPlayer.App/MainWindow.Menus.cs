@@ -17,10 +17,10 @@ public partial class MainWindow
     private void ShowContextMenu()
     {
         var menu = new ContextMenu { PlacementTarget = this, Placement = PlacementMode.MousePoint };
-        menu.Items.Add(Item(Loc.T("menu.openFile"), "Ctrl+O", () => ShowOpenDialog()));
-        menu.Items.Add(Item(Loc.T("menu.openFolder"), "Ctrl+Shift+O", ShowOpenFolderDialog));
+        menu.Items.Add(Item(Loc.T("menu.openFile"), Shortcuts.Gesture(_settings, "openFile"), () => ShowOpenDialog()));
+        menu.Items.Add(Item(Loc.T("menu.openFolder"), Shortcuts.Gesture(_settings, "openFolder"), ShowOpenFolderDialog));
         menu.Items.Add(Item(Loc.T("menu.playPause"), Loc.T("key.space"), _vm.TogglePause, _vm.HasMedia));
-        menu.Items.Add(Item(Loc.T("menu.fullscreen"), "F", () => SetFullscreen(!_vm.IsFullscreen)));
+        menu.Items.Add(Item(Loc.T("menu.fullscreen"), Shortcuts.Gesture(_settings, "fullscreen"), () => SetFullscreen(!_vm.IsFullscreen)));
         if (_vm.HasMedia)
         {
             menu.Items.Add(Item(Loc.T("menu.goHome"), null, GoHome));
@@ -29,14 +29,15 @@ public partial class MainWindow
         menu.Items.Add(new Separator());
         if (_vm.HasMedia && _vm.Library.HasPlaylist)
         {
-            menu.Items.Add(Item(Loc.T("menu.playlist"), "L", () => SetPlaylistPanel(PlaylistPanel.Visibility != Visibility.Visible)));
-            menu.Items.Add(Item(Loc.T("menu.nextEpisode"), "N", _vm.Library.PlayNext));
+            menu.Items.Add(Item(Loc.T("menu.playlist"), Shortcuts.Gesture(_settings, "playlist"), () => SetPlaylistPanel(PlaylistPanel.Visibility != Visibility.Visible)));
+            menu.Items.Add(Item(Loc.T("menu.nextEpisode"), Shortcuts.Gesture(_settings, "nextEpisode"), _vm.Library.PlayNext));
         }
 
-        menu.Items.Add(Item(Loc.T("menu.miniPlayer"), "Ctrl+M", ShowMiniPlayer));
-        menu.Items.Add(Item(Loc.T("menu.radio"), "Ctrl+R", () => ShowRadio()));
-        menu.Items.Add(Item(Loc.T("menu.spotify"), "Ctrl+Shift+S", () => ShowSpotify()));
-        menu.Items.Add(Item(Loc.T("menu.youtube"), "Ctrl+Shift+Y", () => ShowYouTube()));
+        menu.Items.Add(Item(Loc.T("menu.miniPlayer"), Shortcuts.Gesture(_settings, "miniPlayer"), ShowMiniPlayer));
+        menu.Items.Add(Item(Loc.T("menu.radio"), Shortcuts.Gesture(_settings, "radio"), () => ShowRadio()));
+        menu.Items.Add(Item(Loc.T("menu.spotify"), Shortcuts.Gesture(_settings, "spotify"), () => ShowSpotify()));
+        menu.Items.Add(Item(Loc.T("menu.youtube"), Shortcuts.Gesture(_settings, "youTube"), () => ShowYouTube()));
+        menu.Items.Add(Item(Loc.T("menu.discord"), Shortcuts.Gesture(_settings, "discord"), () => ShowDiscord()));
         menu.Items.Add(Item(_vm.Library.IsCurrentFavorite ? Loc.T("home.removeFavorite") : Loc.T("menu.addFavorite"), "Ctrl+D",
             _vm.Library.ToggleFavorite, _vm.HasMedia));
         // N2 (ciklus 5): trenutni video u „Sljedeće za gledanje” (ne za radio).
@@ -62,15 +63,15 @@ public partial class MainWindow
 
         bool canShoot = _vm.HasMedia && !_vm.IsAudioOnly;
         var shot = new HoverIntentMenuItem { Header = Loc.T("menu.screenshot") };
-        shot.Items.Add(Item(Loc.T("menu.screenshotWithSubs"), "S", () => _ = _vm.Extras.TakeScreenshotAsync(withSubtitles: true), canShoot));
-        shot.Items.Add(Item(Loc.T("menu.screenshotPictureOnly"), "Shift+S", () => _ = _vm.Extras.TakeScreenshotAsync(withSubtitles: false), canShoot));
+        shot.Items.Add(Item(Loc.T("menu.screenshotWithSubs"), Shortcuts.Gesture(_settings, "screenshot"), () => _ = _vm.Extras.TakeScreenshotAsync(withSubtitles: true), canShoot));
+        shot.Items.Add(Item(Loc.T("menu.screenshotPictureOnly"), Shortcuts.Gesture(_settings, "screenshotPictureOnly"), () => _ = _vm.Extras.TakeScreenshotAsync(withSubtitles: false), canShoot));
         shot.Items.Add(new Separator());
         shot.Items.Add(Item(Loc.T("menu.openScreenshotFolder"), null, _vm.Extras.OpenScreenshotFolder));
         menu.Items.Add(shot);
 
         menu.Items.Add(new Separator());
         menu.Items.Add(Item(Loc.T("menu.settings"), null, ShowPlayerSettings));
-        menu.Items.Add(Item(Loc.T("menu.shortcuts"), "F1", ShowShortcuts, _vm.HasMedia));
+        menu.Items.Add(Item(Loc.T("menu.shortcuts"), Shortcuts.Gesture(_settings, "help"), ShowShortcuts, _vm.HasMedia));
         menu.Items.Add(Item(Loc.T("menu.exit"), "Alt+F4", Close));
         OpenMenu(menu);
     }
@@ -94,7 +95,7 @@ public partial class MainWindow
         if (extras.AudioTracks.Count > 1)
         {
             items.Add(new Separator());
-            items.Add(Item(Loc.T("menu.nextAudio"), "B", extras.CycleAudio));
+            items.Add(Item(Loc.T("menu.nextAudio"), Shortcuts.Gesture(_settings, "nextAudio"), extras.CycleAudio));
         }
 
         items.Add(new Separator());
@@ -113,8 +114,8 @@ public partial class MainWindow
         }
 
         items.Add(new Separator());
-        items.Add(Item(Loc.T("menu.faster"), "+", () => extras.StepSpeed(+1), extras.Speed < 2 - 1e-6));
-        items.Add(Item(Loc.T("menu.slower"), "−", () => extras.StepSpeed(-1), extras.Speed > 0.5 + 1e-6));
+        items.Add(Item(Loc.T("menu.faster"), Shortcuts.Gesture(_settings, "speedUp"), () => extras.StepSpeed(+1), extras.Speed < 2 - 1e-6));
+        items.Add(Item(Loc.T("menu.slower"), Shortcuts.Gesture(_settings, "speedDown"), () => extras.StepSpeed(-1), extras.Speed > 0.5 + 1e-6));
     }
 
     private void AddAspectItems(ItemCollection items)
@@ -127,7 +128,7 @@ public partial class MainWindow
         }
 
         items.Add(new Separator());
-        items.Add(Item(Loc.T("menu.nextAspect"), "O", extras.CycleAspect));
+        items.Add(Item(Loc.T("menu.nextAspect"), Shortcuts.Gesture(_settings, "aspect"), extras.CycleAspect));
     }
 
     private void ShowSubtitleMenu(FrameworkElement placementTarget)
@@ -150,8 +151,8 @@ public partial class MainWindow
         }
 
         items.Add(new Separator());
-        items.Add(Item(Loc.T("menu.searchOnline"), "Ctrl+F", ShowSearchWindow));
-        items.Add(Item(Loc.T("menu.loadFromFile"), "Ctrl+T", ShowLoadSubtitlesDialog));
+        items.Add(Item(Loc.T("menu.searchOnline"), Shortcuts.Gesture(_settings, "searchSubtitles"), ShowSearchWindow));
+        items.Add(Item(Loc.T("menu.loadFromFile"), Shortcuts.Gesture(_settings, "loadSubtitles"), ShowLoadSubtitlesDialog));
 
         if (selected?.Prepared is { IsBitmap: false } prepared)
         {
@@ -169,7 +170,7 @@ public partial class MainWindow
         items.Add(Item(_autoSync.IsBusy ? Loc.T("menu.syncBusy") : Loc.T("menu.sync"), "A", _autoSync.SyncSelected,
             selected?.Prepared is { IsBitmap: false } && !_autoSync.IsBusy));
         items.Add(Item(Loc.T("menu.syncWindow"), null, ShowSyncWindow, selected != null));
-        items.Add(Item(Loc.T("menu.resetSync"), "Ctrl+Backspace", subs.ResetSync, subs.HasCorrection));
+        items.Add(Item(Loc.T("menu.resetSync"), Shortcuts.Gesture(_settings, "resetSync"), subs.ResetSync, subs.HasCorrection));
         items.Add(Item(subs.IsVisible ? Loc.T("menu.hideSubtitles") : Loc.T("menu.showSubtitles"), "V", subs.ToggleVisibility));
         items.Add(new Separator());
         items.Add(Item(Loc.T("settings.subtitleSettings"), null, ShowSubtitleSettings));

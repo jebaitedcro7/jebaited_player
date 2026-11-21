@@ -73,6 +73,7 @@ public partial class MainWindow
         }
 
         _youTubeWasActive = active;
+        UpdateDiscordInputs();
         _mini?.Tick();
     }
 
@@ -85,7 +86,14 @@ public partial class MainWindow
         }
 
         _youTubeWindow = new YouTubeWindow(YouTube, AppPaths.DataDir) { Owner = owner ?? (IsMiniPlayerActive ? _mini : this) };
-        _youTubeWindow.Closed += (_, _) => _youTubeWindow = null;
+        _youTubeWindow.Closed += (_, _) =>
+        {
+            _youTubeWindow = null;
+            UpdateDiscordInputs();
+        };
+
+        // V4-B: dok je YouTube otvoren, bot za Discord šuti (prije nego WebView2 išta pusti).
+        UpdateDiscordInputs();
         _youTubeWindow.Show();
     }
 

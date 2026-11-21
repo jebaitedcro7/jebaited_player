@@ -22,6 +22,7 @@ public enum SettingsTab
     Audio,
     Video,
     Appearance,
+    Shortcuts,
     Updates,
     About,
 }
@@ -101,6 +102,12 @@ public partial class PlayerSettingsWindow : Window
         ("WebRtcVadSharp", "MIT"),
         ("WebRTC VAD", "BSD-3-Clause"),
         ("Microsoft Edge WebView2 SDK", "BSD-3-Clause"),
+        ("NetCord", "MIT"),
+        ("Concentus (Opus)", "BSD-3-Clause"),
+        ("libdave (Discord DAVE)", "MIT"),
+        ("OpenSSL 3", "Apache-2.0"),
+        ("mlspp", "BSD-2-Clause"),
+        ("nlohmann/json", "MIT"),
     ];
 
     private readonly AppSettings _settings;
@@ -131,6 +138,8 @@ public partial class PlayerSettingsWindow : Window
         LoadAudio();
         LoadVideo();
         LoadAppearance();
+        LoadAccent();
+        LoadShortcuts();
         LoadUpdates();
         LoadAbout();
         LoadDiagnostics();
@@ -176,6 +185,8 @@ public partial class PlayerSettingsWindow : Window
         UpdateWhatsNew();
         AboutVersionText.Text = Loc.T("settings.aboutVersion", _updates.CurrentVersion);
         _subtitlesPanel.RefreshTexts();
+        BuildShortcutRows();
+        LoadAccent();
     }
 
     // --- 1. Općenito ---------------------------------------------------------------------------------------------
@@ -444,6 +455,7 @@ public partial class PlayerSettingsWindow : Window
         SettingsTab.Audio => "audio",
         SettingsTab.Video => "video",
         SettingsTab.Appearance => "appearance",
+        SettingsTab.Shortcuts => "shortcuts",
         SettingsTab.Updates => "updates",
         _ => null,
     };

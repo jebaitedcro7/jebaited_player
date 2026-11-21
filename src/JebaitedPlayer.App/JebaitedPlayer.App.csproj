@@ -34,6 +34,9 @@
     <PackageReference Include="Velopack" Version="1.2.161" />
     <!-- Ciklus 6, V9: službeni ugrađeni YouTube player (IFrame) u vidljivom prozoru. -->
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3537.50" />
+    <!-- V4-B Discord bot: NetCord (MIT, DAVE preko libdave), Concentus (Opus u C#, BSD-3) -->
+    <PackageReference Include="NetCord" Version="1.0.0-beta.30" />
+    <PackageReference Include="Concentus" Version="2.2.2" />
   </ItemGroup>
 
   <ItemGroup>
@@ -61,6 +64,11 @@
   <ItemGroup>
     <!-- libmpv se kopira uz exe; izvor i SHA256 su u third_party/libmpv/SOURCE.md -->
     <None Include="..\..\third_party\libmpv\libmpv-2.dll" Link="libmpv-2.dll" CopyToOutputDirectory="PreserveNewest" Visible="false" />
+    <!-- libdave (DAVE E2EE za Discord bota), izgrađen s OpenSSL 3; izvor i SHA256 su u third_party/libdave/SOURCE.md -->
+    <None Include="..\..\third_party\libdave\libdave.dll" Link="libdave.dll" CopyToOutputDirectory="PreserveNewest" Visible="false" Condition="Exists('..\..\third_party\libdave\libdave.dll')" />
+    <!-- Popis komponenti i puni tekstovi licenci koje traže isporuku uz program (OpenSSL Apache-2.0, BSD, MIT) -->
+    <None Include="..\..\THIRD_PARTY_NOTICES.md" Link="licenses\THIRD_PARTY_NOTICES.md" CopyToOutputDirectory="PreserveNewest" Visible="false" />
+    <None Include="..\..\third_party\licenses\*.txt" Link="licenses\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" Visible="false" />
   </ItemGroup>
 
 </Project>

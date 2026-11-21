@@ -142,6 +142,13 @@ Im selben Tab stellst du die automatische Suche, die Zeichenkodierung alter Unte
 - Der offizielle YouTube-Player läuft im Fenster und muss sichtbar bleiben (YouTube-Regeln): keine Wiedergabe im Hintergrund, kein Werbeblocker; Minimieren pausiert ihn. Solange YouTube die Quelle ist, zeigt der Mini-Player **YOUTUBE** und seine Tasten steuern YouTube; eine Datei oder ein Sender schaltet zurück.
 - YouTube-Ton läuft nicht über den Equalizer des Players.
 
+### Discord-Bot
+
+- **Strg+Umschalt+D**, Rechtsklick → **Discord-Bot …** oder die Headset-Taste im Mini-Player. Dein eigener Bot betritt einen Sprachkanal auf deinem Discord-Server und spielt, was der Player spielt: **nur lokale Musik und Radio**. Filme, YouTube Music und Spotify werden nie gesendet (solange ein Film läuft oder YouTube geöffnet ist, sendet der Bot Stille).
+- Den Bot erstellst du einmal, kostenlos; das Fenster zeigt die Schritte: Discord Developer Portal → neue Anwendung → Install Link auf None und Public Bot aus → URL Generator mit den Berechtigungen View Channels, Connect und Speak → Bot auf deinen Server einladen → Reset Token. Füge den Token im Fenster ein; er wird verschlüsselt nur auf deinem Computer gespeichert.
+- **Meinem Kanal beitreten** bringt den Bot in den Kanal, in dem du bist, oder wähle einen Kanal aus der Liste. Die Headset-Taste im Mini-Player ist grün, solange der Bot Musik sendet. Fehlt dem Bot in einem Kanal eine Berechtigung, zeigt das Fenster, welche und wo man sie erlaubt.
+- Discord hört genau das, was der Player spielt: Die Lautstärke des Players gilt auch für Discord, und ein stummgeschalteter Player sendet Stille. Der Ton ist Ende-zu-Ende-verschlüsselt (Discord DAVE). Der Bot funktioniert nur auf Servern, auf die du ihn einlädst, nicht in privaten Anrufen. Benötigt Windows 11 oder Windows 10 Build 20348 oder neuer.
+
 ### Sicherung und Übertragung
 
 Einstellungen → Allgemein → **Sicherung und Übertragung**: Einstellungen und Wiedergabeverlauf werden einmal täglich und vor jedem Update automatisch kopiert (die letzten 7 bleiben auf deinem Computer). **Einstellungen exportieren** speichert sie in einer Datei (ohne Passwörter, Schlüssel für Untertitelseiten und Fensterposition), **Einstellungen importieren** lädt sie wieder, auch auf einem anderen Computer.
@@ -159,6 +166,10 @@ Einstellungen → Allgemein → **Sicherung und Übertragung**: Einstellungen un
 <p align="center"><img src="manual/images/de/home-light.jpg" width="760" alt="Helles Design"></p>
 
 Mit dem Schalter unten links auf dem Startbildschirm (Mond = dunkel, Sonne = hell) oder unter **Einstellungen → Darstellung → Design**. Die Änderung gilt sofort und wird gespeichert. Dunkel ist Standard. Die Steuerung über dem Video bleibt immer dunkel, damit sie auf dem Bild gut sichtbar ist; Video und Untertitel werden vom Design nicht verändert.
+
+### Akzentfarbe
+
+Unter **Einstellungen → Darstellung → Akzentfarbe** wählst du die Farbe von Schaltflächen, Reglern, markierten Einträgen und dem Mini-Player: acht fertige Farben (Grün ist Standard) oder **Eigene Farbe …** (Farbton, Sättigung und Helligkeit oder #RRGGBB eingeben, mit Live-Vorschau; Abbrechen stellt die vorherige Farbe wieder her). Der Hintergrund bleibt das dunkle oder helle Design, und in jedem Design wird die Farbe bei Bedarf etwas aufgehellt oder abgedunkelt, damit Text lesbar bleibt. Die Änderung ist sofort sichtbar; **Speichern**, **Änderungen verwerfen** und **Standard** funktionieren wie bei allen anderen Einstellungen.
 
 ### Verlauf und Favoriten
 
@@ -178,7 +189,8 @@ Die Einstellungen sind in Tabs aufgeteilt. Jede Änderung gilt sofort (auch für
 | Untertitel | Untertitelsprachen und ihre Reihenfolge, automatisches Laden und Suchen, Quellen im Internet, Zeichenkodierung alter Untertitel, Aussehen, Synchronisierung |
 | Audio | Lautstärke, Lautstärkeausgleich, Equalizer, bevorzugte Audiosprache, Ausgabegerät, Ausgabe für Musik und Radio, Audio-Synchronisierung |
 | Video | Bildqualität, Hardware-Dekodierung, Standard-Seitenverhältnis, HDR |
-| Darstellung | Dunkles / helles Design, Hintergrund des Startbildschirms (Standard oder eigenes Bild: Füllen, Einpassen, Zentriert), wie lange die Steuerung sichtbar bleibt, Oberfläche über die GPU darstellen, Uhrzeit, Datum und Wetter auf dem Startbildschirm (eine Stadt deiner Wahl, von Open-Meteo) |
+| Darstellung | Dunkles / helles Design, Akzentfarbe, Hintergrund des Startbildschirms (Standard oder eigenes Bild: Füllen, Einpassen, Zentriert), wie lange die Steuerung sichtbar bleibt, Oberfläche über die GPU darstellen, Uhrzeit, Datum und Wetter auf dem Startbildschirm (eine Stadt deiner Wahl, von Open-Meteo) |
+| Tastenkürzel | Tasten für jede Aktion, bis zu zwei pro Aktion (siehe [Tastenkürzel](#tastenkürzel)) |
 | Updates | Version, jetzt prüfen, automatischer Download, Neuerungen, Update-Verlauf |
 | Info | Version, Lizenz, verwendete Technologien, Handbuch, Datenschutz, Richtlinie zur Code-Signierung, Fehlerberichte (ohne persönliche Daten auf deinem Computer gespeichert; du sendest sie selbst über GitHub) |
 
@@ -253,23 +265,32 @@ Archive von Untertitelseiten: ZIP wird unterstützt, RAR noch nicht.
 
 ### Tastenkürzel
 
+Die Tasten änderst du unter **Einstellungen → Tastenkürzel**. Jede Aktion kann zwei Tasten haben: auf eine Taste klicken und die neue Kombination drücken (Esc bricht ab, Entf (Delete) entfernt die Taste). Nutzt schon eine andere Aktion die Taste, meldet der Player das, und ein zweiter Druck auf dieselbe Taste verschiebt sie hierher. **Standard** in einer Zeile stellt die Tasten dieser Aktion wieder her, **Standard** für den Tab alle Tasten. F1 und die Menüs zeigen immer deine tatsächlichen Tasten. Esc, Enter, Alt+Enter, Alt+F4 und die Medientasten der Tastatur haben eine feste Rolle und lassen sich nicht zuweisen. Die Tabelle zeigt die Standardtasten.
+
 | Taste | Aktion |
 |---|---|
 | Leertaste / K | Wiedergabe / Pause |
-| ← / → | 5 s zurück / vor (Ctrl: 30 s; einstellbar unter Einstellungen → Allgemein) |
+| ← / → | Zurück / vor (5 s; die Sprungweite wird unter Einstellungen → Allgemein eingestellt) |
+| Ctrl+← / Ctrl+→ | Zurück / vor, 6× länger (standardmäßig 30 s) |
+| Home | Zum Anfang |
 | ↑ / ↓ / Mausrad | Lautstärke |
 | M | Ton aus / an |
-| F / Doppelklick | Vollbild (Esc zum Beenden) |
+| F / F11 / Doppelklick | Vollbild (Esc zum Beenden) |
 | , / . | Bild zurück / vor |
 | N / P / L | Nächste / vorherige Folge / Folgenliste |
 | Ctrl+O / Ctrl+Shift+O | Video öffnen / Ordner öffnen |
 | Ctrl+T / Ctrl+F | Untertitel aus Datei / aus dem Internet |
 | V / J | Untertitel ein- oder ausblenden / nächste Untertitel |
-| G / H | Untertitel früher / später |
+| G / H | Untertitel früher / später (100 ms) |
+| Ctrl+G / Ctrl+H | Untertitel früher / später (10 ms) |
+| Shift+G / Shift+H | Untertitel früher / später (1 s) |
 | Z, dann X | Nach Zeile synchronisieren |
 | A | Nach Sprache synchronisieren |
+| Ctrl+Backspace | Ursprüngliche Untertitel-Synchronisation wiederherstellen |
 | B | Nächste Audiospur |
-| + / − / Backspace | Schnellere / langsamere / normale Wiedergabe |
+| + / Num + | Schnellere Wiedergabe |
+| − / Num − | Langsamere Wiedergabe |
+| Backspace | Normale Geschwindigkeit |
 | O | Seitenverhältnis |
 | S / Shift+S | Screenshot (mit / ohne Untertitel) |
 | Ctrl+D | Zu Favoriten hinzufügen / entfernen |
@@ -277,7 +298,7 @@ Archive von Untertitelseiten: ZIP wird unterstützt, RAR noch nicht.
 | Ctrl+R | Radio |
 | Ctrl+Shift+S | Spotify |
 | Ctrl+Shift+Y | YouTube Music |
-| Ctrl+Backspace | Ursprüngliche Untertitel-Synchronisation wiederherstellen |
+| Ctrl+Shift+D | Discord-Bot |
 | F1 | Alle Tastenkürzel |
 
 ### Updates und deine Daten

@@ -12,11 +12,23 @@ public sealed class VuMeterView : FrameworkElement
     private const double Floor = -60;
     private const int Segments = 16;
 
-    private static readonly Brush Green = Frozen(0x7B, 0xD8, 0x8F);
+    // 2.0: zelena, staza i prigušeni segmenti slijede boju isticanja (mini LCD); žuta i crvena znače razinu i ostaju.
+    private static Brush Green = Frozen(0x7B, 0xD8, 0x8F);
     private static readonly Brush Yellow = Frozen(0xE8, 0xD4, 0x4D);
     private static readonly Brush Red = Frozen(0xE8, 0x57, 0x4D);
-    private static readonly Brush Track = Frozen(0x17, 0x29, 0x1C);
-    private static readonly Brush Dim = Frozen(0x22, 0x3A, 0x28);
+    private static Brush Track = Frozen(0x17, 0x29, 0x1C);
+    private static Brush Dim = Frozen(0x22, 0x3A, 0x28);
+
+    /// <summary>Boje iz palete boje isticanja (mini player poziva pri promjeni boje).</summary>
+    internal static void ApplyPalette(JebaitedPlayer.Infrastructure.AccentPalette palette)
+    {
+        Green = Frozen(palette.LcdText.R, palette.LcdText.G, palette.LcdText.B);
+        Track = Frozen(palette.LcdTrack.R, palette.LcdTrack.G, palette.LcdTrack.B);
+        Dim = Frozen(palette.LcdDim.R, palette.LcdDim.G, palette.LcdDim.B);
+    }
+
+    /// <summary>Dijagnostika: boja traka.</summary>
+    internal static Color BarColor => ((SolidColorBrush)Green).Color;
 
     private readonly double[] _level = [Floor, Floor];
     private readonly double[] _peak = [Floor, Floor];

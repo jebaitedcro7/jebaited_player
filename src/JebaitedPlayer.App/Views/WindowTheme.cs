@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Interop;
+using JebaitedPlayer.Infrastructure;
 using static JebaitedPlayer.Interop.NativeMethods;
 
 namespace JebaitedPlayer.Views;
@@ -52,7 +53,50 @@ internal static class WindowTheme
             ApplyTitleBar(window);
         }
 
+        // 2.0: vlastita boja isticanja se preračuna za novu temu (u svijetloj tamnija, u tamnoj svjetlija).
+        ApplyAccent(Accent);
         Changed?.Invoke();
+    }
+
+    /// <summary>2.0: boja isticanja ("" = zadana zelena teme, inače #RRGGBB).</summary>
+    public static string Accent { get; private set; } = string.Empty;
+
+    /// <summary>Boja isticanja je promijenjena (mini player preračuna LCD).</summary>
+    public static event Action? AccentChanged;
+
+    /// <summary>Izvedene boje za trenutnu temu i boju isticanja.</summary>
+    public static AccentPalette Palette => AccentColors.For(Accent, IsDark);
+
+    /// <summary>
+    /// Postavlja boju isticanja u svim prozorima odmah (DynamicResource). Zadana boja ne postavlja ništa, pa vrijede
+    /// boje iz Dark.xaml / Light.xaml točno kao prije 2.0.
+    /// </summary>
+    public static void ApplyAccent(string? hex)
+    {
+        Accent = AccentColors.Normalize(hex);
+        ResourceDictionary resources = Application.Current.Resources;
+        if (Accent.Length == 0)
+        {
+            resources.Remove("AccentBrush");
+            resources.Remove("AccentForegroundBrush");
+            resources.Remove("SelectionBrush");
+        }
+        else
+        {
+            AccentPalette p = Palette;
+            resources["AccentBrush"] = Frozen(p.Accent);
+            resources["AccentForegroundBrush"] = Frozen(p.AccentForeground);
+            resources["SelectionBrush"] = Frozen(p.Selection);
+        }
+
+        AccentChanged?.Invoke();
+    }
+
+    internal static System.Windows.Media.SolidColorBrush Frozen(System.Windows.Media.Color color)
+    {
+        var brush = new System.Windows.Media.SolidColorBrush(color);
+        brush.Freeze();
+        return brush;
     }
 
     /// <summary>Naslovna traka (Windows 11) u boji teme, čim prozor dobije handle.</summary>

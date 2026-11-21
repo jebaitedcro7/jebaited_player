@@ -79,6 +79,9 @@ public partial class App : Application
             JebaitedPlayer.Views.WindowTheme.Apply(theme);
         }
 
+        // 2.0: boja isticanja (zadana zelena ne mijenja ništa).
+        JebaitedPlayer.Views.WindowTheme.ApplyAccent(settings.AccentColor);
+
         // Jezik: dijagnostika ga zadaje bez mijenjanja postavki (zadano hrvatski, za postojeće provjere u skriptama);
         // inače zapamćeni jezik ili, prvi put, prozor za odabir (bez odabira ostaje engleski).
         if (options.IsDiagnostics || options.DiagLanguage != null)

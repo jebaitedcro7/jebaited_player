@@ -142,6 +142,13 @@ U istoj kartici podešavaš automatsko traženje, kodiranje starih titlova i izg
 - Službeni YouTube player svira u prozoru i mora ostati vidljiv (pravila YouTubea): bez reprodukcije u pozadini i bez blokiranja reklama; smanjivanje prozora ga pauzira. Dok je YouTube izvor, mini player pokazuje **YOUTUBE** i njegove tipke upravljaju YouTubeom; otvaranje datoteke ili postaje vraća natrag.
 - YouTube zvuk ne ide kroz equalizer playera.
 
+### Bot za Discord
+
+- **Ctrl+Shift+D**, desni klik → **Bot za Discord…** ili gumb sa slušalicama u mini playeru. Tvoj vlastiti bot ulazi u glasovni kanal na tvom Discord serveru i pušta ono što svira player: **samo lokalnu glazbu i radio**. Filmovi, YouTube Music i Spotify se nikad ne šalju (dok svira film ili je otvoren YouTube, bot šalje tišinu).
+- Bota napraviš jednom, besplatno; prozor pokazuje korake: Discord Developer Portal → nova aplikacija → Install Link na None i isključen Public Bot → URL Generator s dozvolama View Channels, Connect i Speak → pozovi bota na svoj server → Reset Token. Token zalijepiš u prozor; sprema se kriptirano samo na tvom računalu.
+- **Uđi u moj kanal** odvede bota u kanal u kojem si ti, a može i bilo koji kanal s popisa. Gumb sa slušalicama u mini playeru je zelen dok bot šalje glazbu. Ako botu u kanalu nedostaje dozvola, prozor napiše koja i gdje je uključiti.
+- Discord čuje točno ono što player svira: glasnoća playera vrijedi i za Discord, a utišan player šalje tišinu. Zvuk je end-to-end kriptiran (Discord DAVE). Bot radi samo na serverima na koje ga pozoveš, ne u privatnim pozivima. Treba Windows 11 ili Windows 10 build 20348 ili noviji.
+
 ### Kopije i prijenos
 
 Postavke → Općenito → **Kopije i prijenos**: postavke i povijest gledanja automatski se kopiraju jednom dnevno i prije svake nadogradnje (zadnjih 7 ostaje na tvom računalu). **Izvezi postavke** sprema ih u datoteku (bez lozinki, ključeva za stranice s titlovima i položaja prozora), a **Uvezi postavke** ih ponovno učitava, i na drugom računalu.
@@ -159,6 +166,10 @@ Otvori Postavke (zupčanik na glavnom ekranu ili desni klik → **Postavke…**)
 <p align="center"><img src="manual/images/hr/home-light.jpg" width="760" alt="Svijetla tema"></p>
 
 Prekidačem dolje lijevo na glavnom ekranu (mjesec = tamna, sunce = svijetla) ili u **Postavke → Izgled → Tema**. Promjena je trenutna i pamti se. Tamna je zadana. Kontrole preko videa uvijek ostaju tamne, da se dobro vide na slici; tema ne mijenja video ni titlove.
+
+### Boja isticanja
+
+U **Postavke → Izgled → Boja isticanja** biraš boju gumba, klizača, označenih stavki i mini playera: osam gotovih boja (zelena je zadana) ili **Vlastita boja…** (nijansa, zasićenost i svjetlina ili upis #RRGGBB, uz pregled uživo; Odustani vraća prijašnju boju). Pozadina ostaje tamna ili svijetla tema, a u svakoj temi boja se po potrebi malo posvijetli ili potamni da tekst ostane čitljiv. Promjena se vidi odmah; **Spremi**, **Odbaci promjene** i **Zadano** rade kao i za ostale postavke.
 
 ### Povijest gledanja i omiljeno
 
@@ -178,7 +189,8 @@ Postavke su podijeljene u kartice. Svaka promjena vrijedi odmah (i za video koji
 | Titlovi | Jezici titlova i njihov redoslijed, automatsko učitavanje i traženje, izvori na internetu, kodiranje starih titlova, izgled, sinkronizacija |
 | Zvuk | Glasnoća, ujednačavanje glasnoće, equalizer, željeni jezik zvuka, izlazni uređaj, izlaz za glazbu i radio, sinkronizacija zvuka |
 | Slika | Kvaliteta slike, hardversko dekodiranje, zadani omjer slike, HDR |
-| Izgled | Tamna / svijetla tema, pozadina početnog ekrana (zadana ili vlastita slika: Ispuni, Prilagodi, Sredina), koliko dugo su kontrole vidljive, iscrtavanje sučelja preko GPU-a, vrijeme, datum i prognoza na početnom ekranu (grad po izboru, s Open-Meteoa) |
+| Izgled | Tamna / svijetla tema, boja isticanja, pozadina početnog ekrana (zadana ili vlastita slika: Ispuni, Prilagodi, Sredina), koliko dugo su kontrole vidljive, iscrtavanje sučelja preko GPU-a, vrijeme, datum i prognoza na početnom ekranu (grad po izboru, s Open-Meteoa) |
+| Prečaci | Tipke za sve radnje, do dvije po radnji (vidi [Tipkovnički prečaci](#tipkovnički-prečaci)) |
 | Nadogradnje | Verzija, provjeri sada, automatsko preuzimanje, što je novo, povijest nadogradnji |
 | O aplikaciji | Verzija, licenca, korištene tehnologije, priručnik, privatnost, pravila potpisivanja koda, izvještaji o greškama (spremljeni na računalu bez osobnih podataka; šalješ ih sam preko GitHuba) |
 
@@ -253,23 +265,32 @@ Arhive sa stranica s titlovima: ZIP je podržan, RAR još nije.
 
 ### Tipkovnički prečaci
 
+Tipke se mijenjaju u **Postavke → Prečaci**. Svaka radnja može imati dvije tipke: klikni tipku i pritisni novu kombinaciju (Esc odustaje, Delete briše tipku). Ako tipku već koristi druga radnja, player to javi, a drugi pritisak iste tipke premjesti je ovamo. **Zadano** u retku vraća zadane tipke te radnje, a **Zadano** za karticu sve tipke. F1 i izbornici uvijek pokazuju tvoje stvarne tipke. Esc, Enter, Alt+Enter, Alt+F4 i medijske tipke tipkovnice imaju stalnu ulogu i ne mogu se dodijeliti. Tablica pokazuje zadane tipke.
+
 | Tipka | Radnja |
 |---|---|
 | Razmaknica / K | Reproduciraj / pauziraj |
-| ← / → | 5 s natrag / naprijed (Ctrl: 30 s; podešava se u Postavke → Općenito) |
+| ← / → | Natrag / naprijed (5 s; korak se podešava u Postavke → Općenito) |
+| Ctrl+← / Ctrl+→ | Natrag / naprijed 6× dulje (zadano 30 s) |
+| Home | Na početak |
 | ↑ / ↓ / kotačić | Glasnoća |
 | M | Isključi / uključi zvuk |
-| F / dvoklik | Cijeli zaslon (Esc za izlaz) |
+| F / F11 / dvoklik | Cijeli zaslon (Esc za izlaz) |
 | , / . | Kadar natrag / naprijed |
 | N / P / L | Sljedeća / prethodna epizoda / popis epizoda |
 | Ctrl+O / Ctrl+Shift+O | Otvori video / otvori mapu |
 | Ctrl+T / Ctrl+F | Titlovi iz datoteke / s interneta |
 | V / J | Prikaži ili sakrij titlove / sljedeći titlovi |
-| G / H | Titlovi ranije / kasnije |
+| G / H | Titlovi ranije / kasnije (100 ms) |
+| Ctrl+G / Ctrl+H | Titlovi ranije / kasnije (10 ms) |
+| Shift+G / Shift+H | Titlovi ranije / kasnije (1 s) |
 | Z, zatim X | Sinkronizacija po replici |
 | A | Sinkronizacija prema govoru |
+| Ctrl+Backspace | Vrati originalnu sinkronizaciju titlova |
 | B | Sljedeća audio traka |
-| + / − / Backspace | Brža / sporija / normalna reprodukcija |
+| + / Num + | Brža reprodukcija |
+| − / Num − | Sporija reprodukcija |
+| Backspace | Normalna brzina |
 | O | Omjer slike |
 | S / Shift+S | Snimka zaslona (s titlovima / bez) |
 | Ctrl+D | Dodaj u omiljene / ukloni |
@@ -277,7 +298,7 @@ Arhive sa stranica s titlovima: ZIP je podržan, RAR još nije.
 | Ctrl+R | Radio |
 | Ctrl+Shift+S | Spotify |
 | Ctrl+Shift+Y | YouTube Music |
-| Ctrl+Backspace | Vrati originalnu sinkronizaciju titlova |
+| Ctrl+Shift+D | Bot za Discord |
 | F1 | Svi prečaci |
 
 ### Nadogradnje i tvoji podaci

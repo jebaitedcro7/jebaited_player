@@ -238,6 +238,7 @@ public partial class MainWindow : IMiniPlayerHost
         }
 
         _spotifyWasActive = active;
+        UpdateDiscordInputs();
         _mini?.Tick();
     }
 

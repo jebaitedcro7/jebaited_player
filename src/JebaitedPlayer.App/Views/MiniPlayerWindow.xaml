@@ -15,9 +15,10 @@
         <SolidColorBrush x:Key="LcdBorder" Color="#2A4A32" />
         <SolidColorBrush x:Key="LcdText" Color="#7BD88F" />
         <SolidColorBrush x:Key="LcdTrack" Color="#17291C" />
+        <SolidColorBrush x:Key="LcdTag" Color="#1F3324" />
         <Style x:Key="Lcd" TargetType="Border">
-            <Setter Property="Background" Value="{StaticResource LcdBack}" />
-            <Setter Property="BorderBrush" Value="{StaticResource LcdBorder}" />
+            <Setter Property="Background" Value="{DynamicResource LcdBack}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource LcdBorder}" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="CornerRadius" Value="5" />
         </Style>
@@ -86,15 +87,15 @@
                     <Border Style="{StaticResource Lcd}" Padding="8,3,8,5" Cursor="Hand" ToolTip="{loc:T mini.timeHint}"
                             MouseLeftButtonDown="OnTimeClick">
                         <StackPanel>
-                            <TextBlock x:Name="TimeText" Text="00:00" FontFamily="Consolas" FontSize="26" Foreground="{StaticResource LcdText}" />
+                            <TextBlock x:Name="TimeText" Text="00:00" FontFamily="Consolas" FontSize="26" Foreground="{DynamicResource LcdText}" />
                             <Grid Margin="0,2,0,0" Height="16">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="12" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel x:Name="VuLabels" VerticalAlignment="Center">
-                                    <TextBlock Text="L" FontSize="8" FontFamily="Consolas" Height="8" Foreground="{StaticResource LcdBorder}" />
-                                    <TextBlock Text="R" FontSize="8" FontFamily="Consolas" Height="8" Foreground="{StaticResource LcdBorder}" />
+                                    <TextBlock Text="L" FontSize="8" FontFamily="Consolas" Height="8" Foreground="{DynamicResource LcdBorder}" />
+                                    <TextBlock Text="R" FontSize="8" FontFamily="Consolas" Height="8" Foreground="{DynamicResource LcdBorder}" />
                                 </StackPanel>
                                 <views:VuMeterView x:Name="Vu" Grid.Column="1" Height="14" VerticalAlignment="Center" />
                             </Grid>
@@ -104,7 +105,7 @@
                     <StackPanel Grid.Column="1" Margin="8,0,0,0">
                         <Border Style="{StaticResource Lcd}" Height="26" Padding="8,0">
                             <Canvas x:Name="MarqueeBox" ClipToBounds="True">
-                                <TextBlock x:Name="MarqueeText" FontFamily="Consolas" FontSize="13" Canvas.Top="4" Foreground="{StaticResource LcdText}">
+                                <TextBlock x:Name="MarqueeText" FontFamily="Consolas" FontSize="13" Canvas.Top="4" Foreground="{DynamicResource LcdText}">
                                     <TextBlock.RenderTransform>
                                         <TranslateTransform />
                                     </TextBlock.RenderTransform>
@@ -112,9 +113,9 @@
                             </Canvas>
                         </Border>
                         <DockPanel Margin="0,9,0,0">
-                            <Border DockPanel.Dock="Left" Background="#1F3324" CornerRadius="8" Padding="7,1" VerticalAlignment="Center"
+                            <Border DockPanel.Dock="Left" Background="{DynamicResource LcdTag}" CornerRadius="8" Padding="7,1" VerticalAlignment="Center"
                                     Cursor="Hand" ToolTip="{loc:T menu.radio}" MouseLeftButtonDown="OnSourceClick">
-                                <TextBlock x:Name="SourceText" Text="{loc:T mini.sourceLocal}" FontSize="10" Foreground="{StaticResource LcdText}" />
+                                <TextBlock x:Name="SourceText" Text="{loc:T mini.sourceLocal}" FontSize="10" Foreground="{DynamicResource LcdText}" />
                             </Border>
                             <TextBlock x:Name="RemainingText" DockPanel.Dock="Right" Width="46" TextAlignment="Right" VerticalAlignment="Center"
                                        Foreground="{DynamicResource TextSecondaryBrush}" />
@@ -128,6 +129,8 @@
                                   FontFamily="Consolas" FontSize="12" Content="PL" ToolTip="{loc:T mini.playlist}" Click="OnPanelsChanged" />
                     <ToggleButton x:Name="EqToggle" DockPanel.Dock="Right" Style="{StaticResource MiniButton}" Width="36"
                                   FontFamily="Consolas" FontSize="12" Content="EQ" ToolTip="{loc:T mini.equalizer}" Click="OnPanelsChanged" />
+                    <Button x:Name="DiscordButton" DockPanel.Dock="Right" Style="{StaticResource MiniButton}" Width="36" Content="&#xE95B;"
+                            ToolTip="{loc:T mini.discord}" Click="OnDiscord" />
                     <StackPanel Orientation="Horizontal">
                         <Button Style="{StaticResource MiniButton}" Content="&#xE892;" ToolTip="{loc:T mini.previous}" Click="OnPrevious" />
                         <Button x:Name="PlayButton" Style="{StaticResource MiniButton}" Content="&#xE768;" ToolTip="{loc:T mini.play}" Click="OnPlay" />

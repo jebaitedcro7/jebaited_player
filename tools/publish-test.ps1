@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   Testna instalacija: samostalni paket (win-x64) u zasebnu mapu, bez ikakvih promjena u sustavu.
 
@@ -34,6 +34,14 @@ if ($LASTEXITCODE -ne 0) { throw "Objava nije uspjela." }
 $mpv = (Get-FileHash (Join-Path $Target "libmpv-2.dll") -Algorithm SHA256).Hash.ToLowerInvariant()
 $expected = ([regex]::Match((Get-Content (Join-Path $root "third_party\libmpv\SOURCE.md") -Raw), 'libmpv-2\.dll` \| `([0-9a-f]{64})')).Groups[1].Value
 if ($mpv -ne $expected) { throw "libmpv-2.dll u paketu nema očekivani SHA256 ($mpv)." }
+
+$daveFile = Join-Path $Target "libdave.dll"
+if (Test-Path $daveFile) {
+    $dave = (Get-FileHash $daveFile -Algorithm SHA256).Hash.ToLowerInvariant()
+    $expectedDave = ([regex]::Match((Get-Content (Join-Path $root "third_party\libdave\SOURCE.md") -Raw), 'libdave\.dll` \| `([0-9a-f]{64})')).Groups[1].Value
+    if ($dave -ne $expectedDave) { throw "libdave.dll u paketu nema očekivani SHA256 ($dave)." }
+}
+else { "Upozorenje: libdave.dll nije u paketu, pa bot za Discord neće raditi (tools\get-libdave.ps1)." }
 
 $size = (Get-ChildItem $Target -Recurse -File | Measure-Object Length -Sum).Sum / 1MB
 "Testna instalacija: $Target ({0:N0} MB, verzija {1})" -f $size, (Get-Item (Join-Path $Target "jebaited_player.exe")).VersionInfo.ProductVersion

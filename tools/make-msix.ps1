@@ -26,6 +26,14 @@ dotnet publish (Join-Path $root 'src\JebaitedPlayer.App\JebaitedPlayer.App.cspro
 if ($LASTEXITCODE -ne 0) { throw 'dotnet publish nije uspio.' }
 Get-ChildItem $layout -Filter *.pdb | Remove-Item
 
+# libdave (bot za Discord) mora biti u paketu i tocno onaj provjereni (SHA256 u third_party\libdave\SOURCE.md), uz licence.
+$daveFile = Join-Path $layout 'libdave.dll'
+if (-not (Test-Path $daveFile)) { throw 'libdave.dll nije u paketu. Pokreni tools\get-libdave.ps1 pa ponovi.' }
+$dave = (Get-FileHash $daveFile -Algorithm SHA256).Hash.ToLowerInvariant()
+$expectedDave = ([regex]::Match((Get-Content (Join-Path $root 'third_party\libdave\SOURCE.md') -Raw), 'libdave\.dll` \| `([0-9a-f]{64})')).Groups[1].Value
+if ($dave -ne $expectedDave) { throw "libdave.dll u paketu nema ocekivani SHA256 ($dave)." }
+if (-not (Test-Path (Join-Path $layout 'licenses\THIRD_PARTY_NOTICES.md'))) { throw 'Mapa licenses (THIRD_PARTY_NOTICES.md) nije u paketu.' }
+
 # 2. Manifest s verzijom.
 $manifest = (Get-Content (Join-Path $root 'packaging\msix\AppxManifest.xml') -Raw -Encoding UTF8).Replace('$VERSION$', $msixVersion)
 [IO.File]::WriteAllText((Join-Path $layout 'AppxManifest.xml'), $manifest, (New-Object Text.UTF8Encoding $false))

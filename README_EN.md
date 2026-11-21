@@ -142,6 +142,13 @@ In the same tab you set the automatic search, the encoding of old subtitles and 
 - The official YouTube player plays in the window and must stay visible (YouTube rules): no background playback and no ad blocking; minimizing the window pauses it. While YouTube is the source, the mini player shows **YOUTUBE** and its buttons control YouTube; opening a file or a station switches back.
 - YouTube sound does not go through the player’s equalizer.
 
+### Discord bot
+
+- **Ctrl+Shift+D**, right-click → **Discord bot…** or the headset button in the mini player. Your own bot joins a voice channel on your Discord server and plays what the player plays: **only local music and radio**. Movies, YouTube Music and Spotify are never sent (while a movie plays or YouTube is open, the bot sends silence).
+- You create the bot once, for free; the window shows the steps: Discord Developer Portal → new application → Install Link set to None and Public Bot turned off → URL Generator with the permissions View Channels, Connect and Speak → invite the bot to your server → Reset Token. Paste the token into the window; it is stored encrypted on your computer only.
+- **Join my channel** takes the bot to the channel you are in, or pick any channel from the list. The headset button in the mini player is green while the bot sends music. If the bot is missing a permission in a channel, the window says which one and where to allow it.
+- Discord hears exactly what the player plays: the player volume also applies to Discord, and a muted player sends silence. The sound is end-to-end encrypted (Discord DAVE). The bot works only on servers you invite it to, not in private calls. Needs Windows 11 or Windows 10 build 20348 or newer.
+
 ### Backup and transfer
 
 Settings → General → **Backup and transfer**: settings and watch history are copied automatically once a day and before every update (the last 7 are kept on your computer). **Export settings** saves them to a file (without passwords, subtitle-site keys and the window position) and **Import settings** loads them again, also on another computer.
@@ -159,6 +166,10 @@ Open Settings (the gear on the main screen, or right-click → **Settings…**) 
 <p align="center"><img src="manual/images/en/home-light.jpg" width="760" alt="Light theme"></p>
 
 Use the switch at the bottom left of the main screen (moon = dark, sun = light) or **Settings → Appearance → Theme**. The change is immediate and remembered. Dark is the default. The controls over the video always stay dark so they are easy to see on the picture; the video and subtitles are not affected by the theme.
+
+### Accent color
+
+In **Settings → Appearance → Accent color** you choose the color of buttons, sliders, selected items and the mini player: eight ready-made colors (green is the default) or **Your own color…** (hue, saturation and lightness, or type #RRGGBB, with a live preview; Cancel restores the previous color). The background stays the dark or light theme, and in each theme the color is lightened or darkened a little when needed so that text stays readable. The change shows right away; **Save**, **Discard changes** and **Default** work as for all other settings.
 
 ### Watch history and favorites
 
@@ -178,7 +189,8 @@ Settings are split into tabs. Every change applies right away (also to the video
 | Subtitles | Subtitle languages and their order, automatic loading and searching, sources on the internet, encoding of old subtitles, look, synchronization |
 | Audio | Volume, volume levelling, equalizer, preferred audio language, output device, output for music and radio, audio sync |
 | Video | Picture quality, hardware decoding, default aspect ratio, HDR |
-| Appearance | Dark / light theme, home screen background (default or your own picture: Fill, Fit, Center), how long the controls stay visible, rendering the interface on the GPU, time, date and weather on the home screen (a city you choose, from Open-Meteo) |
+| Appearance | Dark / light theme, accent color, home screen background (default or your own picture: Fill, Fit, Center), how long the controls stay visible, rendering the interface on the GPU, time, date and weather on the home screen (a city you choose, from Open-Meteo) |
+| Shortcuts | Keys for every action, up to two per action (see [Keyboard shortcuts](#keyboard-shortcuts)) |
 | Updates | Version, check now, automatic download, what is new, update history |
 | About | Version, license, technologies used, manual, privacy, code signing policy, error reports (saved on your computer without personal data; you send them yourself via GitHub) |
 
@@ -253,23 +265,32 @@ Archives from subtitle sites: ZIP is supported; RAR is not yet.
 
 ### Keyboard shortcuts
 
+You can change the keys in **Settings → Shortcuts**. Every action can have two keys: click a key and press the new combination (Esc cancels, Delete removes the key). If another action already uses the key, the player tells you, and pressing the same key again moves it here. **Default** on a row restores that action's keys, and **Default** for the tab restores all keys. F1 and the menus always show your actual keys. Esc, Enter, Alt+Enter, Alt+F4 and the keyboard's media keys have a fixed role and cannot be assigned. The table shows the default keys.
+
 | Key | Action |
 |---|---|
 | Space / K | Play / pause |
-| ← / → | 5 s back / forward (Ctrl: 30 s; adjustable in Settings → General) |
+| ← / → | Back / forward (5 s; the step is set in Settings → General) |
+| Ctrl+← / Ctrl+→ | Back / forward 6× longer (30 s by default) |
+| Home | Go to the start |
 | ↑ / ↓ / mouse wheel | Volume |
 | M | Mute / unmute |
-| F / double-click | Fullscreen (Esc to exit) |
+| F / F11 / double-click | Fullscreen (Esc to exit) |
 | , / . | Frame back / forward |
 | N / P / L | Next / previous episode / episode list |
 | Ctrl+O / Ctrl+Shift+O | Open video / open folder |
 | Ctrl+T / Ctrl+F | Subtitles from file / from the internet |
 | V / J | Show or hide subtitles / next subtitles |
-| G / H | Subtitles earlier / later |
+| G / H | Subtitles earlier / later (100 ms) |
+| Ctrl+G / Ctrl+H | Subtitles earlier / later (10 ms) |
+| Shift+G / Shift+H | Subtitles earlier / later (1 s) |
 | Z, then X | Sync by line |
 | A | Sync to speech |
+| Ctrl+Backspace | Restore original subtitle timing |
 | B | Next audio track |
-| + / − / Backspace | Faster / slower / normal playback |
+| + / Num + | Faster playback |
+| − / Num − | Slower playback |
+| Backspace | Normal speed |
 | O | Aspect ratio |
 | S / Shift+S | Screenshot (with / without subtitles) |
 | Ctrl+D | Add to / remove from favorites |
@@ -277,7 +298,7 @@ Archives from subtitle sites: ZIP is supported; RAR is not yet.
 | Ctrl+R | Radio |
 | Ctrl+Shift+S | Spotify |
 | Ctrl+Shift+Y | YouTube Music |
-| Ctrl+Backspace | Restore original subtitle timing |
+| Ctrl+Shift+D | Discord bot |
 | F1 | All shortcuts |
 
 ### Updates and your data

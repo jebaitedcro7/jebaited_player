@@ -45,6 +45,12 @@ internal interface IMiniPlayerHost
     void ShowYouTube(Window owner);
 
     JebaitedPlayer.Services.YouTubeRemote YouTube { get; }
+
+    /// <summary>V4-B: bot za Discord (prozor).</summary>
+    void ShowDiscord(Window owner);
+
+    /// <summary>V4-B: bot ako je već stvoren (null dok ga korisnik ne otvori), za oznaku stanja u mini playeru.</summary>
+    JebaitedPlayer.Services.Discord.DiscordBot? DiscordBot { get; }
 }
 
 /// <summary>
@@ -83,6 +89,11 @@ public partial class MiniPlayerWindow : Window
         _host = host;
         InitializeComponent();
         DataContext = vm.Library;
+
+        // 2.0: LCD i VU metar u boji isticanja (zadana zelena = isto kao prije).
+        ApplyLcd();
+        WindowTheme.AccentChanged += ApplyLcd;
+        Closed += (_, _) => WindowTheme.AccentChanged -= ApplyLcd;
         Equalizer.Initialize(CurrentEqualizer, host.ApplyPlaybackSettings, sliderHeight: 64, columnWidth: 34);
         ContextMenuOpening += (_, _) => ContextMenu = BuildMenu();
         ContextMenu = BuildMenu();
@@ -219,6 +230,7 @@ public partial class MiniPlayerWindow : Window
         menu.Items.Add(Check(Loc.T("mini.autoSwitch"), m.AutoSwitch, () => m.AutoSwitch = !m.AutoSwitch));
         menu.Items.Add(new Separator());
         menu.Items.Add(Check(Loc.T("menu.radio"), false, () => _host.ShowRadio(this)));
+        menu.Items.Add(Check(Loc.T("menu.discord"), false, () => _host.ShowDiscord(this)));
         menu.Items.Add(Check(Loc.T("mini.settings"), false, _host.ShowSettings));
         menu.Items.Add(Check(Loc.T("mini.fullPlayer"), false, _host.ShowFullPlayer));
         menu.Items.Add(Check(Loc.T("mini.close"), false, _host.ClosePlayer));
@@ -548,6 +560,8 @@ public partial class MiniPlayerWindow : Window
 
     internal void Tick()
     {
+        TickDiscord();
+
         // V8: dok je Spotify izvor i mini player vidljiv, stanje se osvježava (inače nema mreže ni timera).
         bool spotify = SpotifyMode;
         if ((spotify && IsVisible) != _spotifyConsumer)
@@ -800,6 +814,60 @@ public partial class MiniPlayerWindow : Window
         CompactPlayPause.Content = s is { IsPlaying: true } ? "\uE769" : "\uE768";
         SetMarquee(s is { Title.Length: > 0 } ? s.Title : _host.YouTube.Status is { Length: > 0 } st ? st : Loc.T("youtube.title"));
     }
+
+    // --- 2.0: boja isticanja ----------------------------------------------------------------------------------------
+
+    /// <summary>LCD (vrijeme, naslov, oznaka izvora, okviri) i VU metar iz palete trenutne boje isticanja.</summary>
+    private void ApplyLcd()
+    {
+        JebaitedPlayer.Infrastructure.AccentPalette p = WindowTheme.Palette;
+        Resources["LcdText"] = WindowTheme.Frozen(p.LcdText);
+        Resources["LcdBorder"] = WindowTheme.Frozen(p.LcdBorder);
+        Resources["LcdTrack"] = WindowTheme.Frozen(p.LcdTrack);
+        Resources["LcdBack"] = WindowTheme.Frozen(p.LcdBack);
+        Resources["LcdTag"] = WindowTheme.Frozen(p.LcdTag);
+        VuMeterView.ApplyPalette(p);
+        Vu.InvalidateVisual();
+        _discordState = string.Empty; // gumb za Discord dobiva novu boju na sljedećem otkucaju
+    }
+
+    /// <summary>Dijagnostika: boja LCD teksta.</summary>
+    internal Color LcdTextColor => ((SolidColorBrush)Resources["LcdText"]).Color;
+
+    // --- V4-B: bot za Discord ----------------------------------------------------------------------------------------
+
+    private string _discordState = string.Empty;
+
+    private void OnDiscord(object sender, RoutedEventArgs e) => _host.ShowDiscord(this);
+
+    /// <summary>Oznaka bota: zelena dok šalje glazbu u kanal, inače obična; u opisu je kanal i što se šalje.</summary>
+    private void TickDiscord()
+    {
+        JebaitedPlayer.Services.Discord.DiscordBot? bot = _host.DiscordBot;
+        bool inChannel = bot?.State == JebaitedPlayer.Services.Discord.DiscordBotState.InChannel;
+        bool sending = inChannel && bot!.Decision == JebaitedPlayer.Services.Discord.DiscordAudioDecision.Send;
+        string state = inChannel ? $"{sending}|{bot!.Decision}|{bot.Channel?.ChannelName}" : "off";
+        if (state == _discordState)
+        {
+            return;
+        }
+
+        _discordState = state;
+        if (sending)
+        {
+            DiscordButton.Foreground = (Brush)FindResource("LcdText");
+        }
+        else
+        {
+            DiscordButton.ClearValue(ForegroundProperty);
+        }
+
+        DiscordButton.ToolTip = inChannel
+            ? Loc.T("mini.discordInChannel", bot!.Channel?.ChannelName ?? string.Empty) + "\n" + DiscordWindow.DecisionText(bot.Decision)
+            : Loc.T("mini.discord");
+    }
+
+    internal bool DiscordButtonIsLit => DiscordButton.ReadLocalValue(ForegroundProperty) != DependencyProperty.UnsetValue;
 
     /// <summary>Klik na oznaku izvora: Radio, Spotify ili YouTube Music (ciklusi 5 i 6).</summary>
     private void OnSourceClick(object sender, MouseButtonEventArgs e)

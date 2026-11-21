@@ -23,4 +23,9 @@
     <Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- C API libdave-a (iste verzije kao libdave.dll, vidi third_party/libdave/SOURCE.md): test uspoređuje potpise s NetCordom. -->
+    <None Include="..\..\third_party\libdave\include\dave\dave.h" Link="dave.h" CopyToOutputDirectory="PreserveNewest" Visible="false" />
+  </ItemGroup>
+
 </Project>

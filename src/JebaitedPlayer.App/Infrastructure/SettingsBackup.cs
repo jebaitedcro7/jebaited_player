@@ -335,7 +335,7 @@ public static class SettingsWorkingCopy
 public static class SettingsDefaults
 {
     /// <summary>Kartice koje imaju zadane vrijednosti (Jezik i O aplikaciji nemaju).</summary>
-    public static readonly IReadOnlyList<string> Tabs = ["general", "subtitles", "audio", "video", "appearance", "updates"];
+    public static readonly IReadOnlyList<string> Tabs = ["general", "subtitles", "audio", "video", "appearance", "shortcuts", "updates"];
 
     public static void Reset(AppSettings s, string? tab)
     {
@@ -366,10 +366,13 @@ public static class SettingsDefaults
                     (s.HardwareDecoding, s.VideoQuality, s.DefaultAspect, s.HdrPassthrough) = (d.HardwareDecoding, d.VideoQuality, d.DefaultAspect, d.HdrPassthrough);
                     break;
                 case "appearance":
-                    (s.Theme, s.ControlsHideSeconds, s.UiGpuRendering) = (d.Theme, d.ControlsHideSeconds, d.UiGpuRendering);
+                    (s.Theme, s.ControlsHideSeconds, s.UiGpuRendering, s.AccentColor) = (d.Theme, d.ControlsHideSeconds, d.UiGpuRendering, d.AccentColor);
                     (s.MiniPlayer.Font, s.MiniPlayer.VuStyle, s.MiniPlayer.AutoSwitch) = (d.MiniPlayer.Font, d.MiniPlayer.VuStyle, d.MiniPlayer.AutoSwitch);
                     (s.HomeBackgroundImage, s.HomeBackgroundMode) = (d.HomeBackgroundImage, d.HomeBackgroundMode);
                     (s.HomeInfo.ShowTime, s.HomeInfo.ShowDate, s.HomeInfo.ShowWeather) = (true, true, false);
+                    break;
+                case "shortcuts":
+                    s.Shortcuts = new Dictionary<string, string[]>();
                     break;
                 case "updates":
                     s.AutoUpdate = d.AutoUpdate;

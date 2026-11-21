@@ -4,6 +4,34 @@ Alle wichtigen Änderungen an jebaited_player. Format: [Keep a Changelog](https:
 
 Andere Sprachen: [English](CHANGELOG.md) · [Hrvatski](CHANGELOG_HR.md). Derselbe Verlauf ist im Player enthalten (Klick auf die Versionsnummer auf dem Startbildschirm). Diese Datei wird aus `src/JebaitedPlayer.App/History/update-history.json` erzeugt.
 
+## [2.0.6] - 2026-11-21
+
+2.0: Dein eigener Discord-Bot spielt Musik und Radio des Players in einem Sprachkanal; jedes Tastenkürzel lässt sich ändern; Akzentfarbe nach Wahl.
+
+### Neu
+
+- Discord-Bot (Strg+Umschalt+D, die Kopfhörer-Taste im Mini-Player oder Rechtsklick → Discord-Bot …): Dein eigener Bot spielt Musik und Radio des Players in einem Sprachkanal auf deinem Server, damit Freunde hören, was du hörst. Erstelle einen kostenlosen Bot im Discord Developer Portal (die Schritte stehen im Fenster), füge sein Token ein und lade ihn ein; „Meinem Kanal beitreten“ findet den Kanal, in dem du bist. Das Token wird verschlüsselt nur auf diesem Computer gespeichert. Gesendet werden nur lokale Musik und Radio: Filme, YouTube und Spotify werden nie gesendet (der Bot sendet Stille). Die Sprachverbindung ist Ende-zu-Ende-verschlüsselt (Discord DAVE).
+- Eigene Tastenkürzel (Einstellungen → Tastenkürzel): Jede Aktion kann zwei Tasten haben. Auf eine Taste klicken und die neue Kombination drücken; nutzt sie schon eine andere Aktion, meldet der Player das, und ein zweiter Druck verschiebt sie. „Standard“ stellt eine Aktion oder den ganzen Tab wieder her. F1 und die Menüs zeigen immer deine tatsächlichen Tasten, und deine Tasten sind im Export der Einstellungen und in den Sicherungen enthalten.
+- Akzentfarbe (Einstellungen → Darstellung → Akzentfarbe): acht fertige Farben oder eine eigene (Farbton, Sättigung und Helligkeit oder #RRGGBB) mit Live-Vorschau. Schaltflächen, Regler, markierte Einträge sowie Anzeige und Pegelanzeige des Mini-Players folgen ihr; in jedem Design wird die Farbe bei Bedarf angepasst, damit Text lesbar bleibt.
+
+### Verbessert
+
+- Der längere Sprung (Strg+←/→) und die feine und grobe Untertitelverschiebung (Strg+G/H, Umschalt+G/H) sind jetzt eigene Aktionen, daher lassen sich auch ihre Tasten ändern.
+- Die vollständigen Lizenztexte der Komponenten des Discord-Bots (NetCord, Concentus, libdave, OpenSSL, mlspp, nlohmann/json) werden zusammen mit THIRD_PARTY_NOTICES im Ordner licenses mit dem Programm installiert.
+
+### Behoben
+
+- Der kurze Datenschutztext in den Einstellungen war veraltet (er nannte nur GitHub, Untertitel und Radio); jetzt nennt er jeden Dienst, mit dem sich der Player verbinden kann.
+- In der F1-Liste der Tastenkürzel fehlten Strg+M, Strg+R, Strg+Umschalt+S und Strg+Umschalt+Y; sie entsteht jetzt aus derselben Liste, die der Player verwendet, und ist daher immer vollständig.
+
+### Bekannte Probleme
+
+- Der Discord-Bot braucht zum Senden von Ton Windows 11 (oder Windows 10 Build 20348 oder neuer).
+- Die App ist noch nicht digital signiert, daher können Windows SmartScreen oder Smart App Control vor der Installation warnen.
+- Das Fortschrittsfenster des Installationsprogramms stammt von Velopack und ist nur auf Englisch.
+
+Release: [v2.0.6](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v2.0.6) · Änderungen seit [v1.8.4...v2.0.6](https://github.com/jebaitedcro7/jebaited_player/compare/v1.8.4...v2.0.6)
+
 ## [1.8.4] - 2026-11-21
 
 Zyklus 6: YouTube Music, Uhrzeit, Datum und Wetter auf dem Startbildschirm und Fehlerberichte.

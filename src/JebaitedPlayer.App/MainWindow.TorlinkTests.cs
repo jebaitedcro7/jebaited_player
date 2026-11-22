@@ -454,7 +454,7 @@ public partial class MainWindow
 
         // ---- 7) pad procesa usred preuzimanja (nakon što je napredak stvarno krenuo: pad tijekom podizanja Torlink sam tretira kao sumnjiv i pauzira stavke) ----
         await WaitForAsync(() => host.Snapshot.Active.Any(i => i.Percent >= 5), 120000);
-        await Task.Delay(8000); // Torlinkov boot marker se briše tek 4 s nakon podizanja; ranije "slučajno" ubijanje bi bilo pad pri podizanju
+        await Task.Delay(8000); // Torlink boot marker is removed 4 s after startup; an earlier kill would count as a crash during startup
         int pid2 = host.Supervisor.ProcessId ?? 0;
         double before = host.Snapshot.Active.FirstOrDefault()?.Percent ?? 0;
         Process.GetProcessById(pid2).Kill(entireProcessTree: true);

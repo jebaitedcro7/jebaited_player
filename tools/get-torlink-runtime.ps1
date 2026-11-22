@@ -22,7 +22,7 @@ New-Item -ItemType Directory -Force -Path $dest | Out-Null
 
 if (-not $Zip) {
     $source = Get-Content (Join-Path $root 'third_party\torlink\SOURCE.md') -Raw
-    $url = ([regex]::Match($source, '\| URL \(planiran\) \| (https://\S+\.zip) \|')).Groups[1].Value
+    $url = ([regex]::Match($source, '\| URL \| (https://\S+\.zip) \|')).Groups[1].Value
     $sha = ([regex]::Match($source, 'SHA256 arhive[^|]*\| `([0-9a-f]{64})`')).Groups[1].Value
     if (-not $url -or -not $sha) { throw 'SOURCE.md nema URL ili SHA-256.' }
     $Zip = Join-Path ([IO.Path]::GetTempPath()) ('torlink-runtime-' + [Guid]::NewGuid().ToString('N') + '.zip')

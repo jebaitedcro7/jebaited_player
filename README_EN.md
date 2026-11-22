@@ -155,6 +155,13 @@ In the same tab you set the automatic search, the encoding of old subtitles and 
 - **Join my channel** takes the bot to the channel you are in, or pick any channel from the list. The headset button in the mini player is green while the bot sends music. If the bot is missing a permission in a channel, the window says which one and where to allow it.
 - Discord hears what the player plays. By default the player volume also applies to Discord; in the Discord window you can give Discord a **volume of its own**, so turning the player down for yourself does not make it quieter in the channel. A muted player (or volume 0) always sends silence. The sound is end-to-end encrypted (Discord DAVE). The bot works only on servers you invite it to, not in private calls. Needs Windows 11 or Windows 10 build 20348 or newer.
 
+### Torlink (search online, GitHub build only)
+
+- Optional and **off by default**. Turn it on in **Settings → Torlink**. After you accept a notice, the player downloads a verified package (Node.js + Torlink, about 40 MB, SHA-256 checked) from this repository's releases. It is **not part of the Microsoft Store version**.
+- Then a third button, **Search online**, appears on the home screen next to Open file and Open folder. It opens the Torlink page: one search over several public indexes (movies, TV, anime, games), results with size, seeders and source (sort and filter), and a download manager (active, queue, completed, failed; pause, resume, cancel, open folder, play). **Home** (or Esc / Alt+←) returns to the player's home screen and downloads continue; **Ctrl+Shift+T** opens and closes the page.
+- Torlink is the open-source project [baairon/torlink](https://github.com/baairon/torlink) (MIT), used unchanged. The player talks to it through its local interface and runs it only while it is needed. Settings: download folder, simultaneous downloads, playlist.m3u, extra trackers, network interface (VPN) and sharing after the download (**off by default**). Updates only on your click, from our verified package, with automatic rollback.
+- **Your responsibility:** BitTorrent shows your IP address to other users. Download and share only what you are allowed to. The player does not host or check any content. See [PRIVACY.md](PRIVACY.md).
+
 ### Backup and transfer
 
 Settings → General → **Backup and transfer**: settings and watch history are copied automatically once a day and before every update (the last 7 are kept on your computer). **Export settings** saves them to a file (without passwords, subtitle-site keys and the window position) and **Import settings** loads them again, also on another computer.
@@ -305,6 +312,7 @@ You can change the keys in **Settings → Shortcuts**. Every action can have two
 | Ctrl+Shift+S | Spotify |
 | Ctrl+Shift+Y | YouTube Music |
 | Ctrl+Shift+D | Discord bot |
+| Ctrl+Shift+T | Torlink (search online) |
 | F1 | All shortcuts |
 
 ### Updates and your data

@@ -155,6 +155,13 @@ U istoj kartici podešavaš automatsko traženje, kodiranje starih titlova i izg
 - **Uđi u moj kanal** odvede bota u kanal u kojem si ti, a može i bilo koji kanal s popisa. Gumb sa slušalicama u mini playeru je zelen dok bot šalje glazbu. Ako botu u kanalu nedostaje dozvola, prozor napiše koja i gdje je uključiti.
 - Discord čuje ono što player svira. Zadano glasnoća playera vrijedi i za Discord; u prozoru Discord možeš Discordu dati **vlastitu glasnoću**, pa kad sebi utišaš player, u kanalu nije tiše. Utišan player (ili glasnoća 0) uvijek šalje tišinu. Zvuk je end-to-end kriptiran (Discord DAVE). Bot radi samo na serverima na koje ga pozoveš, ne u privatnim pozivima. Treba Windows 11 ili Windows 10 build 20348 ili noviji.
 
+### Torlink (pretraži online, samo GitHub inačica)
+
+- Neobavezno i **zadano isključeno**. Uključuje se u **Postavke → Torlink**. Nakon što prihvatiš upozorenje, player s izdanja ovog repozitorija preuzima provjereni paket (Node.js + Torlink, oko 40 MB, provjera SHA-256). **Nije dio Microsoft Store inačice.**
+- Zatim se na početnom ekranu uz Otvori datoteku i Otvori mapu pojavljuje treći gumb **Pretraži online**. Otvara Torlink stranicu: jedna pretraga kroz više javnih indeksa (filmovi, serije, anime, igre), rezultati s veličinom, seederima i izvorom (sortiranje i filter) te upravitelj preuzimanja (aktivna, red, završena, neuspjela; pauza, nastavak, otkaži, otvori mapu, reproduciraj). **Home** (ili Esc / Alt+←) vraća na početni ekran playera, a preuzimanja se nastavljaju; **Ctrl+Shift+T** otvara i zatvara stranicu.
+- Torlink je projekt otvorenog koda [baairon/torlink](https://github.com/baairon/torlink) (MIT), korišten nepromijenjen. Player s njim razgovara preko njegovog lokalnog sučelja i pokreće ga samo dok treba. Postavke: mapa za preuzimanja, istodobna preuzimanja, playlist.m3u, dodatni trackeri, mrežno sučelje (VPN) i dijeljenje nakon preuzimanja (**zadano isključeno**). Ažuriranje samo na tvoj klik, iz našeg provjerenog paketa, uz automatski povratak.
+- **Tvoja odgovornost:** BitTorrent drugim korisnicima otkriva tvoju IP adresu. Preuzimaj i dijeli samo ono što smiješ. Player ne pohranjuje niti provjerava nikakav sadržaj. Vidi [PRIVACY.md](PRIVACY.md).
+
 ### Kopije i prijenos
 
 Postavke → Općenito → **Kopije i prijenos**: postavke i povijest gledanja automatski se kopiraju jednom dnevno i prije svake nadogradnje (zadnjih 7 ostaje na tvom računalu). **Izvezi postavke** sprema ih u datoteku (bez lozinki, ključeva za stranice s titlovima i položaja prozora), a **Uvezi postavke** ih ponovno učitava, i na drugom računalu.
@@ -305,6 +312,7 @@ Tipke se mijenjaju u **Postavke → Prečaci**. Svaka radnja može imati dvije t
 | Ctrl+Shift+S | Spotify |
 | Ctrl+Shift+Y | YouTube Music |
 | Ctrl+Shift+D | Bot za Discord |
+| Ctrl+Shift+T | Torlink (pretraži online) |
 | F1 | Svi prečaci |
 
 ### Nadogradnje i tvoji podaci

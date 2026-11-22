@@ -8,6 +8,9 @@
   <ItemGroup>
     <!-- Jezici sučelja: jedna JSON datoteka po jeziku, ugrađena u program (lang.<kod>.json). -->
     <EmbeddedResource Include="Languages\*.json" LogicalName="lang.%(Filename).json" />
+    <!-- Tekstovi Torlinka (samo GitHub inačica): satelitske datoteke koje se spajaju s glavnima. Store (MSIX) izdanje se gradi s
+         -p:TorlinkEnabled=false i u njemu ih nema (tools/make-msix.ps1 to provjerava). -->
+    <EmbeddedResource Include="Languages\torlink\*.json" LogicalName="langx.torlink.%(Filename).json" Condition="'$(TorlinkEnabled)' != 'false'" />
   </ItemGroup>
 
   <ItemGroup>

@@ -22,7 +22,7 @@ $package = Join-Path $outDir "jebaited_player_${msixVersion}_x64.msix"
 # 1. Izrada (isto kao izdanje na GitHubu: self-contained win-x64).
 if (Test-Path $layout) { Remove-Item $layout -Recurse -Force }
 dotnet publish (Join-Path $root 'src\JebaitedPlayer.App\JebaitedPlayer.App.csproj') -c Release -r win-x64 --self-contained true `
-    -p:Version=$version -p:InformationalVersion=$version -o $layout --nologo -v q
+    -p:Version=$version -p:InformationalVersion=$version -p:TorlinkEnabled=false -o $layout --nologo -v q
 if ($LASTEXITCODE -ne 0) { throw 'dotnet publish nije uspio.' }
 Get-ChildItem $layout -Filter *.pdb | Remove-Item
 
@@ -33,6 +33,32 @@ $dave = (Get-FileHash $daveFile -Algorithm SHA256).Hash.ToLowerInvariant()
 $expectedDave = ([regex]::Match((Get-Content (Join-Path $root 'third_party\libdave\SOURCE.md') -Raw), 'libdave\.dll` \| `([0-9a-f]{64})')).Groups[1].Value
 if ($dave -ne $expectedDave) { throw "libdave.dll u paketu nema ocekivani SHA256 ($dave)." }
 if (-not (Test-Path (Join-Path $layout 'licenses\THIRD_PARTY_NOTICES.md'))) { throw 'Mapa licenses (THIRD_PARTY_NOTICES.md) nije u paketu.' }
+
+# Torlink NIKAD ne ide u Store (MSIX) paket (odluka vlasnika 2026-11-22). Izgradnja je s TorlinkEnabled=false; ovdje se jos jednom provjerava.
+# Obavijest o komponentama je zajednicka za obje inacice, pa se iz Store kopije uklanjaju retci i odjeljak o Torlinku.
+$notices = Join-Path $layout 'licenses\THIRD_PARTY_NOTICES.md'
+$kept = New-Object System.Collections.Generic.List[string]
+$skip = $false
+foreach ($line in (Get-Content $notices -Encoding UTF8)) {
+    if ($line -match '^## ') { $skip = ($line -match '^## Torlink') }
+    if ($skip) { continue }
+    if ($line -match '^\| (Torlink|Node\.js \(u Torlink|webtorrent i ostali)') { continue }
+    $kept.Add($line)
+}
+[IO.File]::WriteAllText($notices, (($kept -join "`n") + "`n"), (New-Object Text.UTF8Encoding $false))
+$forbiddenNames = @(Get-ChildItem $layout -Recurse | Where-Object { $_.Name -match 'torlink|torlnk' })
+if ($forbiddenNames.Count -gt 0) { throw ('Torlink u Store paketu (datoteke): ' + (($forbiddenNames | ForEach-Object { $_.FullName }) -join ', ')) }
+$needles = @('torlnk', 'JebaitedPlayer.Torlink', 'TORLINK_STATE_DIR', 'torlink.homeButton', 'TorlinkService')
+foreach ($f in Get-ChildItem $layout -Recurse -File | Where-Object { ($_.Extension -in '.dll', '.exe' -and $_.Name -match '^(jebaited_player|JebaitedPlayer\.)') -or $_.Extension -in '.json', '.md', '.txt', '.xml' }) {
+    $bytes = [IO.File]::ReadAllBytes($f.FullName)
+    $ascii = [Text.Encoding]::GetEncoding(28591).GetString($bytes)
+    $utf16 = [Text.Encoding]::Unicode.GetString($bytes)
+    $utf16b = [Text.Encoding]::Unicode.GetString($bytes, 1, $bytes.Length - 1)
+    foreach ($n in $needles) {
+        if ($ascii.Contains($n) -or $utf16.Contains($n) -or $utf16b.Contains($n)) { throw "Torlink u Store paketu: '$n' u $($f.FullName)" }
+    }
+}
+Write-Host 'Provjera: u paketu nema Torlinka (datoteke, nazivi, tekstovi).'
 
 # 2. Manifest s verzijom.
 $manifest = (Get-Content (Join-Path $root 'packaging\msix\AppxManifest.xml') -Raw -Encoding UTF8).Replace('$VERSION$', $msixVersion)

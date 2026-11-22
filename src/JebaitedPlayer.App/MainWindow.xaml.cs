@@ -393,6 +393,14 @@ public partial class MainWindow : Window
             return;
         }
 
+#if TORLINK
+        if (!_closing && !ConfirmTorlinkClose())
+        {
+            e.Cancel = true;
+            return;
+        }
+#endif
+
         // Gašenje mpv-a ide u pozadini dok UI dretva i dalje obrađuje poruke (vidi MpvPlayer.Dispose).
         e.Cancel = true;
         if (_closing)
@@ -417,6 +425,9 @@ public partial class MainWindow : Window
 
         // V4-B: bot izlazi iz glasovnog kanala prije gašenja mpv-a (najviše 3 s).
         await CloseDiscordAsync();
+#if TORLINK
+        await ShutdownTorlinkAsync();
+#endif
 
         _events?.Detach();
         _health?.Dispose();
@@ -481,6 +492,9 @@ public partial class MainWindow : Window
         _topBar.MouseWheel += (_, delta) => ChangeVolumeByWheel(delta);
         _ = _topBar.Handle;
         InitializeHomePlayback();
+#if TORLINK
+        InitializeTorlink();
+#endif
         InitializeLibraryUi();
 
         _uiTimer.Start();
@@ -724,6 +738,9 @@ public partial class MainWindow : Window
         Video.Visibility = video ? Visibility.Visible : Visibility.Hidden;
         AudioPanel.Visibility = _vm.HasMedia && _vm.IsAudioOnly && !home ? Visibility.Visible : Visibility.Collapsed;
         WelcomePanel.Visibility = _vm.HasMedia && !home ? Visibility.Collapsed : Visibility.Visible;
+#if TORLINK
+        UpdateTorlinkPanel();
+#endif
         UpdateHomePlayback();
     }
 
@@ -1004,6 +1021,11 @@ public partial class MainWindow : Window
             case "discord":
                 ShowDiscord();
                 return true;
+#if TORLINK
+            case "torlink":
+                ToggleTorlink();
+                return true;
+#endif
             case "settings":
                 ShowPlayerSettings();
                 return true;

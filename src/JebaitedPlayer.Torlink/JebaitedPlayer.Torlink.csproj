@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Torlink (vanjski projekt baairon/torlink, MIT) kao zaseban modul: pokretanje, API, pretraga, ažuriranje.
+       Bez vanjskih paketa. Ne gradi se u Store (MSIX) izdanju: vidi uvjetnu referencu u JebaitedPlayer.App.csproj. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>JebaitedPlayer.Torlink</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="JebaitedPlayer.Torlink.Tests" />
+  </ItemGroup>
+
+</Project>

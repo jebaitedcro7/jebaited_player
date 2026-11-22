@@ -56,6 +56,22 @@
     <ProjectReference Include="..\JebaitedPlayer.Sync\JebaitedPlayer.Sync.csproj" />
   </ItemGroup>
 
+  <!-- Torlink (GitHub inačica): zaseban modul. Store (MSIX) izdanje se gradi s -p:TorlinkEnabled=false: tada nema reference,
+       nema simbola TORLINK i nijedna datoteka iz Views\Torlink ni MainWindow.Torlink*.cs ne ulazi u izgradnju (tools/make-msix.ps1 to provjerava). -->
+  <PropertyGroup Condition="'$(TorlinkEnabled)' != 'false'">
+    <DefineConstants>$(DefineConstants);TORLINK</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(TorlinkEnabled)' != 'false'">
+    <ProjectReference Include="..\JebaitedPlayer.Torlink\JebaitedPlayer.Torlink.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TorlinkEnabled)' == 'false'">
+    <Compile Remove="Views\Torlink\**" />
+    <Page Remove="Views\Torlink\**" />
+    <Compile Remove="MainWindow.Torlink*.cs" />
+    <Compile Remove="Infrastructure\Torlink*.cs" />
+    <Compile Remove="Services\Torlink*.cs" />
+  </ItemGroup>
+
   <ItemGroup>
     <!-- Tekstovi sučelja (Languages/*.json). -->
     <Using Include="JebaitedPlayer.Localization" />

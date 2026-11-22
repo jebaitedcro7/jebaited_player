@@ -25,6 +25,9 @@ public enum SettingsTab
     Shortcuts,
     Updates,
     About,
+#if TORLINK
+    Torlink,
+#endif
 }
 
 /// <summary>Izlazni uređaj zvuka (mpv "audio-device-list").</summary>
@@ -108,6 +111,11 @@ public partial class PlayerSettingsWindow : Window
         ("OpenSSL 3", "Apache-2.0"),
         ("mlspp", "BSD-2-Clause"),
         ("nlohmann/json", "MIT"),
+#if TORLINK
+        ("Torlink (baairon/torlink)", "MIT"),
+        ("Node.js (Torlink)", "MIT"),
+        ("webtorrent (Torlink)", "MIT"),
+#endif
     ];
 
     private readonly AppSettings _settings;
@@ -143,6 +151,9 @@ public partial class PlayerSettingsWindow : Window
         LoadUpdates();
         LoadAbout();
         LoadDiagnostics();
+#if TORLINK
+        LoadTorlinkTab();
+#endif
         SelectTab(tab);
         _loading = false;
 
@@ -166,10 +177,28 @@ public partial class PlayerSettingsWindow : Window
     }
 
     /// <summary>Otvori zadanu karticu (npr. "Titlovi" iz izbornika titlova, "Nadogradnje" iz izbornika verzije).</summary>
-    public void SelectTab(SettingsTab tab) => Tabs.SelectedIndex = (int)tab;
+    public void SelectTab(SettingsTab tab) => Tabs.SelectedIndex = TabIndexOf(tab);
 
     /// <summary>Dijagnostika: naziv i broj otvorene kartice.</summary>
-    internal SettingsTab SelectedTab => (SettingsTab)Math.Max(0, Tabs.SelectedIndex);
+    internal SettingsTab SelectedTab => TabAtIndex(Math.Max(0, Tabs.SelectedIndex));
+
+    private int TabIndexOf(SettingsTab tab)
+    {
+#if TORLINK
+        return TorlinkTabIndexOf(tab);
+#else
+        return (int)tab;
+#endif
+    }
+
+    private SettingsTab TabAtIndex(int index)
+    {
+#if TORLINK
+        return TorlinkTabAt(index);
+#else
+        return (SettingsTab)index;
+#endif
+    }
 
     private void RefreshTexts()
     {
@@ -469,7 +498,7 @@ public partial class PlayerSettingsWindow : Window
         _ => null,
     };
 
-    private string TabTitle(SettingsTab tab) => (Tabs.Items[(int)tab] as TabItem)?.Header?.ToString() ?? tab.ToString();
+    private string TabTitle(SettingsTab tab) => (Tabs.Items[TabIndexOf(tab)] as TabItem)?.Header?.ToString() ?? tab.ToString();
 
     private void OnSave(object sender, RoutedEventArgs e) => SaveNow();
 

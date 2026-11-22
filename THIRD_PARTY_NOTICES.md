@@ -20,8 +20,15 @@ jebaited_player je objavljen pod licencom **GPL-3.0** (vidi [LICENSE](LICENSE)).
 | OpenSSL 3 (statički u `libdave.dll`) | kriptografija za DAVE | Apache-2.0 | https://www.openssl.org |
 | mlspp (statički u `libdave.dll`) | MLS protokol za DAVE | BSD-2-Clause | https://github.com/cisco/mlspp |
 | nlohmann/json (statički u `libdave.dll`) | JSON unutar libdave | MIT | https://github.com/nlohmann/json |
+| Torlink (preuzima se na zahtjev; samo GitHub inačica, nije u instalaciji ni u Store izdanju) | pretraga i preuzimanje putem BitTorrenta (pomoćni proces) | MIT | https://github.com/baairon/torlink |
+| Node.js (u Torlink paketu) | izvođenje Torlinka | MIT | https://nodejs.org |
+| webtorrent i ostali npm paketi u Torlink paketu (~200) | BitTorrent klijent i ovisnosti | MIT, Apache-2.0, ISC, BSD, BlueOak (popis i tekstovi u paketu: `licenses\NPM-PACKAGES.txt` i `licenses\npm`) | https://github.com/webtorrent/webtorrent |
 
 Puni tekstovi licenci za .NET runtime i WPF (uz popis komponenti drugih autora unutar .NET-a), Velopack, Microsoft.Data.Sqlite, SQLitePCLRaw, SQLite, WebRtcVadSharp i WebRTC VAD, Microsoft Edge WebView2 SDK, NetCord, Concentus, libdave, OpenSSL, mlspp i nlohmann/json nalaze se uz program u mapi `licenses` (i u repozitoriju u `third_party/licenses`). Za libmpv i biblioteke u njemu vidi odjeljak „Izvorni kod za libmpv”.
+
+## Torlink (samo GitHub inačica)
+
+Torlink nije dio instalacijskog paketa. Kad korisnik uključi Torlink, player s našeg GitHub repozitorija preuzima paket `torlink-runtime-<verzija>-r<N>` (Node.js + Torlink bez izmjena + npm ovisnosti, bez `node-datachannel`), provjerava SHA-256 zipa i svake datoteke i pokreće ga kao pomoćni proces. Izvor, zakucane verzije i SHA-256 su u `third_party/torlink/SOURCE.md`, a paket gradi `.github/workflows/torlink-runtime.yml`. Licence svih paketa su u paketu (mapa `licenses`, dostupna iz Postavke → Torlink → „Otvori mapu s licencama”). Torlink (© 2026 bairon.dev) je pod licencom MIT, spojivom s GPL-3.0; izvorni kod: https://github.com/baairon/torlink.
 
 ## Izvorni kod za libdave
 

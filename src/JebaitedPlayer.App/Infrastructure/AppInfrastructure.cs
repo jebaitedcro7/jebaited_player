@@ -373,6 +373,11 @@ public sealed class AppSettings
     /// <summary>Pomak zvuka u ms (pozitivno = zvuk kasnije), npr. za Bluetooth slušalice.</summary>
     public double AudioDelayMs { get; set; }
 
+#if TORLINK
+    /// <summary>2.2.14: Torlink (samo GitHub inačica; Store izdanje nema ni ovo polje, a postojeći zapis ostaje u ExtensionData).</summary>
+    public TorlinkSettings Torlink { get; set; } = new();
+
+#endif
     /// <summary>2.1.12: glasnoća na Discordu prati glasnoću playera (zadano, kao do 2.1.12).</summary>
     public bool DiscordFollowPlayerVolume { get; set; } = true;
 

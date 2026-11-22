@@ -155,8 +155,31 @@ public static class Loc
                 return new Dictionary<string, string>(StringComparer.Ordinal);
             }
 
-            return JsonSerializer.Deserialize<Dictionary<string, string>>(stream)
-                   ?? new Dictionary<string, string>(StringComparer.Ordinal);
+            Dictionary<string, string> texts = JsonSerializer.Deserialize<Dictionary<string, string>>(stream)
+                                               ?? new Dictionary<string, string>(StringComparer.Ordinal);
+
+            // Satelitski tekstovi (langx.<modul>.<kod>.json), npr. Torlink u GitHub inačici; u Store izdanju ih nema.
+            string suffix = "." + code + ResourceSuffix;
+            foreach (string name in Self.GetManifestResourceNames())
+            {
+                if (!name.StartsWith("langx.", StringComparison.Ordinal) || !name.EndsWith(suffix, StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                using Stream? extra = Self.GetManifestResourceStream(name);
+                if (extra is null || JsonSerializer.Deserialize<Dictionary<string, string>>(extra) is not { } more)
+                {
+                    continue;
+                }
+
+                foreach ((string k, string v) in more)
+                {
+                    texts[k] = v;
+                }
+            }
+
+            return texts;
         }
 
         /// <summary>Samo zaglavlje (_language.*) s početka datoteke, bez učitavanja svih tekstova.</summary>

@@ -4,6 +4,26 @@ Alle wichtigen Änderungen an jebaited_player. Format: [Keep a Changelog](https:
 
 Andere Sprachen: [English](CHANGELOG.md) · [Hrvatski](CHANGELOG_HR.md). Derselbe Verlauf ist im Player enthalten (Klick auf die Versionsnummer auf dem Startbildschirm). Diese Datei wird aus `src/JebaitedPlayer.App/History/update-history.json` erzeugt.
 
+## [2.2.14] - 2026-11-22
+
+Torlink: online suchen und herunterladen direkt im Player (GitHub-Version, optional, standardmäßig aus).
+
+### Neu
+
+- Torlink (Einstellungen → Torlink, nur GitHub-Version): Auf dem Startbildschirm erscheint neben „Datei öffnen“ und „Ordner öffnen“ ein dritter Knopf, Online suchen, der eine eigene Seite öffnet. Eine Suche über mehrere öffentliche Indizes (Filme, Serien, Anime, Spiele) mit Größe, Seedern und Quelle, Sortierung und Filtern sowie eine Download-Verwaltung (aktiv, Warteschlange, abgeschlossen, fehlgeschlagen; pausieren, fortsetzen, abbrechen, Ordner öffnen, abspielen). Start (Esc, Alt+←) führt zum Player zurück und die Downloads laufen weiter; Strg+Umschalt+T öffnet und schließt die Seite.
+- Torlink ist das Open-Source-Projekt baairon/torlink (MIT), unverändert verwendet und nur gestartet, solange es gebraucht wird. Es ist standardmäßig aus, fragt zuerst nach deiner Zustimmung und wird als geprüftes Paket geladen (SHA-256 des Pakets und jeder Datei). Updates nur auf deinen Klick, mit automatischem Zurücksetzen. Das Teilen nach einem Download ist standardmäßig aus.
+- Einstellungen → Torlink: ein- oder ausschalten (aus bedeutet kein Prozess und keine Netzwerknutzung), Versionen und Update-Prüfung, Download-Ordner, gleichzeitige Downloads, playlist.m3u, zusätzliche Tracker, Netzwerkschnittstelle (VPN), Teilen.
+
+### Verbessert
+
+- Torlink ist nicht Teil der Microsoft-Store-Version.
+
+### Bekannte Probleme
+
+- BitTorrent zeigt anderen Nutzern deine IP-Adresse. Ohne gewählte Netzwerkschnittstelle nutzt Torlink auch die LAN-Erkennung und bittet den Router um einen offenen Port (UPnP/NAT-PMP); Peer-Verbindungen sind nicht verschlüsselt. Siehe PRIVACY.md.
+
+Release: [v2.2.14](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v2.2.14) · Änderungen seit [v2.1.13...v2.2.14](https://github.com/jebaitedcro7/jebaited_player/compare/v2.1.13...v2.2.14)
+
 ## [2.1.13] - 2026-11-22
 
 Albumcover im Mini-Player und auf dem Startbildschirm, eine eigene Lautstärke für Discord und ein Player, der immer ein Fenster zeigt.

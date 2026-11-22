@@ -225,6 +225,9 @@ public static class Shortcuts
         new("spotify", "spotify.title", "windows", [K(Key.S, Ctrl | Shift)]),
         new("youTube", "youtube.title", "windows", [K(Key.Y, Ctrl | Shift)]),
         new("discord", "discord.title", "windows", [K(Key.D, Ctrl | Shift)]),
+#if TORLINK
+        new("torlink", "torlink.shortcutTitle", "windows", [K(Key.T, Ctrl | Shift)]),
+#endif
         new("settings", "settings.title", "windows", []),
         new("help", "shortcut.help", "windows", [K(Key.F1)]),
     ];

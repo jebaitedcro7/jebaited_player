@@ -4,6 +4,26 @@ All notable changes to jebaited_player. Format: [Keep a Changelog](https://keepa
 
 Other languages: [Deutsch](CHANGELOG_DE.md) · [Hrvatski](CHANGELOG_HR.md). The same history is included in the player (click the version number on the home screen). This file is generated from `src/JebaitedPlayer.App/History/update-history.json`.
 
+## [2.2.14] - 2026-11-22
+
+Torlink: search and download online from inside the player (GitHub version, optional, off by default).
+
+### Added
+
+- Torlink (Settings → Torlink, GitHub version only): a third button, Search online, appears on the home screen next to Open file and Open folder and opens a page of its own. One search over several public indexes (movies, TV, anime, games) with size, seeders and source, sorting and filters, and a download manager (active, queue, completed, failed; pause, resume, cancel, open folder, play). Home (Esc, Alt+←) returns to the player and downloads continue; Ctrl+Shift+T opens and closes the page.
+- Torlink is the open-source project baairon/torlink (MIT), used unchanged and started only while it is needed. It is off by default, asks for your acceptance first, and is downloaded as a verified package (SHA-256 of the package and of every file). Updates only on your click, with automatic rollback. Sharing after a download is off by default.
+- Settings → Torlink: turn on or off (off means no process and no network use), versions and update check, download folder, simultaneous downloads, playlist.m3u, extra trackers, network interface (VPN), sharing.
+
+### Improved
+
+- Torlink is not part of the Microsoft Store version.
+
+### Known issues
+
+- BitTorrent shows your IP address to other users. Without a chosen network interface Torlink also uses LAN discovery and asks the router to open a port (UPnP/NAT-PMP), and peer connections are not encrypted. See PRIVACY.md.
+
+Release: [v2.2.14](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v2.2.14) · Changes since [v2.1.13...v2.2.14](https://github.com/jebaitedcro7/jebaited_player/compare/v2.1.13...v2.2.14)
+
 ## [2.1.13] - 2026-11-22
 
 Album covers in the mini player and on the home screen, a volume of its own for Discord, and a player that always shows a window.

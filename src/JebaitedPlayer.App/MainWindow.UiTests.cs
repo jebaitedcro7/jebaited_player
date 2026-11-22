@@ -59,6 +59,10 @@ public partial class MainWindow
                     "ui217" => await Ui217UiTestAsync(),
                     "upnextlead" => await UpNextLeadUiTestAsync(),
                     "v2112" => await V2112UiTestAsync(),
+#if TORLINK
+                    "torlink" => await TorlinkUiTestAsync(),
+                    "torlinkresume" => await TorlinkResumeUiTestAsync(),
+#endif
                     _ => new Dictionary<string, object?> { ["error"] = "nepoznat scenarij " + scenario },
                 };
             }

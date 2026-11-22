@@ -1,0 +1,22 @@
+<Window x:Class="JebaitedPlayer.Views.Torlink.TorlinkConsentWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:JebaitedPlayer.Infrastructure"
+        Title="{loc:T torlink.consent.title}" Width="520" SizeToContent="Height" MinHeight="300" ShowInTaskbar="False" ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner" Background="{DynamicResource WindowBackgroundBrush}"
+        Foreground="{DynamicResource TextPrimaryBrush}" FontFamily="{DynamicResource UiFont}" FontSize="13" UseLayoutRounding="True">
+
+    <!-- Prvo uključivanje Torlinka: izričit prihvat (IP vidljiva, odgovornost za sadržaj, dodatni program). Dok se ne prihvati, ništa se ne preuzima. -->
+    <StackPanel Margin="24,20,24,18">
+        <TextBlock Text="{loc:T torlink.consent.title}" FontSize="18" FontWeight="SemiBold" />
+        <TextBlock Text="{loc:T torlink.consent.text1}" TextWrapping="Wrap" Margin="0,12,0,0" />
+        <TextBlock Text="{loc:T torlink.consent.text2}" TextWrapping="Wrap" Margin="0,8,0,0" />
+        <TextBlock Style="{StaticResource HintText}" Text="{loc:T torlink.consent.download}" Margin="0,8,0,0" />
+        <CheckBox x:Name="AcceptBox" Content="{loc:T torlink.consent.accept}" Margin="0,16,0,0" Checked="OnAcceptChanged" Unchecked="OnAcceptChanged" />
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,18,0,0">
+            <Button Style="{StaticResource SecondaryButton}" Content="{loc:T torlink.cancel}" IsCancel="True" Click="OnCancel" Padding="16,6" />
+            <Button x:Name="TurnOnButton" Style="{StaticResource AccentButton}" Content="{loc:T torlink.consent.turnOn}" IsDefault="True" IsEnabled="False"
+                    Click="OnTurnOn" Margin="8,0,0,0" Padding="16,6" />
+        </StackPanel>
+    </StackPanel>
+</Window>

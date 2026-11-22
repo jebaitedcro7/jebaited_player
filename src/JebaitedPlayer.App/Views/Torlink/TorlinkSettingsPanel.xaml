@@ -1,0 +1,113 @@
+<UserControl x:Class="JebaitedPlayer.Views.Torlink.TorlinkSettingsPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="clr-namespace:JebaitedPlayer.Infrastructure"
+             xmlns:controls="clr-namespace:JebaitedPlayer.Controls"
+             Focusable="False">
+
+    <!-- Postavke → Torlink: uključi/isključi, o Torlinku i ažuriranje, preuzimanja, dijeljenje i mreža. Samo opcije koje Torlink stvarno podržava. -->
+    <StackPanel Margin="28,20,28,24" MaxWidth="640" HorizontalAlignment="Left">
+        <TextBlock Style="{StaticResource TabTitle}" Text="{loc:T torlink.name}" />
+
+        <!-- Uključi / isključi -->
+        <Border Background="{DynamicResource InputBackgroundBrush}" BorderBrush="{DynamicResource MenuBorderBrush}" BorderThickness="1" CornerRadius="8" Padding="14,12" Margin="0,4,0,0">
+            <StackPanel>
+                <DockPanel>
+                    <TextBlock x:Name="StateText" DockPanel.Dock="Right" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" />
+                    <ToggleButton x:Name="EnableSwitch" DockPanel.Dock="Left" Style="{StaticResource SwitchToggle}" VerticalAlignment="Center" Click="OnEnableClick"
+                                  AutomationProperties.Name="{loc:T torlink.set.enable}" />
+                    <TextBlock Text="{loc:T torlink.set.enable}" FontSize="15" FontWeight="SemiBold" Margin="12,0,0,0" VerticalAlignment="Center" />
+                </DockPanel>
+                <TextBlock Style="{StaticResource HintText}" Text="{loc:T torlink.set.enableHint}" Margin="0,8,0,0" />
+                <StackPanel x:Name="InstallPanel" Visibility="Collapsed" Margin="0,10,0,0">
+                    <TextBlock x:Name="InstallText" />
+                    <controls:DownloadProgressBar x:Name="InstallBar" Height="8" Margin="0,6,0,0" />
+                </StackPanel>
+                <TextBlock x:Name="EnableMessage" TextWrapping="Wrap" Margin="0,8,0,0" Visibility="Collapsed" />
+            </StackPanel>
+        </Border>
+
+        <StackPanel x:Name="Body">
+            <!-- O Torlinku -->
+            <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T torlink.set.about}" />
+            <Grid Margin="0,6,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="190" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition /><RowDefinition />
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Text="{loc:T torlink.set.project}" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2" />
+                <TextBlock Grid.Row="0" Grid.Column="1" Text="{loc:T torlink.set.projectValue}" TextWrapping="Wrap" Margin="0,2" />
+                <TextBlock Grid.Row="1" Text="{loc:T torlink.set.integrated}" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2" />
+                <TextBlock x:Name="IntegratedText" Grid.Row="1" Grid.Column="1" TextWrapping="Wrap" Margin="0,2" />
+                <TextBlock Grid.Row="2" Text="{loc:T torlink.set.latest}" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2" />
+                <TextBlock x:Name="LatestText" Grid.Row="2" Grid.Column="1" TextWrapping="Wrap" Margin="0,2" />
+                <TextBlock Grid.Row="3" Text="{loc:T torlink.set.integration}" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2" />
+                <TextBlock x:Name="IntegrationText" Grid.Row="3" Grid.Column="1" TextWrapping="Wrap" Margin="0,2" />
+                <TextBlock Grid.Row="4" Text="{loc:T torlink.set.lastCheck}" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2" />
+                <TextBlock x:Name="LastCheckText" Grid.Row="4" Grid.Column="1" Margin="0,2" />
+                <TextBlock Grid.Row="5" Text="{loc:T torlink.set.lastUpdate}" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2" />
+                <TextBlock x:Name="LastUpdateText" Grid.Row="5" Grid.Column="1" Margin="0,2" />
+                <TextBlock Grid.Row="6" Text="{loc:T torlink.set.services}" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2" />
+                <TextBlock x:Name="ServicesText" Grid.Row="6" Grid.Column="1" TextWrapping="Wrap" Margin="0,2" />
+                <TextBlock Grid.Row="7" Text="{loc:T torlink.set.licenses}" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,2" />
+                <Button Grid.Row="7" Grid.Column="1" Style="{StaticResource LinkButton}" Content="{loc:T torlink.set.openLicenses}" HorizontalAlignment="Left" Click="OnOpenLicenses" Margin="0,2" />
+            </Grid>
+
+            <!-- Ažuriranje -->
+            <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T torlink.set.update}" Margin="0,22,0,2" />
+            <TextBlock x:Name="UpdateStatus" TextWrapping="Wrap" Margin="0,4,0,0" />
+            <TextBlock x:Name="UpdateNotes" Style="{StaticResource HintText}" Margin="0,6,0,0" Visibility="Collapsed" />
+            <controls:DownloadProgressBar x:Name="UpdateBar" Height="8" Margin="0,8,0,0" Visibility="Collapsed" />
+            <TextBlock x:Name="UpdateStepText" Style="{StaticResource HintText}" Margin="0,4,0,0" Visibility="Collapsed" />
+            <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                <Button x:Name="CheckButton" Style="{StaticResource SecondaryButton}" Content="{loc:T torlink.set.check}" Click="OnCheckClick" Padding="14,6" />
+                <Button x:Name="UpdateButton" Style="{StaticResource AccentButton}" Click="OnUpdateClick" Padding="14,6" Margin="8,0,0,0" Visibility="Collapsed" />
+                <Button x:Name="RollbackButton" Style="{StaticResource SecondaryButton}" Click="OnRollbackClick" Padding="14,6" Margin="8,0,0,0" Visibility="Collapsed" />
+            </StackPanel>
+            <TextBlock Style="{StaticResource HintText}" Text="{loc:T torlink.set.updateHint}" Margin="0,6,0,0" />
+
+            <!-- Preuzimanja -->
+            <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T torlink.set.downloads}" Margin="0,22,0,2" />
+            <TextBlock Text="{loc:T torlink.set.folder}" Margin="0,6,0,4" />
+            <DockPanel>
+                <Button DockPanel.Dock="Right" Style="{StaticResource SecondaryButton}" Content="{loc:T torlink.set.open}" Click="OnOpenFolder" Margin="6,0,0,0" Padding="12,5" />
+                <Button DockPanel.Dock="Right" Style="{StaticResource SecondaryButton}" Content="{loc:T torlink.set.change}" Click="OnChangeFolder" Margin="6,0,0,0" Padding="12,5" />
+                <TextBox x:Name="FolderBox" MinHeight="30" Padding="6,4" VerticalContentAlignment="Center" LostFocus="OnFolderLostFocus" />
+            </DockPanel>
+            <TextBlock Text="{loc:T torlink.set.maxDownloads}" Margin="0,12,0,4" />
+            <TextBox x:Name="MaxBox" Width="80" HorizontalAlignment="Left" MinHeight="30" Padding="6,4" VerticalContentAlignment="Center" LostFocus="OnMaxLostFocus" />
+            <TextBlock Style="{StaticResource HintText}" Text="{loc:T torlink.set.maxHint}" Margin="0,4,0,0" />
+            <CheckBox x:Name="PlaylistBox" Content="{loc:T torlink.set.playlist}" Margin="0,12,0,0" Checked="OnPlaylistChanged" Unchecked="OnPlaylistChanged" />
+            <TextBlock Text="{loc:T torlink.set.trackers}" Margin="0,12,0,4" />
+            <TextBox x:Name="TrackersBox" AcceptsReturn="True" MinHeight="56" MaxHeight="110" TextWrapping="NoWrap" VerticalScrollBarVisibility="Auto" Padding="6,4" LostFocus="OnTrackersLostFocus" />
+            <TextBlock Style="{StaticResource HintText}" Text="{loc:T torlink.set.noSpeedLimit}" Margin="0,8,0,0" />
+
+            <!-- Dijeljenje i mreža -->
+            <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T torlink.set.network}" Margin="0,22,0,2" />
+            <CheckBox x:Name="SeedBox" Content="{loc:T torlink.set.seed}" Margin="0,8,0,0" Checked="OnSeedChanged" Unchecked="OnSeedChanged" />
+            <TextBlock Style="{StaticResource HintText}" Text="{loc:T torlink.set.seedHint}" Margin="24,2,0,0" />
+            <StackPanel x:Name="SeedHoursPanel" Margin="24,8,0,0">
+                <TextBlock Text="{loc:T torlink.set.seedHours}" Margin="0,0,0,4" />
+                <TextBox x:Name="SeedHoursBox" Width="80" HorizontalAlignment="Left" MinHeight="30" Padding="6,4" VerticalContentAlignment="Center" LostFocus="OnSeedHoursLostFocus" />
+            </StackPanel>
+            <TextBlock Text="{loc:T torlink.set.interface}" Margin="0,14,0,4" />
+            <TextBox x:Name="InterfaceBox" MinHeight="30" Padding="6,4" VerticalContentAlignment="Center" LostFocus="OnInterfaceLostFocus" />
+            <TextBlock Style="{StaticResource HintText}" Text="{loc:T torlink.set.interfaceHint}" Margin="0,4,0,0" />
+            <TextBlock Text="{loc:T torlink.set.peerPort}" Margin="0,12,0,4" />
+            <TextBox x:Name="PortBox" Width="100" HorizontalAlignment="Left" MinHeight="30" Padding="6,4" VerticalContentAlignment="Center" LostFocus="OnPortLostFocus" />
+            <TextBlock Style="{StaticResource HintText}" Text="{loc:T torlink.set.portHint}" Margin="0,4,0,0" />
+
+            <Border BorderBrush="{DynamicResource MenuBorderBrush}" BorderThickness="1" CornerRadius="8" Padding="14,10" Margin="0,18,0,0">
+                <StackPanel>
+                    <TextBlock Text="{loc:T torlink.set.resp.title}" FontWeight="SemiBold" />
+                    <TextBlock Style="{StaticResource HintText}" Text="{loc:T torlink.set.resp.text}" Margin="0,4,0,0" />
+                </StackPanel>
+            </Border>
+
+            <Button Style="{StaticResource SecondaryButton}" Content="{loc:T torlink.set.resetOptions}" HorizontalAlignment="Left" Click="OnResetClick" Margin="0,16,0,0" Padding="14,6" />
+        </StackPanel>
+    </StackPanel>
+</UserControl>

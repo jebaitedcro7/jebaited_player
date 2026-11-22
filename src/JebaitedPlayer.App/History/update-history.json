@@ -40,6 +40,57 @@
   },
   "versions": [
     {
+      "version": "2.2.14",
+      "date": "2026-11-22",
+      "notes": {
+        "en": {
+          "summary": "Torlink: search and download online from inside the player (GitHub version, optional, off by default).",
+          "features": [
+            "Torlink (Settings → Torlink, GitHub version only): a third button, Search online, appears on the home screen next to Open file and Open folder and opens a page of its own. One search over several public indexes (movies, TV, anime, games) with size, seeders and source, sorting and filters, and a download manager (active, queue, completed, failed; pause, resume, cancel, open folder, play). Home (Esc, Alt+←) returns to the player and downloads continue; Ctrl+Shift+T opens and closes the page.",
+            "Torlink is the open-source project baairon/torlink (MIT), used unchanged and started only while it is needed. It is off by default, asks for your acceptance first, and is downloaded as a verified package (SHA-256 of the package and of every file). Updates only on your click, with automatic rollback. Sharing after a download is off by default.",
+            "Settings → Torlink: turn on or off (off means no process and no network use), versions and update check, download folder, simultaneous downloads, playlist.m3u, extra trackers, network interface (VPN), sharing."
+          ],
+          "improvements": [
+            "Torlink is not part of the Microsoft Store version."
+          ],
+          "fixes": [],
+          "known": [
+            "BitTorrent shows your IP address to other users. Without a chosen network interface Torlink also uses LAN discovery and asks the router to open a port (UPnP/NAT-PMP), and peer connections are not encrypted. See PRIVACY.md."
+          ]
+        },
+        "de": {
+          "summary": "Torlink: online suchen und herunterladen direkt im Player (GitHub-Version, optional, standardmäßig aus).",
+          "features": [
+            "Torlink (Einstellungen → Torlink, nur GitHub-Version): Auf dem Startbildschirm erscheint neben „Datei öffnen“ und „Ordner öffnen“ ein dritter Knopf, Online suchen, der eine eigene Seite öffnet. Eine Suche über mehrere öffentliche Indizes (Filme, Serien, Anime, Spiele) mit Größe, Seedern und Quelle, Sortierung und Filtern sowie eine Download-Verwaltung (aktiv, Warteschlange, abgeschlossen, fehlgeschlagen; pausieren, fortsetzen, abbrechen, Ordner öffnen, abspielen). Start (Esc, Alt+←) führt zum Player zurück und die Downloads laufen weiter; Strg+Umschalt+T öffnet und schließt die Seite.",
+            "Torlink ist das Open-Source-Projekt baairon/torlink (MIT), unverändert verwendet und nur gestartet, solange es gebraucht wird. Es ist standardmäßig aus, fragt zuerst nach deiner Zustimmung und wird als geprüftes Paket geladen (SHA-256 des Pakets und jeder Datei). Updates nur auf deinen Klick, mit automatischem Zurücksetzen. Das Teilen nach einem Download ist standardmäßig aus.",
+            "Einstellungen → Torlink: ein- oder ausschalten (aus bedeutet kein Prozess und keine Netzwerknutzung), Versionen und Update-Prüfung, Download-Ordner, gleichzeitige Downloads, playlist.m3u, zusätzliche Tracker, Netzwerkschnittstelle (VPN), Teilen."
+          ],
+          "improvements": [
+            "Torlink ist nicht Teil der Microsoft-Store-Version."
+          ],
+          "fixes": [],
+          "known": [
+            "BitTorrent zeigt anderen Nutzern deine IP-Adresse. Ohne gewählte Netzwerkschnittstelle nutzt Torlink auch die LAN-Erkennung und bittet den Router um einen offenen Port (UPnP/NAT-PMP); Peer-Verbindungen sind nicht verschlüsselt. Siehe PRIVACY.md."
+          ]
+        },
+        "hr": {
+          "summary": "Torlink: pretraga i preuzimanje online izravno u playeru (GitHub inačica, neobavezno, zadano isključeno).",
+          "features": [
+            "Torlink (Postavke → Torlink, samo GitHub inačica): na početnom ekranu uz Otvori datoteku i Otvori mapu pojavljuje se treći gumb, Pretraži online, koji otvara zasebnu stranicu. Jedna pretraga kroz više javnih indeksa (filmovi, serije, anime, igre) s veličinom, seederima i izvorom, sortiranjem i filtrima te upravitelj preuzimanja (aktivna, red, završena, neuspjela; pauza, nastavak, otkaži, otvori mapu, reproduciraj). Home (Esc, Alt+←) vraća u player, a preuzimanja se nastavljaju; Ctrl+Shift+T otvara i zatvara stranicu.",
+            "Torlink je projekt otvorenog koda baairon/torlink (MIT), korišten nepromijenjen i pokrenut samo dok treba. Zadano je isključen, prvo traži tvoj prihvat i preuzima se kao provjereni paket (SHA-256 paketa i svake datoteke). Ažuriranje samo na tvoj klik, uz automatski povratak. Dijeljenje nakon preuzimanja je zadano isključeno.",
+            "Postavke → Torlink: uključi ili isključi (isključeno znači bez procesa i bez mrežne potrošnje), verzije i provjera ažuriranja, mapa za preuzimanja, istodobna preuzimanja, playlist.m3u, dodatni trackeri, mrežno sučelje (VPN), dijeljenje."
+          ],
+          "improvements": [
+            "Torlink nije dio Microsoft Store inačice."
+          ],
+          "fixes": [],
+          "known": [
+            "BitTorrent drugim korisnicima otkriva tvoju IP adresu. Bez odabranog mrežnog sučelja Torlink koristi i otkrivanje na lokalnoj mreži i traži od usmjerivača otvoren port (UPnP/NAT-PMP); veze s drugim sudionicima nisu šifrirane. Vidi PRIVACY.md."
+          ]
+        }
+      }
+    },
+    {
       "version": "2.1.13",
       "date": "2026-11-22",
       "notes": {

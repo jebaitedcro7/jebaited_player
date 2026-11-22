@@ -4,6 +4,26 @@ Sve važnije promjene jebaited_playera. Oblik: [Keep a Changelog](https://keepac
 
 Drugi jezici: [English](CHANGELOG.md) · [Deutsch](CHANGELOG_DE.md). Ista povijest je i u playeru (klik na broj verzije na početnom ekranu). Ova datoteka nastaje iz `src/JebaitedPlayer.App/History/update-history.json`.
 
+## [2.2.14] - 2026-11-22
+
+Torlink: pretraga i preuzimanje online izravno u playeru (GitHub inačica, neobavezno, zadano isključeno).
+
+### Novo
+
+- Torlink (Postavke → Torlink, samo GitHub inačica): na početnom ekranu uz Otvori datoteku i Otvori mapu pojavljuje se treći gumb, Pretraži online, koji otvara zasebnu stranicu. Jedna pretraga kroz više javnih indeksa (filmovi, serije, anime, igre) s veličinom, seederima i izvorom, sortiranjem i filtrima te upravitelj preuzimanja (aktivna, red, završena, neuspjela; pauza, nastavak, otkaži, otvori mapu, reproduciraj). Home (Esc, Alt+←) vraća u player, a preuzimanja se nastavljaju; Ctrl+Shift+T otvara i zatvara stranicu.
+- Torlink je projekt otvorenog koda baairon/torlink (MIT), korišten nepromijenjen i pokrenut samo dok treba. Zadano je isključen, prvo traži tvoj prihvat i preuzima se kao provjereni paket (SHA-256 paketa i svake datoteke). Ažuriranje samo na tvoj klik, uz automatski povratak. Dijeljenje nakon preuzimanja je zadano isključeno.
+- Postavke → Torlink: uključi ili isključi (isključeno znači bez procesa i bez mrežne potrošnje), verzije i provjera ažuriranja, mapa za preuzimanja, istodobna preuzimanja, playlist.m3u, dodatni trackeri, mrežno sučelje (VPN), dijeljenje.
+
+### Poboljšano
+
+- Torlink nije dio Microsoft Store inačice.
+
+### Poznati problemi
+
+- BitTorrent drugim korisnicima otkriva tvoju IP adresu. Bez odabranog mrežnog sučelja Torlink koristi i otkrivanje na lokalnoj mreži i traži od usmjerivača otvoren port (UPnP/NAT-PMP); veze s drugim sudionicima nisu šifrirane. Vidi PRIVACY.md.
+
+Izdanje: [v2.2.14](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v2.2.14) · Promjene od [v2.1.13...v2.2.14](https://github.com/jebaitedcro7/jebaited_player/compare/v2.1.13...v2.2.14)
+
 ## [2.1.13] - 2026-11-22
 
 Omot albuma u mini playeru i na početnom ekranu, vlastita glasnoća za Discord i player koji uvijek pokaže prozor.

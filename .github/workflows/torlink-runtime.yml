@@ -1,0 +1,77 @@
+# Torlink runtime paket (Node + Torlink) za GitHub inačicu jebaited_playera. NIKAD za Microsoft Store (MSIX).
+#
+# Što gradi: tools/build-torlink-runtime.ps1 preuzima zakucanu verziju Nodea (SHA-256 prema nodejs.org/SHASUMS256.txt),
+# klonira baairon/torlink na zadanu oznaku, izvodi `npm ci --ignore-scripts` iz NJIHOVOG package-lock.json (nijedna install
+# skripta se ne izvršava), gradi, uklanja node-datachannel, radi smoke test (--version + serve + /health), zapisuje MANIFEST.json
+# sa SHA-256 svake datoteke i pakira zip.
+# Rezultat je pre-release `torlink-runtime-<torlink>-r<N>` (nije „Latest”, Velopack ga ne vidi). Player ga preuzima tek kad
+# korisnik uključi ili ažurira Torlink, provjerava SHA-256 zipa (SHA256SUMS.txt) i svake datoteke (MANIFEST.json).
+# Pokreće se ručno, nikad automatski: svaku novu Torlink verziju prvo pregledavamo (lockfile, npm audit, promjene).
+name: Torlink runtime
+
+on:
+  workflow_dispatch:
+    inputs:
+      upstream_tag:
+        description: "Oznaka u github.com/baairon/torlink (npr. v1.11.1)"
+        required: true
+        default: "v1.11.1"
+      revision:
+        description: "Naša revizija paketa za tu verziju (1, 2, ...)"
+        required: true
+        default: "1"
+      node_version:
+        description: "Zakucana verzija Nodea (>= 22.15.0)"
+        required: true
+        default: "22.23.5"
+      publish:
+        description: "Objavi zip kao pre-release (inače samo artifact)"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    env:
+      UPSTREAM_TAG: ${{ inputs.upstream_tag }}
+      REVISION: ${{ inputs.revision }}
+      NODE_VERSION: ${{ inputs.node_version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Build runtime
+        shell: powershell
+        run: |
+          # Ulazi idu preko okoline (ne izravno u naredbu); skripta sama provjerava oblik oznake i verzije.
+          if ($env:REVISION -notmatch '^\d+$') { throw "Neispravna revizija: $env:REVISION" }
+          if ($env:NODE_VERSION -notmatch '^\d+\.\d+\.\d+$') { throw "Neispravna verzija Nodea: $env:NODE_VERSION" }
+          $out = Join-Path $env:RUNNER_TEMP 'torlink-out'
+          .\tools\build-torlink-runtime.ps1 -UpstreamTag $env:UPSTREAM_TAG -Revision ([int]$env:REVISION) -NodeVersion $env:NODE_VERSION -OutDir $out
+          if ($LASTEXITCODE -ne 0) { throw "build-torlink-runtime.ps1 failed" }
+          "OUT_DIR=$out" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          "RELEASE_TAG=torlink-runtime-$($env:UPSTREAM_TAG.TrimStart('v'))-r$($env:REVISION)" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: torlink-runtime
+          path: |
+            ${{ env.OUT_DIR }}/*.zip
+            ${{ env.OUT_DIR }}/SHA256SUMS.txt
+            ${{ env.OUT_DIR }}/MANIFEST.json
+            ${{ env.OUT_DIR }}/npm-audit.json
+
+      - name: Publish pre-release (not Latest)
+        if: ${{ inputs.publish }}
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $zip = Get-ChildItem $env:OUT_DIR -Filter *.zip | Select-Object -First 1
+          $notes = "Torlink $($env:UPSTREAM_TAG) (MIT, github.com/baairon/torlink) packaged with Node $($env:NODE_VERSION) for the optional Torlink feature of the jebaited_player GitHub build. Not a player release and never part of the Microsoft Store build.`n`nVerified at build time: Node SHA-256 against nodejs.org SHASUMS256.txt; npm ci --ignore-scripts from the upstream lockfile; node-datachannel removed (WebRTC permanently disabled); smoke test (--version, serve, /health). MANIFEST.json lists the SHA-256 of every file; the player verifies the zip and every file before installing.`n`n``````n$(Get-Content (Join-Path $env:OUT_DIR 'SHA256SUMS.txt') -Raw)``````"
+          gh release create $env:RELEASE_TAG $zip.FullName (Join-Path $env:OUT_DIR 'SHA256SUMS.txt') (Join-Path $env:OUT_DIR 'MANIFEST.json') (Join-Path $env:OUT_DIR 'npm-audit.json') --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title "Torlink runtime $($env:UPSTREAM_TAG.TrimStart('v')) (r$($env:REVISION))" --notes $notes --prerelease --latest=false

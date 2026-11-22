@@ -8,6 +8,7 @@
     <Project Path="src/JebaitedPlayer.Online/JebaitedPlayer.Online.csproj" />
     <Project Path="src/JebaitedPlayer.Subtitles/JebaitedPlayer.Subtitles.csproj" />
     <Project Path="src/JebaitedPlayer.Sync/JebaitedPlayer.Sync.csproj" />
+    <Project Path="src/JebaitedPlayer.Torlink/JebaitedPlayer.Torlink.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/JebaitedPlayer.App.Tests/JebaitedPlayer.App.Tests.csproj" />
@@ -17,6 +18,7 @@
     <Project Path="tests/JebaitedPlayer.Online.Tests/JebaitedPlayer.Online.Tests.csproj" />
     <Project Path="tests/JebaitedPlayer.Subtitles.Tests/JebaitedPlayer.Subtitles.Tests.csproj" />
     <Project Path="tests/JebaitedPlayer.Sync.Tests/JebaitedPlayer.Sync.Tests.csproj" />
+    <Project Path="tests/JebaitedPlayer.Torlink.Tests/JebaitedPlayer.Torlink.Tests.csproj" />
   </Folder>
   <Folder Name="/tools/">
     <Project Path="tools/SyncLab/SyncLab.csproj" />

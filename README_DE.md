@@ -155,6 +155,13 @@ Im selben Tab stellst du die automatische Suche, die Zeichenkodierung alter Unte
 - **Meinem Kanal beitreten** bringt den Bot in den Kanal, in dem du bist, oder wähle einen Kanal aus der Liste. Die Headset-Taste im Mini-Player ist grün, solange der Bot Musik sendet. Fehlt dem Bot in einem Kanal eine Berechtigung, zeigt das Fenster, welche und wo man sie erlaubt.
 - Discord hört, was der Player spielt. Standardmäßig gilt die Lautstärke des Players auch für Discord; im Discord-Fenster kannst du Discord eine **eigene Lautstärke** geben, dann wird es im Kanal nicht leiser, wenn du den Player für dich leiser stellst. Ein stummgeschalteter Player (oder Lautstärke 0) sendet immer Stille. Der Ton ist Ende-zu-Ende-verschlüsselt (Discord DAVE). Der Bot funktioniert nur auf Servern, auf die du ihn einlädst, nicht in privaten Anrufen. Benötigt Windows 11 oder Windows 10 Build 20348 oder neuer.
 
+### Torlink (online suchen, nur GitHub-Version)
+
+- Optional und **standardmäßig aus**. Einschalten unter **Einstellungen → Torlink**. Nachdem du einen Hinweis akzeptiert hast, lädt der Player ein geprüftes Paket (Node.js + Torlink, ca. 40 MB, SHA-256 geprüft) aus den Releases dieses Repositories. Es ist **nicht Teil der Microsoft-Store-Version**.
+- Danach erscheint auf dem Startbildschirm neben „Datei öffnen“ und „Ordner öffnen“ ein dritter Knopf, **Online suchen**. Er öffnet die Torlink-Seite: eine Suche über mehrere öffentliche Indizes (Filme, Serien, Anime, Spiele), Ergebnisse mit Größe, Seedern und Quelle (sortieren und filtern) und eine Download-Verwaltung (aktiv, Warteschlange, abgeschlossen, fehlgeschlagen; pausieren, fortsetzen, abbrechen, Ordner öffnen, abspielen). **Start** (oder Esc / Alt+←) führt zurück zum Startbildschirm des Players, die Downloads laufen weiter; **Strg+Umschalt+T** öffnet und schließt die Seite.
+- Torlink ist das Open-Source-Projekt [baairon/torlink](https://github.com/baairon/torlink) (MIT), unverändert verwendet. Der Player spricht über dessen lokale Schnittstelle mit ihm und startet es nur, solange es gebraucht wird. Einstellungen: Download-Ordner, gleichzeitige Downloads, playlist.m3u, zusätzliche Tracker, Netzwerkschnittstelle (VPN) und Teilen nach dem Download (**standardmäßig aus**). Updates nur auf deinen Klick, aus unserem geprüften Paket, mit automatischem Zurücksetzen.
+- **Deine Verantwortung:** BitTorrent zeigt anderen Nutzern deine IP-Adresse. Lade nur herunter und teile nur, was du darfst. Der Player hostet oder prüft keine Inhalte. Siehe [PRIVACY.md](PRIVACY.md).
+
 ### Sicherung und Übertragung
 
 Einstellungen → Allgemein → **Sicherung und Übertragung**: Einstellungen und Wiedergabeverlauf werden einmal täglich und vor jedem Update automatisch kopiert (die letzten 7 bleiben auf deinem Computer). **Einstellungen exportieren** speichert sie in einer Datei (ohne Passwörter, Schlüssel für Untertitelseiten und Fensterposition), **Einstellungen importieren** lädt sie wieder, auch auf einem anderen Computer.
@@ -305,6 +312,7 @@ Die Tasten änderst du unter **Einstellungen → Tastenkürzel**. Jede Aktion ka
 | Ctrl+Shift+S | Spotify |
 | Ctrl+Shift+Y | YouTube Music |
 | Ctrl+Shift+D | Discord-Bot |
+| Ctrl+Shift+T | Torlink (online suchen) |
 | F1 | Alle Tastenkürzel |
 
 ### Updates und deine Daten

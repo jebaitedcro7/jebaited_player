@@ -23,7 +23,7 @@ jebaited_player is a lightweight video player for Windows. It plays almost any v
 
 1. Open the [latest release](https://github.com/jebaitedcro7/jebaited_player/releases/latest) and download **`JebaitedPlayer-win-Setup.exe`**.
 2. Run it. Installation takes a few seconds and needs no administrator rights. A **jebaited_player** shortcut appears on the desktop and in the Start menu.
-3. Windows may show a blue “Windows protected your PC” window, because the app is not digitally signed yet. Click **More info → Run anyway**. If **Smart App Control** is on, Windows may block the installer; please do not turn Smart App Control off, wait for a signed release instead (see [CODE_SIGNING.md](CODE_SIGNING.md)).
+3. Windows may show a blue “Windows protected your PC” window, because the app is not digitally signed yet. Click **More info → Run anyway**. If **Smart App Control** is on, Windows blocks the installer and the program (it checks every program and library when it runs). To use the GitHub version, turn it off: Windows Security → App & browser control → Smart App Control settings → Off. If you turn it on again later, Windows will block jebaited_player again, and on Windows 11 builds that are not fully updated it can only be turned on again by resetting Windows. With Smart App Control on, use the Microsoft Store version below (signed by Microsoft). See [CODE_SIGNING.md](CODE_SIGNING.md).
 4. When the installation finishes, the player starts and asks for the **language**. English is preselected; Deutsch and Hrvatski are next to it, and the other languages are under **More languages**. If you just click **Continue** (or close the window), the player stays in English. You can change the language any time in Settings.
 
 <p align="center"><img src="manual/images/en/language-picker.png" width="420" alt="Language selection on first start"></p>
@@ -333,7 +333,7 @@ The Microsoft Store version keeps its data in `%LOCALAPPDATA%\Packages\jebaitedp
 
 ### Troubleshooting
 
-- **“Windows protected your PC”** — the app is not signed yet: More info → Run anyway. Smart App Control: see [CODE_SIGNING.md](CODE_SIGNING.md); please do not turn it off.
+- **“Windows protected your PC”** — the app is not signed yet: More info → Run anyway. Smart App Control: it has to be off for the GitHub version (see [Installation](#installation)); the Microsoft Store version works with it on.
 - **No subtitles are found** — check that a source is set up (Settings → Subtitles → Subtitle sources (keys)). If the daily limit is used up, wait until tomorrow or add SubDL. You can always search manually with **Ctrl+F** and correct the title, season and episode there.
 - **Subtitles are wrong or do not match** — if the player says they do not match the speech, they are probably for a different episode or release: Ctrl+F and choose others. Ctrl+Backspace undoes manual sync.
 - **Strange characters instead of letters** — CC → Encoding → Windows-1250, ISO-8859-2 or Windows-1252. If it happens with most of your subtitles, set it once in Settings → Subtitles → Encoding of old subtitles.

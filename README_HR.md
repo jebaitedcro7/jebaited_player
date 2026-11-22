@@ -23,7 +23,7 @@ jebaited_player je lagani video player za Windows. Reproducira gotovo svaki vide
 
 1. Otvori [najnovije izdanje](https://github.com/jebaitedcro7/jebaited_player/releases/latest) i preuzmi **`JebaitedPlayer-win-Setup.exe`**.
 2. Pokreni ga. Instalacija traje nekoliko sekundi i ne traži administratora. Na radnoj površini i u izborniku Start pojavi se prečac **jebaited_player**.
-3. Windows može prikazati plavi prozor „Windows je zaštitio vaše računalo” jer program još nije digitalno potpisan. Klikni **Više informacija → Ipak pokreni**. Ako je uključen **Smart App Control**, Windows može blokirati instalaciju; molim te ne isključuj Smart App Control, nego pričekaj potpisanu verziju (vidi [CODE_SIGNING.md](CODE_SIGNING.md)).
+3. Windows može prikazati plavi prozor „Windows je zaštitio vaše računalo” jer program još nije digitalno potpisan. Klikni **Više informacija → Ipak pokreni**. Ako je uključen **Smart App Control**, Windows blokira instalaciju i sam program (provjerava svaki program i biblioteku pri pokretanju). Za GitHub inačicu isključi ga: Sigurnost sustava Windows → Upravljanje aplikacijama i preglednikom → Postavke za Smart App Control → Isključeno. Ako ga poslije ponovno uključiš, Windows će opet blokirati jebaited_player, a na Windows 11 inačicama koje nisu potpuno ažurirane može se ponovno uključiti samo resetiranjem Windowsa. Dok je Smart App Control uključen, koristi Microsoft Store inačicu niže (potpisuje je Microsoft). Vidi [CODE_SIGNING.md](CODE_SIGNING.md).
 4. Kad instalacija završi, player se pokrene i pita za **jezik**. English je unaprijed označen, uz njega su Deutsch i Hrvatski, a ostali jezici su pod **More languages** / **Više jezika**. Ako samo klikneš **Continue** / **Nastavi** (ili zatvoriš prozor), player ostaje na engleskom. Jezik možeš promijeniti kad god želiš u Postavkama.
 
 <p align="center"><img src="manual/images/hr/language-picker.png" width="420" alt="Odabir jezika pri prvom pokretanju"></p>
@@ -333,7 +333,7 @@ Store inačica čuva podatke u `%LOCALAPPDATA%\Packages\jebaitedplayer.jebaitedp
 
 ### Rješavanje najčešćih problema
 
-- **„Windows je zaštitio vaše računalo”** — program još nije potpisan: Više informacija → Ipak pokreni. Smart App Control: vidi [CODE_SIGNING.md](CODE_SIGNING.md); molim te ne isključuj ga.
+- **„Windows je zaštitio vaše računalo”** — program još nije potpisan: Više informacija → Ipak pokreni. Smart App Control: za GitHub inačicu mora biti isključen (vidi [Instalacija](#instalacija)); Microsoft Store inačica radi i uz uključen Smart App Control.
 - **Ne pronalazi titlove** — provjeri je li postavljen izvor (Postavke → Titlovi → Izvori titlova (ključevi)). Ako je dnevni limit potrošen, pričekaj do sutra ili dodaj SubDL. Ručno možeš uvijek tražiti s **Ctrl+F** i tamo ispraviti naziv, sezonu i epizodu.
 - **Titlovi su krivi ili se ne poklapaju** — ako player javi da se ne poklapaju s govorom, vjerojatno su za drugu epizodu ili izdanje: Ctrl+F i odaberi druge. Ručnu sinkronizaciju poništava Ctrl+Backspace.
 - **Čudni znakovi umjesto č, ć, ž, š, đ** — CC → Encoding → Windows-1250 ili ISO-8859-2. Ako se to događa s većinom tvojih titlova, postavi to jednom u Postavke → Titlovi → Kodiranje starih titlova.

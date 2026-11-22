@@ -6,10 +6,13 @@
 
 | | |
 |---|---|
-| Current releases (1.0.0 – 1.2.0) | **not code signed yet** |
-| Planned | free code signing for open source projects by [SignPath Foundation](https://signpath.org) (application in preparation) |
+| GitHub releases (all versions) | **not code signed** |
+| Microsoft Store version | signed by Microsoft after certification (works with Smart App Control) |
+| SignPath Foundation (free signing for open source) | application **declined** (2026-11-19): the Foundation program asks for an established public presence (community adoption, external references, sustained activity). A new application is possible once the project has more visibility. |
 
-Until the releases are signed, Windows SmartScreen may show “Windows protected your PC” and Windows **Smart App Control** may block the installer. Please do **not** turn off Smart App Control for this program: it protects you from other programs too, and on older Windows versions it could only be turned back on by reinstalling Windows. If Smart App Control blocks jebaited_player, please wait for a signed release.
+Because the GitHub releases are not signed, Windows SmartScreen may show “Windows protected your PC” (More info → Run anyway), and Windows **Smart App Control** blocks the installer and the program itself (it checks every program and library when it runs). To use the GitHub version, Smart App Control has to be turned off (Windows Security → App & browser control → Smart App Control settings). If it is turned on again, Windows blocks jebaited_player again; on Windows 11 builds that are not fully updated it can only be turned on again by resetting Windows. **With Smart App Control on, use the Microsoft Store version**, which is signed by Microsoft.
+
+The sections below describe the process that would apply if a signing certificate is obtained; at present no file is signed.
 
 When signing starts, this section will say:
 

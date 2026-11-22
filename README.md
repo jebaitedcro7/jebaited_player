@@ -30,7 +30,7 @@ Also in the **[Microsoft Store](https://apps.microsoft.com/detail/9NP4GF0Q40JL)*
 
 The interface is available in English, Deutsch, Hrvatski, Bosanski, Srpski (latinica) and Slovenščina; you choose the language on first start and can change it any time in Settings.
 
-The releases are **not code signed yet**, so Windows SmartScreen may warn and Smart App Control may block the installer. Please do not turn Smart App Control off; see the [code signing policy](CODE_SIGNING.md) for the plan (free code signing for open source by SignPath Foundation).
+The GitHub releases are **not code signed**, so Windows SmartScreen may warn, and **Smart App Control** blocks them (it checks every program and library when it runs, not only the installer). To use the GitHub version, Smart App Control has to be turned off (Windows Security → App & browser control → Smart App Control settings). With Smart App Control on, use the Microsoft Store version, which is signed by Microsoft. See the [code signing policy](CODE_SIGNING.md).
 
 ## Changes
 

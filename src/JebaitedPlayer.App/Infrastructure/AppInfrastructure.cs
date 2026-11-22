@@ -373,6 +373,12 @@ public sealed class AppSettings
     /// <summary>Pomak zvuka u ms (pozitivno = zvuk kasnije), npr. za Bluetooth slušalice.</summary>
     public double AudioDelayMs { get; set; }
 
+    /// <summary>2.1.12: glasnoća na Discordu prati glasnoću playera (zadano, kao do 2.1.12).</summary>
+    public bool DiscordFollowPlayerVolume { get; set; } = true;
+
+    /// <summary>2.1.12: glasnoća na Discordu (0–100) kad ne prati player.</summary>
+    public double DiscordVolume { get; set; } = Services.Discord.DiscordVolume.DefaultVolume;
+
     /// <summary>Ujednačavanje glasnoće (tiši glasni prizori, razumljiviji dijalog).</summary>
     public bool NormalizeAudio { get; set; }
 

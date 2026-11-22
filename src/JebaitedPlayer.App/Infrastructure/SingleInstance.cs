@@ -23,8 +23,22 @@ internal sealed class SingleInstance : IDisposable
     private readonly CancellationTokenSource _cts = new();
     private readonly object _gate = new();
     private readonly List<IReadOnlyList<string>> _pending = [];
-    private Action<IReadOnlyList<string>>? _handler;
+    private Func<IReadOnlyList<string>, CancellationToken, Task>? _handler;
     private bool _owned = true;
+
+    /// <summary>
+    /// 2.1.12: koliko glavni player smije čekati da UI stvarno preuzme datoteke. Ako UI ne odgovara (zamrznut ili bez
+    /// prozora), novo pokretanje dobiva „zauzet” i otvara se kao zaseban player, umjesto da nestane bez traga.
+    /// </summary>
+    internal static TimeSpan DeliveryTimeout { get; set; } = TimeSpan.FromSeconds(3);
+
+    /// <summary>Odgovor glavnog playera drugom pokretanju.</summary>
+    internal enum SendResult
+    {
+        Delivered,
+        Busy,
+        Failed,
+    }
 
     private SingleInstance(Mutex mutex, string pipeName)
     {
@@ -55,9 +69,18 @@ internal sealed class SingleInstance : IDisposable
                 return new SingleInstance(mutex, scope);
             }
 
-            if (TrySend(scope, files, TimeSpan.FromMilliseconds(800)))
+            SendResult sent = Send(scope, files, TimeSpan.FromMilliseconds(800));
+            if (sent == SendResult.Delivered)
             {
                 mutex.Dispose();
+                return null;
+            }
+
+            if (sent == SendResult.Busy)
+            {
+                // Glavni player je primio poruku, ali njegov UI ne odgovara: ovo pokretanje radi samostalno.
+                mutex.Dispose();
+                standalone = true;
                 return null;
             }
 
@@ -84,7 +107,18 @@ internal sealed class SingleInstance : IDisposable
     /// Primatelj datoteka iz drugih pokretanja (poziva se na dretvi cijevi). Zahtjevi stigli prije postavljanja
     /// primatelja (dok se prozor još otvara) predaju se odmah, redom kojim su stigli.
     /// </summary>
-    public void SetHandler(Action<IReadOnlyList<string>> handler)
+    public void SetHandler(Action<IReadOnlyList<string>> handler) =>
+        SetHandler((files, _) =>
+        {
+            handler(files);
+            return Task.CompletedTask;
+        });
+
+    /// <summary>
+    /// Primatelj koji javlja kad je UI stvarno preuzeo datoteke (zadatak završi). Ako ne završi unutar
+    /// <see cref="DeliveryTimeout"/>, token se otkaže (primatelj tada ne smije ništa otvoriti) i drugo pokretanje dobiva „zauzet”.
+    /// </summary>
+    public void SetHandler(Func<IReadOnlyList<string>, CancellationToken, Task> handler)
     {
         List<IReadOnlyList<string>> pending;
         lock (_gate)
@@ -96,7 +130,7 @@ internal sealed class SingleInstance : IDisposable
 
         foreach (IReadOnlyList<string> files in pending)
         {
-            handler(files);
+            _ = handler(files, CancellationToken.None);
         }
     }
 
@@ -165,9 +199,12 @@ internal sealed class SingleInstance : IDisposable
     }
 
     internal static bool TrySend(string pipeName, IReadOnlyList<string> files, TimeSpan connectTimeout) =>
-        TrySendAsync(pipeName, files, connectTimeout).GetAwaiter().GetResult();
+        Send(pipeName, files, connectTimeout) == SendResult.Delivered;
 
-    private static async Task<bool> TrySendAsync(string pipeName, IReadOnlyList<string> files, TimeSpan connectTimeout)
+    internal static SendResult Send(string pipeName, IReadOnlyList<string> files, TimeSpan connectTimeout) =>
+        SendAsync(pipeName, files, connectTimeout).GetAwaiter().GetResult();
+
+    private static async Task<SendResult> SendAsync(string pipeName, IReadOnlyList<string> files, TimeSpan connectTimeout)
     {
         try
         {
@@ -181,19 +218,22 @@ internal sealed class SingleInstance : IDisposable
                 AllowSetForegroundWindow(serverPid);
             }
 
-            using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(3));
+            // Glavni player čeka svoj UI najviše DeliveryTimeout, pa odgovor smije kasniti toliko (+ rezerva).
+            using var timeout = new CancellationTokenSource(DeliveryTimeout + TimeSpan.FromSeconds(3));
             byte[] payload = Encoding.UTF8.GetBytes(Serialize(files) + "\n");
             await client.WriteAsync(payload, timeout.Token).ConfigureAwait(false);
             await client.FlushAsync(timeout.Token).ConfigureAwait(false);
 
-            // Potvrda da je glavni player primio datoteke.
+            // Potvrda: 'K' = UI je preuzeo datoteke, 'B' = glavni player ne odgovara.
             var ack = new byte[1];
             int n = await client.ReadAsync(ack, timeout.Token).ConfigureAwait(false);
-            return n == 1 && ack[0] == 'K';
+            return n == 1 && ack[0] == 'K' ? SendResult.Delivered
+                : n == 1 && ack[0] == 'B' ? SendResult.Busy
+                : SendResult.Failed;
         }
         catch (Exception ex) when (ex is TimeoutException or IOException or UnauthorizedAccessException or OperationCanceledException)
         {
-            return false;
+            return SendResult.Failed;
         }
     }
 
@@ -260,9 +300,21 @@ internal sealed class SingleInstance : IDisposable
                 }
 
                 IReadOnlyList<string> files = Deserialize(Encoding.UTF8.GetString(buffer.ToArray()).TrimEnd('\n', '\r'));
-                await server.WriteAsync(new[] { (byte)'K' }, timeout.Token).ConfigureAwait(false);
-                await server.FlushAsync(timeout.Token).ConfigureAwait(false);
-                Deliver(files);
+
+                // 2.1.12: potvrda tek kad UI stvarno preuzme datoteke; inače „zauzet” i drugo pokretanje radi samostalno.
+                using var delivery = new CancellationTokenSource();
+                Task delivered = Deliver(files, delivery.Token);
+                bool ok = await Task.WhenAny(delivered, Task.Delay(DeliveryTimeout, ct)).ConfigureAwait(false) == delivered;
+                if (!ok)
+                {
+                    delivery.Cancel();
+                    Log.Warn($"Jedna instanca: UI nije preuzeo datoteke unutar {DeliveryTimeout.TotalSeconds:0} s; drugo pokretanje radi samostalno.");
+                }
+
+                using var reply = CancellationTokenSource.CreateLinkedTokenSource(ct);
+                reply.CancelAfter(TimeSpan.FromSeconds(3));
+                await server.WriteAsync(new[] { (byte)(ok ? 'K' : 'B') }, reply.Token).ConfigureAwait(false);
+                await server.FlushAsync(reply.Token).ConfigureAwait(false);
             }
             catch (Exception ex) when (ex is OperationCanceledException or IOException or ObjectDisposedException)
             {
@@ -271,9 +323,13 @@ internal sealed class SingleInstance : IDisposable
         }
     }
 
-    private void Deliver(IReadOnlyList<string> files)
+    /// <summary>
+    /// Preda datoteke primatelju. Dok primatelj još ne postoji (prozor se tek otvara), zahtjev se čuva i odmah potvrđuje,
+    /// kao i prije; inače bi svako sporo pokretanje otvaralo drugi player.
+    /// </summary>
+    private Task Deliver(IReadOnlyList<string> files, CancellationToken ct)
     {
-        Action<IReadOnlyList<string>>? handler;
+        Func<IReadOnlyList<string>, CancellationToken, Task>? handler;
         lock (_gate)
         {
             ReceivedBatches++;
@@ -281,11 +337,18 @@ internal sealed class SingleInstance : IDisposable
             if (handler is null)
             {
                 _pending.Add(files);
-                return;
+                return Task.CompletedTask;
             }
         }
 
-        handler(files);
+        try
+        {
+            return handler(files, ct);
+        }
+        catch (Exception ex)
+        {
+            return Task.FromException(ex);
+        }
     }
 
     private sealed class Message

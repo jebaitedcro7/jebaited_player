@@ -58,6 +58,7 @@ public partial class MainWindow
                     "accent" => await AccentUiTestAsync(),
                     "ui217" => await Ui217UiTestAsync(),
                     "upnextlead" => await UpNextLeadUiTestAsync(),
+                    "v2112" => await V2112UiTestAsync(),
                     _ => new Dictionary<string, object?> { ["error"] = "nepoznat scenarij " + scenario },
                 };
             }

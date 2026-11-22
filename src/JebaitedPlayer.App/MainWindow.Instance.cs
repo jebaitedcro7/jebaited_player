@@ -24,7 +24,16 @@ public partial class MainWindow
     internal void AttachInstance(SingleInstance instance)
     {
         _instance = instance;
-        instance.SetHandler(files => Dispatcher.BeginInvoke(() => OnExternalOpen(files)));
+
+        // 2.1.12: drugo pokretanje dobiva potvrdu tek kad UI stvarno preuzme datoteke. Ako UI ne odgovara, zahtjev se
+        // otkaže (ovdje se tada ništa ne otvara), a novo pokretanje radi kao zaseban player.
+        instance.SetHandler((files, ct) => Dispatcher.InvokeAsync(() =>
+        {
+            if (!ct.IsCancellationRequested)
+            {
+                OnExternalOpen(files);
+            }
+        }).Task);
     }
 
     /// <summary>Prve datoteke: iz naredbenog retka i one koje su stigle dok se prozor otvarao.</summary>
@@ -168,13 +177,29 @@ public partial class MainWindow
 
     private void BringToFront()
     {
-        if (WindowState == WindowState.Minimized)
+        // 2.1.12: dok je mini player prikaz, u prvi plan dolazi on (glavni prozor je tada skriven).
+        if (IsMiniPlayerActive && _mini is { } mini)
         {
-            SystemCommands.RestoreWindow(this);
+            if (mini.WindowState == WindowState.Minimized)
+            {
+                mini.WindowState = WindowState.Normal;
+            }
+
+            mini.Activate();
+        }
+        else
+        {
+            if (WindowState == WindowState.Minimized)
+            {
+                SystemCommands.RestoreWindow(this);
+            }
+
+            // Drugo pokretanje je dopustilo prvi plan (AllowSetForegroundWindow); inače Windows samo zatreperi ikonu.
+            Activate();
         }
 
-        // Drugo pokretanje je dopustilo prvi plan (AllowSetForegroundWindow); inače Windows samo zatreperi ikonu.
-        Activate();
+        // Korisnik je upravo pokrenuo player i očekuje prozor: ako nijedan nije na zaslonu, čuvar vraća glavni.
+        EnsurePlayerWindowVisible("second-launch");
     }
 
     /// <summary>Pri zatvaranju: player pokrenut u tom trenutku otvara se kao novi, ne šalje datoteke ovom.</summary>

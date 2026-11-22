@@ -121,12 +121,12 @@ U istoj kartici podešavaš automatsko traženje, kodiranje starih titlova i izg
 - Glazba otvara mini player, a film ili serija puni player (može se isključiti u Postavke → Izgled). Mini player se uvijek otvara gdje si ga ostavio.
 - Desni klik na mini player (ili Postavke → Izgled): šest fontova zaslona i četiri izgleda VU metra (trake, LED segmenti, tanke linije s vrhom, isključen).
 - Filmovi i serije imaju svoj equalizer, a glazba i radio svoj (Postavke → Zvuk: biraš koji uređuješ).
-- **Pet izgleda** (desni klik → **Izgled**): klasični Winamp, kartica, uska traka, bočna ploča i NLO zaslon. Svi imaju iste tipke i funkcije, a tvoj odabir se pamti.
+- **Pet izgleda** (desni klik → **Izgled**): klasični Winamp, kartica, uska traka, bočna ploča i NLO zaslon. Svi imaju iste tipke i funkcije, a tvoj odabir se pamti. Izgledi kartica i bočna ploča (i početni ekran) prikazuju **omot albuma** pjesme (ugrađen u datoteku ili slika cover/folder uz nju); bez omota prikazuju NLO logo.
 - **Kotačić miša iznad trake glasnoće** mijenja glasnoću za 2 % (u mini playeru i u punom playeru). Kotačić bilo gdje drugdje nikad ne mijenja glasnoću.
 - Naslov se neprekidno vrti u krug, a zadano prikazuje samo **izvođača i pjesmu**. Desni klik na naslov: dodaj album, godinu, žanr, kvalitetu zvuka ili naziv datoteke.
 - Crvena, blago pulsirajuća oznaka **UŽIVO** prikazuje se dok svira radio (svi izgledi, puni player i početni ekran).
 - **Minimiziraj** (tipka ili desni klik → Minimiziraj na taskbar) stavlja player na taskbar, a glazba svira dalje; to je nešto drugo od **Mini playera** i zatvaranja. Mini player i svi ostali prozori (Equalizer, Radio, Discord …) uvijek ostaju potpuno unutar vidljivog zaslona, iznad taskbara, i s više monitora.
-- Pri pokretanju se otvara samo jedan prozor: mini player ako je to bio tvoj zadnji prikaz (ili kad otvoriš glazbu), inače puni player.
+- Pri pokretanju se otvara samo jedan prozor: mini player ako je to bio tvoj zadnji prikaz (ili kad otvoriš glazbu), inače puni player. Ako pokretanje ikad završi bez vidljivog prozora, player sam vraća glavni prozor, a sljedeće pokretanje ga otvara normalno, na sredini zaslona.
 
 ### Radio
 
@@ -153,7 +153,7 @@ U istoj kartici podešavaš automatsko traženje, kodiranje starih titlova i izg
 - **Ctrl+Shift+D**, desni klik → **Bot za Discord…** ili gumb sa slušalicama u mini playeru. Tvoj vlastiti bot ulazi u glasovni kanal na tvom Discord serveru i pušta ono što svira player: **samo lokalnu glazbu i radio**. Filmovi, YouTube Music i Spotify se nikad ne šalju (dok svira film ili je otvoren YouTube, bot šalje tišinu).
 - Bota napraviš jednom, besplatno; prozor pokazuje korake: Discord Developer Portal → nova aplikacija → Install Link na None i isključen Public Bot → URL Generator s dozvolama View Channels, Connect i Speak → pozovi bota na svoj server → Reset Token. Token zalijepiš u prozor; sprema se kriptirano samo na tvom računalu.
 - **Uđi u moj kanal** odvede bota u kanal u kojem si ti, a može i bilo koji kanal s popisa. Gumb sa slušalicama u mini playeru je zelen dok bot šalje glazbu. Ako botu u kanalu nedostaje dozvola, prozor napiše koja i gdje je uključiti.
-- Discord čuje točno ono što player svira: glasnoća playera vrijedi i za Discord, a utišan player šalje tišinu. Zvuk je end-to-end kriptiran (Discord DAVE). Bot radi samo na serverima na koje ga pozoveš, ne u privatnim pozivima. Treba Windows 11 ili Windows 10 build 20348 ili noviji.
+- Discord čuje ono što player svira. Zadano glasnoća playera vrijedi i za Discord; u prozoru Discord možeš Discordu dati **vlastitu glasnoću**, pa kad sebi utišaš player, u kanalu nije tiše. Utišan player (ili glasnoća 0) uvijek šalje tišinu. Zvuk je end-to-end kriptiran (Discord DAVE). Bot radi samo na serverima na koje ga pozoveš, ne u privatnim pozivima. Treba Windows 11 ili Windows 10 build 20348 ili noviji.
 
 ### Kopije i prijenos
 

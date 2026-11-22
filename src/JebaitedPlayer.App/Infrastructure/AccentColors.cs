@@ -109,14 +109,17 @@ public static class AccentColors
         return result;
     }
 
-    /// <summary>Paleta za temu. Zadana zelena daje točno boje iz Dark.xaml / Light.xaml i mini playera.</summary>
+    /// <summary>
+    /// Paleta za temu. Zadana zelena daje točno boje iz Dark.xaml / Light.xaml i mini playera.
+    /// 2.1.12: svijetla tema #1E8739 (prije #1F8A3B, samo 4,41:1 uz bijeli tekst).
+    /// </summary>
     public static AccentPalette For(string? hex, bool dark)
     {
         if (!TryParse(hex, out Color chosen) || ToHex(chosen) == DefaultHex)
         {
             return dark
                 ? new AccentPalette(Rgb(0x7BD88F), Rgb(0x0B1A0F), Rgb(0x2E4A35), Rgb(0x7BD88F), Rgb(0x2A4A32), Rgb(0x17291C), Rgb(0x0B100C), Rgb(0x1F3324), Rgb(0x223A28))
-                : new AccentPalette(Rgb(0x1F8A3B), Rgb(0xFFFFFF), Rgb(0xD3EEDA), Rgb(0x7BD88F), Rgb(0x2A4A32), Rgb(0x17291C), Rgb(0x0B100C), Rgb(0x1F3324), Rgb(0x223A28));
+                : new AccentPalette(Rgb(0x1E8739), Rgb(0xFFFFFF), Rgb(0xD3EEDA), Rgb(0x7BD88F), Rgb(0x2A4A32), Rgb(0x17291C), Rgb(0x0B100C), Rgb(0x1F3324), Rgb(0x223A28));
         }
 
         Color background = dark ? DarkBackground : LightBackground;

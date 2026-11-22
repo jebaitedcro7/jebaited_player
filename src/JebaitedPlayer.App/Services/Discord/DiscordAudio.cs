@@ -50,6 +50,83 @@ public static class DiscordAudioGate
     }
 }
 
+/// <summary>
+/// 2.1.12: glasnoća na Discordu. Zvuk se hvata iz izlaza playera, dakle nakon njegove glasnoće (mpv: (glasnoća/100)³).
+/// Kad Discord ne prati player, uhvaćeni zvuk se pojača ili utiša tako da u kanalu zvuči kao da player svira na
+/// glasnoći za Discord. Utišan player (ili glasnoća 0) i dalje šalje tišinu: iz izlaza se ne može dobiti zvuk koji
+/// player ne pušta.
+/// </summary>
+public static class DiscordVolume
+{
+    /// <summary>Najveće pojačanje (+40 dB); ispod toga, npr. player na 3 %, Discord postaje tiši.</summary>
+    public const double MaxGain = 100;
+
+    public const double DefaultVolume = 60;
+
+    /// <summary>Pojačanje za uhvaćene uzorke: 1 kad Discord prati player.</summary>
+    public static double Gain(bool followPlayer, double playerVolume, bool playerMuted, double discordVolume)
+    {
+        if (followPlayer)
+        {
+            return 1;
+        }
+
+        double player = Cubic(playerVolume);
+        if (playerMuted || player <= 0)
+        {
+            return 0;
+        }
+
+        return Math.Min(Cubic(Math.Clamp(discordVolume, 0, 100)) / player, MaxGain);
+    }
+
+    /// <summary>mpv glasnoća 0–100 (i više) → linearno pojačanje.</summary>
+    public static double Cubic(double volume)
+    {
+        double v = Math.Max(0, volume) / 100;
+        return v * v * v;
+    }
+
+    /// <summary>Float uzorci (-1..1) → 16 bita uz pojačanje i rezanje na granicama; vraća najveću apsolutnu vrijednost.</summary>
+    public static int ToPcm16(ReadOnlySpan<float> input, Span<short> output, double gain)
+    {
+        int peak = 0;
+        float g = (float)gain;
+        for (int i = 0; i < input.Length; i++)
+        {
+            float v = input[i] * g * 32767f;
+            int s = float.IsNaN(v) ? 0 : (int)MathF.Round(Math.Clamp(v, -32768f, 32767f));
+            output[i] = (short)s;
+            int a = s == short.MinValue ? short.MaxValue : Math.Abs(s);
+            if (a > peak)
+            {
+                peak = a;
+            }
+        }
+
+        return peak;
+    }
+
+    /// <summary>16-bitni uzorci (kad Windows ne da float) uz pojačanje i rezanje; vraća najveću apsolutnu vrijednost.</summary>
+    public static int ApplyGain(Span<short> samples, double gain)
+    {
+        int peak = 0;
+        bool unity = Math.Abs(gain - 1) < 1e-9;
+        for (int i = 0; i < samples.Length; i++)
+        {
+            int s = unity ? samples[i] : (int)Math.Round(Math.Clamp(samples[i] * gain, short.MinValue, short.MaxValue));
+            samples[i] = (short)s;
+            int a = s == short.MinValue ? short.MaxValue : Math.Abs(s);
+            if (a > peak)
+            {
+                peak = a;
+            }
+        }
+
+        return peak;
+    }
+}
+
 /// <summary>PCM 48 kHz stereo (16 bita) → Opus okviri od 20 ms (Concentus, bez nativnog opus.dll).</summary>
 public sealed class OpusFramer
 {

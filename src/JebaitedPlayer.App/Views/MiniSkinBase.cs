@@ -2,13 +2,14 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace JebaitedPlayer.Views;
 
 /// <summary>Što skin prikazuje: isto stanje za sve izglede (izračunava ga <see cref="MiniPlayerWindow"/>).</summary>
 internal readonly record struct MiniSkinState(
     string Title, string Time, string Remaining, string Source, double Position, double Duration, bool CanSeek,
-    bool Playing, string MuteGlyph, bool Live, double Volume, bool EqOn, bool PlaylistOn);
+    bool Playing, string MuteGlyph, bool Live, double Volume, bool EqOn, bool PlaylistOn, ImageSource? Cover = null);
 
 /// <summary>
 /// 2.1.7: zajednička osnova za izglede 2 (kartica), 4 (bočna ploča) i 5 (NLO zaslon). Svi izgledi imaju iste elemente
@@ -41,8 +42,46 @@ public abstract class MiniSkinBase : UserControl
 
     internal abstract ToggleButton PlaylistButton { get; }
 
+    /// <summary>2.1.12: mjesto za omot (izgledi 2 i 4); null u izgledima bez njega.</summary>
+    internal virtual Image? CoverImage => null;
+
+    /// <summary>Kvadratno mjesto popuni omotom; široko (bočna ploča) prikazuje cijeli omot na sredini.</summary>
+    internal virtual Stretch CoverStretch => Stretch.UniformToFill;
+
+    private ImageSource? _logo;
+    private Thickness _logoMargin;
+
+    /// <summary>Prikazuje li izgled sada pravi omot (a ne NLO logo), za provjeru.</summary>
+    internal bool ShowsCover { get; private set; }
+
+    private void ApplyCover(ImageSource? cover)
+    {
+        if (CoverImage is not { } image)
+        {
+            return;
+        }
+
+        if (_logo is null)
+        {
+            _logo = image.Source;
+            _logoMargin = image.Margin;
+        }
+
+        ImageSource? wanted = cover ?? _logo;
+        if (ReferenceEquals(image.Source, wanted))
+        {
+            return;
+        }
+
+        image.Source = wanted;
+        image.Margin = cover is null ? _logoMargin : new Thickness(0);
+        image.Stretch = cover is null ? Stretch.Uniform : CoverStretch;
+        ShowsCover = cover is not null;
+    }
+
     internal void Apply(in MiniSkinState s)
     {
+        ApplyCover(s.Cover);
         TitleMarquee.Text = s.Title;
         TimeBlock.Text = s.Time;
         SourceBlock.Text = s.Source;

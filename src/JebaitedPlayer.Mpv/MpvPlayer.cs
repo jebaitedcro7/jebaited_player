@@ -336,8 +336,10 @@ public sealed class MpvPlayer : IDisposable
             case MpvEventId.FileLoaded:
             {
                 // Sinkroni upiti su ovdje sigurni jer smo u dretvi događaja, a ne u UI dretvi.
+                // 2.1.12: omot albuma (ugrađena slika ili cover.jpg uz pjesmu) mpv prikazuje kao video stazu s oznakom
+                // albumart; to nije video, pa se glazba s omotom ne smije ponašati kao film (Discord, Home, titlovi).
                 var args = new MpvFileLoadedEventArgs(
-                    GetPropertyString("current-tracks/video/id") != null,
+                    GetPropertyString("current-tracks/video/id") != null && GetPropertyString("current-tracks/video/albumart") != "yes",
                     GetPropertyString("path"),
                     GetPropertyString("track-list"),
                     GetPropertyDouble("container-fps"));

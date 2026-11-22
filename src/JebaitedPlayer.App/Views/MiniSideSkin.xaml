@@ -17,8 +17,9 @@
             <TextBlock Text="jebaited_cro" FontSize="11" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" />
         </DockPanel>
 
-        <Border Style="{DynamicResource Lcd}" Height="150" Margin="14,6,14,0">
-            <Image Source="/Assets/logo-ufo.png" Margin="18" RenderOptions.BitmapScalingMode="HighQuality" />
+        <Border Style="{DynamicResource Lcd}" Height="150" Margin="14,6,14,0" ClipToBounds="True">
+            <!-- 2.1.12: omot pjesme (iz oznaka ili mape); bez omota NLO logo. -->
+            <Image x:Name="Cover" Source="/Assets/logo-ufo.png" Margin="18" RenderOptions.BitmapScalingMode="HighQuality" />
         </Border>
 
         <views:MarqueeView x:Name="Title" Height="26" Margin="14,10,14,0" TextElement.FontSize="15" TextElement.FontWeight="SemiBold"

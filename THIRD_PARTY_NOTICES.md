@@ -21,7 +21,7 @@ jebaited_player je objavljen pod licencom **GPL-3.0** (vidi [LICENSE](LICENSE)).
 | mlspp (statički u `libdave.dll`) | MLS protokol za DAVE | BSD-2-Clause | https://github.com/cisco/mlspp |
 | nlohmann/json (statički u `libdave.dll`) | JSON unutar libdave | MIT | https://github.com/nlohmann/json |
 
-Puni tekstovi licenci za NetCord, Concentus, libdave, OpenSSL, mlspp i nlohmann/json nalaze se uz program u mapi `licenses` (i u repozitoriju u `third_party/licenses`).
+Puni tekstovi licenci za .NET runtime i WPF (uz popis komponenti drugih autora unutar .NET-a), Velopack, Microsoft.Data.Sqlite, SQLitePCLRaw, SQLite, WebRtcVadSharp i WebRTC VAD, Microsoft Edge WebView2 SDK, NetCord, Concentus, libdave, OpenSSL, mlspp i nlohmann/json nalaze se uz program u mapi `licenses` (i u repozitoriju u `third_party/licenses`). Za libmpv i biblioteke u njemu vidi odjeljak „Izvorni kod za libmpv”.
 
 ## Izvorni kod za libdave
 

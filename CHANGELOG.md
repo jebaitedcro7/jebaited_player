@@ -4,6 +4,33 @@ All notable changes to jebaited_player. Format: [Keep a Changelog](https://keepa
 
 Other languages: [Deutsch](CHANGELOG_DE.md) · [Hrvatski](CHANGELOG_HR.md). The same history is included in the player (click the version number on the home screen). This file is generated from `src/JebaitedPlayer.App/History/update-history.json`.
 
+## [2.1.13] - 2026-11-22
+
+Album covers in the mini player and on the home screen, a volume of its own for Discord, and a player that always shows a window.
+
+### Added
+
+- Album covers: the card and side-panel designs of the mini player and the home screen show the cover of the song (embedded in MP3, FLAC, M4A or Ogg/Opus files, or a cover/folder image next to the song). Songs without a cover, radio, Spotify and YouTube keep the UFO logo.
+- Discord bot: the volume on Discord can follow the player (as before) or have a level of its own, so turning the player down for yourself no longer makes it quieter for everyone in the channel (Discord window).
+- Startup guard: if the player ever starts without a visible window, the main window is brought back automatically, and the next start opens it normally in the middle of the screen (with a short message).
+
+### Improved
+
+- Starting the player again while the mini player is open brings the mini player to the front.
+
+### Fixed
+
+- Songs with an embedded cover (or a cover.jpg next to them) were treated like a video: the home screen closed them, the Discord bot sent silence and subtitle search could start for them. A cover is now just a cover, and such songs behave like all other music.
+- Starting the player again while the running player was not responding did nothing; the new start now opens as a player of its own.
+- The full license texts of .NET and WPF, Velopack, Microsoft.Data.Sqlite, SQLitePCLRaw, SQLite, WebRtcVadSharp/WebRTC and the WebView2 SDK are now included with the program (folder licenses), not only linked.
+- Light theme: the green accent is slightly darker, so white text on it is easier to read (contrast 4.6:1, was 4.4:1).
+
+### Known issues
+
+- A muted player (or volume 0) still sends silence to Discord, also with a Discord volume of its own: the bot can only send what the player plays.
+
+Release: [v2.1.13](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v2.1.13) · Changes since [v2.1.9...v2.1.13](https://github.com/jebaitedcro7/jebaited_player/compare/v2.1.9...v2.1.13)
+
 ## [2.1.9] - 2026-11-22
 
 Volume with the mouse wheel anywhere on the player, a download bar for updates, weather icons and a clearer next-episode setting.

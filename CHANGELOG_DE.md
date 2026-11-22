@@ -4,6 +4,33 @@ Alle wichtigen Änderungen an jebaited_player. Format: [Keep a Changelog](https:
 
 Andere Sprachen: [English](CHANGELOG.md) · [Hrvatski](CHANGELOG_HR.md). Derselbe Verlauf ist im Player enthalten (Klick auf die Versionsnummer auf dem Startbildschirm). Diese Datei wird aus `src/JebaitedPlayer.App/History/update-history.json` erzeugt.
 
+## [2.1.13] - 2026-11-22
+
+Albumcover im Mini-Player und auf dem Startbildschirm, eine eigene Lautstärke für Discord und ein Player, der immer ein Fenster zeigt.
+
+### Neu
+
+- Albumcover: Die Designs „Karte“ und „Seitenleiste“ des Mini-Players und der Startbildschirm zeigen das Cover des Titels (eingebettet in MP3-, FLAC-, M4A- oder Ogg/Opus-Dateien oder ein cover/folder-Bild neben dem Titel). Titel ohne Cover, Radio, Spotify und YouTube behalten das UFO-Logo.
+- Discord-Bot: Die Lautstärke auf Discord kann dem Player folgen (wie bisher) oder einen eigenen Wert haben. Wenn du den Player für dich leiser stellst, wird es im Kanal nicht mehr für alle leiser (Discord-Fenster).
+- Startschutz: Startet der Player einmal ohne sichtbares Fenster, wird das Hauptfenster automatisch zurückgeholt, und der nächste Start öffnet es normal in der Bildschirmmitte (mit einem kurzen Hinweis).
+
+### Verbessert
+
+- Wird der Player erneut gestartet, während der Mini-Player offen ist, kommt der Mini-Player in den Vordergrund.
+
+### Behoben
+
+- Titel mit eingebettetem Cover (oder einer cover.jpg daneben) wurden wie ein Video behandelt: Der Startbildschirm schloss sie, der Discord-Bot sendete Stille und die Untertitelsuche konnte für sie starten. Ein Cover ist jetzt nur ein Cover, solche Titel verhalten sich wie jede andere Musik.
+- Ein erneuter Start, während der laufende Player nicht reagierte, bewirkte nichts; der neue Start öffnet jetzt einen eigenen Player.
+- Die vollständigen Lizenztexte von .NET und WPF, Velopack, Microsoft.Data.Sqlite, SQLitePCLRaw, SQLite, WebRtcVadSharp/WebRTC und dem WebView2 SDK liegen jetzt dem Programm bei (Ordner licenses), nicht nur als Link.
+- Helles Design: Das grüne Akzentgrün ist etwas dunkler, weißer Text darauf ist besser lesbar (Kontrast 4,6:1, vorher 4,4:1).
+
+### Bekannte Probleme
+
+- Ein stummgeschalteter Player (oder Lautstärke 0) sendet auch mit eigener Discord-Lautstärke Stille: Der Bot kann nur senden, was der Player abspielt.
+
+Release: [v2.1.13](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v2.1.13) · Änderungen seit [v2.1.9...v2.1.13](https://github.com/jebaitedcro7/jebaited_player/compare/v2.1.9...v2.1.13)
+
 ## [2.1.9] - 2026-11-22
 
 Lautstärke mit dem Mausrad überall im Player, ein Fortschrittsbalken für Updates, Wetter-Symbole und eine klarere Einstellung für die nächste Folge.

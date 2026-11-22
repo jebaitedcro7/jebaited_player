@@ -4,6 +4,33 @@ Sve važnije promjene jebaited_playera. Oblik: [Keep a Changelog](https://keepac
 
 Drugi jezici: [English](CHANGELOG.md) · [Deutsch](CHANGELOG_DE.md). Ista povijest je i u playeru (klik na broj verzije na početnom ekranu). Ova datoteka nastaje iz `src/JebaitedPlayer.App/History/update-history.json`.
 
+## [2.1.13] - 2026-11-22
+
+Omot albuma u mini playeru i na početnom ekranu, vlastita glasnoća za Discord i player koji uvijek pokaže prozor.
+
+### Novo
+
+- Omot albuma: izgledi „kartica” i „bočna ploča” mini playera i početni ekran prikazuju omot pjesme (ugrađen u MP3, FLAC, M4A ili Ogg/Opus, ili slika cover/folder uz pjesmu). Pjesme bez omota, radio, Spotify i YouTube zadržavaju NLO logo.
+- Bot za Discord: glasnoća na Discordu može pratiti player (kao do sada) ili imati vlastitu razinu, pa kad sebi utišaš player, u kanalu više nije tiše svima (prozor Discord).
+- Čuvar pokretanja: ako se player ikad pokrene bez vidljivog prozora, glavni prozor se sam vraća, a sljedeće pokretanje ga otvara normalno, na sredini zaslona (uz kratku poruku).
+
+### Poboljšano
+
+- Ponovno pokretanje playera dok je otvoren mini player dovodi mini player u prvi plan.
+
+### Ispravljeno
+
+- Pjesme s ugrađenim omotom (ili s cover.jpg uz njih) tretirale su se kao video: početni ekran ih je zatvarao, bot za Discord slao je tišinu, a za njih se mogla pokrenuti i pretraga titlova. Omot je sada samo omot, a takve pjesme se ponašaju kao sva ostala glazba.
+- Ponovno pokretanje dok otvoreni player nije odgovarao nije radilo ništa; novo pokretanje se sada otvara kao zaseban player.
+- Puni tekstovi licenci za .NET i WPF, Velopack, Microsoft.Data.Sqlite, SQLitePCLRaw, SQLite, WebRtcVadSharp/WebRTC i WebView2 SDK sada su uz program (mapa licenses), ne samo poveznica.
+- Svijetla tema: zelena boja isticanja je malo tamnija, pa je bijeli tekst na njoj čitljiviji (kontrast 4,6:1, prije 4,4:1).
+
+### Poznati problemi
+
+- Utišan player (ili glasnoća 0) i uz vlastitu glasnoću za Discord šalje tišinu: bot može slati samo ono što player svira.
+
+Izdanje: [v2.1.13](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v2.1.13) · Promjene od [v2.1.9...v2.1.13](https://github.com/jebaitedcro7/jebaited_player/compare/v2.1.9...v2.1.13)
+
 ## [2.1.9] - 2026-11-22
 
 Glasnoća kotačićem bilo gdje na playeru, traka preuzimanja nadogradnje, ikone uz podatke o vremenu i jasnija postavka sljedeće epizode.

@@ -31,6 +31,32 @@ public sealed class ProcessAudioCapture : IDisposable
 
     public bool IsRunning => _thread is { IsAlive: true };
 
+    /// <summary>2.1.12: pojačanje uhvaćenog zvuka (glasnoća za Discord); 1 = točno ono što player svira.</summary>
+    public double Gain
+    {
+        get => Volatile.Read(ref _gain);
+        set => Volatile.Write(ref _gain, double.IsFinite(value) ? Math.Clamp(value, 0, DiscordVolume.MaxGain) : 1);
+    }
+
+    private double _gain = 1;
+
+    /// <summary>Format koji je Windows prihvatio: "float32" ili "pcm16" (prazno prije pokretanja).</summary>
+    public string FormatName { get; private set; } = string.Empty;
+
+    /// <summary>Samo za testove: preskoči float (provjera puta sa 16 bita).</summary>
+    internal static bool ForcePcm16 { get; set; }
+
+    private static WaveFormatEx Format(bool isFloat) => new()
+    {
+        wFormatTag = (ushort)(isFloat ? 3 : 1), // WAVE_FORMAT_IEEE_FLOAT ili WAVE_FORMAT_PCM
+        nChannels = Channels,
+        nSamplesPerSec = SampleRate,
+        wBitsPerSample = (ushort)(isFloat ? 32 : 16),
+        nBlockAlign = (ushort)(Channels * (isFloat ? 4 : 2)),
+        nAvgBytesPerSec = (uint)(SampleRate * Channels * (isFloat ? 4 : 2)),
+        cbSize = 0,
+    };
+
     /// <summary>Pokreće hvatanje na vlastitoj MTA dretvi; baca grešku ako aktivacija ne uspije.</summary>
     public void Start()
     {
@@ -76,19 +102,24 @@ public sealed class ProcessAudioCapture : IDisposable
         IntPtr evt = IntPtr.Zero;
         try
         {
-            client = Activate((uint)Environment.ProcessId);
-            var format = new WaveFormatEx
-            {
-                wFormatTag = 1, // WAVE_FORMAT_PCM
-                nChannels = Channels,
-                nSamplesPerSec = SampleRate,
-                wBitsPerSample = 16,
-                nBlockAlign = Channels * 2,
-                nAvgBytesPerSec = SampleRate * Channels * 2,
-                cbSize = 0,
-            };
+            // 2.1.12: najprije 32-bitni float (tihi signal se smije pojačati bez šuma zaokruživanja); ako ga Windows
+            // ne prihvati, 16 bita kao prije.
             const uint flags = AudclntStreamflagsLoopback | AudclntStreamflagsEventcallback | AudclntStreamflagsAutoconvertpcm | AudclntStreamflagsSrcDefaultQuality;
-            Check(client.Initialize(0, flags, 200_000, 0, ref format, IntPtr.Zero), "Initialize");
+            bool isFloat = !ForcePcm16;
+            client = Activate((uint)Environment.ProcessId);
+            WaveFormatEx format = Format(isFloat);
+            int hr = client.Initialize(0, flags, 200_000, 0, ref format, IntPtr.Zero);
+            if (hr < 0 && isFloat)
+            {
+                Marshal.ReleaseComObject(client);
+                client = Activate((uint)Environment.ProcessId);
+                isFloat = false;
+                format = Format(false);
+                hr = client.Initialize(0, flags, 200_000, 0, ref format, IntPtr.Zero);
+            }
+
+            Check(hr, "Initialize");
+            FormatName = isFloat ? "float32" : "pcm16";
             evt = CreateEventW(IntPtr.Zero, false, false, null);
             Check(client.SetEventHandle(evt), "SetEventHandle");
             Guid iid = typeof(IAudioCaptureClient).GUID;
@@ -99,6 +130,7 @@ public sealed class ProcessAudioCapture : IDisposable
 
             short[] silence = [];
             short[] buffer = new short[SampleRate / 50 * Channels * 4];
+            float[] floats = new float[isFloat ? buffer.Length : 0];
             while (!_stop)
             {
                 _ = WaitForSingleObject(evt, 100);
@@ -123,21 +155,27 @@ public sealed class ProcessAudioCapture : IDisposable
                             buffer = new short[count];
                         }
 
-                        Marshal.Copy(data, buffer, 0, count);
-                        ReadOnlySpan<short> samples = buffer.AsSpan(0, count);
-
-                        int peak = 0;
-                        foreach (short s in samples)
+                        // Pojačanje za Discord (1 = prati player) prije pretvorbe u 16 bita; razina je ono što se šalje.
+                        double gain = Gain;
+                        int peak;
+                        if (isFloat)
                         {
-                            int a = s == short.MinValue ? short.MaxValue : Math.Abs((int)s);
-                            if (a > peak)
+                            if (floats.Length < count)
                             {
-                                peak = a;
+                                floats = new float[count];
                             }
+
+                            Marshal.Copy(data, floats, 0, count);
+                            peak = DiscordVolume.ToPcm16(floats.AsSpan(0, count), buffer.AsSpan(0, count), gain);
+                        }
+                        else
+                        {
+                            Marshal.Copy(data, buffer, 0, count);
+                            peak = DiscordVolume.ApplyGain(buffer.AsSpan(0, count), gain);
                         }
 
                         LastPeak = peak;
-                        _onSamples(samples);
+                        _onSamples(buffer.AsSpan(0, count));
                     }
 
                     FramesCaptured += frames;

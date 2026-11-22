@@ -40,6 +40,17 @@
             <TextBlock DockPanel.Dock="Bottom" Style="{StaticResource HintText}" Text="{loc:T discord.note}" TextWrapping="Wrap" Margin="0,8,0,0" />
             <TextBlock x:Name="StatusText" DockPanel.Dock="Bottom" Foreground="{DynamicResource AccentBrush}" TextWrapping="Wrap" Margin="0,8,0,0" />
 
+            <!-- 2.1.12: glasnoća na Discordu (prati player ili vlastita). -->
+            <StackPanel x:Name="VolumePanel" DockPanel.Dock="Bottom" Margin="0,10,0,0">
+                <CheckBox x:Name="FollowVolumeBox" Content="{loc:T discord.followVolume}" Click="OnVolumeMode" />
+                <DockPanel Margin="0,6,0,0">
+                    <TextBlock DockPanel.Dock="Left" Text="{loc:T discord.volume}" VerticalAlignment="Center" Margin="0,0,10,0" />
+                    <TextBlock x:Name="VolumeValue" DockPanel.Dock="Right" Width="48" TextAlignment="Right" VerticalAlignment="Center" />
+                    <Slider x:Name="VolumeSlider" Style="{StaticResource PlayerSlider}" Minimum="0" Maximum="100" SmallChange="5" LargeChange="10"
+                            VerticalAlignment="Center" ValueChanged="OnDiscordVolume" />
+                </DockPanel>
+            </StackPanel>
+
             <!-- 3) Glasovni kanal -->
             <Border x:Name="ChannelPanel" DockPanel.Dock="Top" Margin="0,12,0,0" Padding="14" CornerRadius="8" VerticalAlignment="Top"
                     Background="{DynamicResource HomeCardBrush}" BorderBrush="{DynamicResource MenuBorderBrush}" BorderThickness="1">

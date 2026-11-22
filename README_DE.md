@@ -121,12 +121,12 @@ Im selben Tab stellst du die automatische Suche, die Zeichenkodierung alter Unte
 - Musik öffnet den Mini-Player, ein Film oder eine Serie den vollen Player (abschaltbar unter Einstellungen → Darstellung). Der Mini-Player öffnet sich immer dort, wo du ihn gelassen hast.
 - Rechtsklick auf den Mini-Player (oder Einstellungen → Darstellung): sechs Anzeigeschriften und vier VU-Meter-Stile (Balken, LED-Segmente, dünne Linien mit Spitze, aus).
 - Filme und Serien haben einen eigenen Equalizer, Musik und Radio einen eigenen (Einstellungen → Audio: wählen, welcher bearbeitet wird).
-- **Fünf Looks** (Rechtsklick → **Aussehen**): klassisches Winamp, Karte, schmale Leiste, Seitenleiste und UFO-Display. Alle haben dieselben Tasten und Funktionen, deine Wahl wird gespeichert.
+- **Fünf Looks** (Rechtsklick → **Aussehen**): klassisches Winamp, Karte, schmale Leiste, Seitenleiste und UFO-Display. Alle haben dieselben Tasten und Funktionen, deine Wahl wird gespeichert. Die Looks Karte und Seitenleiste (und der Startbildschirm) zeigen das **Albumcover** des Titels (in die Datei eingebettet oder ein cover/folder-Bild daneben); ohne Cover erscheint das UFO-Logo.
 - Das **Mausrad über der Lautstärkeleiste** ändert die Lautstärke um 2 % (im Mini-Player und im vollen Player). Das Mausrad an anderer Stelle ändert die Lautstärke nie.
 - Der Titel läuft in einer Endlosschleife und zeigt standardmäßig nur **Interpret und Titel**. Rechtsklick auf den Titel: Album, Jahr, Genre, Klangqualität oder Dateiname hinzufügen.
 - Eine rote, sanft pulsierende **LIVE**-Anzeige erscheint, solange ein Radiosender läuft (alle Looks, voller Player und Startbildschirm).
 - **Minimieren** (Taste oder Rechtsklick → In die Taskleiste minimieren) legt den Player in die Taskleiste, die Musik läuft weiter; das ist etwas anderes als **Mini-Player** und Schließen. Der Mini-Player und alle anderen Fenster (Equalizer, Radio, Discord …) bleiben immer ganz im sichtbaren Bildschirm, über der Taskleiste, auch mit mehreren Monitoren.
-- Beim Start öffnet sich nur ein Fenster: der Mini-Player, wenn er deine letzte Ansicht war (oder wenn du eine Musikdatei öffnest), sonst der volle Player.
+- Beim Start öffnet sich nur ein Fenster: der Mini-Player, wenn er deine letzte Ansicht war (oder wenn du eine Musikdatei öffnest), sonst der volle Player. Endet ein Start einmal ohne sichtbares Fenster, holt der Player das Hauptfenster selbst zurück, und der nächste Start öffnet es normal in der Bildschirmmitte.
 
 ### Radio
 
@@ -153,7 +153,7 @@ Im selben Tab stellst du die automatische Suche, die Zeichenkodierung alter Unte
 - **Strg+Umschalt+D**, Rechtsklick → **Discord-Bot …** oder die Headset-Taste im Mini-Player. Dein eigener Bot betritt einen Sprachkanal auf deinem Discord-Server und spielt, was der Player spielt: **nur lokale Musik und Radio**. Filme, YouTube Music und Spotify werden nie gesendet (solange ein Film läuft oder YouTube geöffnet ist, sendet der Bot Stille).
 - Den Bot erstellst du einmal, kostenlos; das Fenster zeigt die Schritte: Discord Developer Portal → neue Anwendung → Install Link auf None und Public Bot aus → URL Generator mit den Berechtigungen View Channels, Connect und Speak → Bot auf deinen Server einladen → Reset Token. Füge den Token im Fenster ein; er wird verschlüsselt nur auf deinem Computer gespeichert.
 - **Meinem Kanal beitreten** bringt den Bot in den Kanal, in dem du bist, oder wähle einen Kanal aus der Liste. Die Headset-Taste im Mini-Player ist grün, solange der Bot Musik sendet. Fehlt dem Bot in einem Kanal eine Berechtigung, zeigt das Fenster, welche und wo man sie erlaubt.
-- Discord hört genau das, was der Player spielt: Die Lautstärke des Players gilt auch für Discord, und ein stummgeschalteter Player sendet Stille. Der Ton ist Ende-zu-Ende-verschlüsselt (Discord DAVE). Der Bot funktioniert nur auf Servern, auf die du ihn einlädst, nicht in privaten Anrufen. Benötigt Windows 11 oder Windows 10 Build 20348 oder neuer.
+- Discord hört, was der Player spielt. Standardmäßig gilt die Lautstärke des Players auch für Discord; im Discord-Fenster kannst du Discord eine **eigene Lautstärke** geben, dann wird es im Kanal nicht leiser, wenn du den Player für dich leiser stellst. Ein stummgeschalteter Player (oder Lautstärke 0) sendet immer Stille. Der Ton ist Ende-zu-Ende-verschlüsselt (Discord DAVE). Der Bot funktioniert nur auf Servern, auf die du ihn einlädst, nicht in privaten Anrufen. Benötigt Windows 11 oder Windows 10 Build 20348 oder neuer.
 
 ### Sicherung und Übertragung
 

@@ -1,3 +1,4 @@
+using System.IO;
 using System.Windows.Media;
 using JebaitedPlayer.Infrastructure;
 
@@ -28,11 +29,66 @@ public sealed class AccentColorsTests
         Assert.AreEqual(C("#223A28"), dark.LcdDim);
 
         AccentPalette light = AccentColors.For(null, dark: false);
-        Assert.AreEqual(C("#1F8A3B"), light.Accent);
+        // 2.1.12: svijetla tema dobila je malo tamniju zelenu (prije #1F8A3B, 4,41:1 uz bijeli tekst).
+        Assert.AreEqual(C("#1E8739"), light.Accent);
         Assert.AreEqual(Colors.White, light.AccentForeground);
         Assert.AreEqual(C("#D3EEDA"), light.Selection);
 
         Assert.AreEqual(dark, AccentColors.For("#7bd88f", dark: true), "the green preset is the default");
+    }
+
+    [TestMethod]
+    public void Light_theme_default_green_matches_Light_xaml_and_is_readable()
+    {
+        string xaml = File.ReadAllText(Path.Combine(RepoRoot(), "src", "JebaitedPlayer.App", "Themes", "Light.xaml"));
+        System.Text.RegularExpressions.Match m = System.Text.RegularExpressions.Regex.Match(xaml, "x:Key=\"AccentBrush\" Color=\"(#[0-9A-Fa-f]{6})\"");
+        Assert.IsTrue(m.Success, "AccentBrush in Light.xaml");
+        AccentPalette light = AccentColors.For(null, dark: false);
+        Assert.AreEqual(C(m.Groups[1].Value), light.Accent, "AccentColors and Light.xaml must use the same green");
+        Assert.IsTrue(AccentColors.Contrast(Colors.White, light.Accent) >= 4.5, $"white text {AccentColors.Contrast(Colors.White, light.Accent):F2}");
+        Assert.IsTrue(AccentColors.Contrast(light.Accent, C("#F3F3F3")) >= 3, "accent vs light background");
+    }
+
+    [TestMethod]
+    public void Every_shipped_component_has_its_license_text()
+    {
+        string root = RepoRoot();
+        string licenses = Path.Combine(root, "third_party", "licenses");
+        string[] files = Directory.GetFiles(licenses, "*.txt").Select(Path.GetFileName).ToArray()!;
+        // Komponente iz tablice u THIRD_PARTY_NOTICES.md (osim libmpv/FFmpeg, čiji je izvor opisan u third_party/libmpv/SOURCE.md).
+        string[] required =
+        [
+            "dotnet-runtime-and-WPF-MIT.txt", "dotnet-runtime-THIRD-PARTY-NOTICES.txt", "Velopack-MIT.txt", "Microsoft.Data.Sqlite-MIT.txt",
+            "SQLitePCLRaw-Apache-2.0.txt", "SQLite-public-domain.txt", "WebRtcVadSharp-MIT-and-WebRTC-BSD-3-Clause.txt",
+            "WebView2-SDK-BSD-3-Clause.txt", "NetCord-MIT.txt", "Concentus-BSD-3-Clause.txt", "libdave-MIT.txt",
+            "OpenSSL-Apache-2.0.txt", "mlspp-BSD-2-Clause.txt", "nlohmann-json-MIT.txt",
+        ];
+        foreach (string name in required)
+        {
+            Assert.IsTrue(files.Contains(name), $"missing third_party/licenses/{name}");
+            Assert.IsTrue(new FileInfo(Path.Combine(licenses, name)).Length > 300, $"{name} looks empty");
+        }
+
+        string notices = File.ReadAllText(Path.Combine(root, "THIRD_PARTY_NOTICES.md"));
+        foreach (string component in new[] { "Velopack", "SQLitePCLRaw", "WebRtcVadSharp", "WebView2", "Microsoft.Data.Sqlite" })
+        {
+            Assert.IsTrue(notices.Contains(component, StringComparison.Ordinal), component);
+        }
+
+        string csproj = File.ReadAllText(Path.Combine(root, "src", "JebaitedPlayer.App", "JebaitedPlayer.App.csproj"));
+        StringAssert.Contains(csproj, @"third_party\licenses\*.txt", "licenses are copied next to the exe");
+    }
+
+    private static string RepoRoot()
+    {
+        var dir = new DirectoryInfo(AppContext.BaseDirectory);
+        while (dir is not null && !File.Exists(Path.Combine(dir.FullName, "THIRD_PARTY_NOTICES.md")))
+        {
+            dir = dir.Parent;
+        }
+
+        Assert.IsNotNull(dir, "repo root");
+        return dir.FullName;
     }
 
     [TestMethod]
@@ -61,9 +117,8 @@ public sealed class AccentColorsTests
                 AccentPalette p = AccentColors.For(hex, dark);
                 Color background = dark ? darkBackground : lightBackground;
                 Assert.IsTrue(AccentColors.Contrast(p.Accent, background) >= 3 - 1e-9, $"{hex} {(dark ? "dark" : "light")}: accent {AccentColors.Contrast(p.Accent, background):F2}");
-                // Zadana zelena u svijetloj temi (#1F8A3B / bijelo, 4,41:1) je boja iz Light.xaml od prije 2.0 i namjerno ostaje ista.
-                bool unchangedDefault = !dark && AccentColors.Normalize(hex).Length == 0;
-                Assert.IsTrue(unchangedDefault || AccentColors.Contrast(p.AccentForeground, p.Accent) >= 4.5 - 1e-9, $"{hex} {(dark ? "dark" : "light")}: text {AccentColors.Contrast(p.AccentForeground, p.Accent):F2}");
+                // 2.1.12: i zadana zelena u svijetloj temi sad ima ≥ 4,5:1 (prije iznimka s 4,41:1).
+                Assert.IsTrue(AccentColors.Contrast(p.AccentForeground, p.Accent) >= 4.5 - 1e-9, $"{hex} {(dark ? "dark" : "light")}: text {AccentColors.Contrast(p.AccentForeground, p.Accent):F2}");
                 Assert.IsTrue(AccentColors.Contrast(p.LcdText, p.LcdBack) >= 4.5 - 1e-9, $"{hex}: LCD {AccentColors.Contrast(p.LcdText, p.LcdBack):F2}");
             }
         }

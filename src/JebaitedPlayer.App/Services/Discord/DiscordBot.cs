@@ -105,6 +105,25 @@ internal sealed class DiscordBot : IDisposable
 
     public int LastPeak => _capture?.LastPeak ?? 0;
 
+    private double _sendGain = 1;
+
+    /// <summary>2.1.12: pojačanje za Discord (<see cref="DiscordVolume.Gain"/>); 1 = Discord čuje točno ono što player svira.</summary>
+    public double SendGain
+    {
+        get => _sendGain;
+        set
+        {
+            _sendGain = value;
+            if (_capture is { } capture)
+            {
+                capture.Gain = value;
+            }
+        }
+    }
+
+    /// <summary>Format hvatanja ("float32" ili "pcm16"); prazno dok se ne šalje.</summary>
+    public string CaptureFormat => _capture?.FormatName ?? string.Empty;
+
     public long PacketsSent { get; private set; }
 
     /// <summary>Poveznica kojom korisnik poziva svog bota na server (samo Connect i Speak).</summary>
@@ -569,7 +588,7 @@ internal sealed class DiscordBot : IDisposable
                 Log.Warn($"Discord: slanje zvuka je prekinuto ({ex.Message}).");
             }
         }, token);
-        _capture = new ProcessAudioCapture(OnSamples);
+        _capture = new ProcessAudioCapture(OnSamples) { Gain = _sendGain };
         _capture.Start();
     }
 

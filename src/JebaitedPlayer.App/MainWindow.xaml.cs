@@ -351,6 +351,10 @@ public partial class MainWindow : Window
         // Datoteke iz naredbenog retka otvaramo tek kad je prozor već prikazan,
         // da korisnik odmah vidi prozor, a mpv se pokreće odmah nakon toga.
         OpenStartupFiles();
+
+        // 2.1.12: čuvar pokretanja – oznaka se briše čim je prozor na zaslonu (ne čeka učitavanje svega ostalog).
+        Dispatcher.BeginInvoke(CompleteStartupGuardIfVisible, System.Windows.Threading.DispatcherPriority.Background);
+        Dispatcher.BeginInvoke(ApplyTestFaultAfterStartup, System.Windows.Threading.DispatcherPriority.Background);
         UpdateOnlineSetupButton();
         OfferOnlineSetupOnFirstRun();
 

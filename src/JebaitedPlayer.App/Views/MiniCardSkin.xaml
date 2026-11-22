@@ -4,7 +4,7 @@
         xmlns:loc="clr-namespace:JebaitedPlayer.Infrastructure"
         xmlns:views="clr-namespace:JebaitedPlayer.Views">
 
-    <!-- Dizajn 2: kartica s omotom (omot je NLO). Izgled mijenja samo raspored; funkcije su iste kao u ostalim izgledima. -->
+    <!-- Dizajn 2: kartica s omotom (bez omota NLO). Izgled mijenja samo raspored; funkcije su iste kao u ostalim izgledima. -->
     <StackPanel Width="380">
         <DockPanel Height="24" Margin="8,3,3,0">
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
@@ -22,8 +22,9 @@
                 <ColumnDefinition Width="96" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <Border Style="{DynamicResource Lcd}" Width="96" Height="96" VerticalAlignment="Top">
-                <Image Source="/Assets/logo-ufo.png" Margin="12" RenderOptions.BitmapScalingMode="HighQuality" />
+            <Border Style="{DynamicResource Lcd}" Width="96" Height="96" VerticalAlignment="Top" ClipToBounds="True">
+                <!-- 2.1.12: omot pjesme (iz oznaka ili mape); bez omota NLO logo. -->
+                <Image x:Name="Cover" Source="/Assets/logo-ufo.png" Margin="12" RenderOptions.BitmapScalingMode="HighQuality" />
             </Border>
             <StackPanel Grid.Column="1" Margin="12,0,0,0">
                 <views:MarqueeView x:Name="Title" Height="24" TextElement.FontSize="15" TextElement.FontWeight="SemiBold"

@@ -121,12 +121,12 @@ In the same tab you set the automatic search, the encoding of old subtitles and 
 - Music opens the mini player, a film or series the full player (Settings → Appearance can turn this off). The mini player always opens where you left it.
 - Right-click the mini player (or Settings → Appearance) for six display fonts and four VU meter styles (bars, LED segments, thin lines with peak, off).
 - Films and series have their own equalizer, music and radio their own (Settings → Audio: choose which one to edit).
-- **Five looks** (right-click → **Look**): classic Winamp, card, narrow strip, side panel and UFO screen. All of them have the same buttons and functions, and your choice is remembered.
+- **Five looks** (right-click → **Look**): classic Winamp, card, narrow strip, side panel and UFO screen. All of them have the same buttons and functions, and your choice is remembered. The card and side-panel looks (and the home screen) show the **album cover** of the song (embedded in the file, or a cover/folder image next to it); without a cover they show the UFO logo.
 - The **mouse wheel over the volume bar** changes the volume by 2 % (in the mini player and in the full player). The wheel anywhere else never changes the volume.
 - The title scrolls in an endless loop and by default shows only **artist and song**. Right-click the title to add album, year, genre, sound quality or the file name.
 - A red, gently pulsing **LIVE** badge shows while a radio station plays (all looks, full player and home screen).
 - **Minimize** (button, or right-click → Minimize to taskbar) puts the player on the taskbar while the music keeps playing; it is different from **Mini player** and from closing. The mini player and every other window (Equalizer, Radio, Discord …) always stay fully inside the visible screen, above the taskbar, also with several monitors.
-- At start only one window opens: the mini player if it was your last view (or when you open a music file), otherwise the full player.
+- At start only one window opens: the mini player if it was your last view (or when you open a music file), otherwise the full player. If a start ever ends without a visible window, the player brings the main window back by itself, and the next start opens it normally in the middle of the screen.
 
 ### Radio
 
@@ -153,7 +153,7 @@ In the same tab you set the automatic search, the encoding of old subtitles and 
 - **Ctrl+Shift+D**, right-click → **Discord bot…** or the headset button in the mini player. Your own bot joins a voice channel on your Discord server and plays what the player plays: **only local music and radio**. Movies, YouTube Music and Spotify are never sent (while a movie plays or YouTube is open, the bot sends silence).
 - You create the bot once, for free; the window shows the steps: Discord Developer Portal → new application → Install Link set to None and Public Bot turned off → URL Generator with the permissions View Channels, Connect and Speak → invite the bot to your server → Reset Token. Paste the token into the window; it is stored encrypted on your computer only.
 - **Join my channel** takes the bot to the channel you are in, or pick any channel from the list. The headset button in the mini player is green while the bot sends music. If the bot is missing a permission in a channel, the window says which one and where to allow it.
-- Discord hears exactly what the player plays: the player volume also applies to Discord, and a muted player sends silence. The sound is end-to-end encrypted (Discord DAVE). The bot works only on servers you invite it to, not in private calls. Needs Windows 11 or Windows 10 build 20348 or newer.
+- Discord hears what the player plays. By default the player volume also applies to Discord; in the Discord window you can give Discord a **volume of its own**, so turning the player down for yourself does not make it quieter in the channel. A muted player (or volume 0) always sends silence. The sound is end-to-end encrypted (Discord DAVE). The bot works only on servers you invite it to, not in private calls. Needs Windows 11 or Windows 10 build 20348 or newer.
 
 ### Backup and transfer
 

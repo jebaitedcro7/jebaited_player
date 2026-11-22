@@ -19,4 +19,6 @@ public partial class MiniSideSkin : MiniSkinBase
     internal override Button DiscordButton => Discord;
     internal override ToggleButton EqButton => Eq;
     internal override ToggleButton PlaylistButton => Playlist;
+    internal override Image? CoverImage => Cover;
+    internal override System.Windows.Media.Stretch CoverStretch => System.Windows.Media.Stretch.Uniform;
 }

@@ -56,6 +56,16 @@ public partial class MainWindow
         if (_discord is not null)
         {
             _discord.Inputs = CurrentDiscordInputs();
+            UpdateDiscordGain();
+        }
+    }
+
+    /// <summary>2.1.12: pojačanje za Discord prema glasnoći playera i postavci „prati player”.</summary>
+    internal void UpdateDiscordGain()
+    {
+        if (_discord is not null)
+        {
+            _discord.SendGain = DiscordVolume.Gain(_settings.DiscordFollowPlayerVolume, _vm.Volume, _vm.IsMuted, _settings.DiscordVolume);
         }
     }
 
@@ -64,6 +74,10 @@ public partial class MainWindow
         if (e.PropertyName is nameof(PlayerViewModel.HasMedia) or nameof(PlayerViewModel.IsPaused) or nameof(PlayerViewModel.IsAudioOnly))
         {
             UpdateDiscordInputs();
+        }
+        else if (e.PropertyName is nameof(PlayerViewModel.Volume) or nameof(PlayerViewModel.IsMuted))
+        {
+            UpdateDiscordGain();
         }
     }
 
@@ -75,7 +89,7 @@ public partial class MainWindow
             return;
         }
 
-        _discordWindow = new DiscordWindow(Discord) { Owner = owner ?? (IsMiniPlayerActive ? _mini : this) };
+        _discordWindow = new DiscordWindow(Discord, _settings, UpdateDiscordGain) { Owner = owner ?? (IsMiniPlayerActive ? _mini : this) };
         _discordWindow.Closed += (_, _) => _discordWindow = null;
         _discordWindow.Show();
     }

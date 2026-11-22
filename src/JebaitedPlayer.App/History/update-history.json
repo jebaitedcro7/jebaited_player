@@ -40,6 +40,72 @@
   },
   "versions": [
     {
+      "version": "2.1.13",
+      "date": "2026-11-22",
+      "notes": {
+        "en": {
+          "summary": "Album covers in the mini player and on the home screen, a volume of its own for Discord, and a player that always shows a window.",
+          "features": [
+            "Album covers: the card and side-panel designs of the mini player and the home screen show the cover of the song (embedded in MP3, FLAC, M4A or Ogg/Opus files, or a cover/folder image next to the song). Songs without a cover, radio, Spotify and YouTube keep the UFO logo.",
+            "Discord bot: the volume on Discord can follow the player (as before) or have a level of its own, so turning the player down for yourself no longer makes it quieter for everyone in the channel (Discord window).",
+            "Startup guard: if the player ever starts without a visible window, the main window is brought back automatically, and the next start opens it normally in the middle of the screen (with a short message)."
+          ],
+          "improvements": [
+            "Starting the player again while the mini player is open brings the mini player to the front."
+          ],
+          "fixes": [
+            "Songs with an embedded cover (or a cover.jpg next to them) were treated like a video: the home screen closed them, the Discord bot sent silence and subtitle search could start for them. A cover is now just a cover, and such songs behave like all other music.",
+            "Starting the player again while the running player was not responding did nothing; the new start now opens as a player of its own.",
+            "The full license texts of .NET and WPF, Velopack, Microsoft.Data.Sqlite, SQLitePCLRaw, SQLite, WebRtcVadSharp/WebRTC and the WebView2 SDK are now included with the program (folder licenses), not only linked.",
+            "Light theme: the green accent is slightly darker, so white text on it is easier to read (contrast 4.6:1, was 4.4:1)."
+          ],
+          "known": [
+            "A muted player (or volume 0) still sends silence to Discord, also with a Discord volume of its own: the bot can only send what the player plays."
+          ]
+        },
+        "de": {
+          "summary": "Albumcover im Mini-Player und auf dem Startbildschirm, eine eigene Lautstärke für Discord und ein Player, der immer ein Fenster zeigt.",
+          "features": [
+            "Albumcover: Die Designs „Karte“ und „Seitenleiste“ des Mini-Players und der Startbildschirm zeigen das Cover des Titels (eingebettet in MP3-, FLAC-, M4A- oder Ogg/Opus-Dateien oder ein cover/folder-Bild neben dem Titel). Titel ohne Cover, Radio, Spotify und YouTube behalten das UFO-Logo.",
+            "Discord-Bot: Die Lautstärke auf Discord kann dem Player folgen (wie bisher) oder einen eigenen Wert haben. Wenn du den Player für dich leiser stellst, wird es im Kanal nicht mehr für alle leiser (Discord-Fenster).",
+            "Startschutz: Startet der Player einmal ohne sichtbares Fenster, wird das Hauptfenster automatisch zurückgeholt, und der nächste Start öffnet es normal in der Bildschirmmitte (mit einem kurzen Hinweis)."
+          ],
+          "improvements": [
+            "Wird der Player erneut gestartet, während der Mini-Player offen ist, kommt der Mini-Player in den Vordergrund."
+          ],
+          "fixes": [
+            "Titel mit eingebettetem Cover (oder einer cover.jpg daneben) wurden wie ein Video behandelt: Der Startbildschirm schloss sie, der Discord-Bot sendete Stille und die Untertitelsuche konnte für sie starten. Ein Cover ist jetzt nur ein Cover, solche Titel verhalten sich wie jede andere Musik.",
+            "Ein erneuter Start, während der laufende Player nicht reagierte, bewirkte nichts; der neue Start öffnet jetzt einen eigenen Player.",
+            "Die vollständigen Lizenztexte von .NET und WPF, Velopack, Microsoft.Data.Sqlite, SQLitePCLRaw, SQLite, WebRtcVadSharp/WebRTC und dem WebView2 SDK liegen jetzt dem Programm bei (Ordner licenses), nicht nur als Link.",
+            "Helles Design: Das grüne Akzentgrün ist etwas dunkler, weißer Text darauf ist besser lesbar (Kontrast 4,6:1, vorher 4,4:1)."
+          ],
+          "known": [
+            "Ein stummgeschalteter Player (oder Lautstärke 0) sendet auch mit eigener Discord-Lautstärke Stille: Der Bot kann nur senden, was der Player abspielt."
+          ]
+        },
+        "hr": {
+          "summary": "Omot albuma u mini playeru i na početnom ekranu, vlastita glasnoća za Discord i player koji uvijek pokaže prozor.",
+          "features": [
+            "Omot albuma: izgledi „kartica” i „bočna ploča” mini playera i početni ekran prikazuju omot pjesme (ugrađen u MP3, FLAC, M4A ili Ogg/Opus, ili slika cover/folder uz pjesmu). Pjesme bez omota, radio, Spotify i YouTube zadržavaju NLO logo.",
+            "Bot za Discord: glasnoća na Discordu može pratiti player (kao do sada) ili imati vlastitu razinu, pa kad sebi utišaš player, u kanalu više nije tiše svima (prozor Discord).",
+            "Čuvar pokretanja: ako se player ikad pokrene bez vidljivog prozora, glavni prozor se sam vraća, a sljedeće pokretanje ga otvara normalno, na sredini zaslona (uz kratku poruku)."
+          ],
+          "improvements": [
+            "Ponovno pokretanje playera dok je otvoren mini player dovodi mini player u prvi plan."
+          ],
+          "fixes": [
+            "Pjesme s ugrađenim omotom (ili s cover.jpg uz njih) tretirale su se kao video: početni ekran ih je zatvarao, bot za Discord slao je tišinu, a za njih se mogla pokrenuti i pretraga titlova. Omot je sada samo omot, a takve pjesme se ponašaju kao sva ostala glazba.",
+            "Ponovno pokretanje dok otvoreni player nije odgovarao nije radilo ništa; novo pokretanje se sada otvara kao zaseban player.",
+            "Puni tekstovi licenci za .NET i WPF, Velopack, Microsoft.Data.Sqlite, SQLitePCLRaw, SQLite, WebRtcVadSharp/WebRTC i WebView2 SDK sada su uz program (mapa licenses), ne samo poveznica.",
+            "Svijetla tema: zelena boja isticanja je malo tamnija, pa je bijeli tekst na njoj čitljiviji (kontrast 4,6:1, prije 4,4:1)."
+          ],
+          "known": [
+            "Utišan player (ili glasnoća 0) i uz vlastitu glasnoću za Discord šalje tišinu: bot može slati samo ono što player svira."
+          ]
+        }
+      }
+    },
+    {
       "version": "2.1.9",
       "date": "2026-11-22",
       "notes": {

@@ -61,6 +61,17 @@ public partial class App : Application
         StartupOptions options = _options;
         AppSettings settings = AppSettings.Load();
 
+        // 2.1.12: čuvar pokretanja (samo pravo pokretanje; dijagnostika ima vlastite privremene mape). Ako prošlo
+        // pokretanje nije došlo do prozora, sada se pokreće sigurno: normalan glavni prozor, mini se ne otvara sam.
+        bool guard = !options.IsDiagnostics;
+        bool safeStart = guard && StartupGuard.Begin(AppPaths.DataDir, AppPaths.Version, DateTime.UtcNow);
+        if (safeStart)
+        {
+            DiagLog.Warn(LogCat.Stability, "boot.safe_start", "App", "The previous start did not reach a window; starting with a normal main window",
+                ("wasMaximized", settings.WindowMaximized), ("miniWasOpen", settings.MiniPlayer.WasOpen));
+            StartupGuard.ApplySafeStart(settings);
+        }
+
         // Sučelje (prozori, izbornici) iscrtava se bez GPU-a: na nekim upravljačkim programima WPF-ovo GPU iscrtavanje
         // ostavlja bijele prozore, a za ovako jednostavno sučelje razlika u potrošnji je zanemariva (mjereno u M5).
         // Video uvijek ide preko GPU-a (mpv). --gpu-ui ili postavka UiGpuRendering vraćaju GPU iscrtavanje sučelja.
@@ -108,7 +119,31 @@ public partial class App : Application
         }
 
         window.PrepareStartup();
-        window.Show();
+        if (JebaitedPlayer.MainWindow.TestFault == "show-fails")
+        {
+            // Test (samo uz JEBAITED_DATA_DIR): isto stanje koje je u 2.1.7 rušilo Show().
+            window.WindowState = WindowState.Maximized;
+            window.ShowActivated = false;
+        }
+
+        try
+        {
+            window.Show();
+        }
+        catch (InvalidOperationException ex)
+        {
+            // 2.1.12: prozor se nikad ne smije izgubiti zbog stanja prozora; drugi pokušaj u sigurnom stanju.
+            DiagLog.Error(LogCat.Stability, "boot.show_failed", "App", "Showing the main window failed; retrying in a safe state", ex);
+            window.RestoreMainWindow();
+        }
+
+        window.StartStartupWatch(guard);
+        if (safeStart)
+        {
+            window.Dispatcher.BeginInvoke(() => MessageBox.Show(window, Loc.T("startup.safeStart"), Loc.T("startup.safeStartTitle"),
+                MessageBoxButton.OK, MessageBoxImage.Information), DispatcherPriority.ApplicationIdle);
+        }
+
         if (settings.LoadReport is { } report && !options.IsDiagnostics)
         {
             // M3a: oštećene postavke su popravljene (ili ostavljene netaknute); korisnik to mora znati.

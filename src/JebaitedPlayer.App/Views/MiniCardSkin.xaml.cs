@@ -19,4 +19,5 @@ public partial class MiniCardSkin : MiniSkinBase
     internal override Button DiscordButton => Discord;
     internal override ToggleButton EqButton => Eq;
     internal override ToggleButton PlaylistButton => Playlist;
+    internal override Image? CoverImage => Cover;
 }

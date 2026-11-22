@@ -21,11 +21,18 @@ public partial class DiscordWindow : Window
     private string _channelsKey = string.Empty;
     private DateTime? _onlineSince;
 
-    internal DiscordWindow(DiscordBot bot)
+    private readonly AppSettings _settings;
+    private readonly Action _volumeChanged;
+    private bool _loadingVolume;
+
+    internal DiscordWindow(DiscordBot bot, AppSettings settings, Action volumeChanged)
     {
         _bot = bot;
+        _settings = settings;
+        _volumeChanged = volumeChanged;
         InitializeComponent();
         WindowTheme.UseDarkTitleBar(this);
+        LoadVolume();
 
         // 4× u sekundi, samo dok je bot u kanalu (razina i odluka) ili dok popis servera još nije stigao
         // (Discord ga šalje tek nakon prijave, pa bi inače ostala poruka „bot ne vidi nijedan kanal”).
@@ -51,6 +58,53 @@ public partial class DiscordWindow : Window
     }
 
     private void OnBotChanged(object? sender, EventArgs e) => Dispatcher.BeginInvoke(Render);
+
+    // --- 2.1.12: glasnoća na Discordu --------------------------------------------------------------------------------
+
+    private void LoadVolume()
+    {
+        _loadingVolume = true;
+        FollowVolumeBox.IsChecked = _settings.DiscordFollowPlayerVolume;
+        VolumeSlider.Value = Math.Clamp(double.IsFinite(_settings.DiscordVolume) ? _settings.DiscordVolume : DiscordVolume.DefaultVolume, 0, 100);
+        _loadingVolume = false;
+        RenderVolume();
+    }
+
+    private void RenderVolume()
+    {
+        bool follow = FollowVolumeBox.IsChecked == true;
+        VolumeSlider.IsEnabled = !follow;
+        VolumeValue.Text = follow ? string.Empty : $"{VolumeSlider.Value:0} %";
+    }
+
+    /// <summary>Kvačica „prati player” (i za provjeru).</summary>
+    internal void SetFollowPlayerVolume(bool follow)
+    {
+        FollowVolumeBox.IsChecked = follow;
+        OnVolumeMode(FollowVolumeBox, new RoutedEventArgs());
+    }
+
+    internal void SetDiscordVolume(double volume) => VolumeSlider.Value = volume;
+
+    private void OnVolumeMode(object sender, RoutedEventArgs e)
+    {
+        _settings.DiscordFollowPlayerVolume = FollowVolumeBox.IsChecked == true;
+        Log.Info($"Discord: glasnoća {(_settings.DiscordFollowPlayerVolume ? "prati player" : $"vlastita ({_settings.DiscordVolume:0} %)")}.");
+        RenderVolume();
+        _volumeChanged();
+    }
+
+    private void OnDiscordVolume(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        if (_loadingVolume || !IsInitialized)
+        {
+            return;
+        }
+
+        _settings.DiscordVolume = Math.Round(e.NewValue);
+        RenderVolume();
+        _volumeChanged();
+    }
 
     /// <summary>Poruka greške bota za korisnika (dijagnostika je koristi za provjeru svih vrijednosti).</summary>
     internal static string? ErrorText(DiscordBotError error, string? detail) => error switch

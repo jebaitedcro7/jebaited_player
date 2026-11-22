@@ -51,6 +51,9 @@ internal interface IMiniPlayerHost
 
     /// <summary>V4-B: bot ako je već stvoren (null dok ga korisnik ne otvori), za oznaku stanja u mini playeru.</summary>
     JebaitedPlayer.Services.Discord.DiscordBot? DiscordBot { get; }
+
+    /// <summary>2.1.12: omot trenutne pjesme (zajednički za mini player i Home ekran).</summary>
+    JebaitedPlayer.Services.CoverArtLoader Cover { get; }
 }
 
 /// <summary>
@@ -287,7 +290,8 @@ public partial class MiniPlayerWindow : Window
             Live: _isLive,
             Volume: _vm.Volume,
             EqOn: m.ShowEqualizer,
-            PlaylistOn: m.ShowPlaylist);
+            PlaylistOn: m.ShowPlaylist,
+            Cover: spotify || youtube ? null : _host.Cover.Current);
         _lastSkinState = state;
         skin.Apply(state);
     }
@@ -758,6 +762,9 @@ public partial class MiniPlayerWindow : Window
                 _host.Spotify.RemoveConsumer();
             }
         }
+
+        // 2.1.12: omot samo za lokalnu glazbu (Spotify, YouTube i radio imaju NLO logo).
+        _host.Cover.Request(spotify || YouTubeMode ? null : _vm.CurrentPath);
 
         if (YouTubeMode)
         {

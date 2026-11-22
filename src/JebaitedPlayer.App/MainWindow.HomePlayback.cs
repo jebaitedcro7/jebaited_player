@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using JebaitedPlayer.Infrastructure;
 using JebaitedPlayer.Services;
 using JebaitedPlayer.Services.Discord;
@@ -78,6 +79,13 @@ public partial class MainWindow
         RestoreKeyboardFocus();
     }
 
+    private CoverArtLoader? _cover;
+
+    /// <summary>2.1.12: omot trenutne pjesme (jedan za mini player i Home ekran).</summary>
+    internal CoverArtLoader Cover => _cover ??= new CoverArtLoader(Dispatcher);
+
+    CoverArtLoader JebaitedPlayer.Views.IMiniPlayerHost.Cover => Cover;
+
     private bool SpotifyIsSource => _spotify?.IsActiveSource == true;
 
     private bool YouTubeIsSource => _youTube?.IsActiveSource == true;
@@ -142,6 +150,15 @@ public partial class MainWindow
             }
         }
 
+        // 2.1.12: omot lokalne pjesme (radio, Spotify i YouTube ga nemaju).
+        Cover.Request(spotify || youtube || stream ? null : _vm.CurrentPath);
+        ImageSource? cover = spotify || youtube || stream ? null : Cover.Current;
+        if (!ReferenceEquals(HomeCoverImage.Source, cover))
+        {
+            HomeCoverImage.Source = cover;
+        }
+
+        HomeCoverBox.Visibility = cover is null ? Visibility.Collapsed : Visibility.Visible;
         HomeTrackText.Text = _homeTrack;
         HomeTimeInfo.Text = time;
         HomePlayPauseButton.Content = playing ? "" : "";

@@ -4,6 +4,26 @@ Alle wichtigen Änderungen an jebaited_player. Format: [Keep a Changelog](https:
 
 Andere Sprachen: [English](CHANGELOG.md) · [Hrvatski](CHANGELOG_HR.md). Derselbe Verlauf ist im Player enthalten (Klick auf die Versionsnummer auf dem Startbildschirm). Diese Datei wird aus `src/JebaitedPlayer.App/History/update-history.json` erzeugt.
 
+## [2.3.15] - 2026-11-22
+
+Benachrichtigungen auf dem Startbildschirm, Auswahl des Mini-Player-Aussehens in den Einstellungen und Korrekturen.
+
+### Neu
+
+- Benachrichtigungen: Eine kleine Karte auf dem Startbildschirm zeigt Neuigkeiten, Tipps und neue Versionen. Sie sitzt über der Wiedergabeleiste, wenn etwas läuft, und tief, direkt über der Versionsnummer, wenn nichts läuft; ein dünner Pfeil zeigt auf die Versionsnummer, und die Karte bewegt sich sanft, wenn die Wiedergabeleiste erscheint oder verschwindet. Die neue Taste Benachrichtigungen (unten links, mit der Zahl der ungelesenen) und Einstellungen → Benachrichtigungen listen alles auf, auch gelesene und verworfene. Eine Karte wird höchstens dreimal angezeigt; der Status bleibt auf deinem Computer, und es wird nichts Neues ins Internet gesendet.
+- Einstellungen → Aussehen → Mini-Player: alle fünf Looks (klassisch, Karte, schmale Leiste, Seitenleiste, UFO-Display) mit Vorschau. Die Änderung gilt sofort und wird gespeichert.
+
+### Verbessert
+
+- Die Wiedergabezeit ist kleiner und zentriert, mit stabiler Breite, im vollen Player und in jedem Mini-Player-Look.
+- Mini-Player: Die Lautstärkeleiste folgt dem Mausrad sofort (sie hinkte dem Ton kurz hinterher).
+
+### Behoben
+
+- Text, der in Eingabefeldern getippt wurde (zum Beispiel in der Radiosuche), war unten abgeschnitten.
+
+Release: [v2.3.15](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v2.3.15) · Änderungen seit [v2.2.14...v2.3.15](https://github.com/jebaitedcro7/jebaited_player/compare/v2.2.14...v2.3.15)
+
 ## [2.2.14] - 2026-11-22
 
 Torlink: online suchen und herunterladen direkt im Player (GitHub-Version, optional, standardmäßig aus).

@@ -157,5 +157,9 @@
   "torlink.tab.queued": "Čakalna vrsta",
   "torlink.torrentFilter": "Datoteke torrent",
   "torlink.unhealthy": "Ta vir ne sporoča števila seederjev.",
-  "torlink.waiting": "Čaka na prosto mesto za prenos"
+  "torlink.waiting": "Čaka na prosto mesto za prenos",
+  "torlink.news.title": "Spletno iskanje s Torlinkom",
+  "torlink.news.body": "Neobvezen dodatek v izdaji GitHub za spletno iskanje in upravljanje prenosov.",
+  "torlink.news.detail": "Torlink je neobvezen modul, na voljo samo v izdaji predvajalnika na GitHubu. Doda stran za spletno iskanje in upravitelja prenosov, zažene se samo z vašim soglasjem in ga lahko izklopite v Nastavitve → Torlink. Ni del izdaje za Microsoft Store.",
+  "torlink.news.action": "Odpri nastavitve Torlinka"
 }

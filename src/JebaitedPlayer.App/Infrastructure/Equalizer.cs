@@ -78,6 +78,33 @@ public sealed class MiniPlayerSettings
     [System.Text.Json.Serialization.JsonIgnore]
     public string ActiveDesign => Compact ? "strip" : Design;
 
+    /// <summary>
+    /// Odabir izgleda (isto iz desnog klika i iz Postavki): uska traka (3) je <see cref="Compact"/>, ostali su <see cref="Design"/>.
+    /// Vraća false za nepoznat izgled.
+    /// </summary>
+    public bool SelectDesign(string design)
+    {
+        if (!Designs.Contains(design))
+        {
+            return false;
+        }
+
+        if (design == "strip")
+        {
+            Compact = true;
+            return true;
+        }
+
+        Compact = false;
+        Design = design;
+        if (design == "side")
+        {
+            ShowPlaylist = true; // bočna ploča pokazuje popis odmah (dizajn 4)
+        }
+
+        return true;
+    }
+
     public bool ShowEqualizer { get; set; }
 
     public bool ShowPlaylist { get; set; }

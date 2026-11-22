@@ -121,8 +121,8 @@ In the same tab you set the automatic search, the encoding of old subtitles and 
 - Music opens the mini player, a film or series the full player (Settings → Appearance can turn this off). The mini player always opens where you left it.
 - Right-click the mini player (or Settings → Appearance) for six display fonts and four VU meter styles (bars, LED segments, thin lines with peak, off).
 - Films and series have their own equalizer, music and radio their own (Settings → Audio: choose which one to edit).
-- **Five looks** (right-click → **Look**): classic Winamp, card, narrow strip, side panel and UFO screen. All of them have the same buttons and functions, and your choice is remembered. The card and side-panel looks (and the home screen) show the **album cover** of the song (embedded in the file, or a cover/folder image next to it); without a cover they show the UFO logo.
-- The **mouse wheel over the volume bar** changes the volume by 2 % (in the mini player and in the full player). The wheel anywhere else never changes the volume.
+- **Five looks** (right-click → **Look**, or **Settings → Appearance → Mini player**, where each look has a preview and the change applies at once): classic Winamp, card, narrow strip, side panel and UFO screen. All of them have the same buttons and functions, and your choice is remembered. The card and side-panel looks (and the home screen) show the **album cover** of the song (embedded in the file, or a cover/folder image next to it); without a cover they show the UFO logo.
+- The **mouse wheel** changes the volume by 5 % per notch anywhere on the player (video, controls, home screen and the whole mini player), between 0 and 100 %. Lists that can scroll (playlist, radio stations …) still scroll, and **Ctrl + wheel** resizes the mini player.
 - The title scrolls in an endless loop and by default shows only **artist and song**. Right-click the title to add album, year, genre, sound quality or the file name.
 - A red, gently pulsing **LIVE** badge shows while a radio station plays (all looks, full player and home screen).
 - **Minimize** (button, or right-click → Minimize to taskbar) puts the player on the taskbar while the music keeps playing; it is different from **Mini player** and from closing. The mini player and every other window (Equalizer, Radio, Discord …) always stay fully inside the visible screen, above the taskbar, also with several monitors.
@@ -204,8 +204,16 @@ Settings are split into tabs. Every change applies right away (also to the video
 | Video | Picture quality, hardware decoding, default aspect ratio, HDR |
 | Appearance | Dark / light theme, accent color, home screen background (default or your own picture: Fill, Fit, Center), how long the controls stay visible, rendering the interface on the GPU, time, date and weather on the home screen (a city you choose, from Open-Meteo; font, size and position of each element, a preview, and weather details such as feels-like, min/max, rain, wind, humidity, UV, sunrise and sunset, the next hours and days) |
 | Shortcuts | Keys for every action, up to two per action (see [Keyboard shortcuts](#keyboard-shortcuts)) |
+| Notifications | News, tips and new versions, with read / unread / dismissed state (see [Notifications](#notifications)) |
 | Updates | Version, check now, automatic download, what is new, update history |
 | About | Version, license, technologies used, manual, privacy, code signing policy, error reports (saved on your computer without personal data; you send them yourself via GitHub) |
+
+### Notifications
+
+- On the home screen a small card shows news about the player, a useful tip or a new version. It sits above the playback bar when something is playing (so it never covers it) and low, just above the version number, when nothing is; a thin arrow points to the version number. When the playback bar appears or disappears, the card moves smoothly.
+- **Read more** (or a click on the card) opens the details; **✕** dismisses the card. A card is shown at most three times, and after you react only important items and new versions are shown again in the same session.
+- The **Notifications** button at the bottom left of the home screen (with the number of unread ones) and **Settings → Notifications** list everything, read and dismissed ones as well. **Mark all as read** clears the unread state.
+- News and tips are part of the player itself (in all six languages); the only other source is the update check on GitHub that the player already does. Nothing new is sent to the internet, and the state is kept in `notifications.json` next to your settings.
 
 ### Update history
 
@@ -337,6 +345,7 @@ The Microsoft Store version keeps its data in `%LOCALAPPDATA%\Packages\jebaitedp
 
 - Only these go to the internet: subtitle searches (title, year, season/episode, file fingerprint) to the sources you set up, signing in to those sources with your account, and the update check on GitHub.
 - Passwords and keys are encrypted (Windows DPAPI, tied to your Windows account) and never written to the log.
+- Notifications (news, tips, new versions) are part of the player; they need no extra internet connection.
 - No statistics, no tracking. Full details: [PRIVACY.md](PRIVACY.md).
 
 ### Translations
@@ -351,6 +360,15 @@ The interface is available in English, Deutsch, Hrvatski, Bosanski, Srpski (lati
 dotnet build jebaited_player.slnx -c Release
 dotnet test jebaited_player.slnx -c Release
 ```
+
+**Two separate release builds (permanent rule):**
+
+| Build | Command | Torlink |
+|---|---|---|
+| GitHub release | `dotnet build src/JebaitedPlayer.App -c Release` (installer and portable ZIP via `release.ps1`) | included (optional, off by default) |
+| Microsoft Store | `.\tools\make-msix.ps1` (builds with `-p:TorlinkEnabled=false`) | **never included** |
+
+The Store package is built separately and without the Torlink module: no project reference, no `TORLINK` symbol, no Torlink code, files, texts or licence entries. Hiding a button is not enough. `make-msix.ps1` checks the finished package (file names and contents) and stops if anything of Torlink is found; before every Store release this check and the package contents are also reviewed by hand and recorded in the release checklist.
 
 ### License
 

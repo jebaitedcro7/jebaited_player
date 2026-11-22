@@ -35,11 +35,11 @@
             <!-- Vremenska traka. -->
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" MinWidth="52" />
+                    <ColumnDefinition Width="Auto" MinWidth="58" />
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" MinWidth="52" />
+                    <ColumnDefinition Width="Auto" MinWidth="58" />
                 </Grid.ColumnDefinitions>
-                <TextBlock Text="{Binding PositionText}" Style="{StaticResource TimeText}" HorizontalAlignment="Left" />
+                <TextBlock Text="{Binding PositionText}" Style="{StaticResource TimeText}" FontSize="12" HorizontalAlignment="Center" TextAlignment="Center" />
                 <Slider x:Name="Timeline" Grid.Column="1" Style="{StaticResource TimelineSlider}" Margin="12,0"
                         Minimum="0" Maximum="{Binding TimelineMaximum}" Value="{Binding Position, Mode=OneWay}"
                         AutomationProperties.Name="{loc:T controls.timeline}" />
@@ -54,7 +54,7 @@
                     </Border>
                 </Canvas>
 
-                <TextBlock Grid.Column="2" Text="{Binding DurationText}" Style="{StaticResource TimeText}" HorizontalAlignment="Right" />
+                <TextBlock Grid.Column="2" Text="{Binding DurationText}" Style="{StaticResource TimeText}" FontSize="12" HorizontalAlignment="Center" TextAlignment="Center" />
             </Grid>
 
             <!-- Gumbi. -->

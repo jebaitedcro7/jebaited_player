@@ -49,6 +49,7 @@ $db = Join-Path $script:DiagDir "ciklus3-radio.db"
 Remove-Item "$db*" -ErrorAction SilentlyContinue
 $null = Invoke-Diag -Name "ciklus3_radio" -File $clip -Seconds 1 -ExtraArgs "--diag-ui-test radio --diag-db `"$db`"" -TimeoutSeconds 240
 $r = Read-Ui "ciklus3_radio"
+Check "2.3: upisani tekst u polju pretrage radija je cijeli vidljiv" ([double]$r.typed.viewportHeight -ge [double]$r.typed.extentHeight -and [double]$r.typed.hOffset -eq 0) "visina vidljivog dijela $($r.typed.viewportHeight) px, tekst $($r.typed.extentHeight) px, snimka $($r.typed.screenshot)"
 Check "V3: pretraga Radio Browsera (jazz)" ([int]$r.search.count -gt 5) "$($r.search.count) postaja: $($r.search.first -join ' / ')"
 $st = $r.stream
 Check "V3: stvarni stream svira" ($st.station -and [double]$st.position -gt 2 -and -not $st.paused) "'$($st.station)', $($st.position) s"

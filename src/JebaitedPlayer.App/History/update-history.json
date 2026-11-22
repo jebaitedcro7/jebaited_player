@@ -40,8 +40,60 @@
   },
   "versions": [
     {
+      "version": "2.3.15",
+      "date": "2026-11-22",
+      "notes": {
+        "en": {
+          "summary": "Notifications on the home screen, a choice of the mini player look in Settings, and fixes.",
+          "features": [
+            "Notifications: a small card on the home screen shows news, tips and new versions. It sits above the playback bar when something is playing and low, just above the version number, when nothing is; a thin arrow points to the version number, and the card moves smoothly when the playback bar appears or disappears. The new Notifications button (bottom left, with the number of unread ones) and Settings → Notifications list everything, also read and dismissed ones. A card is shown at most three times; the state is kept on your computer and nothing new is sent to the internet.",
+            "Settings → Appearance → Mini player: all five looks (classic, card, narrow strip, side panel, UFO screen) with a preview. The change applies at once and is remembered."
+          ],
+          "improvements": [
+            "The playback time is smaller and centered, with a stable width, in the full player and in every mini player look.",
+            "Mini player: the volume bar follows the mouse wheel at once (it used to lag behind the sound by a moment)."
+          ],
+          "fixes": [
+            "Text typed into input fields (for example the radio search) was cut off at the bottom."
+          ],
+          "known": []
+        },
+        "de": {
+          "summary": "Benachrichtigungen auf dem Startbildschirm, Auswahl des Mini-Player-Aussehens in den Einstellungen und Korrekturen.",
+          "features": [
+            "Benachrichtigungen: Eine kleine Karte auf dem Startbildschirm zeigt Neuigkeiten, Tipps und neue Versionen. Sie sitzt über der Wiedergabeleiste, wenn etwas läuft, und tief, direkt über der Versionsnummer, wenn nichts läuft; ein dünner Pfeil zeigt auf die Versionsnummer, und die Karte bewegt sich sanft, wenn die Wiedergabeleiste erscheint oder verschwindet. Die neue Taste Benachrichtigungen (unten links, mit der Zahl der ungelesenen) und Einstellungen → Benachrichtigungen listen alles auf, auch gelesene und verworfene. Eine Karte wird höchstens dreimal angezeigt; der Status bleibt auf deinem Computer, und es wird nichts Neues ins Internet gesendet.",
+            "Einstellungen → Aussehen → Mini-Player: alle fünf Looks (klassisch, Karte, schmale Leiste, Seitenleiste, UFO-Display) mit Vorschau. Die Änderung gilt sofort und wird gespeichert."
+          ],
+          "improvements": [
+            "Die Wiedergabezeit ist kleiner und zentriert, mit stabiler Breite, im vollen Player und in jedem Mini-Player-Look.",
+            "Mini-Player: Die Lautstärkeleiste folgt dem Mausrad sofort (sie hinkte dem Ton kurz hinterher)."
+          ],
+          "fixes": [
+            "Text, der in Eingabefeldern getippt wurde (zum Beispiel in der Radiosuche), war unten abgeschnitten."
+          ],
+          "known": []
+        },
+        "hr": {
+          "summary": "Obavijesti na početnom ekranu, odabir izgleda mini playera u Postavkama i ispravci.",
+          "features": [
+            "Obavijesti: mala kartica na početnom ekranu prikazuje novosti, savjete i nove verzije. Kad nešto svira, nalazi se iznad trake reprodukcije, a kad ništa ne svira, nisko, tik iznad broja verzije; tanka strelica pokazuje na broj verzije, a kartica se glatko pomiče kad se traka reprodukcije pojavi ili nestane. Nova tipka Obavijesti (dolje lijevo, s brojem nepročitanih) i Postavke → Obavijesti prikazuju sve, i pročitane i odbačene. Kartica se prikazuje najviše tri puta; stanje je na tvom računalu i ništa novo ne ide na internet.",
+            "Postavke → Izgled → Mini player: svih pet izgleda (klasični, kartica, uska traka, bočna ploča, NLO zaslon) uz pregled. Promjena se primjenjuje odmah i pamti se."
+          ],
+          "improvements": [
+            "Vrijeme reprodukcije je manje i centrirano, stabilne širine, u punom playeru i u svakom izgledu mini playera.",
+            "Mini player: traka glasnoće odmah prati kotačić miša (prije je za zvukom kasnila trenutak)."
+          ],
+          "fixes": [
+            "Tekst upisan u polja za unos (npr. pretraga radija) bio je odrezan pri dnu."
+          ],
+          "known": []
+        }
+      }
+    },
+    {
       "version": "2.2.14",
       "date": "2026-11-22",
+      "scope": "github",
       "notes": {
         "en": {
           "summary": "Torlink: search and download online from inside the player (GitHub version, optional, off by default).",

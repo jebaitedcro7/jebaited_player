@@ -48,7 +48,7 @@ foreach ($line in (Get-Content $notices -Encoding UTF8)) {
 [IO.File]::WriteAllText($notices, (($kept -join "`n") + "`n"), (New-Object Text.UTF8Encoding $false))
 $forbiddenNames = @(Get-ChildItem $layout -Recurse | Where-Object { $_.Name -match 'torlink|torlnk' })
 if ($forbiddenNames.Count -gt 0) { throw ('Torlink u Store paketu (datoteke): ' + (($forbiddenNames | ForEach-Object { $_.FullName }) -join ', ')) }
-$needles = @('torlnk', 'JebaitedPlayer.Torlink', 'TORLINK_STATE_DIR', 'torlink.homeButton', 'TorlinkService')
+$needles = @('torlnk', 'JebaitedPlayer.Torlink', 'TORLINK_STATE_DIR', 'torlink.homeButton', 'TorlinkService', 'Torlink', 'torlink.', 'OpenTorlink')
 foreach ($f in Get-ChildItem $layout -Recurse -File | Where-Object { ($_.Extension -in '.dll', '.exe' -and $_.Name -match '^(jebaited_player|JebaitedPlayer\.)') -or $_.Extension -in '.json', '.md', '.txt', '.xml' }) {
     $bytes = [IO.File]::ReadAllBytes($f.FullName)
     $ascii = [Text.Encoding]::GetEncoding(28591).GetString($bytes)

@@ -65,7 +65,7 @@
                                 <TextBlock x:Name="Source" FontSize="10" Foreground="{DynamicResource LcdText}" />
                             </Border>
                             <views:LiveBadge x:Name="Live" DockPanel.Dock="Left" Margin="6,0,0,0" />
-                            <TextBlock x:Name="Time" HorizontalAlignment="Right" VerticalAlignment="Center" FontFamily="Consolas" FontSize="14"
+                            <TextBlock x:Name="Time" HorizontalAlignment="Right" TextAlignment="Center" MinWidth="68" VerticalAlignment="Center" FontFamily="Consolas" FontSize="13"
                                        Foreground="{DynamicResource LcdText}" />
                         </DockPanel>
                     </StackPanel>

@@ -316,7 +316,7 @@
                         </StackPanel>
                     </Grid>
                 </Border>
-                <DockPanel Margin="8,0,14,8" LastChildFill="False">
+                <DockPanel x:Name="HomeBottomRow" Margin="8,0,14,8" LastChildFill="False">
                     <Button DockPanel.Dock="Left" Style="{StaticResource IconButton}" Content="&#xE713;" FontSize="17"
                             ToolTip="{loc:T home.settingsTooltip}" AutomationProperties.Name="{loc:T home.settingsTooltip}"
                             Click="OnHomeSettingsClick" />
@@ -329,12 +329,45 @@
                         <TextBlock Text="&#xE706;" FontFamily="{DynamicResource IconFont}" FontSize="14" VerticalAlignment="Center"
                                    Foreground="{DynamicResource TextSecondaryBrush}" />
                     </StackPanel>
+                    <!-- Obavijesti: tipka sa zvoncem i brojem nepročitanih; klik otvara popis (isti kao u Postavke → Obavijesti). -->
+                    <Button x:Name="HomeNewsButton" DockPanel.Dock="Left" Style="{StaticResource SecondaryButton}" Margin="14,0,0,0" Padding="10,3"
+                            VerticalAlignment="Center" Click="OnHomeNewsClick" ToolTip="{loc:T news.buttonTooltip}"
+                            AutomationProperties.Name="{loc:T news.button}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xEA8F;" FontFamily="{DynamicResource IconFont}" FontSize="14" VerticalAlignment="Center" />
+                            <TextBlock Text="{loc:T news.button}" Margin="7,0,0,0" FontSize="12.5" VerticalAlignment="Center" />
+                            <Border x:Name="HomeNewsBadge" Margin="8,0,0,0" MinWidth="18" Height="18" CornerRadius="9" Visibility="Collapsed"
+                                    Background="{DynamicResource AccentBrush}">
+                                <TextBlock x:Name="HomeNewsBadgeText" FontSize="11" FontWeight="Bold" Margin="5,0" HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" Foreground="{DynamicResource AccentForegroundBrush}" />
+                            </Border>
+                        </StackPanel>
+                    </Button>
+                    <Popup x:Name="HomeNewsPopup" PlacementTarget="{Binding ElementName=HomeNewsButton}" Placement="Top" VerticalOffset="-6"
+                           StaysOpen="False">
+                        <Border Width="400" Background="{DynamicResource MenuBackgroundBrush}" BorderBrush="{DynamicResource MenuBorderBrush}"
+                                BorderThickness="1" CornerRadius="10" Padding="6">
+                            <DockPanel>
+                                <Grid DockPanel.Dock="Top" Margin="8,4,8,4">
+                                    <TextBlock Text="{loc:T news.title}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                    <Button Style="{StaticResource LinkButton}" Content="{loc:T news.openAll}" HorizontalAlignment="Right" FontSize="12"
+                                            Click="OnHomeNewsAllClick" />
+                                </Grid>
+                                <ScrollViewer MaxHeight="340" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+                                    <ContentControl x:Name="HomeNewsListHost" />
+                                </ScrollViewer>
+                            </DockPanel>
+                        </Border>
+                    </Popup>
                     <!-- Broj verzije: klik otvara povijest nadogradnji (UPGRADE 3). -->
                     <Button x:Name="VersionButton" DockPanel.Dock="Right" Style="{StaticResource LinkButton}" Content="{Binding VersionText}"
                             FontSize="11" VerticalAlignment="Center" Click="OnVersionClick"
                             ToolTip="{loc:T history.versionTooltip}" AutomationProperties.Name="{loc:T history.versionTooltip}" />
                 </DockPanel>
                 </StackPanel>
+
+                <!-- Kartica obavijesti sa strelicom do broja verzije (iznad svega na početnom ekranu). -->
+                <views:NewsOverlay x:Name="HomeNews" Grid.RowSpan="2" Panel.ZIndex="5" />
             </Grid>
         </Grid>
 

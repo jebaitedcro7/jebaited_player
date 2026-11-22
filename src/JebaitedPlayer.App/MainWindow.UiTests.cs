@@ -56,6 +56,8 @@ public partial class MainWindow
                     "discorduilive" => await DiscordWindowLiveUiTestAsync(),
                     "shortcuts" => await ShortcutsUiTestAsync(),
                     "accent" => await AccentUiTestAsync(),
+                    "news" => await NewsUiTestAsync(),
+                    "newsrestart" => await NewsRestartUiTestAsync(),
                     "ui217" => await Ui217UiTestAsync(),
                     "upnextlead" => await UpNextLeadUiTestAsync(),
                     "v2112" => await V2112UiTestAsync(),

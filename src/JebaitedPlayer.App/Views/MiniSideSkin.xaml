@@ -31,7 +31,8 @@
                 <TextBlock x:Name="Source" FontSize="10" Foreground="{DynamicResource LcdText}" />
             </Border>
             <views:LiveBadge x:Name="Live" DockPanel.Dock="Left" Margin="6,0,0,0" />
-            <TextBlock x:Name="Time" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" />
+            <TextBlock x:Name="Time" HorizontalAlignment="Right" TextAlignment="Center" MinWidth="68" Typography.NumeralAlignment="Tabular"
+                       VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" />
         </DockPanel>
         <Slider x:Name="Seek" Style="{StaticResource PlayerSlider}" Margin="14,8,14,0" />
 

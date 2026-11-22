@@ -157,5 +157,9 @@
   "torlink.tab.queued": "Red",
   "torlink.torrentFilter": "Torrent datoteke",
   "torlink.unhealthy": "Ovaj izvor ne javlja broj seedera.",
-  "torlink.waiting": "Čeka slobodno mjesto za preuzimanje"
+  "torlink.waiting": "Čeka slobodno mjesto za preuzimanje",
+  "torlink.news.title": "Pretraži onlajn sa Torlinkom",
+  "torlink.news.body": "Neobavezan dodatak u GitHub izdanju za onlajn pretragu i upravljanje preuzimanjima.",
+  "torlink.news.detail": "Torlink je neobavezan modul dostupan samo u GitHub izdanju plejera. Dodaje stranicu za onlajn pretragu i upravnika preuzimanja, pokreće se samo uz tvoju saglasnost i može se isključiti u Podešavanja → Torlink. Nije deo izdanja za Microsoft Store.",
+  "torlink.news.action": "Otvori podešavanja Torlinka"
 }

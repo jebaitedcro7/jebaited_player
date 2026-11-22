@@ -4,6 +4,26 @@ Sve važnije promjene jebaited_playera. Oblik: [Keep a Changelog](https://keepac
 
 Drugi jezici: [English](CHANGELOG.md) · [Deutsch](CHANGELOG_DE.md). Ista povijest je i u playeru (klik na broj verzije na početnom ekranu). Ova datoteka nastaje iz `src/JebaitedPlayer.App/History/update-history.json`.
 
+## [2.3.15] - 2026-11-22
+
+Obavijesti na početnom ekranu, odabir izgleda mini playera u Postavkama i ispravci.
+
+### Novo
+
+- Obavijesti: mala kartica na početnom ekranu prikazuje novosti, savjete i nove verzije. Kad nešto svira, nalazi se iznad trake reprodukcije, a kad ništa ne svira, nisko, tik iznad broja verzije; tanka strelica pokazuje na broj verzije, a kartica se glatko pomiče kad se traka reprodukcije pojavi ili nestane. Nova tipka Obavijesti (dolje lijevo, s brojem nepročitanih) i Postavke → Obavijesti prikazuju sve, i pročitane i odbačene. Kartica se prikazuje najviše tri puta; stanje je na tvom računalu i ništa novo ne ide na internet.
+- Postavke → Izgled → Mini player: svih pet izgleda (klasični, kartica, uska traka, bočna ploča, NLO zaslon) uz pregled. Promjena se primjenjuje odmah i pamti se.
+
+### Poboljšano
+
+- Vrijeme reprodukcije je manje i centrirano, stabilne širine, u punom playeru i u svakom izgledu mini playera.
+- Mini player: traka glasnoće odmah prati kotačić miša (prije je za zvukom kasnila trenutak).
+
+### Ispravljeno
+
+- Tekst upisan u polja za unos (npr. pretraga radija) bio je odrezan pri dnu.
+
+Izdanje: [v2.3.15](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v2.3.15) · Promjene od [v2.2.14...v2.3.15](https://github.com/jebaitedcro7/jebaited_player/compare/v2.2.14...v2.3.15)
+
 ## [2.2.14] - 2026-11-22
 
 Torlink: pretraga i preuzimanje online izravno u playeru (GitHub inačica, neobavezno, zadano isključeno).

@@ -107,6 +107,9 @@ public partial class RadioWindow : Window
 
     internal int ResultCount => _results.Count;
 
+    /// <summary>Dijagnostika: polje za pretragu (provjera da se upisani tekst vidi).</summary>
+    internal System.Windows.Controls.TextBox SearchTextBox => SearchBox;
+
     internal IReadOnlyList<RadioRow> Results => _results;
 
     internal IReadOnlyList<RadioRow> FavoriteRows => _favorites;

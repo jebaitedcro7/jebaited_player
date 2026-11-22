@@ -157,5 +157,9 @@
   "torlink.tab.queued": "Warteschlange",
   "torlink.torrentFilter": "Torrent-Dateien",
   "torlink.unhealthy": "Diese Quelle meldet keine Seeder.",
-  "torlink.waiting": "Wartet auf einen freien Download-Platz"
+  "torlink.waiting": "Wartet auf einen freien Download-Platz",
+  "torlink.news.title": "Online-Suche mit Torlink",
+  "torlink.news.body": "Ein optionales Zusatzmodul der GitHub-Ausgabe für die Online-Suche und die Verwaltung von Downloads.",
+  "torlink.news.detail": "Torlink ist ein optionales Modul, das nur in der GitHub-Ausgabe des Players enthalten ist. Es fügt eine Online-Suchseite und eine Download-Verwaltung hinzu, startet nur mit deiner Zustimmung und lässt sich unter Einstellungen → Torlink ausschalten. Es ist nicht Teil der Microsoft-Store-Ausgabe.",
+  "torlink.news.action": "Torlink-Einstellungen öffnen"
 }

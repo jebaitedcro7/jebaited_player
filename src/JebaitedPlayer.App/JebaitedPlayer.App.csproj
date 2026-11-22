@@ -26,8 +26,16 @@
 
   <ItemGroup>
     <!-- Povijest nadogradnji (UPGRADE 3): ugrađena u program, pa radi bez interneta; iz nje nastaju i CHANGELOG*.md. -->
-    <EmbeddedResource Include="History\update-history.json" LogicalName="update-history.json" />
+    <EmbeddedResource Include="History\update-history.json" LogicalName="update-history.json" Condition="'$(TorlinkEnabled)' != 'false'" />
   </ItemGroup>
+
+  <!-- Store (MSIX, TorlinkEnabled=false): povijest bez verzija označenih "scope": "github" (npr. Torlink); trajno pravilo, docs/RELEASE_CHECKLIST.md. -->
+  <Target Name="StoreUpdateHistory" BeforeTargets="AssignTargetPaths" Condition="'$(TorlinkEnabled)' == 'false'">
+    <Exec Command="powershell -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildThisFileDirectory)..\..\tools\filter-store-history.ps1&quot; -In &quot;$(MSBuildThisFileDirectory)History\update-history.json&quot; -Out &quot;$(MSBuildThisFileDirectory)$(IntermediateOutputPath)update-history.store.json&quot;" />
+    <ItemGroup>
+      <EmbeddedResource Include="$(MSBuildThisFileDirectory)$(IntermediateOutputPath)update-history.store.json" LogicalName="update-history.json" />
+    </ItemGroup>
+  </Target>
 
   <ItemGroup>
     <!-- Instalacija i nadogradnje preko GitHub Releases (MIT). -->

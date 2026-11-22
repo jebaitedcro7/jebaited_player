@@ -315,7 +315,10 @@
 
                         <!-- 1.4.1: mini player (isto i desnim klikom na mini player) -->
                         <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T menu.miniPlayer}" Margin="0,24,0,2" />
-                        <TextBlock Text="{loc:T mini.menuFont}" Margin="0,4,0,0" />
+                        <TextBlock Text="{loc:T mini.menuDesign}" Margin="0,4,0,0" />
+                        <WrapPanel x:Name="MiniDesignPanel" Margin="0,4,0,0" />
+                        <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.miniDesignHint}" TextWrapping="Wrap" Margin="0,2,0,0" />
+                        <TextBlock Text="{loc:T mini.menuFont}" Margin="0,12,0,0" />
                         <Button x:Name="MiniFontButton" Style="{StaticResource ChoiceButton}" Click="OnMiniFontClick" MinWidth="240" />
                         <TextBlock Text="{loc:T mini.menuVu}" Margin="0,12,0,0" />
                         <Button x:Name="MiniVuButton" Style="{StaticResource ChoiceButton}" Click="OnMiniVuClick" MinWidth="240" />
@@ -339,6 +342,19 @@
                         <StackPanel x:Name="ShortcutsList" Margin="28,0,28,24" MaxWidth="700" HorizontalAlignment="Left" />
                     </ScrollViewer>
                 </DockPanel>
+            </TabItem>
+
+            <!-- 7b. Obavijesti: isti popis kao pod tipkom „Obavijesti” na početnom ekranu. -->
+            <TabItem x:Name="NotificationsTab" Style="{StaticResource SettingsTab}" Tag="&#xEA8F;" Header="{loc:T settings.tabNotifications}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+                    <StackPanel Margin="28,20,28,24" MaxWidth="700" HorizontalAlignment="Left">
+                        <TextBlock Style="{StaticResource TabTitle}" Text="{loc:T news.title}" />
+                        <TextBlock Style="{StaticResource HintText}" Text="{loc:T news.settingsHint}" TextWrapping="Wrap" />
+                        <Button x:Name="NewsMarkAllButton" Style="{StaticResource SecondaryButton}" Content="{loc:T news.markAllRead}"
+                                HorizontalAlignment="Left" Margin="0,12,0,8" Click="OnNewsMarkAll" />
+                        <ContentControl x:Name="NewsListHost" />
+                    </StackPanel>
+                </ScrollViewer>
             </TabItem>
 
             <!-- 8. Nadogradnje -->

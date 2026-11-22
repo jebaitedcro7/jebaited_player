@@ -124,6 +124,8 @@ public partial class MainWindow
         RaiseWheel(mini.Marquee, 120);
         RaiseWheel(mini.TimeText, 120);
         double wheelElsewhere = _vm.Volume;
+        // 2.3.15: traka glasnoće prati kotačić ODMAH (bez čekanja na sat od 250 ms), i kad kotačić nije iznad same trake.
+        double sliderAfterWheel = mini.VolumeSlider.Value;
         _vm.Volume = 99;
         for (int i = 0; i < 4; i++)
         {
@@ -185,6 +187,7 @@ public partial class MainWindow
             ["step"] = Math.Round(miniUp - 50, 1), ["miniDown"] = miniDown, ["elsewhere"] = wheelElsewhere, ["clampedTop"] = clampedTop,
             ["clampedBottom"] = clampedBottom, ["realUp"] = realUp, ["realElsewhere"] = realElsewhere,
             ["overlayStep"] = Math.Round(overlayUp - overlayBefore, 1), ["overlayTimeline"] = overlayTimeline,
+            ["sliderAfterWheel"] = Math.Round(sliderAfterWheel, 1),
         };
 
         // --- 6) Svih pet izgleda mini playera ----------------------------------------------------------------------------
@@ -263,6 +266,50 @@ public partial class MainWindow
         mini.SetPanels(false, false);
         mini.SetDesign("classic");
         await Task.Delay(500);
+
+        // --- 2.3.15: odabir izgleda u Postavkama (svih pet, odmah na mini playeru) i poravnanje vremena -------------------
+        ((IMiniPlayerHost)this).ShowSettings();
+        await WaitForAsync(() => _playerSettingsWindow is { IsLoaded: true }, 5000);
+        PlayerSettingsWindow sw = _playerSettingsWindow!;
+        await Task.Delay(400);
+        var settingsDesigns = new Dictionary<string, object?>();
+        foreach (string id in MiniPlayerSettings.Designs)
+        {
+            sw.SelectMiniDesignForTests(id);
+            await Task.Delay(500);
+            var cards = sw.MiniDesignCards;
+            settingsDesigns[id] = new Dictionary<string, object?>
+            {
+                ["miniActive"] = mini.ActiveDesign, ["saved"] = _settings.MiniPlayer.ActiveDesign,
+                ["cardSelected"] = cards.Count(c => c.Selected) == 1 && cards.First(c => c.Selected).Id == id, ["cards"] = cards.Count,
+                ["skin"] = mini.CurrentSkin?.GetType().Name, ["inside"] = Inside(mini),
+            };
+        }
+
+        r["settingsDesigns"] = settingsDesigns;
+        sw.SelectMiniDesignForTests("classic");
+        await Task.Delay(500);
+        sw.ShowMiniDesignCardsForTests();
+        await Task.Delay(400);
+        r["settingsDesignSnapshot"] = SaveWindowPng("settings_mini_design", sw);
+        sw.Close();
+        await Task.Delay(300);
+
+        var timeAlign = new Dictionary<string, object?>();
+        var timeParent = (FrameworkElement)mini.TimeText.Parent;
+        foreach (string text in new[] { "00:09", "01:25", "12:45", "1:02:03", "-12:45", "-1:02:03" })
+        {
+            mini.TimeText.Text = text;
+            timeParent.UpdateLayout();
+            double centre = mini.TimeText.TranslatePoint(new Point(0, 0), timeParent).X + (mini.TimeText.ActualWidth / 2);
+            timeAlign[text] = new Dictionary<string, object?>
+            {
+                ["offset"] = Math.Round(centre - (timeParent.ActualWidth / 2), 2), ["fits"] = mini.TimeText.ActualWidth <= timeParent.ActualWidth,
+                ["fontSize"] = mini.TimeText.FontSize,
+            };
+        }
+
+        r["timeAlign"] = timeAlign;
 
         // --- 7) Naslov: zadano samo izvođač i pjesma, beskonačno kruženje, odabir podataka -----------------------------
         mini.SetInfoFields(JebaitedPlayer.Services.TrackInfo.DefaultFields);

@@ -95,7 +95,7 @@ public sealed partial class SourceScanTests
 
         // 2.1.7: ključevi koji se slažu iz id-a (izgledi mini playera, podaci o pjesmi, mjesta i podaci prognoze na početnom ekranu).
         // Da svaki id ima prijevod provjerava HomeLookAndDesignTests u JebaitedPlayer.App.Tests.
-        string[] composed = ["miniDesign.", "info.", "homePos.", "weatherDetail.", "homeElement."];
+        string[] composed = ["miniDesign.", "info.", "homePos.", "weatherDetail.", "homeElement.", "news.cat.", "news.status."];
         foreach (string key in english.Keys.Where(k => composed.Any(p => k.StartsWith(p, StringComparison.Ordinal))))
         {
             used.Add(key);

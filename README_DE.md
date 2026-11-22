@@ -121,8 +121,8 @@ Im selben Tab stellst du die automatische Suche, die Zeichenkodierung alter Unte
 - Musik öffnet den Mini-Player, ein Film oder eine Serie den vollen Player (abschaltbar unter Einstellungen → Darstellung). Der Mini-Player öffnet sich immer dort, wo du ihn gelassen hast.
 - Rechtsklick auf den Mini-Player (oder Einstellungen → Darstellung): sechs Anzeigeschriften und vier VU-Meter-Stile (Balken, LED-Segmente, dünne Linien mit Spitze, aus).
 - Filme und Serien haben einen eigenen Equalizer, Musik und Radio einen eigenen (Einstellungen → Audio: wählen, welcher bearbeitet wird).
-- **Fünf Looks** (Rechtsklick → **Aussehen**): klassisches Winamp, Karte, schmale Leiste, Seitenleiste und UFO-Display. Alle haben dieselben Tasten und Funktionen, deine Wahl wird gespeichert. Die Looks Karte und Seitenleiste (und der Startbildschirm) zeigen das **Albumcover** des Titels (in die Datei eingebettet oder ein cover/folder-Bild daneben); ohne Cover erscheint das UFO-Logo.
-- Das **Mausrad über der Lautstärkeleiste** ändert die Lautstärke um 2 % (im Mini-Player und im vollen Player). Das Mausrad an anderer Stelle ändert die Lautstärke nie.
+- **Fünf Looks** (Rechtsklick → **Aussehen** oder **Einstellungen → Aussehen → Mini-Player**, wo jeder Look eine Vorschau hat und die Änderung sofort gilt): klassisches Winamp, Karte, schmale Leiste, Seitenleiste und UFO-Display. Alle haben dieselben Tasten und Funktionen, deine Wahl wird gespeichert. Die Looks Karte und Seitenleiste (und der Startbildschirm) zeigen das **Albumcover** des Titels (in die Datei eingebettet oder ein cover/folder-Bild daneben); ohne Cover erscheint das UFO-Logo.
+- Das **Mausrad** ändert die Lautstärke um 5 % pro Raststufe überall auf dem Player (Video, Bedienleiste, Startbildschirm und der ganze Mini-Player), zwischen 0 und 100 %. Listen, die scrollen können (Playlist, Radiosender …), scrollen weiterhin, und **Strg + Mausrad** ändert die Größe des Mini-Players.
 - Der Titel läuft in einer Endlosschleife und zeigt standardmäßig nur **Interpret und Titel**. Rechtsklick auf den Titel: Album, Jahr, Genre, Klangqualität oder Dateiname hinzufügen.
 - Eine rote, sanft pulsierende **LIVE**-Anzeige erscheint, solange ein Radiosender läuft (alle Looks, voller Player und Startbildschirm).
 - **Minimieren** (Taste oder Rechtsklick → In die Taskleiste minimieren) legt den Player in die Taskleiste, die Musik läuft weiter; das ist etwas anderes als **Mini-Player** und Schließen. Der Mini-Player und alle anderen Fenster (Equalizer, Radio, Discord …) bleiben immer ganz im sichtbaren Bildschirm, über der Taskleiste, auch mit mehreren Monitoren.
@@ -204,8 +204,16 @@ Die Einstellungen sind in Tabs aufgeteilt. Jede Änderung gilt sofort (auch für
 | Video | Bildqualität, Hardware-Dekodierung, Standard-Seitenverhältnis, HDR |
 | Darstellung | Dunkles / helles Design, Akzentfarbe, Hintergrund des Startbildschirms (Standard oder eigenes Bild: Füllen, Einpassen, Zentriert), wie lange die Steuerung sichtbar bleibt, Oberfläche über die GPU darstellen, Uhrzeit, Datum und Wetter auf dem Startbildschirm (eine Stadt deiner Wahl, von Open-Meteo; Schriftart, Größe und Position jedes Elements, Vorschau und Wetterdetails wie gefühlte Temperatur, Min/Max, Regen, Wind, Luftfeuchtigkeit, UV, Sonnenauf- und -untergang, nächste Stunden und Tage) |
 | Tastenkürzel | Tasten für jede Aktion, bis zu zwei pro Aktion (siehe [Tastenkürzel](#tastenkürzel)) |
+| Benachrichtigungen | Neuigkeiten, Tipps und neue Versionen, mit Status gelesen / ungelesen / verworfen (siehe [Benachrichtigungen](#benachrichtigungen)) |
 | Updates | Version, jetzt prüfen, automatischer Download, Neuerungen, Update-Verlauf |
 | Info | Version, Lizenz, verwendete Technologien, Handbuch, Datenschutz, Richtlinie zur Code-Signierung, Fehlerberichte (ohne persönliche Daten auf deinem Computer gespeichert; du sendest sie selbst über GitHub) |
+
+### Benachrichtigungen
+
+- Auf dem Startbildschirm zeigt eine kleine Karte Neuigkeiten zum Player, einen nützlichen Tipp oder eine neue Version. Sie sitzt über der Wiedergabeleiste, wenn etwas läuft (und verdeckt sie nie), und tief, direkt über der Versionsnummer, wenn nichts läuft; ein dünner Pfeil zeigt auf die Versionsnummer. Erscheint oder verschwindet die Wiedergabeleiste, bewegt sich die Karte sanft.
+- **Mehr lesen** (oder ein Klick auf die Karte) öffnet die Details; **✕** verwirft die Karte. Eine Karte wird höchstens dreimal angezeigt, und nachdem du reagiert hast, erscheinen in derselben Sitzung nur noch wichtige Hinweise und neue Versionen.
+- Die Taste **Benachrichtigungen** unten links auf dem Startbildschirm (mit der Zahl der ungelesenen) und **Einstellungen → Benachrichtigungen** listen alles auf, auch gelesene und verworfene. **Alle als gelesen markieren** setzt den Ungelesen-Status zurück.
+- Neuigkeiten und Tipps sind Teil des Players selbst (in allen sechs Sprachen); die einzige weitere Quelle ist die Update-Prüfung auf GitHub, die der Player ohnehin macht. Es wird nichts Neues ins Internet gesendet, der Status liegt in `notifications.json` neben deinen Einstellungen.
 
 ### Update-Verlauf
 
@@ -337,6 +345,7 @@ Die Microsoft-Store-Version speichert ihre Daten in `%LOCALAPPDATA%\Packages\jeb
 
 - Ins Internet gehen nur: Untertitelsuchen (Titel, Jahr, Staffel/Folge, Datei-Fingerabdruck) an die Quellen, die du eingerichtet hast, die Anmeldung bei diesen Quellen mit deinem Konto und die Update-Prüfung auf GitHub.
 - Passwörter und Schlüssel sind verschlüsselt (Windows DPAPI, an dein Windows-Konto gebunden) und werden nie ins Protokoll geschrieben.
+- Benachrichtigungen (Neuigkeiten, Tipps, neue Versionen) sind Teil des Players und brauchen keine zusätzliche Internetverbindung.
 - Keine Statistiken, kein Tracking. Alle Details: [PRIVACY.md](PRIVACY.md).
 
 ### Übersetzungen
@@ -351,6 +360,15 @@ Die Oberfläche gibt es auf English, Deutsch, Hrvatski, Bosanski, Srpski (latini
 dotnet build jebaited_player.slnx -c Release
 dotnet test jebaited_player.slnx -c Release
 ```
+
+**Zwei getrennte Release-Builds (dauerhafte Regel):**
+
+| Build | Befehl | Torlink |
+|---|---|---|
+| GitHub-Release | `dotnet build src/JebaitedPlayer.App -c Release` (Installer und portable ZIP über `release.ps1`) | enthalten (optional, standardmäßig aus) |
+| Microsoft Store | `.\tools\make-msix.ps1` (baut mit `-p:TorlinkEnabled=false`) | **nie enthalten** |
+
+Das Store-Paket wird getrennt und ohne das Torlink-Modul gebaut: keine Projektreferenz, kein `TORLINK`-Symbol, kein Torlink-Code, keine Dateien, Texte oder Lizenzeinträge. Eine Schaltfläche auszublenden reicht nicht. `make-msix.ps1` prüft das fertige Paket (Dateinamen und Inhalt) und bricht ab, wenn etwas von Torlink gefunden wird; vor jedem Store-Release werden diese Prüfung und der Paketinhalt zusätzlich von Hand kontrolliert und in der Release-Checkliste festgehalten.
 
 ### Lizenz
 

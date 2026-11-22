@@ -140,6 +140,23 @@ public partial class MainWindow
         r["search"] = new Dictionary<string, object?> { ["count"] = count, ["first"] = radio.Results.Take(3).Select(x => x.Name + " | " + x.Detail).ToArray() };
         r["radioScreenshot"] = SaveWindowPng("radio_window", radio);
 
+        // Upisani tekst mora biti vidljiv (nije odrezan ni okomito ni vodoravno).
+        radio.SearchTextBox.Text = "Radio Zagreb jazz";
+        radio.SearchTextBox.Focus();
+        await Task.Delay(400);
+        radio.UpdateLayout();
+        System.Windows.Controls.ScrollViewer? host = radio.SearchTextBox.Template.FindName("PART_ContentHost", radio.SearchTextBox) as System.Windows.Controls.ScrollViewer;
+        r["typed"] = new Dictionary<string, object?>
+        {
+            ["boxWidth"] = Math.Round(radio.SearchTextBox.ActualWidth), ["boxHeight"] = Math.Round(radio.SearchTextBox.ActualHeight),
+            ["hostWidth"] = Math.Round(host?.ActualWidth ?? 0), ["hostHeight"] = Math.Round(host?.ActualHeight ?? 0),
+            ["extentWidth"] = Math.Round(host?.ExtentWidth ?? 0), ["viewportWidth"] = Math.Round(host?.ViewportWidth ?? 0),
+            ["extentHeight"] = Math.Round(host?.ExtentHeight ?? 0), ["viewportHeight"] = Math.Round(host?.ViewportHeight ?? 0),
+            ["hOffset"] = Math.Round(host?.HorizontalOffset ?? 0), ["windowWidth"] = Math.Round(radio.ActualWidth),
+            ["screenshot"] = SaveWindowPng("radio_typed", radio),
+        };
+        radio.SearchTextBox.Clear();
+
         // 2) Pokreni postaju (do 4 pokušaja, neke postaje ne rade): mini player, uživo, glazbeni EQ, ne ide u povijest.
         RadioRow? playing = null;
         int index = 0;

@@ -89,9 +89,9 @@ public sealed class TorlinkSettingsTests
     public void SettingsTab_TorlinkIsLast_SoExistingIndicesDoNotChange()
     {
         Assert.AreEqual(0, (int)SettingsTab.General);
-        Assert.AreEqual(7, (int)SettingsTab.Updates);
-        Assert.AreEqual(8, (int)SettingsTab.About);
-        Assert.AreEqual(9, (int)SettingsTab.Torlink, "enum se nije promijenio za postojeće kartice; kartica se u prozoru umeće ispred Nadogradnji");
+        Assert.AreEqual(8, (int)SettingsTab.Updates, "Obavijesti su umetnute ispred Nadogradnji (2.3)");
+        Assert.AreEqual(9, (int)SettingsTab.About);
+        Assert.AreEqual(10, (int)SettingsTab.Torlink, "Torlink je i dalje zadnji u enumu; kartica se u prozoru umeće ispred Nadogradnji");
         Assert.IsNull(PlayerSettingsWindow.DefaultsKey(SettingsTab.Torlink), "kartica Torlink ima vlastiti gumb za vraćanje na zadano");
     }
 }

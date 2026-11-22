@@ -4,6 +4,26 @@ All notable changes to jebaited_player. Format: [Keep a Changelog](https://keepa
 
 Other languages: [Deutsch](CHANGELOG_DE.md) · [Hrvatski](CHANGELOG_HR.md). The same history is included in the player (click the version number on the home screen). This file is generated from `src/JebaitedPlayer.App/History/update-history.json`.
 
+## [2.3.15] - 2026-11-22
+
+Notifications on the home screen, a choice of the mini player look in Settings, and fixes.
+
+### Added
+
+- Notifications: a small card on the home screen shows news, tips and new versions. It sits above the playback bar when something is playing and low, just above the version number, when nothing is; a thin arrow points to the version number, and the card moves smoothly when the playback bar appears or disappears. The new Notifications button (bottom left, with the number of unread ones) and Settings → Notifications list everything, also read and dismissed ones. A card is shown at most three times; the state is kept on your computer and nothing new is sent to the internet.
+- Settings → Appearance → Mini player: all five looks (classic, card, narrow strip, side panel, UFO screen) with a preview. The change applies at once and is remembered.
+
+### Improved
+
+- The playback time is smaller and centered, with a stable width, in the full player and in every mini player look.
+- Mini player: the volume bar follows the mouse wheel at once (it used to lag behind the sound by a moment).
+
+### Fixed
+
+- Text typed into input fields (for example the radio search) was cut off at the bottom.
+
+Release: [v2.3.15](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v2.3.15) · Changes since [v2.2.14...v2.3.15](https://github.com/jebaitedcro7/jebaited_player/compare/v2.2.14...v2.3.15)
+
 ## [2.2.14] - 2026-11-22
 
 Torlink: search and download online from inside the player (GitHub version, optional, off by default).

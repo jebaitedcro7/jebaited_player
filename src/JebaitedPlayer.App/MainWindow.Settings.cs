@@ -139,6 +139,7 @@ public partial class MainWindow : ISettingsHost
 
     void ISettingsHost.ApplyMiniPlayerSettings()
     {
+        _mini?.RefreshDesign();
         _mini?.ApplyDisplayStyle();
         RefreshVuFilter();
     }

@@ -157,5 +157,9 @@
   "torlink.tab.queued": "Queue",
   "torlink.torrentFilter": "Torrent files",
   "torlink.unhealthy": "This source does not report seeders.",
-  "torlink.waiting": "Waiting for a free download slot"
+  "torlink.waiting": "Waiting for a free download slot",
+  "torlink.news.title": "Search online with Torlink",
+  "torlink.news.body": "An optional add-on in the GitHub edition for online search and managing downloads.",
+  "torlink.news.detail": "Torlink is an optional module available only in the GitHub edition of the player. It adds an online search page and a download manager, starts only with your consent and can be turned off in Settings → Torlink. It is not part of the Microsoft Store edition.",
+  "torlink.news.action": "Open Torlink settings"
 }

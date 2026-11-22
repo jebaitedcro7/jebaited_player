@@ -371,8 +371,15 @@
                 <ControlTemplate TargetType="TextBox">
                     <Border x:Name="Bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="1" CornerRadius="4">
+                        <!-- Predložak samo sa sadržajem: zadani ScrollViewer je u visini polja (npr. 32 px) odrezivao upisani tekst. -->
                         <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}" Focusable="False"
-                                      HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" />
+                                      HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden">
+                            <ScrollViewer.Template>
+                                <ControlTemplate TargetType="ScrollViewer">
+                                    <ScrollContentPresenter />
+                                </ControlTemplate>
+                            </ScrollViewer.Template>
+                        </ScrollViewer>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsKeyboardFocused" Value="True">
@@ -399,7 +406,13 @@
                     <Border x:Name="Bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="1" CornerRadius="4">
                         <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}" Focusable="False"
-                                      HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" />
+                                      HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden">
+                            <ScrollViewer.Template>
+                                <ControlTemplate TargetType="ScrollViewer">
+                                    <ScrollContentPresenter />
+                                </ControlTemplate>
+                            </ScrollViewer.Template>
+                        </ScrollViewer>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsKeyboardFocused" Value="True">

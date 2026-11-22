@@ -97,6 +97,20 @@ foreach ($id in "classic", "card", "strip", "side", "ufo") {
 }
 Check "6: odabir se sprema (JSON → učitavanje)" ($u.designPersist.design -eq "side" -and $u.designPersist.playlistShown) "izgled '$($u.designPersist.design)'"
 
+# 2.3.15) Odabir izgleda u Postavkama
+foreach ($id in "classic", "card", "strip", "side", "ufo") {
+    $s = $u.settingsDesigns.$id
+    $skinOk = if ($id -in "card", "side", "ufo") { $s.skin -like "Mini*Skin" } else { -not $s.skin }
+    Check "2.3.15: Postavke → izgled ${id}: odmah na mini playeru i spremljen" ($s.miniActive -eq $id -and $s.saved -eq $id -and $s.cardSelected -and [int]$s.cards -eq 5 -and $skinOk -and $s.inside) "mini '$($s.miniActive)', spremljeno '$($s.saved)', odabrana kartica $($s.cardSelected), kartica $($s.cards)"
+}
+Check "2.3.15: snimka Postavki s izgledima" ([bool]$u.settingsDesignSnapshot) "$($u.settingsDesignSnapshot)"
+$wsync = $u.wheel
+Check "2.3.15: traka glasnoće prati kotačić odmah" ([math]::Abs([double]$wsync.sliderAfterWheel - [double]$wsync.elsewhere) -lt 1) "traka $($wsync.sliderAfterWheel), glasnoća $($wsync.elsewhere)"
+foreach ($text in "00:09", "01:25", "12:45", "1:02:03", "-12:45", "-1:02:03") {
+    $ta = $u.timeAlign.$text
+    Check "2.3.15: vrijeme '$text' centrirano i staje" ([math]::Abs([double]$ta.offset) -lt 1.5 -and $ta.fits -and [double]$ta.fontSize -eq 22) "pomak $($ta.offset) px, staje $($ta.fits), font $($ta.fontSize)"
+}
+
 # 7) Naslov
 $t = $u.title
 Check "7: zadano samo izvođač i pjesma" ($t.default -match "^jebaited_cro — .+pjesma$" -and $t.default -notmatch "kbps|kHz|Test album") "'$($t.default)'"

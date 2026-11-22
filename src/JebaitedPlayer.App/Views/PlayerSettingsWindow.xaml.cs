@@ -23,6 +23,7 @@ public enum SettingsTab
     Video,
     Appearance,
     Shortcuts,
+    Notifications,
     Updates,
     About,
 #if TORLINK
@@ -63,6 +64,12 @@ internal interface ISettingsHost
 
     /// <summary>N1: red izvještaja o greškama i slanje.</summary>
     JebaitedPlayer.Services.ErrorReporting Reports { get; }
+
+    /// <summary>Obavijesti (Postavke → Obavijesti dijele isto stanje kao tipka na Home ekranu).</summary>
+    JebaitedPlayer.Services.News.NewsCenter News { get; }
+
+    /// <summary>Otvori detalje obavijesti (označava je pročitanom).</summary>
+    void OpenNewsItem(JebaitedPlayer.Services.News.NewsItem item);
 
     /// <summary>N3: traži grad (Open-Meteo geokoder).</summary>
     Task<IReadOnlyList<JebaitedPlayer.Online.WeatherPlace>> SearchWeatherPlacesAsync(string name);
@@ -147,6 +154,7 @@ public partial class PlayerSettingsWindow : Window
         LoadVideo();
         LoadAppearance();
         LoadAccent();
+        LoadNews();
         LoadShortcuts();
         LoadUpdates();
         LoadAbout();
@@ -206,6 +214,7 @@ public partial class PlayerSettingsWindow : Window
         UpdateAudioTexts();
         EqualizerPanel.Refresh();
         UpdateMiniTexts();
+        LoadMiniDesign();
         UpdateAspectText();
         UpdateHideControlsText();
         UpdateUpdateStatus();
@@ -840,6 +849,7 @@ public partial class PlayerSettingsWindow : Window
         MiniAutoSwitchBox.Checked += (_, _) => _settings.MiniPlayer.AutoSwitch = true;
         MiniAutoSwitchBox.Unchecked += (_, _) => _settings.MiniPlayer.AutoSwitch = false;
         UpdateMiniTexts();
+        LoadMiniDesign();
 
         GpuUiBox.IsChecked = _settings.UiGpuRendering;
         GpuUiBox.Checked += (_, _) => _settings.UiGpuRendering = true;

@@ -492,6 +492,7 @@ public partial class MainWindow : Window
         _topBar.MouseWheel += (_, delta) => ChangeVolumeByWheel(delta);
         _ = _topBar.Handle;
         InitializeHomePlayback();
+        InitializeNews();
 #if TORLINK
         InitializeTorlink();
 #endif
@@ -755,6 +756,7 @@ public partial class MainWindow : Window
         _vm.Library.OnTick();
         UpdateOverlayVisibility();
         UpdateHomePlayback();
+        UpdateNews();
         AudioLive.Visibility = _vm.IsLiveStream && !_vm.IsPaused && AudioPanel.IsVisible ? Visibility.Visible : Visibility.Collapsed;
     }
 

@@ -89,7 +89,8 @@
                     <Border Style="{StaticResource Lcd}" Padding="8,3,8,5" Cursor="Hand" ToolTip="{loc:T mini.timeHint}"
                             MouseLeftButtonDown="OnTimeClick">
                         <StackPanel>
-                            <TextBlock x:Name="TimeText" Text="00:00" FontFamily="Consolas" FontSize="26" Foreground="{DynamicResource LcdText}" />
+                            <TextBlock x:Name="TimeText" Text="00:00" FontFamily="Consolas" FontSize="22" HorizontalAlignment="Center" TextAlignment="Center"
+                                       Typography.NumeralAlignment="Tabular" Foreground="{DynamicResource LcdText}" />
                             <Grid Margin="0,2,0,0" Height="16">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="12" />
@@ -163,7 +164,7 @@
                             VerticalAlignment="Center" Margin="2,0,4,0" ToolTip="{loc:T controls.volume}" />
                     <Button x:Name="CompactMute" DockPanel.Dock="Right" Style="{StaticResource MiniIcon}" Content="&#xE767;" ToolTip="{loc:T mini.mute}" Click="OnMute" />
                     <views:LiveBadge x:Name="LiveCompact" DockPanel.Dock="Left" Margin="6,0,0,0" />
-                    <TextBlock x:Name="CompactTime" DockPanel.Dock="Right" Margin="8,0,6,0" VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}" />
+                    <TextBlock x:Name="CompactTime" DockPanel.Dock="Right" Margin="8,0,6,0" VerticalAlignment="Center" Typography.NumeralAlignment="Tabular" Foreground="{DynamicResource TextSecondaryBrush}" />
                     <views:MarqueeView x:Name="CompactMarquee" Margin="6,0,0,0" Height="20" TextElement.FontSize="13"
                                        Background="Transparent" MouseRightButtonUp="OnInfoMenu" ToolTip="{loc:T mini.infoHint}" />
                 </DockPanel>

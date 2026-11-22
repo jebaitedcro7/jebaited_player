@@ -121,8 +121,8 @@ U istoj kartici podešavaš automatsko traženje, kodiranje starih titlova i izg
 - Glazba otvara mini player, a film ili serija puni player (može se isključiti u Postavke → Izgled). Mini player se uvijek otvara gdje si ga ostavio.
 - Desni klik na mini player (ili Postavke → Izgled): šest fontova zaslona i četiri izgleda VU metra (trake, LED segmenti, tanke linije s vrhom, isključen).
 - Filmovi i serije imaju svoj equalizer, a glazba i radio svoj (Postavke → Zvuk: biraš koji uređuješ).
-- **Pet izgleda** (desni klik → **Izgled**): klasični Winamp, kartica, uska traka, bočna ploča i NLO zaslon. Svi imaju iste tipke i funkcije, a tvoj odabir se pamti. Izgledi kartica i bočna ploča (i početni ekran) prikazuju **omot albuma** pjesme (ugrađen u datoteku ili slika cover/folder uz nju); bez omota prikazuju NLO logo.
-- **Kotačić miša iznad trake glasnoće** mijenja glasnoću za 2 % (u mini playeru i u punom playeru). Kotačić bilo gdje drugdje nikad ne mijenja glasnoću.
+- **Pet izgleda** (desni klik → **Izgled** ili **Postavke → Izgled → Mini player**, gdje svaki izgled ima pregled, a promjena se primjenjuje odmah): klasični Winamp, kartica, uska traka, bočna ploča i NLO zaslon. Svi imaju iste tipke i funkcije, a tvoj odabir se pamti. Izgledi kartica i bočna ploča (i početni ekran) prikazuju **omot albuma** pjesme (ugrađen u datoteku ili slika cover/folder uz nju); bez omota prikazuju NLO logo.
+- **Kotačić miša** mijenja glasnoću za 5 % po zarezu bilo gdje na playeru (video, kontrole, početni ekran i cijeli mini player), od 0 do 100 %. Popisi koji se mogu listati (popis pjesama, radio postaje …) i dalje se listaju, a **Ctrl + kotačić** mijenja veličinu mini playera.
 - Naslov se neprekidno vrti u krug, a zadano prikazuje samo **izvođača i pjesmu**. Desni klik na naslov: dodaj album, godinu, žanr, kvalitetu zvuka ili naziv datoteke.
 - Crvena, blago pulsirajuća oznaka **UŽIVO** prikazuje se dok svira radio (svi izgledi, puni player i početni ekran).
 - **Minimiziraj** (tipka ili desni klik → Minimiziraj na taskbar) stavlja player na taskbar, a glazba svira dalje; to je nešto drugo od **Mini playera** i zatvaranja. Mini player i svi ostali prozori (Equalizer, Radio, Discord …) uvijek ostaju potpuno unutar vidljivog zaslona, iznad taskbara, i s više monitora.
@@ -204,8 +204,16 @@ Postavke su podijeljene u kartice. Svaka promjena vrijedi odmah (i za video koji
 | Slika | Kvaliteta slike, hardversko dekodiranje, zadani omjer slike, HDR |
 | Izgled | Tamna / svijetla tema, boja isticanja, pozadina početnog ekrana (zadana ili vlastita slika: Ispuni, Prilagodi, Sredina), koliko dugo su kontrole vidljive, iscrtavanje sučelja preko GPU-a, vrijeme, datum i prognoza na početnom ekranu (grad po izboru, s Open-Meteoa; font, veličina i mjesto svakog elementa, pregled te podaci o vremenu: osjećaj temperature, min/maks, kiša, vjetar, vlažnost, UV, izlazak i zalazak sunca, sljedeći sati i dani) |
 | Prečaci | Tipke za sve radnje, do dvije po radnji (vidi [Tipkovnički prečaci](#tipkovnički-prečaci)) |
+| Obavijesti | Novosti, savjeti i nove verzije, sa stanjem pročitano / nepročitano / odbačeno (vidi [Obavijesti](#obavijesti)) |
 | Nadogradnje | Verzija, provjeri sada, automatsko preuzimanje, što je novo, povijest nadogradnji |
 | O aplikaciji | Verzija, licenca, korištene tehnologije, priručnik, privatnost, pravila potpisivanja koda, izvještaji o greškama (spremljeni na računalu bez osobnih podataka; šalješ ih sam preko GitHuba) |
+
+### Obavijesti
+
+- Na početnom ekranu mala kartica prikazuje novosti o playeru, koristan savjet ili novu verziju. Kad nešto svira, nalazi se iznad trake reprodukcije (pa je nikad ne zaklanja), a kad ništa ne svira, nisko, tik iznad broja verzije; tanka strelica pokazuje na broj verzije. Kad se traka reprodukcije pojavi ili nestane, kartica se glatko pomakne.
+- **Pročitaj više** (ili klik na karticu) otvara detalje; **✕** odbacuje karticu. Kartica se prikazuje najviše tri puta, a nakon što reagiraš, u istom pokretanju ponovno se prikazuju samo važne obavijesti i nove verzije.
+- Tipka **Obavijesti** dolje lijevo na početnom ekranu (s brojem nepročitanih) i **Postavke → Obavijesti** prikazuju sve, i pročitane i odbačene. **Označi sve kao pročitano** briše stanje nepročitano.
+- Novosti i savjeti dio su samog playera (na svih šest jezika); jedini drugi izvor je provjera nadogradnji na GitHubu koju player ionako radi. Ništa novo ne ide na internet, a stanje je u `notifications.json` uz tvoje postavke.
 
 ### Povijest nadogradnji
 
@@ -337,6 +345,7 @@ Store inačica čuva podatke u `%LOCALAPPDATA%\Packages\jebaitedplayer.jebaitedp
 
 - Na internet idu samo: pretraga titlova (naziv, godina, sezona/epizoda, otisak datoteke) prema izvorima koje si postavio, prijava s tvojim računom tim izvorima i provjera nadogradnji na GitHubu.
 - Lozinke i ključevi su kriptirani (Windows DPAPI, vezano uz tvoj Windows račun) i ne pišu se u log.
+- Obavijesti (novosti, savjeti, nove verzije) dio su playera i ne trebaju dodatnu internetsku vezu.
 - Nema statistike ni praćenja. Sve pojedinosti: [PRIVACY.md](PRIVACY.md).
 
 ### Prijevodi
@@ -351,6 +360,15 @@ Sučelje postoji na English, Deutsch, Hrvatski, Bosanski, Srpski (latinica) i Sl
 dotnet build jebaited_player.slnx -c Release
 dotnet test jebaited_player.slnx -c Release
 ```
+
+**Dva odvojena izdanja (trajno pravilo):**
+
+| Izdanje | Naredba | Torlink |
+|---|---|---|
+| GitHub | `dotnet build src/JebaitedPlayer.App -c Release` (instalacija i prijenosni ZIP preko `release.ps1`) | uključen (neobavezan, zadano isključen) |
+| Microsoft Store | `.\tools\make-msix.ps1` (gradi s `-p:TorlinkEnabled=false`) | **nikad uključen** |
+
+Store paket gradi se zasebno i bez Torlink modula: bez reference na projekt, bez simbola `TORLINK`, bez Torlink koda, datoteka, tekstova i zapisa o licencama. Skrivanje gumba nije dovoljno. `make-msix.ps1` provjerava gotov paket (nazive datoteka i sadržaj) i staje ako nađe išta od Torlinka; prije svakog Store izdanja ta se provjera i sadržaj paketa još jednom pregledavaju ručno i bilježe u popisu provjere izdanja.
 
 ### Licenca
 

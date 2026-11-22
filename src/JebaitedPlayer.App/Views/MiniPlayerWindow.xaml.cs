@@ -214,30 +214,21 @@ public partial class MiniPlayerWindow : Window
     /// <summary>Odabir izgleda: classic (1), card (2), strip (3), side (4), ufo (5). Sprema se i pamti.</summary>
     internal void SetDesign(string design)
     {
-        MiniPlayerSettings m = _settings.MiniPlayer;
-        if (!MiniPlayerSettings.Designs.Contains(design))
+        if (!_settings.MiniPlayer.SelectDesign(design))
         {
             return;
         }
 
-        if (design == "strip")
-        {
-            m.Compact = true;
-        }
-        else
-        {
-            m.Compact = false;
-            m.Design = design;
-            if (design == "side")
-            {
-                m.ShowPlaylist = true; // bočna ploča pokazuje popis odmah (dizajn 4)
-            }
-        }
+        RefreshDesign();
+        Log.Info($"Mini player: izgled {design}");
+    }
 
+    /// <summary>Prikaži izgled iz postavki (poziva i izbor u Postavkama, bez ponovnog pokretanja).</summary>
+    internal void RefreshDesign()
+    {
         ApplyLayout();
         _marquee = string.Empty;
         Tick();
-        Log.Info($"Mini player: izgled {design}");
     }
 
     private MiniSkinBase CreateSkin(string design)
@@ -545,7 +536,22 @@ public partial class MiniPlayerWindow : Window
         {
             _vm.ChangeVolumeByWheel(e.Delta);
             _settings.Volume = _vm.Volume;
+            // Prozorski handler (tunel) stiže prije handlera trake i troši događaj, pa se trake nisu osvježavale
+            // do idućeg otkucaja sata (250 ms, Background): kotačić je zvučno bio trenutan, a slika kasnila.
+            SyncAllVolumes();
             e.Handled = true;
+        }
+    }
+
+    /// <summary>Sve trake glasnoće (izgled 1, 3 i aktivni izgled s karticom) odmah na stvarnu glasnoću.</summary>
+    internal void SyncAllVolumes()
+    {
+        double volume = _vm.Volume;
+        SyncVolume(VolumeSlider, volume);
+        SyncVolume(CompactVolume, volume);
+        if (_skin is not null)
+        {
+            SyncVolume(_skin.VolumeBar, volume);
         }
     }
 

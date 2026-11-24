@@ -41,7 +41,7 @@
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="{Binding PositionText}" Style="{StaticResource TimeText}" FontSize="12" HorizontalAlignment="Center" TextAlignment="Center" />
                 <Slider x:Name="Timeline" Grid.Column="1" Style="{StaticResource TimelineSlider}" Margin="12,0"
-                        Minimum="0" Maximum="{Binding TimelineMaximum}" Value="{Binding Position, Mode=OneWay}"
+                        Minimum="0" Maximum="{Binding TimelineMaximum}" Value="{Binding TimelinePosition, Mode=OneWay}"
                         AutomationProperties.Name="{loc:T controls.timeline}" />
 
                 <!-- Pod mišem: vrijeme na koje vodi klik (oblačić iznad trake) i oznaka na traci. Ne prima miš. -->

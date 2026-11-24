@@ -39,7 +39,7 @@ public partial class MainWindow : ISettingsHost
         _playerSettingsWindow.Closed += (_, _) =>
         {
             _playerSettingsWindow = null;
-            UpdateOnlineSetupButton();
+            UpdateHomeRail();
             Activate();
         };
         _playerSettingsWindow.Show();

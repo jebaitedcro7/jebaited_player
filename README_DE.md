@@ -55,7 +55,7 @@ Du brauchst Windows 10 oder 11 (64 Bit). Sonst muss nichts installiert werden (D
 
 <p align="center"><img src="manual/images/de/home.jpg" width="760" alt="Startbildschirm"></p>
 
-- **Datei öffnen** und **Ordner öffnen** öffnen Videos; du kannst Dateien oder Ordner auch ins Fenster ziehen.
+- Die **Seitenleiste** links (Symbole; sie wird unter der Maus breiter und zeigt die Namen): **Datei öffnen**, **Ordner öffnen**, **Untertitelsuche**, **IPTV** und **Radio**. Du kannst Dateien oder Ordner auch ins Fenster ziehen.
 - **Weiterschauen** zeigt die letzten Videos mit der Stelle, an der du aufgehört hast. Klicken zum Fortsetzen, **×** entfernt einen Eintrag aus dem Verlauf.
 - **Favoriten** enthält Filme und ganze Serien (Ctrl+D während der Wiedergabe). Eine Serie öffnet sich bei der Folge, bei der du gerade bist.
 - **Tastenkürzel (F1)** zeigt alle Tastenkürzel.
@@ -134,6 +134,14 @@ Im selben Tab stellst du die automatische Suche, die Zeichenkodierung alter Unte
 - Sender laufen im Mini-Player mit dem Musik-Equalizer, gekennzeichnet mit **RADIO** und **LIVE**, mit dem aktuellen Titel, wenn der Sender ihn sendet. Radio erscheint nicht unter „Weiterschauen“.
 - **Stopp** hält den Sender wirklich an (er bleibt im Mini-Player angezeigt); **Wiedergabe** oder Leertaste verbindet neu, live. Pause → Wiedergabe geht ebenfalls live weiter, und Live-Radio lässt sich nicht zurückspulen.
 
+### IPTV
+
+- Klicke in der Seitenleiste des Startbildschirms auf **IPTV** (oder Rechtsklick auf das Video → **IPTV…**). Das Panel öffnet sich links vom Video. **Verbindung hinzufügen**: ein **Xtream-Codes**-Konto (Server, Benutzername, Passwort), ein **M3U/M3U8**-Link oder eine M3U-Datei; **Verbindung testen** prüft sie einmal (keine wiederholten Anmeldungen). Du kannst mehrere Verbindungen anlegen und jederzeit bearbeiten, aktualisieren oder entfernen.
+- Kategorien (mit Flaggen und Symbolen) | Kanäle mit Logo, aktueller Sendung und Fortschrittsleiste, **★** für Favoriten; **Suche**, **Sortierung** (A–Z, Z–A, Original, eigene Reihenfolge: Rechtsklick auf einen Kanal → nach oben/unten), **Zuletzt gesehen**, Kanal oder ganze Kategorie ausblenden (Rechtsklick; ⋯ → *Ausgeblendete Sender anzeigen* holt sie zurück). Doppelklick oder Enter spielt einen Kanal im Hauptplayer ab; **F** oder Doppelklick auf das Bild ist Vollbild; ein Klick auf das Bild pausiert Live-TV nicht (nutze die Pause-Taste). **Stopp** im Player auf dem Startbildschirm beendet das TV und schließt das Panel.
+- Der Programmführer zeigt *Jetzt* und *Danach*, eine Zeitleiste pro Tag (XMLTV oder der eigene Führer des Dienstes) und sagt es, wenn es keine Daten gibt.
+- ⋯ → **Aussehen**: Schriftart, Textgröße, Hervorhebungsfarbe und Hintergrund nur für das IPTV-Panel. Ziehe den rechten Rand des Panels und die Trennlinie zwischen Kategorien und Kanälen auf die gewünschte Breite; sie wird gespeichert. ⋯ → Einstellungen exportieren/importieren (Favoriten, Reihenfolge, Ausgeblendetes – nie Passwörter).
+- Dein Passwort wird **verschlüsselt** (DPAPI) gespeichert und nie angezeigt, protokolliert oder exportiert. Bietet der Server nur einfaches **HTTP**, sind Anmeldung und Stream nicht verschlüsselt, und der Player warnt davor. Der Player bringt **keine Kanäle oder Playlists** mit: Nutze nur Dienste, die du nutzen darfst. Das Modul schaltest du unter **Einstellungen → Allgemein → IPTV** aus.
+
 ### Spotify
 
 - **Strg+Umschalt+S**, Rechtsklick → **Spotify …** oder die Quellenanzeige im Mini-Player. jebaited_player ist eine Fernbedienung für deine Spotify-App: Die Musik läuft in Spotify (Computer, Handy oder Lautsprecher), der Player zeigt den Song mit Cover und steuert ihn. Zum Steuern braucht man **Spotify Premium**.
@@ -158,7 +166,7 @@ Im selben Tab stellst du die automatische Suche, die Zeichenkodierung alter Unte
 ### Torlink (online suchen, nur GitHub-Version)
 
 - Optional und **standardmäßig aus**. Einschalten unter **Einstellungen → Torlink**. Nachdem du einen Hinweis akzeptiert hast, lädt der Player ein geprüftes Paket (Node.js + Torlink, ca. 40 MB, SHA-256 geprüft) aus den Releases dieses Repositories. Es ist **nicht Teil der Microsoft-Store-Version**.
-- Danach erscheint auf dem Startbildschirm neben „Datei öffnen“ und „Ordner öffnen“ ein dritter Knopf, **Online suchen**. Er öffnet die Torlink-Seite: eine Suche über mehrere öffentliche Indizes (Filme, Serien, Anime, Spiele), Ergebnisse mit Größe, Seedern und Quelle (sortieren und filtern) und eine Download-Verwaltung (aktiv, Warteschlange, abgeschlossen, fehlgeschlagen; pausieren, fortsetzen, abbrechen, Ordner öffnen, abspielen). **Start** (oder Esc / Alt+←) führt zurück zum Startbildschirm des Players, die Downloads laufen weiter; **Strg+Umschalt+T** öffnet und schließt die Seite.
+- Danach erscheint in der Seitenleiste des Startbildschirms ein weiterer Eintrag, **Filme und Serien online suchen**. Er öffnet die Torlink-Seite: eine Suche über mehrere öffentliche Indizes (Filme, Serien, Anime, Spiele), Ergebnisse mit Größe, Seedern und Quelle (sortieren und filtern) und eine Download-Verwaltung (aktiv, Warteschlange, abgeschlossen, fehlgeschlagen; pausieren, fortsetzen, abbrechen, Ordner öffnen, abspielen). **Start** (oder Esc / Alt+←) führt zurück zum Startbildschirm des Players, die Downloads laufen weiter; **Strg+Umschalt+T** öffnet und schließt die Seite.
 - Torlink ist das Open-Source-Projekt [baairon/torlink](https://github.com/baairon/torlink) (MIT), unverändert verwendet. Der Player spricht über dessen lokale Schnittstelle mit ihm und startet es nur, solange es gebraucht wird. Einstellungen: Download-Ordner, gleichzeitige Downloads, playlist.m3u, zusätzliche Tracker, Netzwerkschnittstelle (VPN) und Teilen nach dem Download (**standardmäßig aus**). Updates nur auf deinen Klick, aus unserem geprüften Paket, mit automatischem Zurücksetzen.
 - **Deine Verantwortung:** BitTorrent zeigt anderen Nutzern deine IP-Adresse. Lade nur herunter und teile nur, was du darfst. Der Player hostet oder prüft keine Inhalte. Siehe [PRIVACY.md](PRIVACY.md).
 

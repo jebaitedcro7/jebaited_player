@@ -40,6 +40,58 @@
   },
   "versions": [
     {
+      "version": "2.4.16",
+      "date": "2026-11-24",
+      "scope": "github",
+      "notes": {
+        "en": {
+          "summary": "IPTV: watch your own IPTV service (Xtream or M3U) inside the player, plus a new side bar on the home screen.",
+          "features": [
+            "IPTV: add your own connection (Xtream Codes, an M3U/M3U8 link or file) and watch live channels next to the video. Categories with flags and icons, search, favorites, recently watched, hide channels and categories (right click), sort A–Z, Z–A, original or your own order, program guide (now/next, a timeline by day), full-screen with F or a double click. You can change the font, text size and colors of the IPTV panel and drag its edges to the width you like. The password is stored encrypted on your computer, never in logs or exports. Use only services you are allowed to use; the player brings no channels or playlists.",
+            "Home screen side bar: open file, open folder, subtitle search, IPTV and radio are now in one place; it widens smoothly under the mouse and shows the names. The player card on the home screen has a Stop button for live streams."
+          ],
+          "improvements": [
+            "Live streams (TV, radio) show a full progress bar and no duration, and a click on the picture no longer pauses a live TV stream.",
+            "Credentials of IPTV addresses are hidden in logs and error reports."
+          ],
+          "fixes": [],
+          "known": [
+            "IPTV servers that only offer plain HTTP are not encrypted; the player warns about it. Catch-up playback, custom channel groups and picture-in-picture are not available yet."
+          ]
+        },
+        "de": {
+          "summary": "IPTV: Schau deinen eigenen IPTV-Dienst (Xtream oder M3U) im Player, dazu eine neue Seitenleiste auf dem Startbildschirm.",
+          "features": [
+            "IPTV: Füge deine eigene Verbindung hinzu (Xtream Codes, M3U/M3U8-Link oder -Datei) und sieh Live-Kanäle neben dem Video. Kategorien mit Flaggen und Symbolen, Suche, Favoriten, zuletzt gesehen, Kanäle und Kategorien ausblenden (Rechtsklick), Sortierung A–Z, Z–A, Original oder eigene Reihenfolge, Programmführer (Jetzt/Danach, Zeitleiste pro Tag), Vollbild mit F oder Doppelklick. Schriftart, Textgröße und Farben des IPTV-Panels sind einstellbar, die Ränder lassen sich auf die gewünschte Breite ziehen. Das Passwort wird verschlüsselt auf deinem Computer gespeichert, nie in Protokollen oder Exporten. Nutze nur Dienste, die du nutzen darfst; der Player bringt keine Kanäle oder Playlists mit.",
+            "Seitenleiste auf dem Startbildschirm: Datei öffnen, Ordner öffnen, Untertitelsuche, IPTV und Radio sind jetzt an einer Stelle; sie wird unter der Maus sanft breiter und zeigt die Namen. Die Player-Karte auf dem Startbildschirm hat eine Stopp-Taste für Live-Streams."
+          ],
+          "improvements": [
+            "Live-Streams (TV, Radio) zeigen eine volle Fortschrittsleiste ohne Dauer, und ein Klick auf das Bild pausiert einen Live-TV-Stream nicht mehr.",
+            "Zugangsdaten in IPTV-Adressen werden in Protokollen und Fehlerberichten verborgen."
+          ],
+          "fixes": [],
+          "known": [
+            "IPTV-Server, die nur einfaches HTTP anbieten, sind nicht verschlüsselt; der Player warnt davor. Catch-up-Wiedergabe, eigene Kanalgruppen und Bild-in-Bild gibt es noch nicht."
+          ]
+        },
+        "hr": {
+          "summary": "IPTV: gledaj svoju IPTV uslugu (Xtream ili M3U) u playeru, uz novu bočnu traku na početnom ekranu.",
+          "features": [
+            "IPTV: dodaj vlastitu vezu (Xtream Codes, M3U/M3U8 poveznicu ili datoteku) i gledaj kanale uživo uz video. Kategorije sa zastavama i ikonama, pretraga, favoriti, nedavno gledano, skrivanje kanala i kategorija (desni klik), sortiranje A–Ž, Ž–A, izvorno ili po tvom redoslijedu, vodič programa (sada/sljedeće, vremenska crta po danima), cijeli zaslon tipkom F ili dvoklikom. Možeš promijeniti font, veličinu teksta i boje IPTV panela te povući rubove na željenu širinu. Lozinka se sprema šifrirana na tvom računalu, nikad u dnevnike ni izvoze. Koristi samo usluge koje smiješ koristiti; player ne donosi kanale ni popise.",
+            "Bočna traka na početnom ekranu: otvori datoteku, otvori mapu, pretraga titlova, IPTV i radio sada su na jednom mjestu; pod mišem se glatko proširi i pokaže nazive. Kartica playera na početnom ekranu ima gumb Stop za tokove uživo."
+          ],
+          "improvements": [
+            "Tokovi uživo (TV, radio) prikazuju punu traku napretka bez trajanja, a klik na sliku više ne pauzira TV uživo.",
+            "Vjerodajnice u IPTV adresama skrivene su u dnevnicima i izvještajima o greškama."
+          ],
+          "fixes": [],
+          "known": [
+            "IPTV poslužitelji koji nude samo običan HTTP nisu šifrirani; player na to upozorava. Reprodukcija catch-up, vlastite grupe kanala i slika u slici još nisu dostupni."
+          ]
+        }
+      }
+    },
+    {
       "version": "2.3.15",
       "date": "2026-11-22",
       "notes": {

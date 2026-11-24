@@ -1,0 +1,256 @@
+<UserControl x:Class="JebaitedPlayer.Views.IptvPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="clr-namespace:JebaitedPlayer.Infrastructure"
+             Background="{DynamicResource PanelBackgroundBrush}" Foreground="{DynamicResource TextPrimaryBrush}"
+             FontFamily="{DynamicResource UiFont}" FontSize="13" UseLayoutRounding="True" Focusable="False">
+
+    <UserControl.Resources>
+        <!-- Zadani stil ListBoxa u temi nema ScrollViewer: bez njega nema pomicanja ni virtualizacije (svih ~7 700 redaka bi se stvorilo odjednom). -->
+        <Style x:Key="ScrollList" TargetType="ListBox">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBox">
+                        <ScrollViewer Focusable="False" CanContentScroll="True" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Padding="{TemplateBinding Padding}">
+                            <ItemsPresenter />
+                        </ScrollViewer>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True" />
+            <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Recycling" />
+            <Setter Property="ScrollViewer.CanContentScroll" Value="True" />
+        </Style>
+    </UserControl.Resources>
+
+    <!-- IPTV (dizajn C, kompaktni split): lijevo u glavnom prozoru; video je desno, uz isti prozor. Gore izvor/pretraga/sortiranje, kategorije | kanali, dolje sada/sljedeće i EPG traka. -->
+    <Grid>
+        <Grid Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- Gornja traka -->
+            <Grid Grid.Row="0" Margin="0,0,0,6">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Button x:Name="SourceButton" Style="{StaticResource ChoiceButton}" MinWidth="120" Click="OnSourceClick" />
+                <Button x:Name="SortButton" Grid.Column="1" Style="{StaticResource ChoiceButton}" MinWidth="110" Margin="6,0,0,0" Click="OnSortClick" />
+                <Button x:Name="RefreshButton" Grid.Column="2" Style="{StaticResource IconButton}" Content="&#xE72C;" Width="32" Height="32" Margin="4,0,0,0"
+                        ToolTip="{loc:T iptv.refresh}" Click="OnRefresh" />
+                <Button x:Name="GuideButton" Grid.Column="3" Style="{StaticResource IconButton}" Content="&#xE787;" Width="32" Height="32"
+                        ToolTip="{loc:T iptv.refreshGuide}" Click="OnRefreshGuide" />
+                <Button x:Name="MenuButton" Grid.Column="4" Style="{StaticResource IconButton}" Content="&#xE712;" Width="32" Height="32"
+                        Click="OnManageClick" />
+                <Button x:Name="HideButton" Grid.Column="5" Style="{StaticResource IconButton}" Content="&#xE711;" Width="32" Height="32" FontSize="12"
+                        ToolTip="{loc:T iptv.cancel}" Click="OnHidePanel" />
+            </Grid>
+            <TextBox x:Name="SearchBox" Grid.Row="1" Margin="0,0,0,6" Height="30" VerticalContentAlignment="Center"
+                     ToolTip="{loc:T iptv.search}" TextChanged="OnSearchChanged" />
+
+            <!-- Kategorije | kanali -->
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition x:Name="CatCol" Width="150" MinWidth="90" MaxWidth="360" />
+                    <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="*" MinWidth="200" />
+                </Grid.ColumnDefinitions>
+
+                <Border BorderThickness="1" BorderBrush="{DynamicResource MenuBorderBrush}" CornerRadius="6" Padding="2">
+                    <ListBox x:Name="CategoryList" Style="{StaticResource ScrollList}" BorderThickness="0" Background="Transparent" SelectionChanged="OnCategoryChanged">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <DockPanel x:Name="CatRoot" Margin="2,1">
+                                    <TextBlock DockPanel.Dock="Right" Text="{Binding Count}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" VerticalAlignment="Center" />
+                                    <Grid DockPanel.Dock="Left" Width="22" Height="16" Margin="0,0,7,0">
+                                        <Image Source="{Binding Flag}" Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality" />
+                                        <TextBlock Text="{Binding Emoji}" FontFamily="Segoe UI Emoji" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Grid>
+                                    <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" Margin="0,0,6,0" FontSize="12" />
+                                </DockPanel>
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding Hidden}" Value="True">
+                                        <Setter TargetName="CatRoot" Property="Opacity" Value="0.45" />
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Border>
+
+                <!-- Razdjelnik: povuci mišem da proširiš ili suziš popis kategorija (zemalja) naspram popisa kanala. -->
+                <GridSplitter x:Name="CatSplitter" Grid.Column="1" Width="8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent"
+                              ResizeDirection="Columns" ResizeBehavior="PreviousAndNext" Cursor="SizeWE" ShowsPreview="False"
+                              DragCompleted="OnCategorySplitterDone" ToolTip="{loc:T iptv.resize}">
+                    <GridSplitter.Template>
+                        <ControlTemplate TargetType="GridSplitter">
+                            <Grid Background="Transparent">
+                                <Rectangle Width="2" RadiusX="1" RadiusY="1" HorizontalAlignment="Center" Margin="0,12" Fill="{DynamicResource MenuBorderBrush}" />
+                            </Grid>
+                        </ControlTemplate>
+                    </GridSplitter.Template>
+                </GridSplitter>
+
+                <Border Grid.Column="2" BorderThickness="1" BorderBrush="{DynamicResource MenuBorderBrush}" CornerRadius="6" Padding="2">
+                    <Grid>
+                        <ListBox x:Name="ChannelList" Style="{StaticResource ScrollList}" BorderThickness="0" Background="Transparent" SelectionChanged="OnChannelSelected"
+                                 MouseDoubleClick="OnChannelDoubleClick" KeyDown="OnChannelKeyDown">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,2">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Width="38" Height="26" CornerRadius="4" Background="{DynamicResource MenuBackgroundBrush}" Margin="0,0,8,0"
+                                                Visibility="{Binding ShowLogo, Converter={StaticResource BoolToVisibility}}">
+                                            <Image Source="{Binding Logo}" Stretch="Uniform" Margin="2" />
+                                        </Border>
+                                        <Border Grid.Column="0" Width="38" Height="26" Margin="0,0,8,0" CornerRadius="4" Background="{DynamicResource MenuBackgroundBrush}"
+                                                Visibility="{Binding NoLogo, Converter={StaticResource BoolToVisibility}}">
+                                            <TextBlock Text="{Binding Initial}" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="SemiBold"
+                                                       Foreground="{DynamicResource TextSecondaryBrush}" />
+                                        </Border>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                            <TextBlock x:Name="NameText" Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Text="{Binding NowText}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" TextTrimming="CharacterEllipsis"
+                                                       Visibility="{Binding ShowDetail, Converter={StaticResource BoolToVisibility}}" />
+                                            <Grid Height="3" Margin="0,3,0,0" Visibility="{Binding HasProgress, Converter={StaticResource BoolToVisibility}}">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="{Binding FillWidth}" />
+                                                    <ColumnDefinition Width="{Binding RestWidth}" />
+                                                </Grid.ColumnDefinitions>
+                                                <Border Grid.ColumnSpan="2" Background="{DynamicResource TrackBrush}" CornerRadius="1.5" />
+                                                <Border Background="{DynamicResource AccentBrush}" CornerRadius="1.5" />
+                                            </Grid>
+                                        </StackPanel>
+                                        <Button Grid.Column="2" Style="{StaticResource IconButton}" Width="30" Height="30" FontSize="13" Tag="{Binding}"
+                                                Content="{Binding StarGlyph}" Click="OnStarClick" ToolTip="{loc:T iptv.favorites}" />
+                                    </Grid>
+                                    <DataTemplate.Triggers>
+                                        <DataTrigger Binding="{Binding IsPlaying}" Value="True">
+                                            <Setter TargetName="NameText" Property="Foreground" Value="{DynamicResource AccentBrush}" />
+                                            <Setter TargetName="NameText" Property="FontWeight" Value="SemiBold" />
+                                        </DataTrigger>
+                                    </DataTemplate.Triggers>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                        <TextBlock x:Name="EmptyText" HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center" MaxWidth="260"
+                                   Foreground="{DynamicResource TextSecondaryBrush}" IsHitTestVisible="False" />
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- Sada / sljedeće za izabrani kanal -->
+            <Border Grid.Row="3" Margin="0,6,0,0" BorderThickness="1" BorderBrush="{DynamicResource MenuBorderBrush}" CornerRadius="6" Padding="10,8">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <TextBlock x:Name="InfoName" FontSize="14" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                        <TextBlock x:Name="InfoGroup" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" Visibility="Collapsed" />
+                        <TextBlock x:Name="InfoNowLabel" FontSize="10" Margin="0,4,0,0" Foreground="{DynamicResource AccentBrush}" FontWeight="SemiBold" />
+                        <TextBlock x:Name="InfoNow" TextTrimming="CharacterEllipsis" FontWeight="SemiBold" FontSize="12" />
+                        <TextBlock x:Name="InfoNowTime" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" />
+                        <Grid x:Name="InfoProgress" Height="3" Margin="0,4,0,2" Visibility="Collapsed">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition x:Name="InfoFillCol" Width="1*" />
+                                <ColumnDefinition x:Name="InfoRestCol" Width="1*" />
+                            </Grid.ColumnDefinitions>
+                            <Border Grid.ColumnSpan="2" Background="{DynamicResource TrackBrush}" CornerRadius="1.5" />
+                            <Border Background="{DynamicResource AccentBrush}" CornerRadius="1.5" />
+                        </Grid>
+                        <TextBlock x:Name="InfoDesc" TextTrimming="CharacterEllipsis" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" MaxHeight="30" TextWrapping="Wrap" />
+                        <TextBlock x:Name="InfoNextLabel" FontSize="10" Margin="0,4,0,0" Foreground="{DynamicResource AccentBrush}" FontWeight="SemiBold" />
+                        <TextBlock x:Name="InfoNext" TextTrimming="CharacterEllipsis" FontSize="12" />
+                        <TextBlock x:Name="InfoNextTime" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Margin="8,0,0,0" VerticalAlignment="Top">
+                        <Button x:Name="PlayButton" Style="{StaticResource AccentButton}" Content="&#xE768;" FontFamily="{DynamicResource IconFont}" Padding="14,6" Click="OnPlayClick" />
+                        <Button x:Name="RetryButton" Style="{StaticResource SecondaryButton}" Content="{loc:T iptv.retry}" Margin="0,6,0,0" Visibility="Collapsed" Click="OnPlayClick" />
+                    </StackPanel>
+                    <TextBlock x:Name="PlayState" Grid.ColumnSpan="2" VerticalAlignment="Bottom" HorizontalAlignment="Right" Style="{StaticResource HintText}" Margin="0" />
+                </Grid>
+            </Border>
+
+            <!-- EPG traka -->
+            <Border Grid.Row="4" Margin="0,6,0,0" BorderThickness="1" BorderBrush="{DynamicResource MenuBorderBrush}" CornerRadius="6" Padding="4">
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Style="{StaticResource IconButton}" Content="&#xE76B;" Width="28" Height="26" Click="OnDayPrev" />
+                        <Button x:Name="DayButton" Style="{StaticResource SecondaryButton}" Padding="10,2" MinWidth="100" Click="OnDayToday" />
+                        <Button Style="{StaticResource IconButton}" Content="&#xE76C;" Width="28" Height="26" Click="OnDayNext" />
+                    </StackPanel>
+                    <ScrollViewer x:Name="EpgScroll" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Height="104" Focusable="False">
+                        <Grid>
+                            <Canvas x:Name="EpgCanvas" Height="84" HorizontalAlignment="Left" />
+                            <TextBlock x:Name="EpgEmpty" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="12,0" Foreground="{DynamicResource TextSecondaryBrush}" />
+                        </Grid>
+                    </ScrollViewer>
+                </DockPanel>
+            </Border>
+
+            <TextBlock x:Name="StatusText" Grid.Row="5" Margin="0,6,0,0" Style="{StaticResource HintText}" TextWrapping="Wrap" />
+        </Grid>
+
+        <!-- Hvatište na desnom rubu panela: povuci da proširiš ili suziš cijeli IPTV panel (širina popisa kanala). -->
+        <Border x:Name="EdgeGrip" Width="8" HorizontalAlignment="Right" Cursor="SizeWE" Panel.ZIndex="20" Background="Transparent"
+                MouseLeftButtonDown="OnEdgeDown" MouseMove="OnEdgeMove" MouseLeftButtonUp="OnEdgeUp" ToolTip="{loc:T iptv.resize}">
+            <Rectangle Width="3" HorizontalAlignment="Right" Fill="{DynamicResource MenuBorderBrush}" Opacity="0.55" />
+        </Border>
+
+        <!-- Obrazac za dodavanje/uređivanje veze -->
+        <Grid x:Name="SourceForm" Visibility="Collapsed" Background="#CC000000">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Focusable="False">
+            <Border Background="{DynamicResource PanelBackgroundBrush}" BorderBrush="{DynamicResource MenuBorderBrush}" BorderThickness="1" CornerRadius="8"
+                    Padding="16" Margin="12" VerticalAlignment="Center" HorizontalAlignment="Stretch">
+                <StackPanel>
+                    <TextBlock x:Name="FormTitle" Style="{StaticResource TabTitle}" />
+                    <TextBlock Text="{loc:T iptv.autoDetect}" Style="{StaticResource HintText}" TextWrapping="Wrap" Margin="0,0,0,8" />
+                    <TextBlock Text="{loc:T iptv.name}" Margin="0,6,0,2" />
+                    <TextBox x:Name="FName" Height="30" VerticalContentAlignment="Center" />
+                    <TextBlock Text="{loc:T iptv.type}" Margin="0,8,0,2" />
+                    <Button x:Name="FType" Style="{StaticResource ChoiceButton}" Click="OnFormTypeClick" HorizontalAlignment="Left" MinWidth="200" />
+                    <TextBlock x:Name="FAddressLabel" Margin="0,8,0,2" />
+                    <DockPanel>
+                        <Button x:Name="FBrowse" DockPanel.Dock="Right" Style="{StaticResource SecondaryButton}" Content="…" Margin="6,0,0,0" Click="OnBrowse" Visibility="Collapsed" />
+                        <TextBox x:Name="FAddress" Height="30" VerticalContentAlignment="Center" LostFocus="OnAddressLostFocus" />
+                    </DockPanel>
+                    <StackPanel x:Name="FCredentials">
+                        <TextBlock Text="{loc:T iptv.username}" Margin="0,8,0,2" />
+                        <TextBox x:Name="FUser" Height="30" VerticalContentAlignment="Center" />
+                        <TextBlock Text="{loc:T iptv.password}" Margin="0,8,0,2" />
+                        <PasswordBox x:Name="FPass" Height="30" VerticalContentAlignment="Center" />
+                        <TextBlock x:Name="FPassHint" Text="{loc:T iptv.passwordKeep}" Style="{StaticResource HintText}" Visibility="Collapsed" />
+                    </StackPanel>
+                    <TextBlock Text="{loc:T iptv.xmltv}" Margin="0,8,0,2" />
+                    <TextBox x:Name="FXmltv" Height="30" VerticalContentAlignment="Center" />
+                    <TextBlock x:Name="FWarn" Foreground="{DynamicResource ErrorBrush}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                    <TextBlock x:Name="FResult" TextWrapping="Wrap" Margin="0,6,0,0" />
+                    <TextBlock Text="{loc:T iptv.legal}" Style="{StaticResource HintText}" TextWrapping="Wrap" Margin="0,8,0,0" />
+                    <WrapPanel HorizontalAlignment="Right" Margin="0,14,0,0">
+                        <Button x:Name="FTest" Style="{StaticResource SecondaryButton}" Content="{loc:T iptv.test}" Click="OnFormTest" />
+                        <Button Style="{StaticResource SecondaryButton}" Content="{loc:T iptv.cancel}" Margin="8,0,0,0" Click="OnFormCancel" />
+                        <Button Style="{StaticResource AccentButton}" Content="{loc:T iptv.save}" Margin="8,0,0,0" Click="OnFormSave" />
+                    </WrapPanel>
+                </StackPanel>
+            </Border>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</UserControl>

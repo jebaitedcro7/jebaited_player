@@ -4,6 +4,26 @@ All notable changes to jebaited_player. Format: [Keep a Changelog](https://keepa
 
 Other languages: [Deutsch](CHANGELOG_DE.md) · [Hrvatski](CHANGELOG_HR.md). The same history is included in the player (click the version number on the home screen). This file is generated from `src/JebaitedPlayer.App/History/update-history.json`.
 
+## [2.4.16] - 2026-11-24
+
+IPTV: watch your own IPTV service (Xtream or M3U) inside the player, plus a new side bar on the home screen.
+
+### Added
+
+- IPTV: add your own connection (Xtream Codes, an M3U/M3U8 link or file) and watch live channels next to the video. Categories with flags and icons, search, favorites, recently watched, hide channels and categories (right click), sort A–Z, Z–A, original or your own order, program guide (now/next, a timeline by day), full-screen with F or a double click. You can change the font, text size and colors of the IPTV panel and drag its edges to the width you like. The password is stored encrypted on your computer, never in logs or exports. Use only services you are allowed to use; the player brings no channels or playlists.
+- Home screen side bar: open file, open folder, subtitle search, IPTV and radio are now in one place; it widens smoothly under the mouse and shows the names. The player card on the home screen has a Stop button for live streams.
+
+### Improved
+
+- Live streams (TV, radio) show a full progress bar and no duration, and a click on the picture no longer pauses a live TV stream.
+- Credentials of IPTV addresses are hidden in logs and error reports.
+
+### Known issues
+
+- IPTV servers that only offer plain HTTP are not encrypted; the player warns about it. Catch-up playback, custom channel groups and picture-in-picture are not available yet.
+
+Release: [v2.4.16](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v2.4.16) · Changes since [v2.3.15...v2.4.16](https://github.com/jebaitedcro7/jebaited_player/compare/v2.3.15...v2.4.16)
+
 ## [2.3.15] - 2026-11-22
 
 Notifications on the home screen, a choice of the mini player look in Settings, and fixes.

@@ -13,12 +13,17 @@
 
     <Grid>
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
 
+        <!-- IPTV (lijevo; video se suzi, pa se ništa ne preklapa). Panel se stvara tek kad zatreba. -->
+        <Border x:Name="IptvDock" Grid.Column="0" Width="520" Visibility="Collapsed"
+                Background="Transparent" BorderBrush="{DynamicResource MenuBorderBrush}" BorderThickness="0,0,1,0" />
+
         <!-- Područje videa (preko njega leže prozori s kontrolama i karticama). -->
-        <Grid x:Name="VideoArea">
+        <Grid x:Name="VideoArea" Grid.Column="1">
             <!-- Video (mpv crta ovdje). Skriven dok nema medija. -->
             <controls:VideoHost x:Name="Video" Visibility="Hidden" />
 
@@ -51,9 +56,56 @@
                         IsHitTestVisible="False" />
 
                 <!-- N3 (ciklus 6): vrijeme, datum i prognoza gore lijevo (nenametljivo, ne prima klikove). -->
-                <controls:HomeInfoLayer x:Name="HomeLayer" Panel.ZIndex="1" />
+                <controls:HomeInfoLayer x:Name="HomeLayer" Panel.ZIndex="1"  />
 
-                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+                <!-- Bočna traka (dizajn A): otvaranje datoteke i mape, pretraga titlova, IPTV, radio. Jedino mjesto tih radnji na početnom ekranu. -->
+                <Grid x:Name="HomeRail" Grid.Row="0" Grid.RowSpan="2" Width="56" ClipToBounds="True" HorizontalAlignment="Left" Panel.ZIndex="3">
+                    <!-- Uska traka: poluprozirna ploča. Široka (pod mišem): tamna ploča koja se prelijeva u prozirno udesno, bez oštrog ruba. -->
+                    <Rectangle x:Name="HomeRailNarrowBg" Fill="{DynamicResource HomeCardBrush}" />
+                    <Rectangle x:Name="HomeRailWideBg" Opacity="0">
+                        <Rectangle.Fill>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                <GradientStop Color="#F2090D14" Offset="0" />
+                                <GradientStop Color="#E2090D14" Offset="0.68" />
+                                <GradientStop Color="#00090D14" Offset="1" />
+                            </LinearGradientBrush>
+                        </Rectangle.Fill>
+                    </Rectangle>
+                    <StackPanel x:Name="HomeOpenButtons" Margin="6,10,6,10" VerticalAlignment="Center">
+                        <Button x:Name="HomeOpenFileButton" Style="{StaticResource RailButton}" Click="OnOpenClick" AutomationProperties.Name="{loc:T home.openFile}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE8E5;" FontFamily="{DynamicResource IconFont}" FontSize="18" Width="28" TextAlignment="Center" VerticalAlignment="Center" />
+                                <TextBlock Text="{loc:T home.openFile}" Margin="10,0,0,0" FontSize="13.5" VerticalAlignment="Center" Visibility="Collapsed" />
+                            </StackPanel>
+                        </Button>
+                        <Button x:Name="HomeOpenFolderButton" Style="{StaticResource RailButton}" Margin="0,4,0,0" Click="OnOpenFolderClick" AutomationProperties.Name="{loc:T home.openFolder}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE838;" FontFamily="{DynamicResource IconFont}" FontSize="18" Width="28" TextAlignment="Center" VerticalAlignment="Center" />
+                                <TextBlock Text="{loc:T home.openFolder}" Margin="10,0,0,0" FontSize="13.5" VerticalAlignment="Center" Visibility="Collapsed" />
+                            </StackPanel>
+                        </Button>
+                        <Button x:Name="HomeSearchButton" Style="{StaticResource RailButton}" Margin="0,4,0,0" Click="OnHomeSearchClick" AutomationProperties.Name="{loc:T home.railSearch}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE721;" FontFamily="{DynamicResource IconFont}" FontSize="18" Width="28" TextAlignment="Center" VerticalAlignment="Center" />
+                                <TextBlock Text="{loc:T home.railSearch}" Margin="10,0,0,0" FontSize="13.5" VerticalAlignment="Center" Visibility="Collapsed" />
+                            </StackPanel>
+                        </Button>
+                        <Button x:Name="HomeIptvButton" Style="{StaticResource RailButton}" Margin="0,4,0,0" Click="OnHomeIptvClick" AutomationProperties.Name="{loc:T iptv.title}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE7F4;" FontFamily="{DynamicResource IconFont}" FontSize="18" Width="28" TextAlignment="Center" VerticalAlignment="Center" />
+                                <TextBlock Text="{loc:T iptv.title}" Margin="10,0,0,0" FontSize="13.5" VerticalAlignment="Center" Visibility="Collapsed" />
+                            </StackPanel>
+                        </Button>
+                        <Button x:Name="HomeRadioButton" Style="{StaticResource RailButton}" Margin="0,4,0,0" Click="OnHomeRadioClick" AutomationProperties.Name="{loc:T menu.radio}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE7F6;" FontFamily="{DynamicResource IconFont}" FontSize="18" Width="28" TextAlignment="Center" VerticalAlignment="Center" />
+                                <TextBlock Text="{loc:T menu.radio}" Margin="10,0,0,0" FontSize="13.5" VerticalAlignment="Center" Visibility="Collapsed" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False" Margin="56,0,0,0">
                     <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="24,20,24,16">
                         <!-- Alien logo (glavni element) s blagim sjajem i ime ispod njega. -->
                         <Grid x:Name="LogoBlock" HorizontalAlignment="Center" Width="300" Height="200" IsHitTestVisible="False">
@@ -67,26 +119,6 @@
                         <TextBlock Text="{loc:T home.dropHint}" FontSize="15" Margin="0,18,0,0" MaxWidth="560"
                                    TextWrapping="Wrap" TextAlignment="Center"
                                    Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center" />
-
-                        <StackPanel x:Name="HomeOpenButtons" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,28,0,0">
-                            <Button Style="{StaticResource AccentButton}" Click="OnOpenClick">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xE8E5;" FontFamily="{DynamicResource IconFont}" FontSize="16" VerticalAlignment="Center" />
-                                    <TextBlock Text="{loc:T home.openFile}" Margin="10,0,0,0" FontSize="15" FontWeight="SemiBold" VerticalAlignment="Center" />
-                                </StackPanel>
-                            </Button>
-                            <Button Style="{StaticResource SecondaryButton}" Click="OnOpenFolderClick" Margin="10,0,0,0" Padding="18,10">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xE838;" FontFamily="{DynamicResource IconFont}" FontSize="16" VerticalAlignment="Center" />
-                                    <TextBlock Text="{loc:T home.openFolder}" Margin="10,0,0,0" FontSize="15" VerticalAlignment="Center" />
-                                </StackPanel>
-                            </Button>
-                        </StackPanel>
-
-                        <!-- Dok nijedan izvor titlova nema korisnikov račun ili ključ. -->
-                        <Button x:Name="OnlineSetupButton" Style="{StaticResource LinkButton}" Click="OnOnlineSetupClick"
-                                HorizontalAlignment="Center" Margin="0,16,0,0" Visibility="Collapsed"
-                                Content="{loc:T home.onlineSetup}" />
 
                         <TextBlock Text="{Binding ErrorMessage}" Foreground="{DynamicResource ErrorBrush}" Margin="0,18,0,0"
                                    HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" MaxWidth="560"
@@ -274,7 +306,7 @@
                 </ScrollViewer>
 
                 <!-- Donja traka: postavke i tema lijevo (zaseban red, pa popisi ne prelaze preko nje), verzija desno. -->
-                <StackPanel Grid.Row="1">
+                <StackPanel Grid.Row="1" Margin="56,0,0,0">
                 <!-- 2.1.7: kontrole reprodukcije na početnom ekranu (isto stanje kao player i mini player). -->
                 <Border x:Name="HomePlaybackBar" Visibility="Collapsed" MaxWidth="760" Margin="14,0,14,8" Padding="14,10"
                         Background="{DynamicResource HomeCardBrush}" CornerRadius="10">
@@ -304,6 +336,7 @@
                             <Button x:Name="HomePrevButton" Style="{StaticResource IconButton}" Content="&#xE892;" ToolTip="{loc:T mini.previous}" Click="OnHomePrevious" />
                             <Button x:Name="HomePlayPauseButton" Style="{StaticResource IconButton}" FontSize="20" Content="&#xE768;" ToolTip="{loc:T controls.playPause}" Click="OnHomePlayPause" />
                             <Button x:Name="HomeNextButton" Style="{StaticResource IconButton}" Content="&#xE893;" ToolTip="{loc:T mini.next}" Click="OnHomeNext" />
+                            <Button x:Name="HomeStopButton" Style="{StaticResource IconButton}" Content="&#xE71A;" ToolTip="{loc:T mini.stop}" Click="OnHomeStop" Visibility="Collapsed" />
                             <Button Style="{StaticResource IconButton}" Content="&#xE8A7;" ToolTip="{loc:T home.showPlayer}" Click="OnHomeShowPlayer" />
                         </StackPanel>
                         <StackPanel x:Name="HomeVolumeArea" Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0,0,0" Background="Transparent">
@@ -372,7 +405,7 @@
         </Grid>
 
         <!-- Popis epizoda (desno; video se suzi, pa se ništa ne preklapa). -->
-        <Border x:Name="PlaylistPanel" Grid.Column="1" Width="340" Visibility="Collapsed"
+        <Border x:Name="PlaylistPanel" Grid.Column="2" Width="340" Visibility="Collapsed"
                 Background="{DynamicResource PanelBackgroundBrush}" BorderBrush="{DynamicResource MenuBorderBrush}" BorderThickness="1,0,0,0">
             <DockPanel>
                 <Grid DockPanel.Dock="Top" Margin="16,10,6,6">

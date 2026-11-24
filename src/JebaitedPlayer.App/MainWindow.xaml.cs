@@ -164,15 +164,30 @@ public partial class MainWindow : Window
         Video.VideoClick += (_, _) =>
         {
             RegisterActivity();
-            _vm.TogglePause();
+            // IPTV (uživo): klik na sliku ne pauzira (pauza i nastavak uživo se spajaju iznova i zastaju); pauza samo gumbom.
+            if (!_currentIsIptv)
+            {
+                _vm.TogglePause();
+            }
         };
         Video.VideoDoubleClick += (_, _) =>
         {
-            // Prvi klik dvoklika je već pauzirao/pokrenuo video; vrati to stanje i promijeni cijeli zaslon.
-            _vm.TogglePause();
+            // Prvi klik dvoklika je već pauzirao/pokrenuo video; vrati to stanje i promijeni cijeli zaslon (IPTV: klik ne pauzira).
+            if (!_currentIsIptv)
+            {
+                _vm.TogglePause();
+            }
+
             SetFullscreen(!_vm.IsFullscreen);
         };
         Video.VideoRightClick += (_, _) => ShowContextMenu();
+        InitHomeRail();
+        // Početni ekran: desni klik otvara isti izbornik (uključuje IPTV).
+        WelcomePanel.MouseRightButtonUp += (_, e) =>
+        {
+            ShowContextMenu();
+            e.Handled = true;
+        };
         // 2.1.9: kotačić mijenja glasnoću bilo gdje na playeru (video, trake, Home); popisi koji se listaju kotačićem se i dalje listaju.
         Video.VideoMouseWheel += (_, delta) => ChangeVolumeByWheel(delta);
         Video.FilesDropped += (_, files) => OpenFiles(files);
@@ -355,7 +370,7 @@ public partial class MainWindow : Window
         // 2.1.12: čuvar pokretanja – oznaka se briše čim je prozor na zaslonu (ne čeka učitavanje svega ostalog).
         Dispatcher.BeginInvoke(CompleteStartupGuardIfVisible, System.Windows.Threading.DispatcherPriority.Background);
         Dispatcher.BeginInvoke(ApplyTestFaultAfterStartup, System.Windows.Threading.DispatcherPriority.Background);
-        UpdateOnlineSetupButton();
+        UpdateHomeRail();
         OfferOnlineSetupOnFirstRun();
 
         // N4: vlastita pozadina se učitava tek kad je prozor prikazan, izvan UI dretve (ne usporava pokretanje).
@@ -897,6 +912,21 @@ public partial class MainWindow : Window
             WindowState = _restoreState == WindowState.Maximized ? WindowState.Maximized : WindowState.Normal;
         }
 
+        // IPTV panel nije dio cijelog zaslona: sakrij ga i vrati nakon izlaska.
+        if (fullscreen)
+        {
+            _iptvDockWasVisible = IsIptvVisible;
+            if (_iptvDockWasVisible)
+            {
+                IptvDock.Visibility = Visibility.Collapsed;
+            }
+        }
+        else if (_iptvDockWasVisible)
+        {
+            IptvDock.Visibility = Visibility.Visible;
+            _iptvDockWasVisible = false;
+        }
+
         _vm.IsFullscreen = fullscreen;
         UpdateOverlayBounds();
         RegisterActivity();
@@ -904,6 +934,13 @@ public partial class MainWindow : Window
 
     private void OnPreviewKeyDown(object sender, KeyEventArgs e)
     {
+        // Dok se u IPTV panelu upisuje tekst (pretraga, obrazac veze), tipke su za tekst, ne prečaci playera.
+        if (Keyboard.FocusedElement is System.Windows.Controls.Primitives.TextBoxBase or System.Windows.Controls.PasswordBox
+            && Keyboard.FocusedElement is DependencyObject fe && IptvDock.IsAncestorOf(fe))
+        {
+            return;
+        }
+
         if (HandleKey(e))
         {
             e.Handled = true;

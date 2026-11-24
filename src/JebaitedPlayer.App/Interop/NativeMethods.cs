@@ -155,12 +155,22 @@ internal static class NativeMethods
     [DllImport("shell32.dll")]
     public static extern void DragFinish(nint hDrop);
 
-    [DllImport("user32.dll")]
-    public static extern bool SetCursorPos(int x, int y);
+    /// <summary>Dijagnostika bez miša (JEBAITED_DIAG_NO_MOUSE=1): testovi ne smiju micati kursor ni „klikati” (korisnik radi na drugom monitoru).</summary>
+    public static bool NoMouse { get; } = Environment.GetEnvironmentVariable("JEBAITED_DIAG_NO_MOUSE") == "1";
+
+    public static bool SetCursorPos(int x, int y) => NoMouse || SetCursorPosNative(x, y);
+
+    [DllImport("user32.dll", EntryPoint = "SetCursorPos")]
+    private static extern bool SetCursorPosNative(int x, int y);
 
     /// <summary>Dijagnostika (UPGRADE 3): pritisak ili otpuštanje lijeve tipke miša na mjestu kursora (pravi ulaz, kao korisnik).</summary>
     public static void MouseButton(bool down)
     {
+        if (NoMouse)
+        {
+            return;
+        }
+
         var input = new INPUT { type = 0, mi = new MOUSEINPUT { dwFlags = down ? 0x0002u : 0x0004u } };
         SendInput(1, [input], Marshal.SizeOf<INPUT>());
     }

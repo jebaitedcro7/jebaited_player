@@ -68,6 +68,10 @@
                                        HorizontalAlignment="Right" VerticalAlignment="Center" />
                         </Grid>
                         <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.autoNextHint}" />
+                        <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T iptv.title}" Margin="0,24,0,2" />
+                        <CheckBox x:Name="IptvEnableBox" Content="{loc:T iptv.enable}" Checked="OnIptvEnableChanged" Unchecked="OnIptvEnableChanged" />
+                        <TextBlock Style="{StaticResource HintText}" Text="{loc:T iptv.legal}" TextWrapping="Wrap" />
+                        <Button x:Name="IptvOpenButton" Style="{StaticResource SecondaryButton}" Content="{loc:T menu.iptv}" HorizontalAlignment="Left" Margin="0,8,0,0" Click="OnIptvOpen" />
                         <!-- Naslov je u svom retku: u jednom retku s klizačem je dugi naslov guran vrijednost izvan vidljivog dijela. -->
                         <TextBlock Text="{loc:T settings.upNextLead}" Margin="0,12,0,4" TextWrapping="Wrap" />
                         <Grid MaxWidth="440" HorizontalAlignment="Left">

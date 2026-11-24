@@ -4,6 +4,26 @@ Alle wichtigen Änderungen an jebaited_player. Format: [Keep a Changelog](https:
 
 Andere Sprachen: [English](CHANGELOG.md) · [Hrvatski](CHANGELOG_HR.md). Derselbe Verlauf ist im Player enthalten (Klick auf die Versionsnummer auf dem Startbildschirm). Diese Datei wird aus `src/JebaitedPlayer.App/History/update-history.json` erzeugt.
 
+## [2.4.16] - 2026-11-24
+
+IPTV: Schau deinen eigenen IPTV-Dienst (Xtream oder M3U) im Player, dazu eine neue Seitenleiste auf dem Startbildschirm.
+
+### Neu
+
+- IPTV: Füge deine eigene Verbindung hinzu (Xtream Codes, M3U/M3U8-Link oder -Datei) und sieh Live-Kanäle neben dem Video. Kategorien mit Flaggen und Symbolen, Suche, Favoriten, zuletzt gesehen, Kanäle und Kategorien ausblenden (Rechtsklick), Sortierung A–Z, Z–A, Original oder eigene Reihenfolge, Programmführer (Jetzt/Danach, Zeitleiste pro Tag), Vollbild mit F oder Doppelklick. Schriftart, Textgröße und Farben des IPTV-Panels sind einstellbar, die Ränder lassen sich auf die gewünschte Breite ziehen. Das Passwort wird verschlüsselt auf deinem Computer gespeichert, nie in Protokollen oder Exporten. Nutze nur Dienste, die du nutzen darfst; der Player bringt keine Kanäle oder Playlists mit.
+- Seitenleiste auf dem Startbildschirm: Datei öffnen, Ordner öffnen, Untertitelsuche, IPTV und Radio sind jetzt an einer Stelle; sie wird unter der Maus sanft breiter und zeigt die Namen. Die Player-Karte auf dem Startbildschirm hat eine Stopp-Taste für Live-Streams.
+
+### Verbessert
+
+- Live-Streams (TV, Radio) zeigen eine volle Fortschrittsleiste ohne Dauer, und ein Klick auf das Bild pausiert einen Live-TV-Stream nicht mehr.
+- Zugangsdaten in IPTV-Adressen werden in Protokollen und Fehlerberichten verborgen.
+
+### Bekannte Probleme
+
+- IPTV-Server, die nur einfaches HTTP anbieten, sind nicht verschlüsselt; der Player warnt davor. Catch-up-Wiedergabe, eigene Kanalgruppen und Bild-in-Bild gibt es noch nicht.
+
+Release: [v2.4.16](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v2.4.16) · Änderungen seit [v2.3.15...v2.4.16](https://github.com/jebaitedcro7/jebaited_player/compare/v2.3.15...v2.4.16)
+
 ## [2.3.15] - 2026-11-22
 
 Benachrichtigungen auf dem Startbildschirm, Auswahl des Mini-Player-Aussehens in den Einstellungen und Korrekturen.

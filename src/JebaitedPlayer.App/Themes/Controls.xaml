@@ -41,6 +41,42 @@
         </Setter>
     </Style>
 
+    <!-- Gumb bočne trake početnog ekrana: ikona lijevo, naziv desno (vidljiv kad se traka proširi). -->
+    <Style x:Key="RailButton" TargetType="Button">
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+        <Setter Property="Height" Value="42" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Grid Background="Transparent">
+                        <!-- Sjaj naglasne boje koji blijedi udesno + tanka crta lijevo (pod mišem). -->
+                        <Border x:Name="Glow" Background="{DynamicResource AccentBrush}" Visibility="Collapsed" IsHitTestVisible="False">
+                            <Border.OpacityMask>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                    <GradientStop Color="#38000000" Offset="0" />
+                                    <GradientStop Color="#00000000" Offset="1" />
+                                </LinearGradientBrush>
+                            </Border.OpacityMask>
+                        </Border>
+                        <Border x:Name="Ind" Width="3" HorizontalAlignment="Left" Margin="0,8" CornerRadius="2" Background="{DynamicResource AccentBrush}" Visibility="Collapsed" IsHitTestVisible="False" />
+                        <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Glow" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="Ind" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Glow" Property="Opacity" Value="1.6" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- Glavni gumb (naglasna boja). -->
     <Style x:Key="AccentButton" TargetType="Button">
         <Setter Property="Focusable" Value="False" />

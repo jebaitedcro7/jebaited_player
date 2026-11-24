@@ -35,6 +35,11 @@ public partial class MainWindow
 
         menu.Items.Add(Item(Loc.T("menu.miniPlayer"), Shortcuts.Gesture(_settings, "miniPlayer"), ShowMiniPlayer));
         menu.Items.Add(Item(Loc.T("menu.radio"), Shortcuts.Gesture(_settings, "radio"), () => ShowRadio()));
+        if (IptvEnabled)
+        {
+            menu.Items.Add(Item(Loc.T("menu.iptv"), null, () => ShowIptv()));
+        }
+
         menu.Items.Add(Item(Loc.T("menu.spotify"), Shortcuts.Gesture(_settings, "spotify"), () => ShowSpotify()));
         menu.Items.Add(Item(Loc.T("menu.youtube"), Shortcuts.Gesture(_settings, "youTube"), () => ShowYouTube()));
         menu.Items.Add(Item(Loc.T("menu.discord"), Shortcuts.Gesture(_settings, "discord"), () => ShowDiscord()));
@@ -196,16 +201,59 @@ public partial class MainWindow
         _onlineSetupWindow.Closed += (_, _) =>
         {
             _onlineSetupWindow = null;
-            UpdateOnlineSetupButton();
+            UpdateHomeRail();
         };
         _onlineSetupWindow.Show();
     }
 
-    /// <summary>Gumb na početnom ekranu dok korisnik nema nijedan svoj račun ili ključ.</summary>
-    private void UpdateOnlineSetupButton() =>
-        OnlineSetupButton.Visibility = OnlineSetup.HasPersonalSetup(_settings.Online) ? Visibility.Collapsed : Visibility.Visible;
+    /// <summary>Bočna traka početnog ekrana: IPTV gumb samo dok je modul uključen.</summary>
+    private void UpdateHomeRail() =>
+        HomeIptvButton.Visibility = IptvEnabled ? Visibility.Visible : Visibility.Collapsed;
 
-    private void OnOnlineSetupClick(object sender, RoutedEventArgs e) => ShowOnlineSetup();
+    /// <summary>Pretraga titlova: uz otvoren video traži titlove; inače postavljanje/izvori (nema što tražiti bez videa).</summary>
+    /// <summary>
+    /// Pretraga titlova traži video za koji se traže titlovi. Bez videa (ili uz TV/radio uživo) odmah se nudi izbor videa,
+    /// a čim se učita otvara se prozor pretrage (nikad postavke izvora i nikad „tiha” poruka koju se previdi).
+    /// </summary>
+    private async void OnHomeSearchClick(object sender, RoutedEventArgs e)
+    {
+        if (_vm.HasMedia && !_vm.IsLiveStream)
+        {
+            ShowSearchWindow();
+            return;
+        }
+
+        var dialog = new Microsoft.Win32.OpenFileDialog
+        {
+            Title = Loc.T("notice.openVideoBeforeSearch"),
+            Multiselect = false,
+            Filter = MediaFormats.DialogFilter,
+        };
+        if (dialog.ShowDialog(this) != true)
+        {
+            return;
+        }
+
+        OpenFiles(dialog.FileNames);
+        await WaitForVideoLoadedAsync(15000);
+        if (_vm.HasMedia && !_vm.IsLiveStream)
+        {
+            ShowSearchWindow();
+        }
+    }
+
+    private async Task WaitForVideoLoadedAsync(int timeoutMs)
+    {
+        long end = Environment.TickCount64 + timeoutMs;
+        while (Environment.TickCount64 < end && !(_vm.HasMedia && !_vm.IsLoading && _vm.Position > 0))
+        {
+            await Task.Delay(100);
+        }
+    }
+
+    private void OnHomeIptvClick(object sender, RoutedEventArgs e) => ShowIptv();
+
+    private void OnHomeRadioClick(object sender, RoutedEventArgs e) => ShowRadio();
 
     /// <summary>
     /// Prvo pokretanje bez datoteke (npr. odmah nakon instalacije): vodič se ponudi jednom.

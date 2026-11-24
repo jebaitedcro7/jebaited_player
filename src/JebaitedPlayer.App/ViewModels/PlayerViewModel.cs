@@ -113,6 +113,9 @@ public sealed class PlayerViewModel : ObservableObject
         private set => SetField(ref _stoppedStream, value);
     }
 
+    /// <summary>Zaboravi zaustavljeni stream (IPTV: nakon Stopa player nestaje s početnog ekrana).</summary>
+    public void ClearStoppedStream() => StoppedStream = null;
+
     /// <summary>Na početnom ekranu: prikaži popis prečaca (inače "Nastavi gledati").</summary>
     public bool ShowWelcomeShortcuts
     {
@@ -233,6 +236,7 @@ public sealed class PlayerViewModel : ObservableObject
             if (SetField(ref _position, value))
             {
                 OnPropertyChanged(nameof(PositionText));
+                OnPropertyChanged(nameof(TimelinePosition));
             }
         }
     }
@@ -247,11 +251,15 @@ public sealed class PlayerViewModel : ObservableObject
                 OnPropertyChanged(nameof(DurationText));
                 OnPropertyChanged(nameof(PositionText));
                 OnPropertyChanged(nameof(TimelineMaximum));
+                OnPropertyChanged(nameof(TimelinePosition));
             }
         }
     }
 
-    public double TimelineMaximum => Duration > 0 ? Duration : 1;
+    public double TimelineMaximum => IsLiveStream ? 1 : Duration > 0 ? Duration : 1;
+
+    /// <summary>Položaj na traci: uživo (TV, radio) nema trajanja ni premotavanja, pa je traka uvijek puna.</summary>
+    public double TimelinePosition => IsLiveStream ? TimelineMaximum : Position;
 
     public string Title
     {
@@ -289,7 +297,7 @@ public sealed class PlayerViewModel : ObservableObject
 
     public string PositionText => TimeFormat.Format(Position, Duration >= 3600);
 
-    public string DurationText => TimeFormat.Format(Duration, Duration >= 3600);
+    public string DurationText => IsLiveStream ? string.Empty : TimeFormat.Format(Duration, Duration >= 3600);
 
     public string PlayPauseGlyph => IsPaused ? "" : "";
 
@@ -337,6 +345,10 @@ public sealed class PlayerViewModel : ObservableObject
         Position = 0;
         Duration = 0;
         _eofReached = false;
+        // Uživo (TV, radio) traka je puna i bez trajanja: osvježi vezane vrijednosti i kad se Position/Duration nisu promijenili.
+        OnPropertyChanged(nameof(TimelinePosition));
+        OnPropertyChanged(nameof(TimelineMaximum));
+        OnPropertyChanged(nameof(DurationText));
 
         // Pauza se postavlja prije učitavanja, da video ne krene dok korisnik ne odgovori na pitanje o nastavku.
         _player.SetPropertyAsync("pause", startPaused);

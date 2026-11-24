@@ -224,6 +224,13 @@ public class DiagLoggerTests
 public class RedactorTests
 {
     [TestMethod]
+    public void Hides_iptv_credentials_in_paths_and_queries()
+    {
+        Assert.AreEqual("Opening http://srv.example:80/live/***/***/123.m3u8", Redactor.Clean("Opening http://srv.example:80/live/mojeime/mojalozinka/123.m3u8"));
+        Assert.AreEqual("http://s/player_api.php?username=***&password=***", Redactor.Clean("http://s/player_api.php?username=ime&password=lozinka"));
+    }
+
+    [TestMethod]
     public void Clean_RemovesProfileAndSecrets()
     {
         Assert.AreEqual(@"<dir>\a.mkv", Redactor.Clean(@"C:\Users\Some User\Videos\a.mkv"));

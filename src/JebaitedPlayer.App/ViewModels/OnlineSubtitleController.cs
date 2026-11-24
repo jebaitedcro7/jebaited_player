@@ -219,7 +219,7 @@ public sealed class OnlineSubtitleController : ObservableObject
     {
         try
         {
-            if (!_settings.Online.AutoSearch || e.Restored || e.VideoPath is null || _vm.IsAudioOnly)
+            if (!_settings.Online.AutoSearch || e.Restored || e.VideoPath is null || _vm.IsAudioOnly || _vm.IsLiveStream)
             {
                 return;
             }

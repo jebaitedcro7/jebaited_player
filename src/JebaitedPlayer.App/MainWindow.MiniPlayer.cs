@@ -22,6 +22,12 @@ public partial class MainWindow : IMiniPlayerHost
     /// <summary>Dijagnostika ne prebacuje sama (testovi drugih dijelova), osim scenarija koji to testira.</summary>
     private bool _diagAutoSwitch;
 
+    /// <summary>Sljedeće učitavanje je video stream (IPTV), iako je putanja internetska adresa.</summary>
+    private bool _nextLoadIsVideo;
+
+    /// <summary>Trenutno svira IPTV kanal (klik na sliku ne pauzira; pauza samo gumbom).</summary>
+    private bool _currentIsIptv;
+
     /// <summary>Glazba (datoteka ili internetski stream) ili video.</summary>
     internal static bool IsMusic(string path) => MediaScanner.IsAudio(path) || PlayerViewModel.IsStreamPath(path);
 
@@ -31,7 +37,10 @@ public partial class MainWindow : IMiniPlayerHost
     /// </summary>
     private void OnLoadStarting(string path)
     {
-        bool music = IsMusic(path);
+        // IPTV kanal je internetski stream, ali je TV (video): ne ponaša se kao radio (mini player, glazbeni equalizer).
+        bool music = !_nextLoadIsVideo && IsMusic(path);
+        _currentIsIptv = _nextLoadIsVideo;
+        _nextLoadIsVideo = false;
         if (music != MpvConfig.MusicMode)
         {
             MpvConfig.MusicMode = music;

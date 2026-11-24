@@ -155,6 +155,7 @@ public partial class PlayerSettingsWindow : Window
         LoadAppearance();
         LoadAccent();
         LoadNews();
+        LoadIptv();
         LoadShortcuts();
         LoadUpdates();
         LoadAbout();

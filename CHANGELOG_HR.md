@@ -4,6 +4,26 @@ Sve važnije promjene jebaited_playera. Oblik: [Keep a Changelog](https://keepac
 
 Drugi jezici: [English](CHANGELOG.md) · [Deutsch](CHANGELOG_DE.md). Ista povijest je i u playeru (klik na broj verzije na početnom ekranu). Ova datoteka nastaje iz `src/JebaitedPlayer.App/History/update-history.json`.
 
+## [2.4.16] - 2026-11-24
+
+IPTV: gledaj svoju IPTV uslugu (Xtream ili M3U) u playeru, uz novu bočnu traku na početnom ekranu.
+
+### Novo
+
+- IPTV: dodaj vlastitu vezu (Xtream Codes, M3U/M3U8 poveznicu ili datoteku) i gledaj kanale uživo uz video. Kategorije sa zastavama i ikonama, pretraga, favoriti, nedavno gledano, skrivanje kanala i kategorija (desni klik), sortiranje A–Ž, Ž–A, izvorno ili po tvom redoslijedu, vodič programa (sada/sljedeće, vremenska crta po danima), cijeli zaslon tipkom F ili dvoklikom. Možeš promijeniti font, veličinu teksta i boje IPTV panela te povući rubove na željenu širinu. Lozinka se sprema šifrirana na tvom računalu, nikad u dnevnike ni izvoze. Koristi samo usluge koje smiješ koristiti; player ne donosi kanale ni popise.
+- Bočna traka na početnom ekranu: otvori datoteku, otvori mapu, pretraga titlova, IPTV i radio sada su na jednom mjestu; pod mišem se glatko proširi i pokaže nazive. Kartica playera na početnom ekranu ima gumb Stop za tokove uživo.
+
+### Poboljšano
+
+- Tokovi uživo (TV, radio) prikazuju punu traku napretka bez trajanja, a klik na sliku više ne pauzira TV uživo.
+- Vjerodajnice u IPTV adresama skrivene su u dnevnicima i izvještajima o greškama.
+
+### Poznati problemi
+
+- IPTV poslužitelji koji nude samo običan HTTP nisu šifrirani; player na to upozorava. Reprodukcija catch-up, vlastite grupe kanala i slika u slici još nisu dostupni.
+
+Izdanje: [v2.4.16](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v2.4.16) · Promjene od [v2.3.15...v2.4.16](https://github.com/jebaitedcro7/jebaited_player/compare/v2.3.15...v2.4.16)
+
 ## [2.3.15] - 2026-11-22
 
 Obavijesti na početnom ekranu, odabir izgleda mini playera u Postavkama i ispravci.

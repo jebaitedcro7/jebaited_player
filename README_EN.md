@@ -55,7 +55,7 @@ You need Windows 10 or 11 (64-bit). Nothing else has to be installed (download s
 
 <p align="center"><img src="manual/images/en/home.jpg" width="760" alt="Main screen"></p>
 
-- **Open file** and **Open folder** open videos; you can also drag files or folders into the window.
+- The **side bar** on the left (icons; it widens under the mouse and shows the names): **Open file**, **Open folder**, **Subtitle search**, **IPTV** and **Radio**. You can also drag files or folders into the window.
 - **Continue watching** lists the last videos with the position where you stopped. Click to continue, **×** to remove an item from the history.
 - **Favorites** holds movies and whole series (Ctrl+D while watching). A series opens at the episode you are on.
 - **Keyboard shortcuts (F1)** shows all shortcuts.
@@ -134,6 +134,14 @@ In the same tab you set the automatic search, the encoding of old subtitles and 
 - Stations play in the mini player with the music equalizer, marked **RADIO** and **LIVE**, with the current song when the station sends it. Radio does not appear in “Continue watching”.
 - **Stop** really stops the station (it stays shown in the mini player); **Play** or Space connects again, live. Pause → Play also continues live, and live radio cannot be rewound.
 
+### IPTV
+
+- Click **IPTV** in the home screen side bar (or right-click the video → **IPTV…**). The panel opens to the left of the video. **Add connection**: an **Xtream Codes** account (server, username, password), an **M3U/M3U8** link or an M3U file; **Test connection** checks it once (no repeated logins). You can add several connections; edit, refresh or remove them any time.
+- Categories (with flags and icons) | channels with logo, the program that is on now and a progress bar, **★** for favorites; **search**, **sort** (A–Z, Z–A, original, your own order: right-click a channel → move up/down), **Recently watched**, hide a channel or a whole category (right-click; ⋯ → *Show hidden channels* brings them back). Double-click or Enter plays a channel in the main player; **F** or a double-click on the picture is full screen; clicking the picture does not pause live TV (use the pause button). **Stop** on the home screen player stops the TV and closes the panel.
+- The program guide shows *now* and *next*, a timeline by day (XMLTV or the service's own guide) and says so when there is no guide data.
+- ⋯ → **Appearance**: font, text size, highlight color and background of the IPTV panel only. Drag the panel's right edge and the divider between categories and channels to the width you like; it is remembered. ⋯ → export/import preferences (favorites, order, hidden ones – never passwords).
+- Your password is stored **encrypted** (DPAPI) and never shown, logged or exported. If the server only offers plain **HTTP**, the login and the stream are not encrypted and the player warns about it. The player brings **no channels or playlists**: use only services you are allowed to use. Switch the module off in **Settings → General → IPTV**.
+
 ### Spotify
 
 - **Ctrl+Shift+S**, right-click → **Spotify…** or the source label in the mini player. jebaited_player is a remote control for your Spotify app: the music plays in Spotify (computer, phone or speaker), the player shows the song with its cover and controls it. Controlling playback needs **Spotify Premium**.
@@ -158,7 +166,7 @@ In the same tab you set the automatic search, the encoding of old subtitles and 
 ### Torlink (search online, GitHub build only)
 
 - Optional and **off by default**. Turn it on in **Settings → Torlink**. After you accept a notice, the player downloads a verified package (Node.js + Torlink, about 40 MB, SHA-256 checked) from this repository's releases. It is **not part of the Microsoft Store version**.
-- Then a third button, **Search online**, appears on the home screen next to Open file and Open folder. It opens the Torlink page: one search over several public indexes (movies, TV, anime, games), results with size, seeders and source (sort and filter), and a download manager (active, queue, completed, failed; pause, resume, cancel, open folder, play). **Home** (or Esc / Alt+←) returns to the player's home screen and downloads continue; **Ctrl+Shift+T** opens and closes the page.
+- Then another item, **Search online movies and series**, appears in the home screen side bar. It opens the Torlink page: one search over several public indexes (movies, TV, anime, games), results with size, seeders and source (sort and filter), and a download manager (active, queue, completed, failed; pause, resume, cancel, open folder, play). **Home** (or Esc / Alt+←) returns to the player's home screen and downloads continue; **Ctrl+Shift+T** opens and closes the page.
 - Torlink is the open-source project [baairon/torlink](https://github.com/baairon/torlink) (MIT), used unchanged. The player talks to it through its local interface and runs it only while it is needed. Settings: download folder, simultaneous downloads, playlist.m3u, extra trackers, network interface (VPN) and sharing after the download (**off by default**). Updates only on your click, from our verified package, with automatic rollback.
 - **Your responsibility:** BitTorrent shows your IP address to other users. Download and share only what you are allowed to. The player does not host or check any content. See [PRIVACY.md](PRIVACY.md).
 

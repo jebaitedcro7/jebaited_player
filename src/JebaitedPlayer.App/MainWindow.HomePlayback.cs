@@ -105,7 +105,7 @@ public partial class MainWindow
         bool stream = !spotify && !youtube && (_vm.IsLiveStream || _vm.StoppedStream != null);
         bool live = !spotify && !youtube && _vm.IsLiveStream && !_vm.IsPaused;
 
-        string source = Loc.T(spotify ? "mini.sourceSpotify" : youtube ? "mini.sourceYouTube" : stream ? "mini.sourceRadio" : "mini.sourceLocal");
+        string source = Loc.T(spotify ? "mini.sourceSpotify" : youtube ? "mini.sourceYouTube" : stream ? (_currentIsIptv ? "iptv.title" : "mini.sourceRadio") : "mini.sourceLocal");
         if (_discord is { State: DiscordBotState.InChannel, Decision: DiscordAudioDecision.Send })
         {
             source += " · " + Loc.T("home.sourceDiscord");
@@ -165,6 +165,8 @@ public partial class MainWindow
         HomeVolumeArea.Visibility = spotify || youtube ? Visibility.Collapsed : Visibility.Visible;
         bool canSkip = spotify || youtube || (!stream && _vm.Library.HasPlaylist);
         HomePrevButton.IsEnabled = HomeNextButton.IsEnabled = canSkip;
+        // Stop za uživo tokove (IPTV, radio): zaustavi i, za IPTV, ukloni player s početnog ekrana.
+        HomeStopButton.Visibility = !spotify && !youtube && _vm.IsLiveStream ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private async Task RefreshHomeTrackAsync()
@@ -229,6 +231,20 @@ public partial class MainWindow
         {
             _vm.Library.PlayNext();
         }
+    }
+
+    private void OnHomeStop(object sender, RoutedEventArgs e)
+    {
+        _vm.Stop();
+        if (_currentIsIptv)
+        {
+            // IPTV se ne nastavlja „iz zaustavljenog”: tok se prekida, a player nestaje s početnog ekrana.
+            _vm.ClearStoppedStream();
+            _currentIsIptv = false;
+            HideIptv();
+        }
+
+        UpdateHomePlayback();
     }
 
     private void OnHomePlayPause(object sender, RoutedEventArgs e)

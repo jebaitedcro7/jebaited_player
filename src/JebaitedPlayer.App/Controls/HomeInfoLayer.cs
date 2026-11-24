@@ -133,7 +133,8 @@ public sealed class HomeInfoLayer : Grid
         StyleText(WeatherText, s.WeatherStyle, weatherSize);
         _detailSize = Math.Max(8, weatherSize * 0.92);
         _detailFont = s.WeatherStyle.Font.Length > 0 ? new FontFamily(s.WeatherStyle.Font) : null;
-        Margin = new Thickness(0);
+        // Lijevo je bočna traka početnog ekrana (56 px): informacije ne smiju ići ispod nje.
+        Margin = new Thickness(56, 0, 0, 0);
 
         foreach (StackPanel panel in _anchors.Values)
         {

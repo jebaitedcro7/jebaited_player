@@ -2,6 +2,7 @@
   <Folder Name="/src/">
     <Project Path="src/JebaitedPlayer.App/JebaitedPlayer.App.csproj" />
     <Project Path="src/JebaitedPlayer.Diagnostics/JebaitedPlayer.Diagnostics.csproj" />
+    <Project Path="src/JebaitedPlayer.Iptv/JebaitedPlayer.Iptv.csproj" />
     <Project Path="src/JebaitedPlayer.Library/JebaitedPlayer.Library.csproj" />
     <Project Path="src/JebaitedPlayer.Localization/JebaitedPlayer.Localization.csproj" />
     <Project Path="src/JebaitedPlayer.Mpv/JebaitedPlayer.Mpv.csproj" />
@@ -13,6 +14,7 @@
   <Folder Name="/tests/">
     <Project Path="tests/JebaitedPlayer.App.Tests/JebaitedPlayer.App.Tests.csproj" />
     <Project Path="tests/JebaitedPlayer.Diagnostics.Tests/JebaitedPlayer.Diagnostics.Tests.csproj" />
+    <Project Path="tests/JebaitedPlayer.Iptv.Tests/JebaitedPlayer.Iptv.Tests.csproj" />
     <Project Path="tests/JebaitedPlayer.Library.Tests/JebaitedPlayer.Library.Tests.csproj" />
     <Project Path="tests/JebaitedPlayer.Localization.Tests/JebaitedPlayer.Localization.Tests.csproj" />
     <Project Path="tests/JebaitedPlayer.Online.Tests/JebaitedPlayer.Online.Tests.csproj" />

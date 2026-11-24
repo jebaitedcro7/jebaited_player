@@ -77,10 +77,34 @@ public partial class MainWindow
     /// glavni prozor se ne smije ni načas pojaviti. Prije se prvo prikazao veliki prozor, pa tek onda mali.
     /// Glavni prozor se zato prikaže izvan zaslona i bez gumba na taskbaru (mpv i dalje dobiva svoj prozor), a mini ga zatim sakrije.
     /// </summary>
+    /// <summary>
+    /// Dijagnostika (JEBAITED_DIAG_MONITOR="x,y,širina,visina" u pikselima): prozor se otvara i maksimizira na tom monitoru,
+    /// da testovi ne smetaju na monitoru na kojem korisnik radi.
+    /// </summary>
+    private void PlaceOnDiagnosticMonitor()
+    {
+        string[]? p = Environment.GetEnvironmentVariable("JEBAITED_DIAG_MONITOR")?.Split(',');
+        if (p is not { Length: 4 } || !p.All(v => int.TryParse(v, out _)))
+        {
+            return;
+        }
+
+        int x = int.Parse(p[0]), y = int.Parse(p[1]), w = int.Parse(p[2]), h = int.Parse(p[3]);
+        WindowStartupLocation = WindowStartupLocation.Manual;
+        SourceInitialized += (_, _) =>
+        {
+            nint hwnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
+            // SWP_NOZORDER | SWP_NOACTIVATE
+            Interop.NativeMethods.SetWindowPos(hwnd, 0, x + 60, y + 60, Math.Max(800, Math.Min(w - 120, 1300)), Math.Max(600, Math.Min(h - 120, 800)), 0x0004 | 0x0010);
+        };
+        Loaded += (_, _) => WindowState = WindowState.Maximized;
+    }
+
     internal void PrepareStartup()
     {
         if (_options.IsDiagnostics)
         {
+            PlaceOnDiagnosticMonitor();
             return;
         }
 

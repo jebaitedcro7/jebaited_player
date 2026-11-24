@@ -55,7 +55,7 @@ Treba ti Windows 10 ili 11 (64-bitni). Ništa drugo nije potrebno instalirati (o
 
 <p align="center"><img src="manual/images/hr/home.jpg" width="760" alt="Glavni ekran"></p>
 
-- **Otvori datoteku** i **Otvori mapu** otvaraju video; datoteke i mape možeš i povući u prozor.
+- **Bočna traka** lijevo (ikone; pod mišem se proširi i pokaže nazive): **Otvori datoteku**, **Otvori mapu**, **Pretraga titlova**, **IPTV** i **Radio**. Datoteke i mape možeš i povući u prozor.
 - **Nastavi gledati** prikazuje zadnje videe s mjestom gdje si stao. Klik nastavlja, **×** uklanja stavku iz povijesti.
 - **Omiljeno** sadrži filmove i cijele serije (Ctrl+D tijekom gledanja). Serija se otvara na epizodi na kojoj si.
 - **Tipkovnički prečaci (F1)** prikazuje sve prečace.
@@ -134,6 +134,14 @@ U istoj kartici podešavaš automatsko traženje, kodiranje starih titlova i izg
 - Postaje sviraju u mini playeru s glazbenim equalizerom, označene s **RADIO** i **UŽIVO**, uz trenutnu pjesmu kad je postaja šalje. Radio ne ulazi u „Nastavi gledati”.
 - **Stop** stvarno zaustavlja postaju (ostaje prikazana u mini playeru); **Play** ili razmak je ponovno spajaju, uživo. I Pauza → Play nastavlja uživo, a radio uživo se ne premotava.
 
+### IPTV
+
+- Klikni **IPTV** u bočnoj traci početnog ekrana (ili desni klik na videu → **IPTV…**). Panel se otvara lijevo od videa. **Dodaj vezu**: **Xtream Codes** račun (poslužitelj, korisničko ime, lozinka), **M3U/M3U8** poveznica ili M3U datoteka; **Testiraj vezu** provjerava je jednom (bez ponavljanja prijava). Možeš dodati više veza te ih bilo kad urediti, osvježiti ili ukloniti.
+- Kategorije (sa zastavama i ikonama) | kanali s logotipom, programom koji je sada i trakom napretka, **★** za favorite; **pretraga**, **sortiranje** (A–Ž, Ž–A, izvorno, tvoj redoslijed: desni klik na kanal → gore/dolje), **Nedavno gledano**, skrivanje kanala ili cijele kategorije (desni klik; ⋯ → *Prikaži skrivene kanale* ih vraća). Dvoklik ili Enter pušta kanal u glavnom playeru; **F** ili dvoklik na sliku je cijeli zaslon; klik na sliku ne pauzira TV uživo (koristi gumb za pauzu). **Stop** na playeru početnog ekrana zaustavlja TV i zatvara panel.
+- Vodič programa prikazuje *sada* i *sljedeće*, vremensku crtu po danima (XMLTV ili vodič same usluge) i javlja kad nema podataka.
+- ⋯ → **Izgled**: font, veličina teksta, boja isticanja i pozadina samo za IPTV panel. Povuci desni rub panela i razdjelnik između kategorija i kanala na željenu širinu; pamti se. ⋯ → izvoz/uvoz postavki (favoriti, redoslijed, skriveno – nikad lozinke).
+- Lozinka se sprema **šifrirana** (DPAPI) i nikad se ne prikazuje, ne zapisuje ni ne izvozi. Ako poslužitelj nudi samo običan **HTTP**, prijava i tok nisu šifrirani, a player na to upozorava. Player **ne donosi kanale ni popise**: koristi samo usluge koje smiješ koristiti. Modul isključuješ u **Postavke → Općenito → IPTV**.
+
 ### Spotify
 
 - **Ctrl+Shift+S**, desni klik → **Spotify…** ili oznaka izvora u mini playeru. jebaited_player je daljinski za tvoju Spotify aplikaciju: glazba svira u Spotifyju (računalo, mobitel ili zvučnik), a player prikazuje pjesmu s omotom i upravlja njome. Za upravljanje treba **Spotify Premium**.
@@ -158,7 +166,7 @@ U istoj kartici podešavaš automatsko traženje, kodiranje starih titlova i izg
 ### Torlink (pretraži online, samo GitHub inačica)
 
 - Neobavezno i **zadano isključeno**. Uključuje se u **Postavke → Torlink**. Nakon što prihvatiš upozorenje, player s izdanja ovog repozitorija preuzima provjereni paket (Node.js + Torlink, oko 40 MB, provjera SHA-256). **Nije dio Microsoft Store inačice.**
-- Zatim se na početnom ekranu uz Otvori datoteku i Otvori mapu pojavljuje treći gumb **Pretraži online**. Otvara Torlink stranicu: jedna pretraga kroz više javnih indeksa (filmovi, serije, anime, igre), rezultati s veličinom, seederima i izvorom (sortiranje i filter) te upravitelj preuzimanja (aktivna, red, završena, neuspjela; pauza, nastavak, otkaži, otvori mapu, reproduciraj). **Home** (ili Esc / Alt+←) vraća na početni ekran playera, a preuzimanja se nastavljaju; **Ctrl+Shift+T** otvara i zatvara stranicu.
+- Zatim se u bočnoj traci početnog ekrana pojavljuje još jedna stavka, **Pretraži online filmove i serije**. Otvara Torlink stranicu: jedna pretraga kroz više javnih indeksa (filmovi, serije, anime, igre), rezultati s veličinom, seederima i izvorom (sortiranje i filter) te upravitelj preuzimanja (aktivna, red, završena, neuspjela; pauza, nastavak, otkaži, otvori mapu, reproduciraj). **Home** (ili Esc / Alt+←) vraća na početni ekran playera, a preuzimanja se nastavljaju; **Ctrl+Shift+T** otvara i zatvara stranicu.
 - Torlink je projekt otvorenog koda [baairon/torlink](https://github.com/baairon/torlink) (MIT), korišten nepromijenjen. Player s njim razgovara preko njegovog lokalnog sučelja i pokreće ga samo dok treba. Postavke: mapa za preuzimanja, istodobna preuzimanja, playlist.m3u, dodatni trackeri, mrežno sučelje (VPN) i dijeljenje nakon preuzimanja (**zadano isključeno**). Ažuriranje samo na tvoj klik, iz našeg provjerenog paketa, uz automatski povratak.
 - **Tvoja odgovornost:** BitTorrent drugim korisnicima otkriva tvoju IP adresu. Preuzimaj i dijeli samo ono što smiješ. Player ne pohranjuje niti provjerava nikakav sadržaj. Vidi [PRIVACY.md](PRIVACY.md).
 

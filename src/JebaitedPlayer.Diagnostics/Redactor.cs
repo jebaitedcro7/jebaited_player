@@ -15,6 +15,13 @@ public static partial class Redactor
     [GeneratedRegex(@"(?i)([?&](?:api[-_]?key|key|token|password|auth)=)[^&\s]+")]
     private static partial Regex QuerySecret();
 
+    // IPTV (Xtream): vjerodajnice su u putanji /live/KORISNIK/LOZINKA/ID.ts i u upitu username=.
+    [GeneratedRegex(@"(?i)(/(?:live|movie|series|timeshift)/)[^/\s]+/[^/\s]+/")]
+    private static partial Regex XtreamPath();
+
+    [GeneratedRegex(@"(?i)([?&]username=)[^&\s]+")]
+    private static partial Regex QueryUser();
+
     public static string Clean(string? text)
     {
         if (string.IsNullOrEmpty(text))
@@ -22,7 +29,9 @@ public static partial class Redactor
             return string.Empty;
         }
 
-        string s = DirectoryPrefix().Replace(text, @"<dir>\");
+        string s = XtreamPath().Replace(text, "$1***/***/");
+        s = QueryUser().Replace(s, "$1***");
+        s = DirectoryPrefix().Replace(s, @"<dir>\");
         s = QuerySecret().Replace(s, "$1***");
         s = Secret().Replace(s, m => $"{m.Groups[1].Value}{m.Groups[2].Value}***");
         return s;

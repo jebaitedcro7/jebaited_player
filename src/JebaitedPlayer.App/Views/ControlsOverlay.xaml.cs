@@ -55,7 +55,7 @@ public partial class ControlsOverlay : Window
         Timeline.PreviewMouseLeftButtonDown += (_, e) =>
         {
             e.Handled = true;
-            if (!_vm.HasMedia || _vm.Duration <= 0)
+            if (!_vm.HasMedia || _vm.Duration <= 0 || _vm.IsLiveStream)
             {
                 return;
             }

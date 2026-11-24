@@ -68,16 +68,18 @@ public partial class MainWindow
     {
         var icon = new TextBlock { Text = "", FontSize = 16, VerticalAlignment = VerticalAlignment.Center };
         icon.SetResourceReference(TextBlock.FontFamilyProperty, "IconFont");
-        var label = new TextBlock { Margin = new Thickness(10, 0, 0, 0), FontSize = 15, VerticalAlignment = VerticalAlignment.Center };
+        // Bočna traka početnog ekrana: ikona + naziv (naziv se vidi kad se traka proširi).
+        var label = new TextBlock { Margin = new Thickness(10, 0, 0, 0), FontSize = 13.5, VerticalAlignment = VerticalAlignment.Center, Visibility = Visibility.Collapsed };
         label.SetBinding(TextBlock.TextProperty, LocBinding("torlink.homeButton"));
+        icon.Width = 28;
+        icon.TextAlignment = TextAlignment.Center;
         _torlinkHomeButton = new Button
         {
             Content = new StackPanel { Orientation = Orientation.Horizontal, Children = { icon, label } },
-            Margin = new Thickness(10, 0, 0, 0),
-            Padding = new Thickness(18, 10, 18, 10),
+            Margin = new Thickness(0, 4, 0, 0),
             Visibility = Visibility.Collapsed,
         };
-        _torlinkHomeButton.SetResourceReference(StyleProperty, "SecondaryButton");
+        _torlinkHomeButton.SetResourceReference(StyleProperty, "RailButton");
         _torlinkHomeButton.SetBinding(System.Windows.Automation.AutomationProperties.NameProperty,
             LocBinding("torlink.homeButton"));
         _torlinkHomeButton.Click += (_, _) => OpenTorlink();

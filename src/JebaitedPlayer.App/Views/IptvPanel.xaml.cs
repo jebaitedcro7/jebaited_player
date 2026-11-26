@@ -556,7 +556,7 @@ public partial class IptvPanel : UserControl
         StatusText.Foreground = (Brush)FindResource("TextSecondaryBrush");
     }
 
-    private static string SortLabel(ChannelSort s) => s switch
+    internal static string SortLabel(ChannelSort s) => s switch
     {
         ChannelSort.NameAsc => Loc.T("iptv.sortAz"),
         ChannelSort.NameDesc => Loc.T("iptv.sortZa"),
@@ -1169,6 +1169,11 @@ public partial class IptvPanel : UserControl
         if (_settings.DefaultSourceId == id) { _settings.DefaultSourceId = null; }
         if (_settings.LastSourceId == id) { _settings.LastSourceId = null; }
         SaveSettings();
+        ResetAfterSourceRemoved();
+    }
+
+    private void ResetAfterSourceRemoved()
+    {
         _connectCts?.Cancel();
         _source = null;
         _session = null;
@@ -1187,6 +1192,24 @@ public partial class IptvPanel : UserControl
         {
             ShowEmpty(Loc.T("iptv.noSource"));
         }
+    }
+
+    /// <summary>
+    /// Postavke → IPTV mijenjaju iptv.json izvana: panel ponovno učita postavke (da ih kasnije ne prepiše starima),
+    /// primijeni izgled i popis, a ako je trenutni izvor uklonjen, vrati se na prazno stanje ili prvi preostali izvor.
+    /// </summary>
+    internal void ReloadSettings()
+    {
+        _settings = _store.LoadSettings();
+        ApplyAppearance();
+        UpdateTexts();
+        if (_source is { } current && !_settings.Sources.Any(s => s.Id == current.Id))
+        {
+            ResetAfterSourceRemoved();
+            return;
+        }
+
+        ApplyFilter();
     }
 
     private void ClearLogin()

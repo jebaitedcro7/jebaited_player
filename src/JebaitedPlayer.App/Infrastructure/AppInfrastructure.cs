@@ -320,6 +320,11 @@ public sealed class AppSettings
         "sr" => ["sr", "hr", "bs", "en"],
         "sl" => ["sl", "hr", "en"],
         "de" => ["de", "en"],
+        "es" => ["es", "en"],
+        "fr" => ["fr", "en"],
+        "it" => ["it", "en"],
+        "pt" => ["pt", "en"],
+        "ru" => ["ru", "en"],
         _ => ["en"],
     };
 

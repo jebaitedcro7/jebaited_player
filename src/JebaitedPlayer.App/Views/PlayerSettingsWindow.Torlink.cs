@@ -8,7 +8,7 @@ using JebaitedPlayer.Views.Torlink;
 namespace JebaitedPlayer.Views;
 
 /// <summary>
-/// 2.2.14: kartica Postavke → Torlink (samo GitHub inačica). Umeće se ispred "Nadogradnje" u kodu (ne u XAML-u), pa Store izdanje nema ni trag;
+/// 2.2.14: kartica Postavke → Torlink (samo GitHub inačica). Umeće se ispred kartice IPTV (pa je IPTV odmah ispod) u kodu (ne u XAML-u), pa Store izdanje nema ni trag;
 /// indeksi ostalih kartica (enum <see cref="SettingsTab"/>) ostaju isti jer se preslikavaju ovdje.
 /// </summary>
 public partial class PlayerSettingsWindow
@@ -43,7 +43,7 @@ public partial class PlayerSettingsWindow
         };
         item.SetResourceReference(StyleProperty, "SettingsTab");
         item.SetBinding(HeaderedContentControl.HeaderProperty, new Binding("[torlink.name]") { Source = LocSource.Instance, Mode = BindingMode.OneWay });
-        _torlinkTabIndex = Tabs.Items.IndexOf(UpdatesTab);
+        _torlinkTabIndex = Tabs.Items.IndexOf(IptvTab);
         Tabs.Items.Insert(_torlinkTabIndex, item);
         Closed += (_, _) => _ = _torlinkPanel.ApplyOptionsAsync();
     }

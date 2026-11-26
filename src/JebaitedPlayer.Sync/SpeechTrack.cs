@@ -7,6 +7,7 @@ public sealed class SpeechTrack
 {
     public const int FramesPerSecond = 100;
     private const string Magic = "JPVAD1";
+    private const string MagicWithStrict = "JPVAD2";
 
     private readonly byte[] _frames;
     private int[]? _prefix;
@@ -32,6 +33,15 @@ public sealed class SpeechTrack
     public double SpeechRatio => _frames.Length == 0 ? 0 : SpeechFrames / (double)_frames.Length;
 
     public ReadOnlySpan<byte> Frames => _frames;
+
+    /// <summary>
+    /// Isti zvuk, strožim detektorom (manje lažnog govora usred glazbe i buke). Koristi se kad rezultat s osnovnim
+    /// detektorom nije čist, jer pomaci ondje često ostanu neodređeni.
+    /// </summary>
+    public SpeechTrack? Strict { get; init; }
+
+    /// <summary>Isti zvuk uz priložen strožiji rezultat (<see cref="Strict"/>).</summary>
+    public SpeechTrack WithStrict(SpeechTrack strict) => new(_frames) { Strict = strict };
 
     /// <summary>Kopija kružno pomaknuta za <paramref name="frames"/> okvira: zvuk koji sigurno ne odgovara titlovima (razina slučajnosti).</summary>
     internal SpeechTrack Rotate(int frames)
@@ -70,12 +80,34 @@ public sealed class SpeechTrack
     public void Save(Stream stream)
     {
         using var w = new BinaryWriter(stream, System.Text.Encoding.ASCII, leaveOpen: true);
-        w.Write(Magic);
-        w.Write(_frames.Length);
-        byte[] packed = new byte[(_frames.Length + 7) / 8];
-        for (int i = 0; i < _frames.Length; i++)
+        w.Write(Strict is null ? Magic : MagicWithStrict);
+        WriteFrames(w, _frames);
+        if (Strict is not null)
         {
-            if (_frames[i] != 0)
+            WriteFrames(w, Strict._frames);
+        }
+    }
+
+    public static SpeechTrack Load(Stream stream)
+    {
+        using var r = new BinaryReader(stream, System.Text.Encoding.ASCII, leaveOpen: true);
+        string magic = r.ReadString();
+        if (magic != Magic && magic != MagicWithStrict)
+        {
+            throw new InvalidDataException("Nepoznat format analize govora.");
+        }
+
+        byte[] frames = ReadFrames(r);
+        return new SpeechTrack(frames) { Strict = magic == MagicWithStrict ? new SpeechTrack(ReadFrames(r)) : null };
+    }
+
+    private static void WriteFrames(BinaryWriter w, byte[] frames)
+    {
+        w.Write(frames.Length);
+        byte[] packed = new byte[(frames.Length + 7) / 8];
+        for (int i = 0; i < frames.Length; i++)
+        {
+            if (frames[i] != 0)
             {
                 packed[i >> 3] |= (byte)(1 << (i & 7));
             }
@@ -84,14 +116,8 @@ public sealed class SpeechTrack
         w.Write(packed);
     }
 
-    public static SpeechTrack Load(Stream stream)
+    private static byte[] ReadFrames(BinaryReader r)
     {
-        using var r = new BinaryReader(stream, System.Text.Encoding.ASCII, leaveOpen: true);
-        if (r.ReadString() != Magic)
-        {
-            throw new InvalidDataException("Nepoznat format analize govora.");
-        }
-
         int length = r.ReadInt32();
         if (length is < 0 or > 100 * 60 * 60 * 24)
         {
@@ -110,7 +136,7 @@ public sealed class SpeechTrack
             frames[i] = (byte)((packed[i >> 3] >> (i & 7)) & 1);
         }
 
-        return new SpeechTrack(frames);
+        return frames;
     }
 }
 
@@ -137,6 +163,9 @@ public sealed class SpeechDetector : IDisposable
             OperatingMode = mode,
         };
     }
+
+    /// <summary>Strožiji detektor (VeryAggressive): manje lažnog govora usred glazbe i buke.</summary>
+    public static SpeechDetector CreateStrict() => new(OperatingMode.VeryAggressive);
 
     public int FrameCount => _count;
 

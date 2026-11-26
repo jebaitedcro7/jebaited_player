@@ -101,13 +101,19 @@ public sealed class SpeechAnalysisService(string cacheDir)
 
         var sw = Stopwatch.StartNew();
         using var detector = new SpeechDetector();
+        // Isti zvuk i strožim detektorom (jedan prolaz): koristi se kad osnovni ne odredi mjesto skoka pomaka titlova.
+        using var strictDetector = SpeechDetector.CreateStrict();
 
         // Samo središnji kanal (dijalog) kad postoji: uz sve kanale detektor i glazbu i efekte smatra govorom.
         AudioExtraction extraction = await MpvAudioExtractor.ExtractAsync(videoPath, audioTrack, null, null,
-            (buffer, count) => detector.Push(buffer, count), new SyncProgress(p => Progress?.Invoke(p)), ct,
+            (buffer, count) =>
+            {
+                detector.Push(buffer, count);
+                strictDetector.Push(buffer, count);
+            }, new SyncProgress(p => Progress?.Invoke(p)), ct,
             AudioChannelMode.Dialogue).ConfigureAwait(false);
         ct.ThrowIfCancellationRequested();
-        SpeechTrack speech = detector.Finish();
+        SpeechTrack speech = detector.Finish().WithStrict(strictDetector.Finish());
         LastAnalysisMs = sw.ElapsedMilliseconds;
         string channels = extraction.DialogueOnly ? "središnji kanal" : "svi kanali";
         Log.Info($"Analiza govora: {extraction.Samples / 16000.0:0} s zvuka za {sw.Elapsed.TotalSeconds:0.0} s, govor {speech.SpeechRatio:P0}, " +
@@ -154,11 +160,12 @@ public sealed class SpeechAnalysisService(string cacheDir)
     /// <summary>
     /// Ključ: putanja, veličina i vrijeme izmjene datoteke te audio traka (nova verzija datoteke = nova analiza).
     /// v2: analizira se samo središnji kanal, pa se analize iz ranijih verzija (svi kanali) ne koriste.
+    /// v3: uz osnovni sprema se i strožiji detektor govora (<see cref="SpeechTrack.Strict"/>).
     /// </summary>
     private static string CacheKey(string videoPath, string? audioTrack)
     {
         var info = new FileInfo(videoPath);
-        string raw = $"{info.FullName.ToUpperInvariant()}|{(info.Exists ? info.Length : 0)}|{(info.Exists ? info.LastWriteTimeUtc.Ticks : 0)}|{audioTrack ?? "auto"}|v2";
+        string raw = $"{info.FullName.ToUpperInvariant()}|{(info.Exists ? info.Length : 0)}|{(info.Exists ? info.LastWriteTimeUtc.Ticks : 0)}|{audioTrack ?? "auto"}|v3";
         return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(raw)))[..32].ToLowerInvariant();
     }
 

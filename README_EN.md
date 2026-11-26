@@ -140,7 +140,9 @@ In the same tab you set the automatic search, the encoding of old subtitles and 
 - Categories (with flags and icons) | channels with logo, the program that is on now and a progress bar, **★** for favorites; **search**, **sort** (A–Z, Z–A, original, your own order: right-click a channel → move up/down), **Recently watched**, hide a channel or a whole category (right-click; ⋯ → *Show hidden channels* brings them back). Double-click or Enter plays a channel in the main player; **F** or a double-click on the picture is full screen; clicking the picture does not pause live TV (use the pause button). **Stop** on the home screen player stops the TV and closes the panel.
 - The program guide shows *now* and *next*, a timeline by day (XMLTV or the service's own guide) and says so when there is no guide data.
 - ⋯ → **Appearance**: font, text size, highlight color and background of the IPTV panel only. Drag the panel's right edge and the divider between categories and channels to the width you like; it is remembered. ⋯ → export/import preferences (favorites, order, hidden ones – never passwords).
-- Your password is stored **encrypted** (DPAPI) and never shown, logged or exported. If the server only offers plain **HTTP**, the login and the stream are not encrypted and the player warns about it. The player brings **no channels or playlists**: use only services you are allowed to use. Switch the module off in **Settings → General → IPTV**.
+- Your password is stored **encrypted** (DPAPI) and never shown, logged or exported. If the server only offers plain **HTTP**, the login and the stream are not encrypted and the player warns about it. The player brings **no channels or playlists**: use only services you are allowed to use. Switch the module off in **Settings → IPTV**, where all IPTV settings are in one tab: your connections and the default one, default sorting, compact rows, resuming the last channel, and the font, text size and colors; changes also apply to an open IPTV panel.
+
+<p align="center"><img src="manual/images/en/iptv-settings.png" width="640" alt="Settings, IPTV tab"></p>
 
 ### Spotify
 
@@ -180,7 +182,7 @@ Settings → General → **Backup and transfer**: settings and watch history are
 
 <p align="center"><img src="manual/images/en/settings.png" width="640" alt="Settings, Language tab"></p>
 
-Open Settings (the gear on the main screen, or right-click → **Settings…**) and the **Language** tab. Click English, Deutsch or Hrvatski; Bosanski, Srpski and Slovenščina are under **More languages**. The whole player changes right away, including open windows, menus and messages. No restart is needed, and the language is remembered after closing, restarting the computer and updating.
+Open Settings (the gear on the main screen, or right-click → **Settings…**) and the **Language** tab. Click English, Deutsch or Hrvatski; Bosanski, Srpski, Slovenščina, Español, Français, Italiano, Português and Русский are under **More languages**. The whole player changes right away, including open windows, menus and messages. No restart is needed, and the language is remembered after closing, restarting the computer and updating.
 
 ### Dark / Light mode
 
@@ -213,6 +215,8 @@ Settings are split into tabs. Every change applies right away (also to the video
 | Appearance | Dark / light theme, accent color, home screen background (default or your own picture: Fill, Fit, Center), how long the controls stay visible, rendering the interface on the GPU, time, date and weather on the home screen (a city you choose, from Open-Meteo; font, size and position of each element, a preview, and weather details such as feels-like, min/max, rain, wind, humidity, UV, sunrise and sunset, the next hours and days) |
 | Shortcuts | Keys for every action, up to two per action (see [Keyboard shortcuts](#keyboard-shortcuts)) |
 | Notifications | News, tips and new versions, with read / unread / dismissed state (see [Notifications](#notifications)) |
+| Torlink | Only in the GitHub build (see [Torlink](#torlink-search-online-github-build-only)) |
+| IPTV | Turn the module on or off, connections and the default one, default sorting, compact rows, resume the last channel, font, text size and colors (see [IPTV](#iptv)) |
 | Updates | Version, check now, automatic download, what is new, update history |
 | About | Version, license, technologies used, manual, privacy, code signing policy, error reports (saved on your computer without personal data; you send them yourself via GitHub) |
 
@@ -221,7 +225,7 @@ Settings are split into tabs. Every change applies right away (also to the video
 - On the home screen a small card shows news about the player, a useful tip or a new version. It sits above the playback bar when something is playing (so it never covers it) and low, just above the version number, when nothing is; a thin arrow points to the version number. When the playback bar appears or disappears, the card moves smoothly.
 - **Read more** (or a click on the card) opens the details; **✕** dismisses the card. A card is shown at most three times, and after you react only important items and new versions are shown again in the same session.
 - The **Notifications** button at the bottom left of the home screen (with the number of unread ones) and **Settings → Notifications** list everything, read and dismissed ones as well. **Mark all as read** clears the unread state.
-- News and tips are part of the player itself (in all six languages); the only other source is the update check on GitHub that the player already does. Nothing new is sent to the internet, and the state is kept in `notifications.json` next to your settings.
+- News and tips are part of the player itself (in all 11 languages); the only other source is the update check on GitHub that the player already does. Nothing new is sent to the internet, and the state is kept in `notifications.json` next to your settings.
 
 ### Update history
 
@@ -260,7 +264,7 @@ When a video has no subtitles in the first language of your list, the player sea
 
 Open it with CC → **Subtitle synchronization…**. The top line shows the current correction. Corrections are remembered per video and subtitle file; the original file is never changed.
 
-1. **Automatically by speech (recommended).** When external text subtitles are loaded, the player compares them with the speech in the video and corrects the offset, the speed (e.g. subtitles for 25 fps on a 23.976 fps video) and jumps in a different cut. It only applies a checked result. Subtitles for a different episode or movie get a warning. Run it again with **A** or **Sync (A)**. Embedded subtitles are already in sync and are not checked.
+1. **Automatically by speech (recommended).** When external text subtitles are loaded, the player compares them with the speech in the video and corrects the offset, the speed (e.g. subtitles for 25 fps on a 23.976 fps video) and jumps in a different cut. It only applies a checked result. When the result is not clean, the speech is checked once more with a stricter speech detector (it ignores more music and noise) and the better result is kept. Subtitles for a different episode or movie get a warning. Run it again with **A** or **Sync (A)**. Embedded subtitles are already in sync and are not checked.
 2. **Offset — all subtitles earlier or later.** **G** / **H** move by 0.1 s (Shift: 1 s, Ctrl: 10 ms), or use the buttons, or type an exact value in seconds and press Enter. Minus = earlier.
 3. **Subtitles gradually drift late or early.** When they are right where you are but drift further into the video: each click changes 0.5 s per 10 minutes; the line on screen stays where it is.
 4. **Align by line (most accurate).** Pause when you hear a line begin, click **Show lines around this point**, select the line and click **This line starts now**. Repeat later in the video if needed: from several points the player calculates the offset, the speed or a piecewise correction.
@@ -358,7 +362,7 @@ The Microsoft Store version keeps its data in `%LOCALAPPDATA%\Packages\jebaitedp
 
 ### Translations
 
-The interface is available in English, Deutsch, Hrvatski, Bosanski, Srpski (latinica) and Slovenščina. Each language is one file in `src/JebaitedPlayer.Localization/Languages/`; a new language is a copy of `en.json` with the translation. Corrections are welcome (open an issue or a pull request).
+The interface is available in 11 languages: English, Deutsch, Hrvatski, Bosanski, Srpski (latinica), Slovenščina, Español, Français, Italiano, Português and Русский (the last five were translated without review by native speakers; corrections are welcome). Each language is one file in `src/JebaitedPlayer.Localization/Languages/`; a new language is a copy of `en.json` with the translation. Corrections are welcome (open an issue or a pull request).
 
 ### For developers
 

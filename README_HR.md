@@ -140,7 +140,9 @@ U istoj kartici podešavaš automatsko traženje, kodiranje starih titlova i izg
 - Kategorije (sa zastavama i ikonama) | kanali s logotipom, programom koji je sada i trakom napretka, **★** za favorite; **pretraga**, **sortiranje** (A–Ž, Ž–A, izvorno, tvoj redoslijed: desni klik na kanal → gore/dolje), **Nedavno gledano**, skrivanje kanala ili cijele kategorije (desni klik; ⋯ → *Prikaži skrivene kanale* ih vraća). Dvoklik ili Enter pušta kanal u glavnom playeru; **F** ili dvoklik na sliku je cijeli zaslon; klik na sliku ne pauzira TV uživo (koristi gumb za pauzu). **Stop** na playeru početnog ekrana zaustavlja TV i zatvara panel.
 - Vodič programa prikazuje *sada* i *sljedeće*, vremensku crtu po danima (XMLTV ili vodič same usluge) i javlja kad nema podataka.
 - ⋯ → **Izgled**: font, veličina teksta, boja isticanja i pozadina samo za IPTV panel. Povuci desni rub panela i razdjelnik između kategorija i kanala na željenu širinu; pamti se. ⋯ → izvoz/uvoz postavki (favoriti, redoslijed, skriveno – nikad lozinke).
-- Lozinka se sprema **šifrirana** (DPAPI) i nikad se ne prikazuje, ne zapisuje ni ne izvozi. Ako poslužitelj nudi samo običan **HTTP**, prijava i tok nisu šifrirani, a player na to upozorava. Player **ne donosi kanale ni popise**: koristi samo usluge koje smiješ koristiti. Modul isključuješ u **Postavke → Općenito → IPTV**.
+- Lozinka se sprema **šifrirana** (DPAPI) i nikad se ne prikazuje, ne zapisuje ni ne izvozi. Ako poslužitelj nudi samo običan **HTTP**, prijava i tok nisu šifrirani, a player na to upozorava. Player **ne donosi kanale ni popise**: koristi samo usluge koje smiješ koristiti. Modul isključuješ u **Postavke → IPTV**, gdje su sve postavke IPTV-a u jednoj kartici: tvoje veze i zadana veza, zadano sortiranje, zbijeni redovi, nastavak zadnjeg kanala te font, veličina teksta i boje. Promjene vrijede i za otvoreni IPTV panel.
+
+<p align="center"><img src="manual/images/hr/iptv-settings.png" width="640" alt="Postavke, kartica IPTV"></p>
 
 ### Spotify
 
@@ -180,7 +182,7 @@ Postavke → Općenito → **Kopije i prijenos**: postavke i povijest gledanja a
 
 <p align="center"><img src="manual/images/hr/settings.png" width="640" alt="Postavke, kartica Jezik"></p>
 
-Otvori Postavke (zupčanik na glavnom ekranu ili desni klik → **Postavke…**) i karticu **Jezik**. Klikni English, Deutsch ili Hrvatski; Bosanski, Srpski i Slovenščina su pod **Više jezika**. Cijeli player se mijenja odmah, uključujući otvorene prozore, izbornike i poruke. Ponovno pokretanje ne treba, a jezik ostaje zapamćen nakon zatvaranja, ponovnog pokretanja računala i nadogradnje.
+Otvori Postavke (zupčanik na glavnom ekranu ili desni klik → **Postavke…**) i karticu **Jezik**. Klikni English, Deutsch ili Hrvatski; Bosanski, Srpski, Slovenščina, Español, Français, Italiano, Português i Русский su pod **Više jezika**. Cijeli player se mijenja odmah, uključujući otvorene prozore, izbornike i poruke. Ponovno pokretanje ne treba, a jezik ostaje zapamćen nakon zatvaranja, ponovnog pokretanja računala i nadogradnje.
 
 ### Tamna / svijetla tema
 
@@ -213,6 +215,8 @@ Postavke su podijeljene u kartice. Svaka promjena vrijedi odmah (i za video koji
 | Izgled | Tamna / svijetla tema, boja isticanja, pozadina početnog ekrana (zadana ili vlastita slika: Ispuni, Prilagodi, Sredina), koliko dugo su kontrole vidljive, iscrtavanje sučelja preko GPU-a, vrijeme, datum i prognoza na početnom ekranu (grad po izboru, s Open-Meteoa; font, veličina i mjesto svakog elementa, pregled te podaci o vremenu: osjećaj temperature, min/maks, kiša, vjetar, vlažnost, UV, izlazak i zalazak sunca, sljedeći sati i dani) |
 | Prečaci | Tipke za sve radnje, do dvije po radnji (vidi [Tipkovnički prečaci](#tipkovnički-prečaci)) |
 | Obavijesti | Novosti, savjeti i nove verzije, sa stanjem pročitano / nepročitano / odbačeno (vidi [Obavijesti](#obavijesti)) |
+| Torlink | Samo u GitHub inačici (vidi [Torlink](#torlink-pretraži-online-samo-github-inačica)) |
+| IPTV | Uključi ili isključi modul, veze i zadana veza, zadano sortiranje, zbijeni redovi, nastavak zadnjeg kanala, font, veličina teksta i boje (vidi [IPTV](#iptv)) |
 | Nadogradnje | Verzija, provjeri sada, automatsko preuzimanje, što je novo, povijest nadogradnji |
 | O aplikaciji | Verzija, licenca, korištene tehnologije, priručnik, privatnost, pravila potpisivanja koda, izvještaji o greškama (spremljeni na računalu bez osobnih podataka; šalješ ih sam preko GitHuba) |
 
@@ -221,7 +225,7 @@ Postavke su podijeljene u kartice. Svaka promjena vrijedi odmah (i za video koji
 - Na početnom ekranu mala kartica prikazuje novosti o playeru, koristan savjet ili novu verziju. Kad nešto svira, nalazi se iznad trake reprodukcije (pa je nikad ne zaklanja), a kad ništa ne svira, nisko, tik iznad broja verzije; tanka strelica pokazuje na broj verzije. Kad se traka reprodukcije pojavi ili nestane, kartica se glatko pomakne.
 - **Pročitaj više** (ili klik na karticu) otvara detalje; **✕** odbacuje karticu. Kartica se prikazuje najviše tri puta, a nakon što reagiraš, u istom pokretanju ponovno se prikazuju samo važne obavijesti i nove verzije.
 - Tipka **Obavijesti** dolje lijevo na početnom ekranu (s brojem nepročitanih) i **Postavke → Obavijesti** prikazuju sve, i pročitane i odbačene. **Označi sve kao pročitano** briše stanje nepročitano.
-- Novosti i savjeti dio su samog playera (na svih šest jezika); jedini drugi izvor je provjera nadogradnji na GitHubu koju player ionako radi. Ništa novo ne ide na internet, a stanje je u `notifications.json` uz tvoje postavke.
+- Novosti i savjeti dio su samog playera (na svih 11 jezika); jedini drugi izvor je provjera nadogradnji na GitHubu koju player ionako radi. Ništa novo ne ide na internet, a stanje je u `notifications.json` uz tvoje postavke.
 
 ### Povijest nadogradnji
 
@@ -260,7 +264,7 @@ Kad uz video nema titlova na prvom jeziku s tvog popisa, player ih sam traži na
 
 Otvara se preko CC → **Sinkronizacija titlova…**. Gore piše trenutna korekcija. Korekcije se pamte po videu i titlu, a originalna datoteka se nikad ne mijenja.
 
-1. **Automatski prema govoru (preporučeno).** Kad se učitaju vanjski tekstualni titlovi, player ih usporedi s govorom u videu i ispravi pomak, brzinu (npr. titlovi za 25 fps na videu od 23,976 fps) i skokove kod druge montaže. Primjenjuje samo provjeren rezultat. Titlovi druge epizode ili filma dobiju upozorenje. Ponovno: tipka **A** ili **Sinkroniziraj (A)**. Ugrađeni titlovi su već usklađeni i ne provjeravaju se.
+1. **Automatski prema govoru (preporučeno).** Kad se učitaju vanjski tekstualni titlovi, player ih usporedi s govorom u videu i ispravi pomak, brzinu (npr. titlovi za 25 fps na videu od 23,976 fps) i skokove kod druge montaže. Primjenjuje samo provjeren rezultat. Kad rezultat nije čist, govor se provjeri još jednom strožim detektorom govora (zanemaruje više glazbe i buke) i zadrži se bolji rezultat. Titlovi druge epizode ili filma dobiju upozorenje. Ponovno: tipka **A** ili **Sinkroniziraj (A)**. Ugrađeni titlovi su već usklađeni i ne provjeravaju se.
 2. **Pomak – svi titlovi ranije ili kasnije.** **G** / **H** pomiču za 0,1 s (Shift: 1 s, Ctrl: 10 ms), ili gumbi, ili upiši točan pomak u sekundama i pritisni Enter. Minus = ranije.
 3. **Titlovi postupno kasne ili žure.** Kad su točni ovdje gdje si, a dalje u filmu sve više odstupaju: svaki klik mijenja 0,5 s na svakih 10 minuta; replika koja je sad na ekranu ostaje gdje jest.
 4. **Poravnaj po replici (najtočnije).** Pauziraj kad čuješ početak replike, klikni **Prikaži replike oko ovog mjesta**, odaberi repliku i klikni **Ova replika počinje sada**. Po potrebi ponovi dalje u filmu: iz više točaka player izračuna pomak, brzinu ili ispravak po dijelovima.
@@ -358,7 +362,7 @@ Store inačica čuva podatke u `%LOCALAPPDATA%\Packages\jebaitedplayer.jebaitedp
 
 ### Prijevodi
 
-Sučelje postoji na English, Deutsch, Hrvatski, Bosanski, Srpski (latinica) i Slovenščina. Svaki jezik je jedna datoteka u `src/JebaitedPlayer.Localization/Languages/`; novi jezik je kopija `en.json` s prijevodom. Ispravci su dobrodošli (issue ili pull request).
+Sučelje postoji na 11 jezika: English, Deutsch, Hrvatski, Bosanski, Srpski (latinica), Slovenščina, Español, Français, Italiano, Português i Русский (zadnjih pet prevedeno je bez provjere izvornih govornika; ispravci su dobrodošli). Svaki jezik je jedna datoteka u `src/JebaitedPlayer.Localization/Languages/`; novi jezik je kopija `en.json` s prijevodom. Ispravci su dobrodošli (issue ili pull request).
 
 ### Za programere
 

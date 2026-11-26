@@ -28,7 +28,7 @@ Each manual has three parts: **Quick Start**, **Basic Guide** and **Advanced Gui
 
 Also in the **[Microsoft Store](https://apps.microsoft.com/detail/9NP4GF0Q40JL)** (works with Smart App Control; updated by the Store, can be a version or two behind GitHub).
 
-The interface is available in English, Deutsch, Hrvatski, Bosanski, Srpski (latinica) and Slovenščina; you choose the language on first start and can change it any time in Settings.
+The interface is available in 11 languages: English, Deutsch, Hrvatski, Bosanski, Srpski (latinica), Slovenščina, Español, Français, Italiano, Português and Русский; you choose the language on first start and can change it any time in Settings.
 
 The GitHub releases are **not code signed**, so Windows SmartScreen may warn, and **Smart App Control** blocks them (it checks every program and library when it runs, not only the installer). To use the GitHub version, Smart App Control has to be turned off (Windows Security → App & browser control → Smart App Control settings). With Smart App Control on, use the Microsoft Store version, which is signed by Microsoft. See the [code signing policy](CODE_SIGNING.md).
 

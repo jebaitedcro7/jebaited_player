@@ -49,6 +49,8 @@ internal static class MpvConfig
         ("osd-font-size", "32"),
         ("osd-border-size", "2"),
         ("osd-duration", "1200"),
+        // Poruka je gore desno: lijevo gore je Home gumb gornje trake, koji je tekst glasnoće preklapao.
+        ("osd-align-x", "right"),
         ("osd-margin-x", "32"),
         ("osd-margin-y", "28"),
 

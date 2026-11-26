@@ -68,10 +68,6 @@
                                        HorizontalAlignment="Right" VerticalAlignment="Center" />
                         </Grid>
                         <TextBlock Style="{StaticResource HintText}" Text="{loc:T settings.autoNextHint}" />
-                        <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T iptv.title}" Margin="0,24,0,2" />
-                        <CheckBox x:Name="IptvEnableBox" Content="{loc:T iptv.enable}" Checked="OnIptvEnableChanged" Unchecked="OnIptvEnableChanged" />
-                        <TextBlock Style="{StaticResource HintText}" Text="{loc:T iptv.legal}" TextWrapping="Wrap" />
-                        <Button x:Name="IptvOpenButton" Style="{StaticResource SecondaryButton}" Content="{loc:T menu.iptv}" HorizontalAlignment="Left" Margin="0,8,0,0" Click="OnIptvOpen" />
                         <!-- Naslov je u svom retku: u jednom retku s klizačem je dugi naslov guran vrijednost izvan vidljivog dijela. -->
                         <TextBlock Text="{loc:T settings.upNextLead}" Margin="0,12,0,4" TextWrapping="Wrap" />
                         <Grid MaxWidth="440" HorizontalAlignment="Left">
@@ -357,6 +353,40 @@
                         <Button x:Name="NewsMarkAllButton" Style="{StaticResource SecondaryButton}" Content="{loc:T news.markAllRead}"
                                 HorizontalAlignment="Left" Margin="0,12,0,8" Click="OnNewsMarkAll" />
                         <ContentControl x:Name="NewsListHost" />
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- 7c. IPTV: sve postavke IPTV-a na jednom mjestu (u GitHub inačici odmah ispod kartice Torlink). -->
+            <TabItem x:Name="IptvTab" Style="{StaticResource SettingsTab}" Tag="&#xE7F4;" Header="{loc:T iptv.title}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+                    <StackPanel Margin="28,20,28,24" MaxWidth="640" HorizontalAlignment="Left">
+                        <TextBlock Style="{StaticResource TabTitle}" Text="{loc:T iptv.title}" />
+                        <CheckBox x:Name="IptvEnableBox" Content="{loc:T iptv.enable}" Checked="OnIptvEnableChanged" Unchecked="OnIptvEnableChanged" />
+                        <TextBlock Style="{StaticResource HintText}" Text="{loc:T iptv.legal}" TextWrapping="Wrap" />
+                        <Button x:Name="IptvOpenButton" Style="{StaticResource SecondaryButton}" Content="{loc:T menu.iptv}" HorizontalAlignment="Left" Margin="0,8,0,0" Click="OnIptvOpen" />
+
+                        <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T iptv.set.sources}" Margin="0,24,0,2" />
+                        <StackPanel x:Name="IptvSourcesHost" />
+                        <TextBlock x:Name="IptvNoSourcesText" Style="{StaticResource HintText}" Text="{loc:T iptv.noSource}" TextWrapping="Wrap" />
+                        <TextBlock Style="{StaticResource HintText}" Text="{loc:T iptv.set.sourcesHint}" TextWrapping="Wrap" />
+
+                        <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T iptv.set.list}" Margin="0,24,0,2" />
+                        <TextBlock Text="{loc:T iptv.set.sort}" Margin="0,6,0,4" />
+                        <Button x:Name="IptvSortButton" Style="{StaticResource ChoiceButton}" MinWidth="240" Click="OnIptvSortClick" />
+                        <CheckBox x:Name="IptvCompactBox" Content="{loc:T iptv.compact}" Margin="0,12,0,0" Checked="OnIptvListChanged" Unchecked="OnIptvListChanged" />
+                        <CheckBox x:Name="IptvResumeBox" Content="{loc:T iptv.set.resume}" Margin="0,6,0,0" Checked="OnIptvListChanged" Unchecked="OnIptvListChanged" />
+
+                        <TextBlock Style="{StaticResource SectionHeader}" Text="{loc:T iptv.appearance}" Margin="0,24,0,2" />
+                        <TextBlock Text="{loc:T iptv.font}" Margin="0,6,0,4" />
+                        <Button x:Name="IptvFontButton" Style="{StaticResource ChoiceButton}" MinWidth="240" Click="OnIptvFontClick" />
+                        <TextBlock Text="{loc:T iptv.textSize}" Margin="0,12,0,4" />
+                        <Button x:Name="IptvSizeButton" Style="{StaticResource ChoiceButton}" MinWidth="240" Click="OnIptvSizeClick" />
+                        <TextBlock Text="{loc:T iptv.accentColor}" Margin="0,12,0,4" />
+                        <Button x:Name="IptvAccentButton" Style="{StaticResource ChoiceButton}" MinWidth="240" Click="OnIptvAccentClick" />
+                        <TextBlock Text="{loc:T iptv.backgroundColor}" Margin="0,12,0,4" />
+                        <Button x:Name="IptvBackgroundButton" Style="{StaticResource ChoiceButton}" MinWidth="240" Click="OnIptvBackgroundClick" />
+                        <Button Style="{StaticResource SecondaryButton}" Content="{loc:T iptv.resetAppearance}" HorizontalAlignment="Left" Margin="0,14,0,0" Click="OnIptvResetAppearance" />
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>

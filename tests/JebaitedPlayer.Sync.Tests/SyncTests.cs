@@ -318,6 +318,23 @@ public class SpeechTrackAndFftTests
     }
 
     [TestMethod]
+    public void Strict_speech_track_survives_save_and_load()
+    {
+        var (speech, _) = Film.Make(9, 3);
+        var (other, _) = Film.Make(9, 4);
+        SpeechTrack both = speech.WithStrict(other);
+        using var ms = new MemoryStream();
+        both.Save(ms);
+        ms.Position = 0;
+
+        SpeechTrack loaded = SpeechTrack.Load(ms);
+
+        Assert.IsTrue(speech.Frames.SequenceEqual(loaded.Frames));
+        Assert.IsNotNull(loaded.Strict);
+        Assert.IsTrue(other.Frames.SequenceEqual(loaded.Strict.Frames));
+    }
+
+    [TestMethod]
     public void Corrupted_speech_cache_is_rejected()
     {
         using var ms = new MemoryStream([1, 2, 3, 4, 5]);

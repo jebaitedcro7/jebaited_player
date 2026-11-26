@@ -140,7 +140,9 @@ Im selben Tab stellst du die automatische Suche, die Zeichenkodierung alter Unte
 - Kategorien (mit Flaggen und Symbolen) | Kanäle mit Logo, aktueller Sendung und Fortschrittsleiste, **★** für Favoriten; **Suche**, **Sortierung** (A–Z, Z–A, Original, eigene Reihenfolge: Rechtsklick auf einen Kanal → nach oben/unten), **Zuletzt gesehen**, Kanal oder ganze Kategorie ausblenden (Rechtsklick; ⋯ → *Ausgeblendete Sender anzeigen* holt sie zurück). Doppelklick oder Enter spielt einen Kanal im Hauptplayer ab; **F** oder Doppelklick auf das Bild ist Vollbild; ein Klick auf das Bild pausiert Live-TV nicht (nutze die Pause-Taste). **Stopp** im Player auf dem Startbildschirm beendet das TV und schließt das Panel.
 - Der Programmführer zeigt *Jetzt* und *Danach*, eine Zeitleiste pro Tag (XMLTV oder der eigene Führer des Dienstes) und sagt es, wenn es keine Daten gibt.
 - ⋯ → **Aussehen**: Schriftart, Textgröße, Hervorhebungsfarbe und Hintergrund nur für das IPTV-Panel. Ziehe den rechten Rand des Panels und die Trennlinie zwischen Kategorien und Kanälen auf die gewünschte Breite; sie wird gespeichert. ⋯ → Einstellungen exportieren/importieren (Favoriten, Reihenfolge, Ausgeblendetes – nie Passwörter).
-- Dein Passwort wird **verschlüsselt** (DPAPI) gespeichert und nie angezeigt, protokolliert oder exportiert. Bietet der Server nur einfaches **HTTP**, sind Anmeldung und Stream nicht verschlüsselt, und der Player warnt davor. Der Player bringt **keine Kanäle oder Playlists** mit: Nutze nur Dienste, die du nutzen darfst. Das Modul schaltest du unter **Einstellungen → Allgemein → IPTV** aus.
+- Dein Passwort wird **verschlüsselt** (DPAPI) gespeichert und nie angezeigt, protokolliert oder exportiert. Bietet der Server nur einfaches **HTTP**, sind Anmeldung und Stream nicht verschlüsselt, und der Player warnt davor. Der Player bringt **keine Kanäle oder Playlists** mit: Nutze nur Dienste, die du nutzen darfst. Das Modul schaltest du unter **Einstellungen → IPTV** aus; dort sind alle IPTV-Einstellungen in einem Tab: deine Verbindungen und die Standardverbindung, Standardsortierung, kompakte Zeilen, letzten Kanal fortsetzen sowie Schriftart, Textgröße und Farben. Änderungen gelten auch für ein geöffnetes IPTV-Panel.
+
+<p align="center"><img src="manual/images/de/iptv-settings.png" width="640" alt="Einstellungen, Tab IPTV"></p>
 
 ### Spotify
 
@@ -180,7 +182,7 @@ Einstellungen → Allgemein → **Sicherung und Übertragung**: Einstellungen un
 
 <p align="center"><img src="manual/images/de/settings.png" width="640" alt="Einstellungen, Tab Sprache"></p>
 
-Öffne die Einstellungen (Zahnrad auf dem Startbildschirm oder Rechtsklick → **Einstellungen…**) und den Tab **Sprache**. Auf English, Deutsch oder Hrvatski klicken; Bosanski, Srpski und Slovenščina stehen unter **Weitere Sprachen**. Der ganze Player wechselt sofort, auch offene Fenster, Menüs und Meldungen. Ein Neustart ist nicht nötig, und die Sprache bleibt nach dem Schließen, einem Neustart des Computers und einem Update erhalten.
+Öffne die Einstellungen (Zahnrad auf dem Startbildschirm oder Rechtsklick → **Einstellungen…**) und den Tab **Sprache**. Auf English, Deutsch oder Hrvatski klicken; Bosanski, Srpski, Slovenščina, Español, Français, Italiano, Português und Русский stehen unter **Weitere Sprachen**. Der ganze Player wechselt sofort, auch offene Fenster, Menüs und Meldungen. Ein Neustart ist nicht nötig, und die Sprache bleibt nach dem Schließen, einem Neustart des Computers und einem Update erhalten.
 
 ### Dunkles / helles Design
 
@@ -213,6 +215,8 @@ Die Einstellungen sind in Tabs aufgeteilt. Jede Änderung gilt sofort (auch für
 | Darstellung | Dunkles / helles Design, Akzentfarbe, Hintergrund des Startbildschirms (Standard oder eigenes Bild: Füllen, Einpassen, Zentriert), wie lange die Steuerung sichtbar bleibt, Oberfläche über die GPU darstellen, Uhrzeit, Datum und Wetter auf dem Startbildschirm (eine Stadt deiner Wahl, von Open-Meteo; Schriftart, Größe und Position jedes Elements, Vorschau und Wetterdetails wie gefühlte Temperatur, Min/Max, Regen, Wind, Luftfeuchtigkeit, UV, Sonnenauf- und -untergang, nächste Stunden und Tage) |
 | Tastenkürzel | Tasten für jede Aktion, bis zu zwei pro Aktion (siehe [Tastenkürzel](#tastenkürzel)) |
 | Benachrichtigungen | Neuigkeiten, Tipps und neue Versionen, mit Status gelesen / ungelesen / verworfen (siehe [Benachrichtigungen](#benachrichtigungen)) |
+| Torlink | Nur in der GitHub-Version (siehe [Torlink](#torlink-online-suchen-nur-github-version)) |
+| IPTV | Modul ein- oder ausschalten, Verbindungen und die Standardverbindung, Standardsortierung, kompakte Zeilen, letzten Kanal fortsetzen, Schriftart, Textgröße und Farben (siehe [IPTV](#iptv)) |
 | Updates | Version, jetzt prüfen, automatischer Download, Neuerungen, Update-Verlauf |
 | Info | Version, Lizenz, verwendete Technologien, Handbuch, Datenschutz, Richtlinie zur Code-Signierung, Fehlerberichte (ohne persönliche Daten auf deinem Computer gespeichert; du sendest sie selbst über GitHub) |
 
@@ -221,7 +225,7 @@ Die Einstellungen sind in Tabs aufgeteilt. Jede Änderung gilt sofort (auch für
 - Auf dem Startbildschirm zeigt eine kleine Karte Neuigkeiten zum Player, einen nützlichen Tipp oder eine neue Version. Sie sitzt über der Wiedergabeleiste, wenn etwas läuft (und verdeckt sie nie), und tief, direkt über der Versionsnummer, wenn nichts läuft; ein dünner Pfeil zeigt auf die Versionsnummer. Erscheint oder verschwindet die Wiedergabeleiste, bewegt sich die Karte sanft.
 - **Mehr lesen** (oder ein Klick auf die Karte) öffnet die Details; **✕** verwirft die Karte. Eine Karte wird höchstens dreimal angezeigt, und nachdem du reagiert hast, erscheinen in derselben Sitzung nur noch wichtige Hinweise und neue Versionen.
 - Die Taste **Benachrichtigungen** unten links auf dem Startbildschirm (mit der Zahl der ungelesenen) und **Einstellungen → Benachrichtigungen** listen alles auf, auch gelesene und verworfene. **Alle als gelesen markieren** setzt den Ungelesen-Status zurück.
-- Neuigkeiten und Tipps sind Teil des Players selbst (in allen sechs Sprachen); die einzige weitere Quelle ist die Update-Prüfung auf GitHub, die der Player ohnehin macht. Es wird nichts Neues ins Internet gesendet, der Status liegt in `notifications.json` neben deinen Einstellungen.
+- Neuigkeiten und Tipps sind Teil des Players selbst (in allen 11 Sprachen); die einzige weitere Quelle ist die Update-Prüfung auf GitHub, die der Player ohnehin macht. Es wird nichts Neues ins Internet gesendet, der Status liegt in `notifications.json` neben deinen Einstellungen.
 
 ### Update-Verlauf
 
@@ -260,7 +264,7 @@ Hat ein Video keine Untertitel in der ersten Sprache deiner Liste, sucht der Pla
 
 Öffnen mit CC → **Untertitel-Synchronisation…**. Oben steht die aktuelle Korrektur. Korrekturen werden pro Video und Untertiteldatei gespeichert; die Originaldatei wird nie verändert.
 
-1. **Automatisch nach Sprache (empfohlen).** Beim Laden externer Text-Untertitel vergleicht der Player sie mit der Sprache im Video und korrigiert Versatz, Geschwindigkeit (z. B. Untertitel für 25 fps bei einem 23,976-fps-Video) und Sprünge bei einem anderen Schnitt. Übernommen wird nur ein geprüftes Ergebnis. Untertitel einer anderen Folge oder eines anderen Films lösen eine Warnung aus. Erneut starten mit **A** oder **Synchronisieren (A)**. Eingebettete Untertitel sind bereits synchron und werden nicht geprüft.
+1. **Automatisch nach Sprache (empfohlen).** Beim Laden externer Text-Untertitel vergleicht der Player sie mit der Sprache im Video und korrigiert Versatz, Geschwindigkeit (z. B. Untertitel für 25 fps bei einem 23,976-fps-Video) und Sprünge bei einem anderen Schnitt. Übernommen wird nur ein geprüftes Ergebnis. Ist das Ergebnis nicht eindeutig, wird die Sprache noch einmal mit einem strengeren Sprachdetektor geprüft (er blendet mehr Musik und Geräusche aus) und das bessere Ergebnis behalten. Untertitel einer anderen Folge oder eines anderen Films lösen eine Warnung aus. Erneut starten mit **A** oder **Synchronisieren (A)**. Eingebettete Untertitel sind bereits synchron und werden nicht geprüft.
 2. **Versatz – alle Untertitel früher oder später.** **G** / **H** verschieben um 0,1 s (Shift: 1 s, Ctrl: 10 ms), oder die Schaltflächen nutzen, oder einen genauen Wert in Sekunden eingeben und Enter drücken. Minus = früher.
 3. **Untertitel nach und nach zu spät oder zu früh.** Wenn sie an der aktuellen Stelle stimmen, weiter hinten aber abweichen: Jeder Klick ändert 0,5 s pro 10 Minuten; die gerade sichtbare Zeile bleibt, wo sie ist.
 4. **Nach Zeile ausrichten (am genauesten).** Halte an, wenn eine Zeile beginnt, klicke auf **Zeilen um diese Stelle anzeigen**, wähle die Zeile und klicke auf **Diese Zeile beginnt jetzt**. Bei Bedarf weiter hinten im Video wiederholen: Aus mehreren Punkten berechnet der Player Versatz, Geschwindigkeit oder eine abschnittsweise Korrektur.
@@ -358,7 +362,7 @@ Die Microsoft-Store-Version speichert ihre Daten in `%LOCALAPPDATA%\Packages\jeb
 
 ### Übersetzungen
 
-Die Oberfläche gibt es auf English, Deutsch, Hrvatski, Bosanski, Srpski (latinica) und Slovenščina. Jede Sprache ist eine Datei in `src/JebaitedPlayer.Localization/Languages/`; eine neue Sprache ist eine Kopie von `en.json` mit der Übersetzung. Verbesserungen sind willkommen (Issue oder Pull Request).
+Die Oberfläche gibt es in 11 Sprachen: English, Deutsch, Hrvatski, Bosanski, Srpski (latinica), Slovenščina, Español, Français, Italiano, Português und Русский (die letzten fünf wurden ohne Prüfung durch Muttersprachler übersetzt; Verbesserungen sind willkommen). Jede Sprache ist eine Datei in `src/JebaitedPlayer.Localization/Languages/`; eine neue Sprache ist eine Kopie von `en.json` mit der Übersetzung. Verbesserungen sind willkommen (Issue oder Pull Request).
 
 ### Für Entwickler
 

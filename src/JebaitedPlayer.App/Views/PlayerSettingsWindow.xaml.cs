@@ -24,6 +24,7 @@ public enum SettingsTab
     Appearance,
     Shortcuts,
     Notifications,
+    Iptv,
     Updates,
     About,
 #if TORLINK
@@ -226,6 +227,7 @@ public partial class PlayerSettingsWindow : Window
         _subtitlesPanel.RefreshTexts();
         BuildShortcutRows();
         LoadAccent();
+        LoadIptv();
     }
 
     // --- 1. Općenito ---------------------------------------------------------------------------------------------

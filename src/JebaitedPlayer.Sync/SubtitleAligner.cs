@@ -190,6 +190,42 @@ public static class SubtitleAligner
 
     public static SyncResult Align(SpeechTrack speech, IReadOnlyList<Cue> rawCues, AlignOptions? options = null)
     {
+        SyncResult result = AlignCore(speech, rawCues, options);
+
+        // Čist rezultat (jedan pomak) ostaje. Inače ga provjerimo i strožim detektorom govora: usred glazbe i buke osnovni
+        // detektor vidi govor posvuda, pa mjesto skoka pomaka ostane neodređeno (primjer: S01E19, skok kasni 3 minute).
+        if (speech.Strict is { } strict && result.Verdict is not (SyncVerdict.InSync or SyncVerdict.Corrected))
+        {
+            SyncResult second = AlignCore(strict, rawCues, options);
+            if (IsBetter(second, result))
+            {
+                return second;
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>Upotrebljiv rezultat pobjeđuje neupotrebljiv; inače veći udio prozora koji se poklapaju, pa jači dokaz.</summary>
+    private static bool IsBetter(SyncResult candidate, SyncResult current)
+    {
+        if (candidate.IsUsable != current.IsUsable)
+        {
+            return candidate.IsUsable;
+        }
+
+        if (!candidate.IsUsable)
+        {
+            return false;
+        }
+
+        double a = candidate.Windows == 0 ? 0 : candidate.AgreeingWindows / (double)candidate.Windows;
+        double b = current.Windows == 0 ? 0 : current.AgreeingWindows / (double)current.Windows;
+        return Math.Abs(a - b) > 0.05 ? a > b : candidate.Evidence > current.Evidence;
+    }
+
+    private static SyncResult AlignCore(SpeechTrack speech, IReadOnlyList<Cue> rawCues, AlignOptions? options)
+    {
         options ??= new AlignOptions();
         List<Cue> cues = Normalize(rawCues);
         if (cues.Count < 15)

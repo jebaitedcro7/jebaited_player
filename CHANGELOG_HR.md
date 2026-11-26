@@ -4,6 +4,31 @@ Sve važnije promjene jebaited_playera. Oblik: [Keep a Changelog](https://keepac
 
 Drugi jezici: [English](CHANGELOG.md) · [Deutsch](CHANGELOG_DE.md). Ista povijest je i u playeru (klik na broj verzije na početnom ekranu). Ova datoteka nastaje iz `src/JebaitedPlayer.App/History/update-history.json`.
 
+## [2.4.17] - 2026-11-25
+
+Bolja automatska sinkronizacija titlova u glasnim scenama, nova kartica IPTV u postavkama i još pet jezika.
+
+### Novo
+
+- Još pet jezika sučelja: španjolski, francuski, talijanski, portugalski i ruski (ukupno 11). Odaberi ih u Postavke → Jezik, pod „Više jezika“.
+- Postavke → IPTV: sve postavke IPTV-a u jednoj kartici (uključen/isključen, veze i zadana veza, zadano sortiranje, zbijeni redovi, nastavak zadnjeg kanala, font, veličina teksta i boje). Promjene vrijede odmah i za otvoreni IPTV panel.
+
+### Poboljšano
+
+- Automatska sinkronizacija titlova: kad rezultat nije čist (titlovi za drugo izdanje), player govor provjeri i strožim detektorom govora te zadrži bolji rezultat. U scenama s glazbom i bukom mjesto na kojem se pomak mijenja tako je mnogo bliže stvarnom.
+- Popis komponenti drugih autora (THIRD_PARTY_NOTICES) sada je na engleskom.
+
+### Ispravljeno
+
+- Poruka o glasnoći na videu više ne prekriva gumb Home: sada se pojavljuje gore desno.
+- Titlovi za drugo izdanje u glasnim su scenama mogli preskočiti na sljedeći pomak i do oko tri minute prekasno (npr. 6 sekundi prerano oko 27. minute).
+
+### Poznati problemi
+
+- Gdje scena nema jasnog govora, pomak se na samom mjestu promjene još uvijek može razlikovati za sekundu-dvije. Novi prijevodi napisani su bez provjere izvornih govornika; ispravci su dobrodošli.
+
+Izdanje: [v2.4.17](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v2.4.17) · Promjene od [v2.4.16...v2.4.17](https://github.com/jebaitedcro7/jebaited_player/compare/v2.4.16...v2.4.17)
+
 ## [2.4.16] - 2026-11-24
 
 IPTV: gledaj svoju IPTV uslugu (Xtream ili M3U) u playeru, uz novu bočnu traku na početnom ekranu.

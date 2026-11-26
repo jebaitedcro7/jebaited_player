@@ -3,8 +3,8 @@
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Version>2.4.16</Version>
-    <InformationalVersion>2.4.16</InformationalVersion>
+    <Version>2.4.17</Version>
+    <InformationalVersion>2.4.17</InformationalVersion>
     <Product>jebaited_player</Product>
     <!-- Izdanja i nadogradnje (Velopack GitHubSource). -->
     <UpdateRepositoryUrl>https://github.com/jebaitedcro7/jebaited_player</UpdateRepositoryUrl>

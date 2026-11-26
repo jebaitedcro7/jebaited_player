@@ -8,19 +8,19 @@ namespace JebaitedPlayer.Views;
 /// <summary>IPTV: izgled sekcije (font, veličina teksta, boja isticanja i pozadina). Vrijedi samo za IPTV panel, ne za cijeli player.</summary>
 public partial class IptvPanel
 {
-    private static readonly string[] Fonts =
+    internal static readonly string[] Fonts =
         ["Segoe UI", "Segoe UI Variable Text", "Arial", "Verdana", "Tahoma", "Trebuchet MS", "Calibri", "Georgia", "Consolas"];
 
-    private static readonly (string Key, double Scale)[] Sizes =
+    internal static readonly (string Key, double Scale)[] Sizes =
         [("iptv.sizeSmall", 0.9), ("iptv.sizeNormal", 1.0), ("iptv.sizeLarge", 1.15), ("iptv.sizeXLarge", 1.3)];
 
-    private static readonly (string Key, string Hex)[] Accents =
+    internal static readonly (string Key, string Hex)[] Accents =
     [
         ("iptv.colorGreen", "#7BD88F"), ("iptv.colorBlue", "#5AA9FF"), ("iptv.colorPurple", "#B48CFF"), ("iptv.colorOrange", "#FFB05A"),
         ("iptv.colorRed", "#FF6B6B"), ("iptv.colorPink", "#FF8AC8"), ("iptv.colorTeal", "#4FD1C5"),
     ];
 
-    private static readonly (string Key, string Hex)[] Backgrounds =
+    internal static readonly (string Key, string Hex)[] Backgrounds =
     [
         ("iptv.bgBlack", "#000000"), ("iptv.bgGray", "#1E1E1E"), ("iptv.bgNavy", "#0F1B33"), ("iptv.bgForest", "#10241A"), ("iptv.bgLight", "#F3F3F3"),
     ];

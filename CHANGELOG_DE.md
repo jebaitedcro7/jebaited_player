@@ -4,6 +4,31 @@ Alle wichtigen Änderungen an jebaited_player. Format: [Keep a Changelog](https:
 
 Andere Sprachen: [English](CHANGELOG.md) · [Hrvatski](CHANGELOG_HR.md). Derselbe Verlauf ist im Player enthalten (Klick auf die Versionsnummer auf dem Startbildschirm). Diese Datei wird aus `src/JebaitedPlayer.App/History/update-history.json` erzeugt.
 
+## [2.4.17] - 2026-11-25
+
+Bessere automatische Untertitel-Synchronisierung bei lauten Szenen, ein neuer IPTV-Tab in den Einstellungen und fünf weitere Sprachen.
+
+### Neu
+
+- Fünf weitere Sprachen der Oberfläche: Spanisch, Französisch, Italienisch, Portugiesisch und Russisch (insgesamt 11). Wähle sie unter Einstellungen → Sprache bei „Weitere Sprachen“.
+- Einstellungen → IPTV: alle IPTV-Einstellungen in einem Tab (ein/aus, Verbindungen und die Standardverbindung, Standardsortierung, kompakte Zeilen, letzten Kanal fortsetzen, Schriftart, Textgröße und Farben). Änderungen gelten sofort auch für ein geöffnetes IPTV-Panel.
+
+### Verbessert
+
+- Automatische Untertitel-Synchronisierung: Ist das Ergebnis nicht eindeutig (Untertitel für eine andere Fassung), prüft der Player die Sprache zusätzlich mit einem strengeren Sprachdetektor und behält das bessere Ergebnis. In Szenen mit Musik und Lärm liegt die Stelle, an der sich der Versatz ändert, so deutlich näher an der tatsächlichen.
+- Die Liste der Komponenten anderer Autoren (THIRD_PARTY_NOTICES) ist jetzt auf Englisch.
+
+### Behoben
+
+- Die Lautstärkeanzeige im Video verdeckt den Home-Knopf nicht mehr: Sie erscheint jetzt oben rechts.
+- Untertitel für eine andere Fassung konnten in lauten Szenen bis zu etwa drei Minuten zu spät auf den nächsten Versatz springen (zum Beispiel 6 Sekunden zu früh um Minute 27).
+
+### Bekannte Probleme
+
+- Wo eine Szene keine klare Sprache hat, kann der Versatz genau an der Stelle der Änderung noch ein bis zwei Sekunden danebenliegen. Die neuen Übersetzungen wurden ohne Prüfung durch Muttersprachler geschrieben; Korrekturen sind willkommen.
+
+Release: [v2.4.17](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v2.4.17) · Änderungen seit [v2.4.16...v2.4.17](https://github.com/jebaitedcro7/jebaited_player/compare/v2.4.16...v2.4.17)
+
 ## [2.4.16] - 2026-11-24
 
 IPTV: Schau deinen eigenen IPTV-Dienst (Xtream oder M3U) im Player, dazu eine neue Seitenleiste auf dem Startbildschirm.

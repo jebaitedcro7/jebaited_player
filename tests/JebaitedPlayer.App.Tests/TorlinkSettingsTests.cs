@@ -89,9 +89,11 @@ public sealed class TorlinkSettingsTests
     public void SettingsTab_TorlinkIsLast_SoExistingIndicesDoNotChange()
     {
         Assert.AreEqual(0, (int)SettingsTab.General);
-        Assert.AreEqual(8, (int)SettingsTab.Updates, "Obavijesti su umetnute ispred Nadogradnji (2.3)");
-        Assert.AreEqual(9, (int)SettingsTab.About);
-        Assert.AreEqual(10, (int)SettingsTab.Torlink, "Torlink je i dalje zadnji u enumu; kartica se u prozoru umeće ispred Nadogradnji");
+        Assert.AreEqual(8, (int)SettingsTab.Iptv, "IPTV kartica je ispred Nadogradnji; u prozoru je odmah ispod Torlinka");
+        Assert.AreEqual(9, (int)SettingsTab.Updates);
+        Assert.AreEqual(10, (int)SettingsTab.About);
+        Assert.AreEqual(11, (int)SettingsTab.Torlink, "Torlink je i dalje zadnji u enumu; kartica se u prozoru umeće ispred IPTV-a");
+        Assert.IsNull(PlayerSettingsWindow.DefaultsKey(SettingsTab.Iptv), "IPTV postavke se spremaju odmah u iptv.json, nema zadanih vrijednosti kartice");
         Assert.IsNull(PlayerSettingsWindow.DefaultsKey(SettingsTab.Torlink), "kartica Torlink ima vlastiti gumb za vraćanje na zadano");
     }
 }

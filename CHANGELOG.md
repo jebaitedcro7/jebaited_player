@@ -4,6 +4,31 @@ All notable changes to jebaited_player. Format: [Keep a Changelog](https://keepa
 
 Other languages: [Deutsch](CHANGELOG_DE.md) · [Hrvatski](CHANGELOG_HR.md). The same history is included in the player (click the version number on the home screen). This file is generated from `src/JebaitedPlayer.App/History/update-history.json`.
 
+## [2.4.17] - 2026-11-25
+
+Better automatic subtitle sync in loud scenes, a new IPTV tab in Settings and five more languages.
+
+### Added
+
+- Five more interface languages: Spanish, French, Italian, Portuguese and Russian (11 in total). Choose one in Settings → Language, under “More languages”.
+- Settings → IPTV: all IPTV settings in one tab (on/off, connections and the default one, default sorting, compact rows, resume the last channel, font, text size and colors). Changes apply to an open IPTV panel right away.
+
+### Improved
+
+- Automatic subtitle sync: when the result is not clean (subtitles for a different release), the player also checks the speech with a stricter speech detector and keeps the better result. In scenes with music and noise this finds the point where the offset changes much closer to where it really is.
+- The list of third-party components (THIRD_PARTY_NOTICES) is now in English.
+
+### Fixed
+
+- The volume message on the video no longer covers the Home button: it now appears at the top right.
+- Subtitles for a different release could switch to the next offset up to about three minutes late in loud scenes (for example 6 seconds too early around minute 27).
+
+### Known issues
+
+- Where a scene has no clear speech, the offset can still be a second or two off right at the point where it changes. The new translations were written without review by native speakers; corrections are welcome.
+
+Release: [v2.4.17](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v2.4.17) · Changes since [v2.4.16...v2.4.17](https://github.com/jebaitedcro7/jebaited_player/compare/v2.4.16...v2.4.17)
+
 ## [2.4.16] - 2026-11-24
 
 IPTV: watch your own IPTV service (Xtream or M3U) inside the player, plus a new side bar on the home screen.

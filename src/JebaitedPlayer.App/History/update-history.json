@@ -40,6 +40,67 @@
   },
   "versions": [
     {
+      "version": "2.4.17",
+      "date": "2026-11-25",
+      "scope": "github",
+      "notes": {
+        "en": {
+          "summary": "Better automatic subtitle sync in loud scenes, a new IPTV tab in Settings and five more languages.",
+          "features": [
+            "Five more interface languages: Spanish, French, Italian, Portuguese and Russian (11 in total). Choose one in Settings → Language, under “More languages”.",
+            "Settings → IPTV: all IPTV settings in one tab (on/off, connections and the default one, default sorting, compact rows, resume the last channel, font, text size and colors). Changes apply to an open IPTV panel right away."
+          ],
+          "improvements": [
+            "Automatic subtitle sync: when the result is not clean (subtitles for a different release), the player also checks the speech with a stricter speech detector and keeps the better result. In scenes with music and noise this finds the point where the offset changes much closer to where it really is.",
+            "The list of third-party components (THIRD_PARTY_NOTICES) is now in English."
+          ],
+          "fixes": [
+            "The volume message on the video no longer covers the Home button: it now appears at the top right.",
+            "Subtitles for a different release could switch to the next offset up to about three minutes late in loud scenes (for example 6 seconds too early around minute 27)."
+          ],
+          "known": [
+            "Where a scene has no clear speech, the offset can still be a second or two off right at the point where it changes. The new translations were written without review by native speakers; corrections are welcome."
+          ]
+        },
+        "de": {
+          "summary": "Bessere automatische Untertitel-Synchronisierung bei lauten Szenen, ein neuer IPTV-Tab in den Einstellungen und fünf weitere Sprachen.",
+          "features": [
+            "Fünf weitere Sprachen der Oberfläche: Spanisch, Französisch, Italienisch, Portugiesisch und Russisch (insgesamt 11). Wähle sie unter Einstellungen → Sprache bei „Weitere Sprachen“.",
+            "Einstellungen → IPTV: alle IPTV-Einstellungen in einem Tab (ein/aus, Verbindungen und die Standardverbindung, Standardsortierung, kompakte Zeilen, letzten Kanal fortsetzen, Schriftart, Textgröße und Farben). Änderungen gelten sofort auch für ein geöffnetes IPTV-Panel."
+          ],
+          "improvements": [
+            "Automatische Untertitel-Synchronisierung: Ist das Ergebnis nicht eindeutig (Untertitel für eine andere Fassung), prüft der Player die Sprache zusätzlich mit einem strengeren Sprachdetektor und behält das bessere Ergebnis. In Szenen mit Musik und Lärm liegt die Stelle, an der sich der Versatz ändert, so deutlich näher an der tatsächlichen.",
+            "Die Liste der Komponenten anderer Autoren (THIRD_PARTY_NOTICES) ist jetzt auf Englisch."
+          ],
+          "fixes": [
+            "Die Lautstärkeanzeige im Video verdeckt den Home-Knopf nicht mehr: Sie erscheint jetzt oben rechts.",
+            "Untertitel für eine andere Fassung konnten in lauten Szenen bis zu etwa drei Minuten zu spät auf den nächsten Versatz springen (zum Beispiel 6 Sekunden zu früh um Minute 27)."
+          ],
+          "known": [
+            "Wo eine Szene keine klare Sprache hat, kann der Versatz genau an der Stelle der Änderung noch ein bis zwei Sekunden danebenliegen. Die neuen Übersetzungen wurden ohne Prüfung durch Muttersprachler geschrieben; Korrekturen sind willkommen."
+          ]
+        },
+        "hr": {
+          "summary": "Bolja automatska sinkronizacija titlova u glasnim scenama, nova kartica IPTV u postavkama i još pet jezika.",
+          "features": [
+            "Još pet jezika sučelja: španjolski, francuski, talijanski, portugalski i ruski (ukupno 11). Odaberi ih u Postavke → Jezik, pod „Više jezika“.",
+            "Postavke → IPTV: sve postavke IPTV-a u jednoj kartici (uključen/isključen, veze i zadana veza, zadano sortiranje, zbijeni redovi, nastavak zadnjeg kanala, font, veličina teksta i boje). Promjene vrijede odmah i za otvoreni IPTV panel."
+          ],
+          "improvements": [
+            "Automatska sinkronizacija titlova: kad rezultat nije čist (titlovi za drugo izdanje), player govor provjeri i strožim detektorom govora te zadrži bolji rezultat. U scenama s glazbom i bukom mjesto na kojem se pomak mijenja tako je mnogo bliže stvarnom.",
+            "Popis komponenti drugih autora (THIRD_PARTY_NOTICES) sada je na engleskom."
+          ],
+          "fixes": [
+            "Poruka o glasnoći na videu više ne prekriva gumb Home: sada se pojavljuje gore desno.",
+            "Titlovi za drugo izdanje u glasnim su scenama mogli preskočiti na sljedeći pomak i do oko tri minute prekasno (npr. 6 sekundi prerano oko 27. minute)."
+          ],
+          "known": [
+            "Gdje scena nema jasnog govora, pomak se na samom mjestu promjene još uvijek može razlikovati za sekundu-dvije. Novi prijevodi napisani su bez provjere izvornih govornika; ispravci su dobrodošli."
+          ]
+        }
+      }
+    },
+    {
       "version": "2.4.16",
       "date": "2026-11-24",
       "scope": "github",

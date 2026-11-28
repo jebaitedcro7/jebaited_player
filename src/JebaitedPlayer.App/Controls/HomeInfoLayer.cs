@@ -15,9 +15,46 @@ public sealed class HomeInfoLayer : Grid
     private readonly Dictionary<string, StackPanel> _anchors = [];
     private readonly StackPanel _weatherBlock = new();
     private double _scale = 1;
+    private double _userScale = 1;
+    private HomeInfoSettings? _style;
+    private bool _detailsHidden;
+
+    // Referentna veličina početnog ekrana: do nje su veličine iz postavki, manji prozor ih razmjerno smanjuje (2.4.18).
+    private const double ReferenceWidth = 1100, ReferenceHeight = 650, MinFit = 0.4;
+    private const double DetailsMinWidth = 520, DetailsMinHeight = 380;
+
+    /// <summary>Glavni prozor: veličine se prilagođavaju prozoru (pregled u postavkama ima vlastiti razmjer).</summary>
+    public bool AutoFit { get; set; }
+
+    private double FitScale() =>
+        ActualWidth > 0 && ActualHeight > 0
+            ? Math.Clamp(Math.Min(ActualWidth / ReferenceWidth, ActualHeight / ReferenceHeight), MinFit, 1)
+            : 1;
+
+    private bool TooSmallForDetails() => ActualWidth > 0 && ActualHeight > 0 && (ActualWidth < DetailsMinWidth || ActualHeight < DetailsMinHeight);
+
+    /// <summary>Trenutni razmjer (za provjeru).</summary>
+    public double CurrentScale => _scale;
+
+    /// <summary>Prikazuju li se dodatni redovi prognoze (za provjeru).</summary>
+    public bool DetailsShown => WeatherDetails.Visibility == Visibility.Visible;
+
+    private void OnSizeChangedFit()
+    {
+        if (!AutoFit || _style is null)
+        {
+            return;
+        }
+
+        if (Math.Abs(FitScale() * _userScale - _scale) > 0.01 || TooSmallForDetails() != _detailsHidden)
+        {
+            ApplyStyle(_style, _userScale);
+        }
+    }
 
     public HomeInfoLayer()
     {
+        SizeChanged += (_, _) => OnSizeChangedFit();
         IsHitTestVisible = false;
         TimeText = new TextBlock { FontWeight = FontWeights.Light };
         DateText = new TextBlock();
@@ -108,7 +145,7 @@ public sealed class HomeInfoLayer : Grid
             WeatherDetails.Children.Add(row);
         }
 
-        WeatherDetails.Visibility = _details.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+        WeatherDetails.Visibility = _details.Count > 0 && !_detailsHidden ? Visibility.Visible : Visibility.Collapsed;
     }
 
     /// <summary>Mjesto na kojem je pojedini element ("time", "date", "weather"). Za provjeru.</summary>
@@ -124,7 +161,11 @@ public sealed class HomeInfoLayer : Grid
     /// <summary>Font, veličina i mjesto svakog elementa iz postavki; <paramref name="scale"/> smanjuje sve za pregled u postavkama.</summary>
     public void ApplyStyle(HomeInfoSettings s, double scale = 1)
     {
+        _style = s;
+        _userScale = scale;
+        scale *= AutoFit ? FitScale() : 1;
         _scale = scale;
+        _detailsHidden = AutoFit && TooSmallForDetails();
         double timeSize = Size(s.TimeStyle, HomeInfoSettings.DefaultTimeSize);
         double dateSize = Size(s.DateStyle, HomeInfoSettings.DefaultDateSize);
         double weatherSize = Size(s.WeatherStyle, HomeInfoSettings.DefaultWeatherSize);

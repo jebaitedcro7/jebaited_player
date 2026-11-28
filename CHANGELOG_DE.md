@@ -4,6 +4,16 @@ Alle wichtigen Änderungen an jebaited_player. Format: [Keep a Changelog](https:
 
 Andere Sprachen: [English](CHANGELOG.md) · [Hrvatski](CHANGELOG_HR.md). Derselbe Verlauf ist im Player enthalten (Klick auf die Versionsnummer auf dem Startbildschirm). Diese Datei wird aus `src/JebaitedPlayer.App/History/update-history.json` erzeugt.
 
+## [2.4.18] - 2026-11-28
+
+Uhrzeit, Datum und Wetter auf dem Startbildschirm passen sich der Fenstergröße an.
+
+### Behoben
+
+- Wenn das Fenster verkleinert wurde, behielten Uhrzeit, Datum und Wetter auf dem Startbildschirm ihre Größe und verdeckten alles andere. Sie werden jetzt mit dem Fenster kleiner, und die zusätzlichen Wetterzeilen werden bei sehr kleinem Fenster ausgeblendet.
+
+Release: [v2.4.18](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v2.4.18) · Änderungen seit [v2.4.17...v2.4.18](https://github.com/jebaitedcro7/jebaited_player/compare/v2.4.17...v2.4.18)
+
 ## [2.4.17] - 2026-11-25
 
 Bessere automatische Untertitel-Synchronisierung bei lauten Szenen, ein neuer IPTV-Tab in den Einstellungen und fünf weitere Sprachen.

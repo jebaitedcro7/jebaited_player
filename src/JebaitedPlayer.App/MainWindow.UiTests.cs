@@ -48,6 +48,7 @@ public partial class MainWindow
                     "watchnext" => await WatchNextUiTestAsync(),
                     "spotify" => await SpotifyUiTestAsync(),
                     "homeinfo" => await HomeInfoUiTestAsync(),
+                    "homefit" => await HomeFitUiTestAsync(),
                     "reports" => await ReportsUiTestAsync(),
                     "youtube" => await YouTubeUiTestAsync(),
                     "discord" => await DiscordUiTestAsync(),

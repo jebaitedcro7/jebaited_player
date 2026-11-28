@@ -40,9 +40,32 @@
   },
   "versions": [
     {
+      "version": "2.4.18",
+      "date": "2026-11-28",
+      "notes": {
+        "en": {
+          "summary": "The time, date and weather on the home screen now adapt to the window size.",
+          "fixes": [
+            "When the window was made smaller, the time, date and weather on the home screen kept their size and covered everything else. They now shrink with the window, and the extra weather lines are hidden when the window is very small."
+          ]
+        },
+        "de": {
+          "summary": "Uhrzeit, Datum und Wetter auf dem Startbildschirm passen sich der Fenstergröße an.",
+          "fixes": [
+            "Wenn das Fenster verkleinert wurde, behielten Uhrzeit, Datum und Wetter auf dem Startbildschirm ihre Größe und verdeckten alles andere. Sie werden jetzt mit dem Fenster kleiner, und die zusätzlichen Wetterzeilen werden bei sehr kleinem Fenster ausgeblendet."
+          ]
+        },
+        "hr": {
+          "summary": "Vrijeme, datum i prognoza na početnom ekranu prilagođavaju se veličini prozora.",
+          "fixes": [
+            "Kad se prozor smanjio, vrijeme, datum i prognoza na početnom ekranu ostajali su iste veličine i prekrivali sve ostalo. Sada se smanjuju s prozorom, a dodatni redovi prognoze skrivaju se kad je prozor jako malen."
+          ]
+        }
+      }
+    },
+    {
       "version": "2.4.17",
       "date": "2026-11-25",
-      "scope": "github",
       "notes": {
         "en": {
           "summary": "Better automatic subtitle sync in loud scenes, a new IPTV tab in Settings and five more languages.",
@@ -103,7 +126,6 @@
     {
       "version": "2.4.16",
       "date": "2026-11-24",
-      "scope": "github",
       "notes": {
         "en": {
           "summary": "IPTV: watch your own IPTV service (Xtream or M3U) inside the player, plus a new side bar on the home screen.",

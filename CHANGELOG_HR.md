@@ -4,6 +4,16 @@ Sve važnije promjene jebaited_playera. Oblik: [Keep a Changelog](https://keepac
 
 Drugi jezici: [English](CHANGELOG.md) · [Deutsch](CHANGELOG_DE.md). Ista povijest je i u playeru (klik na broj verzije na početnom ekranu). Ova datoteka nastaje iz `src/JebaitedPlayer.App/History/update-history.json`.
 
+## [2.4.18] - 2026-11-28
+
+Vrijeme, datum i prognoza na početnom ekranu prilagođavaju se veličini prozora.
+
+### Ispravljeno
+
+- Kad se prozor smanjio, vrijeme, datum i prognoza na početnom ekranu ostajali su iste veličine i prekrivali sve ostalo. Sada se smanjuju s prozorom, a dodatni redovi prognoze skrivaju se kad je prozor jako malen.
+
+Izdanje: [v2.4.18](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v2.4.18) · Promjene od [v2.4.17...v2.4.18](https://github.com/jebaitedcro7/jebaited_player/compare/v2.4.17...v2.4.18)
+
 ## [2.4.17] - 2026-11-25
 
 Bolja automatska sinkronizacija titlova u glasnim scenama, nova kartica IPTV u postavkama i još pet jezika.

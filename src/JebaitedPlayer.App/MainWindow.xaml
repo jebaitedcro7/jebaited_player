@@ -56,7 +56,7 @@
                         IsHitTestVisible="False" />
 
                 <!-- N3 (ciklus 6): vrijeme, datum i prognoza gore lijevo (nenametljivo, ne prima klikove). -->
-                <controls:HomeInfoLayer x:Name="HomeLayer" Panel.ZIndex="1"  />
+                <controls:HomeInfoLayer x:Name="HomeLayer" Panel.ZIndex="1" AutoFit="True" />
 
                 <!-- Bočna traka (dizajn A): otvaranje datoteke i mape, pretraga titlova, IPTV, radio. Jedino mjesto tih radnji na početnom ekranu. -->
                 <Grid x:Name="HomeRail" Grid.Row="0" Grid.RowSpan="2" Width="56" ClipToBounds="True" HorizontalAlignment="Left" Panel.ZIndex="3">

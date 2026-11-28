@@ -42,7 +42,7 @@ $skip = $false
 foreach ($line in (Get-Content $notices -Encoding UTF8)) {
     if ($line -match '^## ') { $skip = ($line -match '^## Torlink') }
     if ($skip) { continue }
-    if ($line -match '^\| (Torlink|Node\.js \(u Torlink|webtorrent i ostali)') { continue }
+    if ($line -match '^\| (Torlink|Node\.js \((u|in the) Torlink|webtorrent (i ostali|and the other))') { continue }
     $kept.Add($line)
 }
 [IO.File]::WriteAllText($notices, (($kept -join "`n") + "`n"), (New-Object Text.UTF8Encoding $false))

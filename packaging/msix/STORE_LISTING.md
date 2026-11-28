@@ -22,7 +22,7 @@ jebaited_player is a desktop (WPF/.NET) video player packaged as MSIX. runFullTr
 
 **Notes for certification:**
 ```text
-No account or sign-in is needed to play video. To test: open any video file (Open file on the main screen, or drag a file into the window). Subtitle search on the internet is optional: it uses the user's own free account or API key for a subtitle source (OpenSubtitles.com, SubDL.com or Titlovi.com), set up via right-click → Subtitles → Set up subtitles from the internet. Without it, local subtitle files and embedded subtitles work normally.
+No account or sign-in is needed to play video. To test: open any video file (Open file on the main screen, or drag a file into the window). Subtitle search on the internet is optional: it uses the user's own free account or API key for a subtitle source (OpenSubtitles.com, SubDL.com or Titlovi.com), set up via right-click → Subtitles → Set up subtitles from the internet. Without it, local subtitle files and embedded subtitles work normally. IPTV is optional and shows nothing until the user adds their own connection (Xtream Codes or an M3U/M3U8 link or file) on the main screen side bar or in Settings → IPTV; the app contains no channels, playlists or stream addresses, so there is nothing to test without a service of your own.
 ```
 
 ---
@@ -36,6 +36,8 @@ jebaited_player is a lightweight, free video player for Windows that takes care 
 It finds subtitles on the internet (with your free OpenSubtitles.com, SubDL.com or Titlovi.com account), checks that they really belong to the video you are watching and synchronizes them to the speech, so the text appears when the words are spoken, even when the subtitle file was made for a different release.
 
 Everything else stays simple: continue watching where you stopped, open a whole series as a playlist with the next episode ready, keep favorite movies and series on the main screen, switch audio tracks and subtitle styles, and choose a dark or light look. The player opens all common video and audio formats.
+
+If you already have your own IPTV service (Xtream Codes or an M3U/M3U8 playlist), you can add it and watch live channels next to your video. The player brings no channels or playlists of its own.
 
 There are no ads and no account. Settings and watch history stay on your computer.
 
@@ -51,6 +53,7 @@ Series as a playlist, with the next episode ready
 Favorite movies and series on the main screen
 Audio track, audio delay and volume levelling for quiet dialogue
 Subtitle style, encoding and timing settings
+Watch your own IPTV service (Xtream or M3U) next to the video; no channels are included
 Opens all common video and audio formats
 Dark and light mode, interface in several languages
 No ads, no account; settings and history stay on your PC
@@ -75,6 +78,8 @@ Er findet Untertitel im Internet (mit Ihrem kostenlosen Konto bei OpenSubtitles.
 
 Alles andere bleibt einfach: dort weiterschauen, wo Sie aufgehört haben, eine ganze Serie als Wiedergabeliste mit der nächsten Folge öffnen, Lieblingsfilme und -serien auf dem Startbildschirm, Tonspuren und Untertitelstil wechseln, dunkles oder helles Design. Der Player öffnet alle gängigen Video- und Audioformate.
 
+Wenn Sie bereits einen eigenen IPTV-Dienst haben (Xtream Codes oder eine M3U/M3U8-Playlist), können Sie ihn hinzufügen und Live-Kanäle neben dem Video ansehen. Der Player bringt keine eigenen Kanäle oder Playlists mit.
+
 Keine Werbung, kein Konto. Einstellungen und Wiedergabeverlauf bleiben auf Ihrem Computer.
 
 Kostenlos und quelloffen (GPL-3.0): https://github.com/jebaitedcro7/jebaited_player
@@ -89,6 +94,7 @@ Serien als Wiedergabeliste, die nächste Folge ist bereit
 Lieblingsfilme und -serien auf dem Startbildschirm
 Tonspur, Audioverzögerung und Lautstärkeausgleich für leise Dialoge
 Einstellungen für Untertitelstil, Kodierung und Timing
+Eigenen IPTV-Dienst (Xtream oder M3U) neben dem Video ansehen; keine Kanäle enthalten
 Öffnet alle gängigen Video- und Audioformate
 Dunkles und helles Design, Oberfläche in mehreren Sprachen
 Keine Werbung, kein Konto; Einstellungen und Verlauf bleiben auf Ihrem PC
@@ -113,6 +119,8 @@ Pronalazi titlove na internetu (uz vaš besplatni račun na OpenSubtitles.com, S
 
 Sve ostalo ostaje jednostavno: nastavak gledanja ondje gdje ste stali, cijela serija kao popis s idućom epizodom spremnom, omiljeni filmovi i serije na početnom zaslonu, promjena audio zapisa i izgleda titlova te tamni ili svijetli izgled. Player otvara sve uobičajene video i audio formate.
 
+Ako već imate vlastitu IPTV uslugu (Xtream Codes ili M3U/M3U8 popis), možete je dodati i gledati kanale uživo uz video. Player ne donosi vlastite kanale ni popise.
+
 Bez reklama i bez računa. Postavke i povijest gledanja ostaju na vašem računalu.
 
 Besplatan i otvorenog koda (GPL-3.0): https://github.com/jebaitedcro7/jebaited_player
@@ -127,6 +135,7 @@ Serije kao popis, iduća epizoda je spremna
 Omiljeni filmovi i serije na početnom zaslonu
 Audio zapis, kašnjenje zvuka i izjednačavanje glasnoće za tihe dijaloge
 Postavke izgleda, kodiranja i vremena titlova
+Gledajte vlastitu IPTV uslugu (Xtream ili M3U) uz video; kanali nisu uključeni
 Otvara sve uobičajene video i audio formate
 Tamni i svijetli izgled, sučelje na više jezika
 Bez reklama i računa; postavke i povijest ostaju na vašem računalu

@@ -4,6 +4,16 @@ All notable changes to jebaited_player. Format: [Keep a Changelog](https://keepa
 
 Other languages: [Deutsch](CHANGELOG_DE.md) · [Hrvatski](CHANGELOG_HR.md). The same history is included in the player (click the version number on the home screen). This file is generated from `src/JebaitedPlayer.App/History/update-history.json`.
 
+## [2.4.18] - 2026-11-28
+
+The time, date and weather on the home screen now adapt to the window size.
+
+### Fixed
+
+- When the window was made smaller, the time, date and weather on the home screen kept their size and covered everything else. They now shrink with the window, and the extra weather lines are hidden when the window is very small.
+
+Release: [v2.4.18](https://github.com/jebaitedcro7/jebaited_player/releases/tag/v2.4.18) · Changes since [v2.4.17...v2.4.18](https://github.com/jebaitedcro7/jebaited_player/compare/v2.4.17...v2.4.18)
+
 ## [2.4.17] - 2026-11-25
 
 Better automatic subtitle sync in loud scenes, a new IPTV tab in Settings and five more languages.
